@@ -10,6 +10,33 @@ A way to learn via "alist". Made by you, another human or something else.
 It will be a service, which will consume the Learnalist API. Hosted via learnalist.net or privately.
 
 
+# Getting Started
+
+Grab the repo.
+```
+git clone https://github.com/freshteapot/learnalist.git
+cd learnalist/api
+go get .
+go run api/main.go --port=1234 --database=/tmp/api.db
+```
+Your server should now be running on port 1234 with the database created at /tmp/api.db
+
+```
+curl -i http://localhost:1234
+```
+
+Should produce something like
+```
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 24 Sep 2016 14:24:46 GMT
+Content-Length: 31
+
+{"message":"1, 2, 3. Lets go!"}
+```
+
+
+
 # Api
 
 | Method | Uri | Description |
@@ -19,3 +46,12 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 | PUT | /alist/{uuid} | Update all fields allowed to a list. |
 | GET | /alist/{uuid} | Get a list via uuid. |
 | GET | /alist/by/{uuid} | Get lists by {uuid}. Allow for both public, private lists. |
+
+
+
+# References as this becomes more useful.
+
+* https://echo.labstack.com/
+* https://github.com/thewhitetulip/web-dev-golang-anti-textbook
+* https://gobyexample.com/command-line-flags
+* https://developer.github.com/v3/

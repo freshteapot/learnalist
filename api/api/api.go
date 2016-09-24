@@ -2,13 +2,21 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/freshteapot/learnalist/api/api/models"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
 	uuid "github.com/satori/go.uuid"
 )
+
+// Env exposing the data abstraction layer
+type Env struct {
+	db     models.Datastore
+	userID string
+}
 
 type (
 	responseMessage struct {
@@ -35,13 +43,19 @@ func SetDomain(_domain string) {
 func getUUID() string {
 	// @todo is this good enough?
 	var secret = uuid.NewV4()
-	fmt.Println(domain)
 	u := uuid.NewV5(secret, domain)
 	return u.String()
 }
 
 // Run This starts the api listening on the port supplied
-func Run(port int) {
+func Run(port int, database string) {
+	db, err := models.NewDB(database)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	env := &Env{db, "me"}
+
 	// Echo instance
 	e := echo.New()
 	// Gives pretty formatting
@@ -72,7 +86,10 @@ func Run(port int) {
 	})
 
 	e.POST("/alist", func(c echo.Context) error {
-		message := fmt.Sprintf("I want to upload alist with uuid: %s", getUUID())
+		uuid := getUUID()
+		fmt.Println(uuid)
+		fmt.Println(len(uuid))
+		message := fmt.Sprintf("I want to upload alist with uuid: %s", uuid)
 		response := &responseMessage{
 			Message: message,
 		}
@@ -99,20 +116,26 @@ func Run(port int) {
 
 	e.GET("/alist/:uuid", func(c echo.Context) error {
 		uuid := c.Param("uuid")
-		message := fmt.Sprintf("I want alist %s", uuid)
-		response := &responseMessage{
-			Message: message,
+		alist, err := env.db.GetAlist(uuid)
+		if err != nil {
+			message := fmt.Sprintf("Failed to find alist with uuid: %s", uuid)
+			response := new(responseMessage)
+			response.Message = message
+			return c.JSON(http.StatusBadRequest, *response)
 		}
-		return c.JSON(http.StatusOK, response)
+		return c.JSON(http.StatusOK, *alist)
 	})
 
 	e.GET("/alist/by/:uuid", func(c echo.Context) error {
 		uuid := c.Param("uuid")
-		message := fmt.Sprintf("I want all lists by %s", uuid)
-		response := &responseMessage{
-			Message: message,
+		alists, err := env.db.GetListsBy(uuid)
+		if err != nil {
+			message := fmt.Sprintf("Failed to find all lists.")
+			response := new(responseMessage)
+			response.Message = message
+			return c.JSON(http.StatusBadRequest, *response)
 		}
-		return c.JSON(http.StatusOK, response)
+		return c.JSON(http.StatusOK, alists)
 	})
 
 	// Start server

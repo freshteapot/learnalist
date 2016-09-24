@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	database := flag.String("database", "/tmp/api.db", "The database.")
 	domain := flag.String("domain", "learnalist.net", "The domain.")
 	basicAuth := flag.String("basicAuth", "", "Single user with basic auth username:password.")
 	port := flag.Int("port", 80, "Port to listen on.")
@@ -17,5 +18,5 @@ func main() {
 		api.UseBasicAuth(*basicAuth)
 	}
 
-	api.Run(*port)
+	api.Run(*port, *database)
 }
