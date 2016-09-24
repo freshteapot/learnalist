@@ -35,6 +35,16 @@ Content-Length: 31
 {"message":"1, 2, 3. Lets go!"}
 ```
 
+When the database is created, two types of lists are added.
+You can query all (not quite right yet as it should be linked to an uuid):
+```
+curl http://localhost:1234/alist/by/me
+```
+Or an individual list.
+```
+curl http://localhost:1234/alist/efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9
+```
+
 
 
 # Api
@@ -55,3 +65,5 @@ Content-Length: 31
 * https://github.com/thewhitetulip/web-dev-golang-anti-textbook
 * https://gobyexample.com/command-line-flags
 * https://developer.github.com/v3/
+* [Example that helped understand Unmarshall and Marshall 1](http://mattyjwilliams.blogspot.no/2013/01/using-go-to-unmarshal-json-lists-with.html)
+* [Example that helped understand Unmarshall and Marshall 2](https://gist.github.com/mdwhatcott/8dd2eef0042f7f1c0cd8)
