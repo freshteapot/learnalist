@@ -1,12 +1,14 @@
-Learnalist - Education by one list at a time.
+# Learnalist - Education by one list at a time.
 
 # Today
-[vaporware](https://en.wikipedia.org/wiki/Vaporware), check [status.json](./status.json) for random updates.
+[Vaporware](https://en.wikipedia.org/wiki/Vaporware).
+Check [status.json](./status.json) for current status. (Not very useful, yet...)
 
 # Tomorrow
 
 A way to learn via "alist". Made by you, another human or something else.
 It will be a service, which will consume the Learnalist API. Hosted via learnalist.net or privately.
+
 
 # Api
 
