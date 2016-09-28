@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/freshteapot/learnalist/api/api/models"
 	"github.com/labstack/echo"
@@ -77,66 +76,13 @@ func Run(port int, database string) {
 	e.Use(middleware.Recover())
 
 	// Route => handler
-	e.GET("/", func(c echo.Context) error {
-		message := "1, 2, 3. Lets go!"
-		response := &responseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusOK, response)
-	})
+	e.GET("/", env.GetRoot)
+	e.GET("/alist/:uuid", env.GetListByUUID)
+	e.GET("/alist/by/:uuid", env.GetListsBy)
 
-	e.POST("/alist", func(c echo.Context) error {
-		uuid := getUUID()
-		fmt.Println(uuid)
-		fmt.Println(len(uuid))
-		message := fmt.Sprintf("I want to upload alist with uuid: %s", uuid)
-		response := &responseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusOK, response)
-	})
-
-	e.PUT("/alist/:uuid", func(c echo.Context) error {
-		uuid := c.Param("uuid")
-		message := fmt.Sprintf("I want to alter alist with uuid: %s", uuid)
-		response := &responseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusOK, response)
-	})
-
-	e.PATCH("/alist/:uuid", func(c echo.Context) error {
-		uuid := c.Param("uuid")
-		message := fmt.Sprintf("I want to alter alist with uuid: %s", uuid)
-		response := &responseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusOK, response)
-	})
-
-	e.GET("/alist/:uuid", func(c echo.Context) error {
-		uuid := c.Param("uuid")
-		alist, err := env.db.GetAlist(uuid)
-		if err != nil {
-			message := fmt.Sprintf("Failed to find alist with uuid: %s", uuid)
-			response := new(responseMessage)
-			response.Message = message
-			return c.JSON(http.StatusBadRequest, *response)
-		}
-		return c.JSON(http.StatusOK, *alist)
-	})
-
-	e.GET("/alist/by/:uuid", func(c echo.Context) error {
-		uuid := c.Param("uuid")
-		alists, err := env.db.GetListsBy(uuid)
-		if err != nil {
-			message := fmt.Sprintf("Failed to find all lists.")
-			response := new(responseMessage)
-			response.Message = message
-			return c.JSON(http.StatusBadRequest, *response)
-		}
-		return c.JSON(http.StatusOK, alists)
-	})
+	e.POST("/alist", env.PostAlist)
+	e.PUT("/alist/:uuid", env.PutAlist)
+	e.PATCH("/alist/:uuid", env.PatchAlist)
 
 	// Start server
 	listenOn := fmt.Sprintf(":%d", port)
