@@ -16,12 +16,12 @@ type Datastore interface {
 }
 
 // DB allowing us to build an abstraction layer
-type DB struct {
-	*sql.DB
+type DAL struct {
+	Db *sql.DB
 }
 
 // NewDB load up the database
-func NewDB(dataSourceName string) (*DB, error) {
+func NewDB(dataSourceName string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,9 @@ func NewDB(dataSourceName string) (*DB, error) {
 		return nil, err
 	}
 
-	dbRef := &DB{db}
+	dbRef := &DAL{
+		Db: db,
+	}
 	dbRef.CreateDBStructure()
-	return dbRef, nil
+	return dbRef.Db, nil
 }

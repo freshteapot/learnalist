@@ -18,5 +18,10 @@ func main() {
 		api.UseBasicAuth(*basicAuth)
 	}
 
-	api.Run(*port, *database)
+	env := api.Env{
+		Port:         *port,
+		DatabaseName: *database,
+		UserID:       "me",
+	}
+	api.Run(env)
 }

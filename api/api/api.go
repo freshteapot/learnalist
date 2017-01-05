@@ -6,22 +6,18 @@ import (
 
 	"github.com/freshteapot/learnalist/api/api/models"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
 	uuid "github.com/satori/go.uuid"
 )
 
 // Env exposing the data abstraction layer
 type Env struct {
-	db     models.Datastore
-	userID string
+	Datastore    models.Datastore
+	UserID       string
+	Port         int
+	DatabaseName string
+	Dal          models.DAL
 }
-
-type (
-	responseMessage struct {
-		Message string `json:"message"`
-	}
-)
 
 var basicAuth = ""
 
@@ -47,13 +43,15 @@ func getUUID() string {
 }
 
 // Run This starts the api listening on the port supplied
-func Run(port int, database string) {
-	db, err := models.NewDB(database)
+func Run(env Env) {
+	db, err := models.NewDB(env.DatabaseName)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	env := &Env{db, "me"}
+	env.Datastore = &models.DAL{
+		Db: db,
+	}
 
 	// Echo instance
 	e := echo.New()
@@ -72,6 +70,7 @@ func Run(port int, database string) {
 	}
 
 	// Middleware
+	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -85,6 +84,6 @@ func Run(port int, database string) {
 	e.PATCH("/alist/:uuid", env.PatchAlist)
 
 	// Start server
-	listenOn := fmt.Sprintf(":%d", port)
-	e.Run(standard.New(listenOn))
+	listenOn := fmt.Sprintf(":%d", env.Port)
+	e.Logger.Fatal(e.Start(listenOn))
 }

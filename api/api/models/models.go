@@ -24,16 +24,20 @@ type AlistTypeV1 []string
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
-	Title    string
-	listType string
+	Title    string `json:"title"`
+	ListType string `json:"type"`
+}
+
+type InputAlist struct {
+	*Alist
 }
 
 // Alist the outer wrapping of a list.
 type Alist struct {
-	uuid     string
-	listType string
-	info     AlistInfo
-	data     interface{}
+	Uuid     string `json:"uuid"`
+	ListType string
+	Info     AlistInfo   `json:"info"`
+	Data     interface{} `json:"data"`
 }
 
 // UnmarshalJSON convert list type v2 from json
@@ -71,23 +75,23 @@ func (data AlistItemTypeV2) MarshalJSON() ([]byte, error) {
 func (a AlistInfo) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"title": a.Title,
-		"type":  a.listType,
+		"type":  a.ListType,
 	})
 }
 
 // MarshalJSON convert alist into json
 func (a Alist) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"uuid": a.uuid,
-		"info": a.info,
-		"data": a.data,
+		"uuid": a.Uuid,
+		"info": a.Info,
+		"data": a.Data,
 	})
 }
 
 // GetListsBy Get all alists by uuid
-func (db *DB) GetListsBy(uuid string) ([]*Alist, error) {
+func (dal *DAL) GetListsBy(uuid string) ([]*Alist, error) {
 	// @todo use userid and not return all lists.
-	rows, err := db.Query("SELECT uuid FROM alist")
+	rows, err := dal.Db.Query("SELECT uuid FROM alist")
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +106,7 @@ func (db *DB) GetListsBy(uuid string) ([]*Alist, error) {
 			return nil, err
 		}
 		var item *Alist
-		item, err = db.GetAlist(uuid)
+		item, err = dal.GetAlist(uuid)
 		if err != nil {
 			return nil, err
 		}
@@ -115,60 +119,61 @@ func (db *DB) GetListsBy(uuid string) ([]*Alist, error) {
 }
 
 // GetAlist Get alist
-func (db *DB) GetAlist(uuid string) (*Alist, error) {
-	stmt, err := db.Prepare("select uuid, list_type as listType, info, data from alist where uuid = ?")
+func (dal *DAL) GetAlist(uuid string) (*Alist, error) {
+	stmt, err := dal.Db.Prepare("select uuid, list_type as listType, info, data from alist where uuid = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
+	fmt.Println("After")
 	var sInfo string
 	var sData string
 	info := new(AlistInfo)
 	item := new(Alist)
-	err = stmt.QueryRow(uuid).Scan(&item.uuid, &item.listType, &sInfo, &sData)
+	err = stmt.QueryRow(uuid).Scan(&item.Uuid, &item.ListType, &sInfo, &sData)
 	if err != nil {
 		return nil, err
 	}
 	json.Unmarshal([]byte(sInfo), &info)
 
 	//Could maybe use this if I want to get fancy
-	if item.listType == "v1" {
+	if item.ListType == "v1" {
 		dataV1 := new(AlistTypeV1)
 		json.Unmarshal([]byte(sData), &dataV1)
-		item.data = *dataV1
-	} else if item.listType == "v2" {
+		item.Data = *dataV1
+	} else if item.ListType == "v2" {
 		fmt.Println(sData)
 		dataV2 := new(AlistTypeV2)
 		json.Unmarshal([]byte(sData), &dataV2)
-		item.data = *dataV2
+		item.Data = *dataV2
 	} else {
-		json.Unmarshal([]byte(sData), &item.data)
+		json.Unmarshal([]byte(sData), &item.Data)
 	}
 
-	info.listType = item.listType
-	item.info = *info
+	info.ListType = item.ListType
+	item.Info = *info
 
 	return item, nil
 }
 
 // @todo
 // PostAlist Process user data and store as new in the db.
-func (db *DB) PostAlist(interface{}) (*Alist, error) {
+func (dal *DAL) PostAlist(interface{}) (*Alist, error) {
 	uuid := "123"
-	return db.GetAlist(uuid)
+	return dal.GetAlist(uuid)
 }
 
 // @todo
 // UpdateAlist Process user data and store in db as an update.
-func (db *DB) UpdateAlist(interface{}) (*Alist, error) {
+func (dal *DAL) UpdateAlist(interface{}) (*Alist, error) {
 	uuid := "123"
-	return db.GetAlist(uuid)
+	return dal.GetAlist(uuid)
 }
 
 // CreateDBStructure Create the database tables
-func (db *DB) CreateDBStructure() {
+func (dal *DAL) CreateDBStructure() {
 	query := "create table alist (uuid CHARACTER(36)  not null primary key, list_type CHARACTER(3), info text, data text);"
-	_, err := db.Exec(query)
+	_, err := dal.Db.Exec(query)
 	if err != nil {
 		// table alist already exists
 		return
@@ -178,5 +183,5 @@ func (db *DB) CreateDBStructure() {
 INSERT INTO alist values ('230bf9f8-592b-55c1-8f72-9ea32fbdcdc4', 'v1', '{"title":"I am a list"}', '["a","b"]');
 INSERT INTO alist values ('efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9', 'v2', '{"title":"I am a list with items"}', '{"car":"bil", "water": "vann"}');
 `
-	db.Exec(query)
+	dal.Db.Exec(query)
 }

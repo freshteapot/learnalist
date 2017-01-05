@@ -7,6 +7,12 @@ import (
 	"github.com/labstack/echo"
 )
 
+type (
+	responseMessage struct {
+		Message string `json:"message"`
+	}
+)
+
 func (env *Env) GetRoot(c echo.Context) error {
 	message := "1, 2, 3. Lets go!"
 	response := &responseMessage{
@@ -16,9 +22,9 @@ func (env *Env) GetRoot(c echo.Context) error {
 }
 
 func (env *Env) GetListsBy(c echo.Context) error {
-	fmt.Println(domain)
 	uuid := c.Param("uuid")
-	alists, err := env.db.GetListsBy(uuid)
+	alists, err := env.Datastore.GetListsBy(uuid)
+	fmt.Println("here2")
 	if err != nil {
 		message := fmt.Sprintf("Failed to find all lists.")
 		response := new(responseMessage)
@@ -30,7 +36,7 @@ func (env *Env) GetListsBy(c echo.Context) error {
 
 func (env *Env) GetListByUUID(c echo.Context) error {
 	uuid := c.Param("uuid")
-	alist, err := env.db.GetAlist(uuid)
+	alist, err := env.Datastore.GetAlist(uuid)
 	if err != nil {
 		message := fmt.Sprintf("Failed to find alist with uuid: %s", uuid)
 		response := new(responseMessage)
