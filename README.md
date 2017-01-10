@@ -1,5 +1,7 @@
 # Learnalist - Education by one list at a time.
 
+# Far from production ready
+
 # Today
 [Vaporware](https://en.wikipedia.org/wiki/Vaporware).
 Check [status.json](./status.json) for current status. (Not very useful, yet...)
@@ -17,7 +19,7 @@ Grab the repo.
 git clone https://github.com/freshteapot/learnalist.git
 cd learnalist/api
 go get .
-go run api/main.go --port=1234 --database=/tmp/api.db
+go run cmd/api/main.go --port=1234 --database=/tmp/api.db
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 
@@ -35,47 +37,62 @@ Content-Length: 31
 {"message":"1, 2, 3. Lets go!"}
 ```
 
-When the database is created, two types of lists are added.
-You can query all (not quite right yet as it should be linked to an uuid):
+## Play along.
+When the database is created, it is empty.
+
+### Add a list of type v1.
+
+```
+curl -XPOST http://localhost:1234/alist -d'
+{
+    "data": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1"
+    }
+}
+'
+```
+
+### Get all lists created by you.
 ```
 curl http://localhost:1234/alist/by/me
 ```
-Or an individual list.
-```
-curl http://localhost:1234/alist/efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9
-```
 
-## List types
-
-### V1
+### Add a list of type v2.
 
 ```
-curl -XPOST http://localhost:1234/alist/ -d'
-{
-        "data": [
-            "a",
-            "b"
-        ],
-        "info": {
-            "title": "I am a list",
-            "type": "v1"
-        },
-        "uuid": "230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"
-    }
-'
-```
+curl -XPOST http://localhost:1234/alist -d'
 {
     "data": {
         "car": "bil",
         "water": "vann"
     },
     "info": {
-        "title": "I am a list with items",
+        "title": "A few words from English to Norwegian.",
         "type": "v2"
-    },
-    "uuid": "efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9"
+    }
 }
+'
+```
 
+Again, query all the lists by you.
+```
+curl http://localhost:1234/alist/by/me
+```
+
+Or an individual list.
+```
+curl http://localhost:1234/alist/{uuid}
+```
 
 # Api
 
@@ -88,6 +105,43 @@ curl -XPOST http://localhost:1234/alist/ -d'
 | GET | /alist/by/{uuid} | Get lists by {uuid}. Allow for both public, private lists. |
 
 
+
+# List types
+
+| Type | Description |
+| --- | --- |
+| v1 | An array of a string.|
+| v2 | An array of key:value objects.|
+
+### V1
+
+```
+{
+    "data": [
+        "a",
+        "b"
+    ],
+    "info": {
+        "title": "A list of strings",
+        "type": "v1"
+    }
+}
+'
+```
+
+### V2
+
+```
+{
+    "data": {
+        "key": "value"
+    },
+    "info": {
+        "title": "A list of key:value pairs.",
+        "type": "v2"
+    }
+}
+```
 
 # References as this becomes more useful.
 

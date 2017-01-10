@@ -81,7 +81,7 @@ func Run(env Env) {
 
 	e.POST("/alist", env.PostAlist)
 	e.PUT("/alist/:uuid", env.PutAlist)
-	e.PATCH("/alist/:uuid", env.PatchAlist)
+	e.DELETE("/alist/:uuid", env.RemoveAlist)
 
 	// Start server
 	listenOn := fmt.Sprintf(":%d", env.Port)

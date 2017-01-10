@@ -2,8 +2,10 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist/api/alist"
 	"github.com/labstack/echo"
 )
 
@@ -18,13 +20,13 @@ func (env *Env) GetRoot(c echo.Context) error {
 	response := &responseMessage{
 		Message: message,
 	}
+
 	return c.JSON(http.StatusOK, response)
 }
 
 func (env *Env) GetListsBy(c echo.Context) error {
 	uuid := c.Param("uuid")
 	alists, err := env.Datastore.GetListsBy(uuid)
-	fmt.Println("here2")
 	if err != nil {
 		message := fmt.Sprintf("Failed to find all lists.")
 		response := new(responseMessage)
@@ -48,29 +50,60 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 
 func (env *Env) PostAlist(c echo.Context) error {
 	uuid := getUUID()
-	fmt.Println(uuid)
-	fmt.Println(len(uuid))
-	message := fmt.Sprintf("I want to upload alist with uuid: %s", uuid)
-	response := &responseMessage{
-		Message: message,
+
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	aList := new(alist.Alist)
+	aList.Uuid = uuid
+	err := aList.UnmarshalJSON(jsonBytes)
+	if err != nil {
+		message := fmt.Sprintf("Your Json has a problem. %s", err)
+		response := &responseMessage{
+			Message: message,
+		}
+		return c.JSON(http.StatusBadRequest, *response)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	env.Datastore.PostAlist(uuid, *aList)
+	return c.JSON(http.StatusOK, *aList)
 }
 
 func (env *Env) PutAlist(c echo.Context) error {
+	var err error
+	var jsonBytes []byte
+
 	uuid := c.Param("uuid")
-	message := fmt.Sprintf("I want to alter alist with uuid: %s", uuid)
-	response := &responseMessage{
-		Message: message,
+	defer c.Request().Body.Close()
+	jsonBytes, _ = ioutil.ReadAll(c.Request().Body)
+
+	aList := new(alist.Alist)
+	aList.Uuid = uuid
+	err = aList.UnmarshalJSON(jsonBytes)
+	if err != nil {
+		message := fmt.Sprintf("Your Json has a problem. %s", err)
+		response := &responseMessage{
+			Message: message,
+		}
+		return c.JSON(http.StatusBadRequest, *response)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	err = env.Datastore.UpdateAlist(*aList)
+	return c.JSON(http.StatusOK, *aList)
 }
 
-func (env *Env) PatchAlist(c echo.Context) error {
+func (env *Env) RemoveAlist(c echo.Context) error {
+	var message string
 	uuid := c.Param("uuid")
-	message := fmt.Sprintf("I want to alter alist with uuid: %s", uuid)
-	response := &responseMessage{
-		Message: message,
+	err := env.Datastore.RemoveAlist(uuid)
+	response := &responseMessage{}
+
+	message = fmt.Sprintf("List %s was removed.", uuid)
+	if err != nil {
+		message = fmt.Sprintf("Your Json has a problem. %s", err)
+		response.Message = message
+		return c.JSON(http.StatusBadRequest, *response)
 	}
-	return c.JSON(http.StatusOK, response)
+	response.Message = message
+	return c.JSON(http.StatusOK, *response)
 }
