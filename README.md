@@ -13,5 +13,7 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 
 # Getting Started
-* look at [api readme]](api/README.md)
-* look at [www ui readme](www-ui/README.md)
+## Api
+* look at [Readme](api/README.md)
+## Web UI
+* look at [Readme](www-ui/README.md)
