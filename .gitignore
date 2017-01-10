@@ -2,5 +2,8 @@
 *.db
 
 # GO: Ignore all files in vendor
-/api/vendor/**
+api/vendor/**
 !api/vendor/vendor.json
+
+# www-ui
+www-ui/node_modules
