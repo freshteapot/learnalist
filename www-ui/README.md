@@ -1,4 +1,4 @@
-# Learnalist
+# Learnalist - UI
 
 > UI for learanlist API
 
