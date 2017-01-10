@@ -55,24 +55,13 @@ func Run(env Env) {
 
 	// Echo instance
 	e := echo.New()
-	// Gives pretty formatting
-	// e.SetDebug(true)
-
-	if basicAuth != "" {
-		e.Use(middleware.BasicAuth(func(username, password string) bool {
-			match := fmt.Sprintf("%s:%s", username, password)
-
-			if match == basicAuth {
-				return true
-			}
-			return false
-		}))
-	}
 
 	// Middleware
-	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	if basicAuth != "" {
+		e.Use(middleware.BasicAuth(checkBasicAuth))
+	}
 
 	// Route => handler
 	e.GET("/", env.GetRoot)
@@ -86,4 +75,13 @@ func Run(env Env) {
 	// Start server
 	listenOn := fmt.Sprintf(":%d", env.Port)
 	e.Logger.Fatal(e.Start(listenOn))
+}
+
+func checkBasicAuth(username string, password string, c echo.Context) bool {
+	match := fmt.Sprintf("%s:%s", username, password)
+
+	if match == basicAuth {
+		return true
+	}
+	return false
 }

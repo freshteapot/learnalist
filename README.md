@@ -14,11 +14,12 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 # Getting Started
 
-Grab the repo.
+* Make sure you have [govendor](https://github.com/kardianos/govendor) installed, it is used to manage dependencies.
+* Grab the repo
 ```
 git clone https://github.com/freshteapot/learnalist.git
 cd learnalist/api
-go get .
+govendor sync
 go run cmd/api/main.go --port=1234 --database=/tmp/api.db
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
@@ -146,6 +147,7 @@ curl http://localhost:1234/alist/{uuid}
 # References as this becomes more useful.
 
 * https://echo.labstack.com/
+* Managing dependencies with [govendor](https://github.com/kardianos/govendor)
 * https://github.com/thewhitetulip/web-dev-golang-anti-textbook
 * https://gobyexample.com/command-line-flags
 * https://developer.github.com/v3/
@@ -156,3 +158,14 @@ curl http://localhost:1234/alist/{uuid}
 * https://gobyexample.com/json
 * [Like casting but not](https://golang.org/ref/spec#Type_assertions)
 * Interfaces http://go-book.appspot.com/interfaces.html
+
+
+# Problems
+
+* Slow to run via 'go run'
+```
+cd ./vendor/github.com/mattn/go-sqlite3/
+go install
+```
+
+Thanks to http://stackoverflow.com/a/38296407.
