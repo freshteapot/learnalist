@@ -1,1 +1,6 @@
+# Ignore all databases
 *.db
+
+# GO: Ignore all files in vendor
+/api/vendor/**
+!api/vendor/vendor.json
