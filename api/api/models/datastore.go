@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql"
 
-	"github.com/freshteapot/learnalist/api/alist"
+	"github.com/freshteapot/learnalist-api/api/alist"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 

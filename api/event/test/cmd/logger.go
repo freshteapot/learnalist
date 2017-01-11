@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/freshteapot/learnalist/api/event"
-	"github.com/freshteapot/learnalist/api/uuid"
+	"github.com/freshteapot/learnalist-api/api/event"
+	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/rifflock/lfshook"
 )
 

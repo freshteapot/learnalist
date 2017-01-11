@@ -2,7 +2,7 @@ package event
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/freshteapot/learnalist/api/uuid"
+	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
 type eventAction struct {

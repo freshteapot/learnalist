@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/freshteapot/learnalist/api/alist"
+	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/labstack/echo"
 )
 

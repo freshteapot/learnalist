@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/freshteapot/learnalist/api/api/models"
+	"github.com/freshteapot/learnalist-api/api/api/models"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	uuid "github.com/satori/go.uuid"

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/freshteapot/learnalist/api/api"
+	"github.com/freshteapot/learnalist-api/api/api"
 )
 
 func main() {

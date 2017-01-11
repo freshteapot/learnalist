@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/freshteapot/learnalist/api/alist"
+	"github.com/freshteapot/learnalist-api/api/alist"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
