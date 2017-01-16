@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo"
 )
 
@@ -24,9 +25,9 @@ func (env *Env) GetRoot(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (env *Env) GetListsBy(c echo.Context) error {
-	uuid := c.Param("uuid")
-	alists, err := env.Datastore.GetListsBy(uuid)
+func (env *Env) GetListsByMe(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	alists, err := env.Datastore.GetListsBy(user.Uuid)
 	if err != nil {
 		message := fmt.Sprintf("Failed to find all lists.")
 		response := new(responseMessage)
@@ -49,13 +50,17 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 }
 
 func (env *Env) PostAlist(c echo.Context) error {
-	uuid := getUUID()
+	user := c.Get("loggedInUser").(uuid.User)
+	playList := uuid.NewPlaylist(&user)
+	fmt.Println(playList.ToString())
+	uuid := playList.Uuid
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	aList := new(alist.Alist)
 	aList.Uuid = uuid
+	aList.User = user
 	err := aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
 		message := fmt.Sprintf("Your Json has a problem. %s", err)
@@ -106,4 +111,12 @@ func (env *Env) RemoveAlist(c echo.Context) error {
 	}
 	response.Message = message
 	return c.JSON(http.StatusOK, *response)
+}
+
+func (env *Env) PostRegister(c echo.Context) error {
+	newUser, err := env.Datastore.InsertNewUser(c)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Bad json.")
+	}
+	return c.JSON(http.StatusOK, *newUser)
 }

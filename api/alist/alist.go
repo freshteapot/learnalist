@@ -3,6 +3,8 @@ package alist
 import (
 	"encoding/json"
 	"errors"
+
+	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
 // AlistItemTypeV2 Item in  AlistTypeV2
@@ -32,6 +34,7 @@ type InputAlist struct {
 // Alist the outer wrapping of a list.
 type Alist struct {
 	Uuid     string `json:"uuid"`
+	User     uuid.User
 	ListType string
 	Info     AlistInfo   `json:"info"`
 	Data     interface{} `json:"data"`

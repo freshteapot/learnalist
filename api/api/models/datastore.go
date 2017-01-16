@@ -4,6 +4,9 @@ import (
 	"database/sql"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/uuid"
+	"github.com/labstack/echo"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
@@ -15,6 +18,8 @@ type Datastore interface {
 	UpdateAlist(aList alist.Alist) error
 	RemoveAlist(uuid string) error
 	CreateDBStructure()
+	InsertNewUser(c echo.Context) (*uuid.User, error)
+	GetUserByCredentials(loginUser authenticate.LoginUser) (*uuid.User, error)
 }
 
 // DB allowing us to build an abstraction layer

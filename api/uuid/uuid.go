@@ -11,7 +11,7 @@ type Info interface {
 }
 
 type User struct {
-	Uuid string
+	Uuid string `json:"uuid"`
 }
 
 func (u User) ToString() string {
@@ -29,24 +29,24 @@ func (p PlayList) ToString() string {
 
 func NewUser() User {
 	u := &User{
-		Uuid: getUUID(),
+		Uuid: getUUID("user"),
 	}
 	return *u
 }
 
 func NewPlaylist(user *User) PlayList {
 	p := &PlayList{
-		Uuid: getUUID(),
+		Uuid: getUUID("playlist"),
 		User: *user,
 	}
 	return *p
 }
 
-func getUUID() string {
+func getUUID(typeOf string) string {
 	// @todo is this good enough?
 	var secret = uuid.NewV4()
-	// @todo fix this
-	var domain = "learnalist.net"
-	u := uuid.NewV5(secret, domain)
+	// @todo Remove hardcoded learnalist
+	var salt = fmt.Sprintf("learnalist.net:%s", typeOf)
+	u := uuid.NewV5(secret, salt)
 	return u.String()
 }

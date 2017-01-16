@@ -29,6 +29,16 @@ Content-Length: 31
 ## Play along.
 When the database is created, it is empty.
 
+## You need a user first.
+```
+curl -XPOST 127.0.0.1:1234/register -d'
+{
+    "username":"chris",
+    "password":"test"
+}
+'
+```
+
 ### Add a list of type v1.
 
 ```
