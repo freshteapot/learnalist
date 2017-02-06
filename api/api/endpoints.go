@@ -52,15 +52,11 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 func (env *Env) PostAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	playList := uuid.NewPlaylist(&user)
-	fmt.Println(playList.ToString())
 	uuid := playList.Uuid
-
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	aList := new(alist.Alist)
-	aList.Uuid = uuid
-	aList.User = user
 	err := aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
 		message := fmt.Sprintf("Your Json has a problem. %s", err)
@@ -69,7 +65,8 @@ func (env *Env) PostAlist(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, *response)
 	}
-
+	aList.Uuid = uuid
+	aList.User = user
 	env.Datastore.PostAlist(uuid, *aList)
 	return c.JSON(http.StatusOK, *aList)
 }
@@ -77,13 +74,12 @@ func (env *Env) PostAlist(c echo.Context) error {
 func (env *Env) PutAlist(c echo.Context) error {
 	var err error
 	var jsonBytes []byte
-
+	// @todo issue #11 do I not need to lock this down by logged in user?
 	uuid := c.Param("uuid")
 	defer c.Request().Body.Close()
 	jsonBytes, _ = ioutil.ReadAll(c.Request().Body)
 
 	aList := new(alist.Alist)
-	aList.Uuid = uuid
 	err = aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
 		message := fmt.Sprintf("Your Json has a problem. %s", err)
@@ -92,6 +88,7 @@ func (env *Env) PutAlist(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, *response)
 	}
+	aList.Uuid = uuid
 
 	err = env.Datastore.UpdateAlist(*aList)
 	return c.JSON(http.StatusOK, *aList)

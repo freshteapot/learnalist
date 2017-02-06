@@ -25,6 +25,7 @@ type AlistTypeV1 []string
 type AlistInfo struct {
 	Title    string `json:"title"`
 	ListType string `json:"type"`
+	From     string `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
 }
 
 type InputAlist struct {
@@ -126,12 +127,6 @@ func (data AlistItemTypeV2) MarshalJSON() ([]byte, error) {
 }
 
 // MarshalJSON convert list info into json
-func (a AlistInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		"title": a.Title,
-		"type":  a.ListType,
-	})
-}
 
 // MarshalJSON convert alist into json
 func (a Alist) MarshalJSON() ([]byte, error) {
