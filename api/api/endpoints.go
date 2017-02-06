@@ -74,7 +74,7 @@ func (env *Env) PostAlist(c echo.Context) error {
 func (env *Env) PutAlist(c echo.Context) error {
 	var err error
 	var jsonBytes []byte
-	// @todo do I not need to lock this down by logged in user?
+	// @todo issue #11 do I not need to lock this down by logged in user?
 	uuid := c.Param("uuid")
 	defer c.Request().Body.Close()
 	jsonBytes, _ = ioutil.ReadAll(c.Request().Body)
