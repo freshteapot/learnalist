@@ -9,14 +9,11 @@ import (
 
 // AlistItemTypeV2 Item in  AlistTypeV2
 type AlistItemTypeV2 struct {
-	From string
-	To   string
+	From string `json:"from"`
+	To   string `json:"to"`
 }
 
-// AlistTypeV2 list type v2
-type AlistTypeV2 struct {
-	Items []AlistItemTypeV2
-}
+type AlistTypeV2 []AlistItemTypeV2
 
 // AlistTypeV1 list type v1
 type AlistTypeV1 []string
@@ -94,39 +91,6 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
-
-// UnmarshalJSON convert list type v2 from json
-func (items *AlistTypeV2) UnmarshalJSON(data []byte) error {
-	var stuff map[string]string
-	err := json.Unmarshal(data, &stuff)
-	if err != nil {
-		return err
-	}
-	for key, value := range stuff {
-		item := AlistItemTypeV2{From: key, To: value}
-		items.Items = append(items.Items, item)
-	}
-	return nil
-
-}
-
-// MarshalJSON convert list type v2 into json
-func (data AlistTypeV2) MarshalJSON() ([]byte, error) {
-	response := make(map[string]string)
-	for _, v := range data.Items {
-		response[v.From] = v.To
-	}
-	return json.Marshal(response)
-}
-
-// MarshalJSON convert list type v2 item into json
-func (data AlistItemTypeV2) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		data.From: data.To,
-	})
-}
-
-// MarshalJSON convert list info into json
 
 // MarshalJSON convert alist into json
 func (a Alist) MarshalJSON() ([]byte, error) {

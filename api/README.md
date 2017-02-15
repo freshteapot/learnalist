@@ -42,7 +42,7 @@ curl -XPOST 127.0.0.1:1234/register -d'
 ### Add a list of type v1.
 
 ```
-curl -XPOST http://localhost:1234/alist -d'
+curl -XPOST http://localhost:1234/alist -u'chris:test' -d'
 {
     "data": [
         "monday",
@@ -69,18 +69,19 @@ curl http://localhost:1234/alist/by/me
 ### Add a list of type v2.
 
 ```
-curl -XPOST http://localhost:1234/alist -d'
+curl -XPOST http://localhost:1234/alist -uchris:test -d'
 {
-    "data": {
-        "car": "bil",
-        "water": "vann"
-    },
+    "data": [
+        {
+            "from": "chris",
+            "to": "christopher"
+        }
+    ],
     "info": {
-        "title": "A few words from English to Norwegian.",
+        "title": "A list of key:value pairs.",
         "type": "v2"
     }
-}
-'
+}'
 ```
 
 Again, query all the lists by you.
@@ -110,7 +111,7 @@ curl http://localhost:1234/alist/{uuid}
 | Type | Description |
 | --- | --- |
 | v1 | An array of a string.|
-| v2 | An array of key:value objects.|
+| v2 | An array of object alist.AlistItemTypeV2 |
 
 ### V1
 
@@ -132,9 +133,12 @@ curl http://localhost:1234/alist/{uuid}
 
 ```
 {
-    "data": {
-        "key": "value"
-    },
+    "data": [
+        {
+            "from": "chris",
+            "to": "chris"
+        }
+    ],
     "info": {
         "title": "A list of key:value pairs.",
         "type": "v2"
@@ -171,4 +175,16 @@ Thanks to http://stackoverflow.com/a/38296407.
 * Update all vendors
 ```
 govendor fetch +v
+```
+
+
+# Working with structs and json
+
+Get the Data object and add a single row to the v2 type data.
+```
+aListV2Data := aList.Data.(alist.AlistTypeV2)
+
+item := &alist.AlistItemTypeV2{From: "Hi", To: "Hello"}
+aListV2Data = append(aListV2Data, *item)
+aList.Data = aListV2Data
 ```
