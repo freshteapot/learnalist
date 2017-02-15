@@ -19,3 +19,6 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 ## Web UI
 * look at [Readme](www-ui/README.md)
+
+## iOS Bacis app
+* look at [Readme](https://github.com/freshteapot/learnalist-ios/blob/master/README.md)
