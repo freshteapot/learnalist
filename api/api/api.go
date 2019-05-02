@@ -40,6 +40,7 @@ func Run(env Env) {
 
 	// Echo instance
 	e := echo.New()
+	e.HideBanner = true
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
