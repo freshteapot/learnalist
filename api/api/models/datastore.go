@@ -6,7 +6,7 @@ import (
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 

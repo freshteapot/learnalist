@@ -1,7 +1,7 @@
 package event
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 

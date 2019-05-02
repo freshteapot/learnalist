@@ -3,7 +3,7 @@
 
 # GO: Ignore all files in vendor
 api/vendor/**
-!api/vendor/vendor.json
+#!api/vendor/modules.txt
 
 # www-ui
 www-ui/node_modules

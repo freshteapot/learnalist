@@ -1,0 +1,11 @@
+{
+  "configurations": [ {
+    "name": "Debug Api",
+    "mode": "debug",
+    "args": ["--database=./test.db", "--port=9090"],
+    "env": {
+      "USER": "ROOT",
+      "PW": "SECRET!"
+    }
+  }]
+}

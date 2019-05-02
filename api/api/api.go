@@ -6,8 +6,8 @@ import (
 
 	"github.com/freshteapot/learnalist-api/api/api/models"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // Env exposing the data abstraction layer

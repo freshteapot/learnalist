@@ -3,7 +3,7 @@ package main
 import (
 	"io/ioutil"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/freshteapot/learnalist-api/api/event"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/rifflock/lfshook"

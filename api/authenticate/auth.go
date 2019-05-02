@@ -3,10 +3,11 @@ package authenticate
 import (
 	"fmt"
 	"hash/fnv"
+	"log"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 var LookUp func(loginUser LoginUser) (*uuid.User, error)
@@ -29,7 +30,7 @@ func SkipBasicAuth(c echo.Context) bool {
 
 var basicAuth = "chris:chris"
 
-func ValidateBasicAuth(username string, password string, c echo.Context) bool {
+func ValidateBasicAuth(username string, password string, c echo.Context) (bool, error) {
 	loginUser := &LoginUser{
 		Username: username,
 		Password: password,
@@ -37,11 +38,11 @@ func ValidateBasicAuth(username string, password string, c echo.Context) bool {
 	user, err := LookUp(*loginUser)
 	if err != nil {
 		fmt.Println(err)
-		return false
+		return false, nil
 	}
 
 	c.Set("loggedInUser", *user)
-	return true
+	return true, nil
 }
 
 type LoginUser struct {
@@ -52,8 +53,10 @@ type LoginUser struct {
 func HashIt(user LoginUser) (string, error) {
 	h := fnv.New64()
 	beforeHash := fmt.Sprintf("%s:%s", user.Username, user.Password)
+	log.Print(beforeHash)
 	h.Write([]byte(beforeHash))
 	hash := h.Sum64()
 	storedHash := fmt.Sprintf("A%d", hash)
+	log.Print(storedHash)
 	return storedHash, nil
 }

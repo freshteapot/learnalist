@@ -2,16 +2,30 @@
 
 # Getting Started
 
-* Make sure you have [govendor](https://github.com/kardianos/govendor) installed, it is used to manage dependencies.
 * Grab the repo
 ```
 git clone https://github.com/freshteapot/learnalist.git
 cd learnalist/api
-govendor sync
-go run cmd/api/main.go --port=1234 --database=/tmp/api.db
+```
+Then we need to fake a few things whilst go-plus improves its handling of go modules
+```
+GO111MODULE=on go mod init
+GO111MODULE=on go mod vendor
+```
+Now we can run the app
+```
+go run main.go --port=1234 --database=/tmp/api.db
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 
+
+# Build for server
+Create an apiserver binary.
+```
+go build -ldflags="-s -w" -o apiserver main.go
+```
+
+# Once the binary is running.
 ```
 curl -i http://localhost:1234
 ```

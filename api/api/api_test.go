@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/api/models"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/engine/standard"
 	"github.com/stretchr/testify/assert"
 )
 

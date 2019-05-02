@@ -45,6 +45,7 @@ func NewPlaylist(user *User) PlayList {
 func getUUID(typeOf string) string {
 	// @todo is this good enough?
 	var secret = uuid.NewV4()
+
 	// @todo Remove hardcoded learnalist
 	var salt = fmt.Sprintf("learnalist.net:%s", typeOf)
 	u := uuid.NewV5(secret, salt)

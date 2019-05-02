@@ -10,7 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
@@ -125,6 +125,7 @@ func (dal *DAL) InsertNewUser(c echo.Context) (*uuid.User, error) {
 	var savedUsername string
 
 	loginUser = &authenticate.LoginUser{}
+
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
