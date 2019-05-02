@@ -20,9 +20,9 @@ Your server should now be running on port 1234 with the database created at /tmp
 
 
 # Build for server
-Create an apiserver binary.
+Create an apiserver binary including variables injected in during the build step.
 ```
-go build -ldflags="-s -w" -o apiserver main.go
+sh build.sh
 ```
 
 # Once the binary is running.
@@ -169,6 +169,8 @@ curl http://localhost:1234/alist/{uuid}
 * https://developer.github.com/v3/
 * [Example that helped understand Unmarshall and Marshall 1](http://mattyjwilliams.blogspot.no/2013/01/using-go-to-unmarshal-json-lists-with.html)
 * [Example that helped understand Unmarshall and Marshall 2](https://gist.github.com/mdwhatcott/8dd2eef0042f7f1c0cd8)
+* [Getting a date in a format I can parse to the bash script](https://stackoverflow.com/questions/21363187/git-show-dates-in-utc)
+* [How to add build time variables to the go application](https://github.com/Ropes/go-linker-vars-example)
 
 # References as I dive deeper into golang.
 * https://gobyexample.com/json

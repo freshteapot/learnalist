@@ -19,5 +19,6 @@ func Start() {
 		DatabaseName: *database,
 		UserID:       "me",
 	}
+
 	api.Run(env)
 }

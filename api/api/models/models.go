@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"log"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
@@ -114,9 +112,9 @@ func (dal *DAL) RemoveAlist(uuid string) error {
 	return nil
 }
 
-func (dal *DAL) InsertNewUser(c echo.Context) (*uuid.User, error) {
+func (dal *DAL) InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, error) {
 	var hash string
-	var loginUser *authenticate.LoginUser
+
 	var err error
 	var stmt *sql.Stmt
 
@@ -124,13 +122,7 @@ func (dal *DAL) InsertNewUser(c echo.Context) (*uuid.User, error) {
 	var savedHash string
 	var savedUsername string
 
-	loginUser = &authenticate.LoginUser{}
-
-	defer c.Request().Body.Close()
-	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
-
-	json.Unmarshal(jsonBytes, loginUser)
-	hash, err = authenticate.HashIt(*loginUser)
+	hash, err = authenticate.HashIt(loginUser)
 
 	// Make sure user is unique.
 	stmt, err = dal.Db.Prepare("SELECT uuid, hash, username FROM user WHERE username = ?")

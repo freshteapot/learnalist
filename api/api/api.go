@@ -19,6 +19,10 @@ type Env struct {
 	Dal          models.DAL
 }
 
+type HttpResponseMessage struct {
+	Message string `json:"message"`
+}
+
 // @todo change this to be a configure file
 var domain string
 
@@ -50,6 +54,8 @@ func Run(env Env) {
 		Skipper:   authenticate.SkipBasicAuth,
 		Validator: authenticate.ValidateBasicAuth,
 	}))
+
+	e.GET("/version", env.GetVersion)
 
 	e.POST("/register", env.PostRegister)
 

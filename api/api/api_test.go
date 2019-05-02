@@ -1,5 +1,28 @@
 package api
 
+import (
+	"log"
+
+	"github.com/freshteapot/learnalist-api/api/api/models"
+)
+
+var env = Env{
+	Port:         9090,
+	DatabaseName: "./test.db",
+	UserID:       "me",
+}
+
+func resetDatabase() {
+	db, err := models.NewTestDB()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	env.Datastore = &models.DAL{
+		Db: db,
+	}
+}
+
 // @TODO
 /*
 import (

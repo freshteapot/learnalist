@@ -3,7 +3,6 @@ package authenticate
 import (
 	"fmt"
 	"hash/fnv"
-	"log"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/uuid"
@@ -14,7 +13,13 @@ var LookUp func(loginUser LoginUser) (*uuid.User, error)
 
 func SkipBasicAuth(c echo.Context) bool {
 	url := c.Request().URL.Path
+	method := c.Request().Method
+
 	if url == "/" {
+		return true
+	}
+
+	if url == "/version" && method == "GET" {
 		return true
 	}
 
@@ -53,10 +58,9 @@ type LoginUser struct {
 func HashIt(user LoginUser) (string, error) {
 	h := fnv.New64()
 	beforeHash := fmt.Sprintf("%s:%s", user.Username, user.Password)
-	log.Print(beforeHash)
+
 	h.Write([]byte(beforeHash))
 	hash := h.Sum64()
 	storedHash := fmt.Sprintf("A%d", hash)
-	log.Print(storedHash)
 	return storedHash, nil
 }
