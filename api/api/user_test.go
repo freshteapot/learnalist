@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -13,6 +14,22 @@ import (
 
 func init() {
 	resetDatabase()
+}
+
+func TestPostRegisterEmptyBody(t *testing.T) {
+	resetDatabase()
+	expected := `{"message":"Bad input."}`
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/register", strings.NewReader(""))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	if assert.NoError(t, env.PostRegister(c)) {
+		assert.Equal(t, http.StatusBadRequest, rec.Code)
+		response := strings.TrimSpace(rec.Body.String())
+		assert.Equal(t, expected, response)
+	}
 }
 
 func TestPostRegisterNotValidJSON(t *testing.T) {
