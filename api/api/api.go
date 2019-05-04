@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"log"
+	"net/http"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/api/models"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
@@ -12,11 +14,12 @@ import (
 
 // Env exposing the data abstraction layer
 type Env struct {
-	Datastore    models.Datastore
-	UserID       string
-	Port         int
-	DatabaseName string
-	Dal          models.DAL
+	Datastore        models.Datastore
+	UserID           string
+	Port             int
+	DatabaseName     string
+	Dal              models.DAL
+	CorsAllowOrigins string
 }
 
 type HttpResponseMessage struct {
@@ -54,6 +57,14 @@ func Run(env Env) {
 		Skipper:   authenticate.SkipBasicAuth,
 		Validator: authenticate.ValidateBasicAuth,
 	}))
+
+	if env.CorsAllowOrigins != "" {
+		allowOrigins := strings.Split(env.CorsAllowOrigins, ",")
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: allowOrigins,
+			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		}))
+	}
 
 	e.GET("/version", env.GetVersion)
 
