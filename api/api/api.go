@@ -52,6 +52,10 @@ func Run(env Env) {
 	e.Use(middleware.Recover())
 
 	authenticate.LookUp = env.Datastore.GetUserByCredentials
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 9,
+	}))
+
 	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
 		Skipper:   authenticate.SkipBasicAuth,
 		Validator: authenticate.ValidateBasicAuth,
