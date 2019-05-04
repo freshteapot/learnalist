@@ -1,6 +1,6 @@
 # Docs
 * [Api readme](../README.md)
-* [manual install instructions for me](./doc/INSTALL.md)
-* [client commands](./doc/client.md)
-* [golang tips](./doc/tips.md)
-* [Try curl requests](./doc/play.along.md)
+* [manual install instructions for me](./INSTALL.md)
+* [client commands](./client.md)
+* [golang tips](./tips.md)
+* [Try curl requests](./play.along.md)
