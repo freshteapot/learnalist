@@ -14,7 +14,7 @@ GO111MODULE=on go mod vendor
 ```
 Now we can run the app
 ```
-go run main.go --port=1234 --database=/tmp/api.db
+go run commands/api/main.go --port=1234 --database=/tmp/api.db
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 

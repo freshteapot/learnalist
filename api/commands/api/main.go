@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"flag"
@@ -6,7 +6,7 @@ import (
 	"github.com/freshteapot/learnalist-api/api/api"
 )
 
-func Start() {
+func main() {
 	database := flag.String("database", "/tmp/api.db", "The database.")
 	domain := flag.String("domain", "learnalist.net", "The domain.")
 	port := flag.Int("port", 80, "Port to listen on.")
