@@ -52,6 +52,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | Method | Uri | Description |
 | --- | --- | --- |
 | POST | /alist | Save a list. |
+| DELETE | /alist/{uuid} | Delete a list via uuid. |
 | PUT | /alist/{uuid} | Update all fields allowed to a list. |
 | GET | /alist/{uuid} | Get a list via uuid. |
 | GET | /alist/by/{uuid} | Get lists by {uuid}. Allow for both public, private lists. |
