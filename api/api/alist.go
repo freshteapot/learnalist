@@ -31,7 +31,7 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 		response := HttpResponseMessage{
 			Message: message,
 		}
-		return c.JSON(http.StatusBadRequest, response)
+		return c.JSON(http.StatusNotFound, response)
 	}
 	return c.JSON(http.StatusOK, *alist)
 }
