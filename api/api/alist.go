@@ -55,6 +55,14 @@ func (env *Env) PostAlist(c echo.Context) error {
 	}
 	aList.Uuid = uuid
 	aList.User = user
+	err = alist.Validate(*aList)
+	if err != nil {
+		response := HttpResponseMessage{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+	// @todo input validation of the lists.
 	env.Datastore.PostAlist(uuid, *aList)
 	return c.JSON(http.StatusOK, *aList)
 }
@@ -77,7 +85,10 @@ func (env *Env) PutAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	aList.Uuid = uuid
-
+	//@todo what happens if we are updating a list that doesnt exist?
+	//TODO does the uuid exist?
+	//TODO if yes = update
+	//TODO if no = insert
 	err = env.Datastore.UpdateAlist(*aList)
 	return c.JSON(http.StatusOK, *aList)
 }

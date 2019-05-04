@@ -64,6 +64,10 @@ func Run(env Env) {
 	e.GET("/alist/:uuid", env.GetListByUUID)
 	e.GET("/alist/by/me", env.GetListsByMe)
 
+	//e.POST("/alist/v1", env.PostAlist)
+	//e.POST("/alist/v2", env.PostAlist)
+	//e.POST("/alist/v3", env.PostAlist)
+	//e.POST("/alist/v4", env.PostAlist)
 	e.POST("/alist", env.PostAlist)
 	e.PUT("/alist/:uuid", env.PutAlist)
 	e.DELETE("/alist/:uuid", env.RemoveAlist)
