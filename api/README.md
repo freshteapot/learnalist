@@ -174,6 +174,7 @@ curl http://localhost:1234/alist/{uuid}
 * [Example that helped understand Unmarshall and Marshall 2](https://gist.github.com/mdwhatcott/8dd2eef0042f7f1c0cd8)
 * [Getting a date in a format I can parse to the bash script](https://stackoverflow.com/questions/21363187/git-show-dates-in-utc)
 * [How to add build time variables to the go application](https://github.com/Ropes/go-linker-vars-example)
+* [Parse curl commands and get GO back](https://mholt.github.io/curl-to-go)
 
 # References as I dive deeper into golang.
 * https://gobyexample.com/json
