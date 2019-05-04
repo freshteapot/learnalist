@@ -1,5 +1,8 @@
 # Learnalist - API
 
+* [manual install instructions for me](./doc/INSTALL.md)
+* [client commands](./doc/client.md)
+
 # Getting Started
 
 * Grab the repo

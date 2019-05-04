@@ -4,7 +4,9 @@ Maybe get a ubuntu local copy so I dont need to do it from the server.
 
 ## Update the learnalist server
 ```
+sudo su -
 cd /root/work/src/github.com/freshteapot/learnalist-api/
+git pull --rebase origin master
 cd api/
 GO111MODULE=on sh build.sh
 ```
