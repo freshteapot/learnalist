@@ -15,7 +15,6 @@ import (
 // Env exposing the data abstraction layer
 type Env struct {
 	Datastore        models.Datastore
-	UserID           string
 	Port             int
 	DatabaseName     string
 	Dal              models.DAL

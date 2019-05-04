@@ -18,7 +18,6 @@ func main() {
 	env := api.Env{
 		Port:             *port,
 		DatabaseName:     *database,
-		UserID:           "me",
 		CorsAllowOrigins: *corsAllowedOrigins,
 	}
 

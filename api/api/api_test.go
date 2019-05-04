@@ -13,7 +13,6 @@ import (
 var env = Env{
 	Port:         9090,
 	DatabaseName: "./test.db",
-	UserID:       "me",
 }
 
 func resetDatabase() {
