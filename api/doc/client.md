@@ -1,8 +1,8 @@
 A client binary exists
 
-`
+```sh
 go run commands/client/main.go
-`
+```
 
 It doesnt do a lot yet.
 
