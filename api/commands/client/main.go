@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/freshteapot/learnalist-api/api/client"
+	"github.com/freshteapot/learnalist-api/api/integrations"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 	server := flag.String("server", "https://learnalist.net/api", "The server.")
 
 	showSupported := flag.Bool("show-supported", false, "When set, show the api endpoints supported by the client.")
+	runIntegrationTest := flag.Bool("run-integration-test", false, "When set, show the api endpoints supported by the client.")
 	flag.Parse()
 
 	if *showSupported {
@@ -31,6 +33,14 @@ func main() {
 
 	client := client.Client{
 		Config: config,
+	}
+
+	if *runIntegrationTest {
+		integrations := integrations.Client{
+			ApiClient: client,
+		}
+		integrations.RunIntegrationTests()
+		os.Exit(0)
 	}
 
 	rootResponse, _ := client.GetRoot()
