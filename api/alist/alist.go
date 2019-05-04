@@ -38,6 +38,15 @@ type Alist struct {
 	Data     interface{} `json:"data"`
 }
 
+// MarshalJSON convert alist into json
+func (a Alist) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"uuid": a.Uuid,
+		"info": a.Info,
+		"data": a.Data,
+	})
+}
+
 // UnmarshalJSON convert list type v2 from json
 func (aList *Alist) UnmarshalJSON(data []byte) error {
 	var raw map[string]interface{}
@@ -46,7 +55,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 
 	err = json.Unmarshal(data, &raw)
 	if err != nil {
-		err = errors.New("Failed to pass list.")
+		err = errors.New("Failed to parse list.")
 		return err
 	}
 
@@ -54,24 +63,24 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		aList.Uuid = raw["uuid"].(string)
 	}
 
-	jsonBytes, err = json.Marshal(raw["info"])
-	if err != nil {
-		err = errors.New("Failed to pass list.")
+	if raw["info"] == nil {
+		err = errors.New("Failed to pass list. Info is missing.")
 		return err
 	}
 
+	jsonBytes, _ = json.Marshal(raw["info"])
 	aList.Info, err = parseAlistInfo(jsonBytes)
 	if err != nil {
-		err = errors.New("Failed to pass list.")
+		err = errors.New("Failed to pass list. Something wrong with info object.")
 		return err
 	}
 
-	jsonBytes, err = json.Marshal(raw["data"])
-	if err != nil {
-		err = errors.New("Failed to pass list data.")
+	if raw["data"] == nil {
+		err = errors.New("Failed to pass list. Data is missing.")
 		return err
 	}
 
+	jsonBytes, _ = json.Marshal(raw["data"])
 	switch aList.Info.ListType {
 	case "v1":
 		aList.Data, err = parseAlistTypeV1(jsonBytes)
@@ -90,30 +99,4 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-// MarshalJSON convert alist into json
-func (a Alist) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		"uuid": a.Uuid,
-		"info": a.Info,
-		"data": a.Data,
-	})
-}
-
-func parseAlistInfo(jsonBytes []byte) (AlistInfo, error) {
-	listInfo := new(AlistInfo)
-	err := json.Unmarshal(jsonBytes, &listInfo)
-	return *listInfo, err
-}
-func parseAlistTypeV1(jsonBytes []byte) (AlistTypeV1, error) {
-	listData := new(AlistTypeV1)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
-}
-
-func parseAlistTypeV2(jsonBytes []byte) (AlistTypeV2, error) {
-	listData := new(AlistTypeV2)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
 }
