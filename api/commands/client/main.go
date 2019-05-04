@@ -40,9 +40,14 @@ func main() {
 }
 
 func supported() {
-	apiSupported := `
-	/
-	/version
+	const apiSupported = `
+GET    /
+GET    /version
+POST   /alist
+GET    /alist/:uuid
+PUT    /alist/:uuid
+DELETE /alist/:uuid
+PUT    /alist/:uuid
 `
 	fmt.Println(apiSupported)
 }
