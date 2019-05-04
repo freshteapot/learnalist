@@ -2,6 +2,7 @@
 
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
+* [golang tips](./doc/tips.md)
 
 # Getting Started
 
@@ -195,16 +196,4 @@ Thanks to http://stackoverflow.com/a/38296407.
 * Update all vendors
 ```sh
 govendor fetch +v
-```
-
-
-# Working with structs and json
-
-Get the Data object and add a single row to the v2 type data.
-```go
-aListV2Data := aList.Data.(alist.AlistTypeV2)
-
-item := &alist.AlistItemTypeV2{From: "Hi", To: "Hello"}
-aListV2Data = append(aListV2Data, *item)
-aList.Data = aListV2Data
 ```
