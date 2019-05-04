@@ -103,7 +103,7 @@ func (dal *DAL) UpdateAlist(aList alist.Alist) error {
 func (dal *DAL) RemoveAlist(uuid string) error {
 	var err error
 	var stmt *sql.Stmt
-
+	// @todo lock this down to the user as well.
 	stmt, err = dal.Db.Prepare("DELETE FROM alist_kv WHERE uuid=?")
 	checkErr(err)
 
