@@ -15,10 +15,17 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 # Getting Started
 
 ## Api
-* look at [Readme](api/README.md)
+* look at [Readme](api/README.md).
+
+## Chrome Extension
+* [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
 
 ## Web UI
-* look at [Readme](www-ui/README.md)
+* look at [Readme](www-ui/README.md).
+
+## Mobile app built with flutter
+* [learnalist-mobile](https://github.com/freshteapot/learnalist-mobile).
+
 
 ## iOS Bacis app
-* look at [Readme](https://github.com/freshteapot/learnalist-ios/blob/master/README.md)
+* look at [Readme](https://github.com/freshteapot/learnalist-ios/blob/master/README.md).
