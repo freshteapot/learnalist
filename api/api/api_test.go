@@ -27,7 +27,7 @@ func resetDatabase() {
 }
 
 func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {
-	req := httptest.NewRequest(http.MethodPost, "/register", strings.NewReader(body))
+	req := httptest.NewRequest(method, uri, strings.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()
