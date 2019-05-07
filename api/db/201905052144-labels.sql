@@ -22,3 +22,6 @@ CREATE TABLE IF NOT EXISTS simple_event (
 
 CREATE INDEX IF NOT EXISTS simple_event_who ON simple_event (who_uuid);
 CREATE INDEX IF NOT EXISTS simple_event_who_what ON simple_event (who_uuid, what);
+
+
+CREATE INDEX IF NOT EXISTS labels_by_user ON label (user_uuid);
