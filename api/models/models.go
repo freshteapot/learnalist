@@ -1,14 +1,12 @@
 package models
 
 import (
-	"database/sql"
-
-	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
+	"github.com/jmoiron/sqlx"
 )
 
 // DB allowing us to build an abstraction layer
 type DAL struct {
-	Db *sql.DB
+	Db *sqlx.DB
 }
 
 func checkErr(err error) {

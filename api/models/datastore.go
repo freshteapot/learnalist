@@ -4,7 +4,6 @@ import (
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
 // Datastore allowing us to build an abstraction layer

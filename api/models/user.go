@@ -7,7 +7,6 @@ import (
 
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
 
 func (dal *DAL) InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, error) {

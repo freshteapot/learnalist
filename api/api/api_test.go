@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 var env = Env{
