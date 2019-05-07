@@ -133,3 +133,46 @@ curl -s  -XGET http://127.0.0.1:1234/alist/by/me -u'chris:test' | \
 jq -r '.[] | .uuid' | \
 awk '{cmd="curl -s -w \"%{http_code}\\n\" -XDELETE http://127.0.0.1:1234/alist/"$1" -u'chris:test'";print(cmd);system(cmd)}'
 ```
+
+# Add a label
+First time, it will return a 201
+```sh
+curl -s -w "%{http_code}\n"  -XPOST http://localhost:1234/labels -uchris:test -d'
+{
+  "label": "water"
+}'
+```
+
+Second time, it will return a 200
+```sh
+curl -s -w "%{http_code}\n"  -XPOST http://localhost:1234/labels -uchris:test -d'
+{
+  "label": "water"
+}'
+```
+
+# Get all labels from a user
+First time, it will return a 201
+```sh
+curl -s -w "%{http_code}\n"  -XGET http://localhost:1234/labels/by/me -u'chris:test'
+```
+
+Second time, it will return a 200
+```sh
+curl -s -w "%{http_code}\n"  -XPOST http://localhost:1234/labels -uchris:test -d'
+{
+  "label": "water"
+}'
+```
+
+Remove the label
+```sh
+curl -s -w "%{http_code}\n"  -XDELETE http://localhost:1234/labels/31957f08-cb3c-5841-9ee9-9b516d72f44d -u'chris:test'
+```
+
+Remove all labels
+```sh
+curl -s  -XGET http://127.0.0.1:1234/labels/by/me -u'chris:test' | \
+jq -r '.[] | .uuid' | \
+awk '{cmd="curl -s -w \"%{http_code}\\n\" -XDELETE http://127.0.0.1:1234/labels/"$1" -u'chris:test'";print(cmd);system(cmd)}'
+```

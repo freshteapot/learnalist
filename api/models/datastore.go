@@ -15,8 +15,10 @@ type Datastore interface {
 
 type DatastoreLabels interface {
 	// Labels
-	GetLabelsByUser(Uuid string) ([]Label, error)
+	GetLabelsByUser(Uuid string) []Label
 	SaveLabel(label Label) error
+	GetLabel(uuid string) (*Label, error)
+	RemoveLabel(uuid string) error
 }
 
 type DatastoreAlists interface {

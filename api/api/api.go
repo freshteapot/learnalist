@@ -84,6 +84,10 @@ func Run(env Env) {
 	e.POST("/alist", env.PostAlist)
 	e.PUT("/alist/:uuid", env.PutAlist)
 	e.DELETE("/alist/:uuid", env.RemoveAlist)
+	// Labels
+	e.POST("/labels", env.PostLabel)
+	e.GET("/labels/by/me", env.GetLabelsByUser)
+	e.DELETE("/labels/:uuid", env.RemoveLabel)
 
 	// Start server
 	listenOn := fmt.Sprintf(":%d", env.Port)
