@@ -7,7 +7,7 @@ ls db/*.sql | sort | xargs cat | sqlite3 ./server.db
 go run commands/api/main.go --port=1234 --database=./server.db
 ```
 
-Add test user
+# Add test user
 ```sh
 curl -s -w "%{http_code}\n" -XPOST 127.0.0.1:1234/register -d'
 {
@@ -17,7 +17,7 @@ curl -s -w "%{http_code}\n" -XPOST 127.0.0.1:1234/register -d'
 '
 ```
 
-Add a valid list
+# Add a valid list v1
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -28,8 +28,10 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
     }
 }'
 ```
+Should return 200
 
-Try adding a list with an empty item.
+
+# Try adding a list with an empty item.
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -46,7 +48,7 @@ Should return
 400
 ```
 
-Add a list with empty data
+# Add a list with empty data
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -57,8 +59,10 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
     }
 }'
 ```
+Should return 200
 
-Add a list with unknown type, should fail with 400.
+
+# Add a list with unknown type, should fail with 400.
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -70,7 +74,7 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
 }'
 ```
 
-Add a valid list v2
+# Add a valid list v2
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -81,8 +85,10 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
     }
 }'
 ```
+Should return 200.
 
-Add bad data and see a 400 response.
+
+# Add bad data and see a 400 response.
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -94,7 +100,7 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
 }'
 ```
 
-Add list V2 with empty data, 200.
+# Add list V2 with empty data, 200.
 ```sh
 curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
 {
@@ -106,7 +112,8 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -
 }'
 ```
 
-Try putting a fake item. (https://github.com/freshteapot/learnalist-api/issues/20)
+# Try putting a fake item.
+(https://github.com/freshteapot/learnalist-api/issues/20)
 ```sh
 curl -s -w "%{http_code}\n" -XPUT  http://127.0.0.1:1234/alist/fakeuuid123 -u'chris:test' -d'
 {
@@ -121,13 +128,15 @@ curl -s -w "%{http_code}\n" -XPUT  http://127.0.0.1:1234/alist/fakeuuid123 -u'ch
 ```sh
 curl -s -w "%{http_code}\n" -XGET http://127.0.0.1:1234/alist/fakeuuid123 -u'chris:test'
 ```
+Currently returns a 404, with #20, this should get fixed.
 
-Delete a list that isnt in the system (https://github.com/freshteapot/learnalist-api/issues/21)
+
+# Delete a list that isnt in the system (https://github.com/freshteapot/learnalist-api/issues/21)
 ```sh
 curl -s -w "%{http_code}\n" -XDELETE http://127.0.0.1:1234/alist/fakeuuid123 -u'chris:test'
 ```
 
-Remove all lists via jq
+# Remove all lists via jq
 ```sh
 curl -s  -XGET http://127.0.0.1:1234/alist/by/me -u'chris:test' | \
 jq -r '.[] | .uuid' | \
@@ -152,25 +161,11 @@ curl -s -w "%{http_code}\n"  -XPOST http://localhost:1234/labels -uchris:test -d
 ```
 
 # Get all labels from a user
-First time, it will return a 201
 ```sh
 curl -s -w "%{http_code}\n"  -XGET http://localhost:1234/labels/by/me -u'chris:test'
 ```
 
-Second time, it will return a 200
-```sh
-curl -s -w "%{http_code}\n"  -XPOST http://localhost:1234/labels -uchris:test -d'
-{
-  "label": "water"
-}'
-```
-
-Remove the label
-```sh
-curl -s -w "%{http_code}\n"  -XDELETE http://localhost:1234/labels/31957f08-cb3c-5841-9ee9-9b516d72f44d -u'chris:test'
-```
-
-Remove all labels
+# Remove all labels
 ```sh
 curl -s  -XGET http://127.0.0.1:1234/labels/by/me -u'chris:test' | \
 jq -r '.[] | .uuid' | \
