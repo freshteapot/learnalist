@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/api/api/models"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -17,7 +17,6 @@ type Env struct {
 	Datastore        models.Datastore
 	Port             int
 	DatabaseName     string
-	Dal              models.DAL
 	CorsAllowOrigins string
 }
 

@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/api/api/models"
+	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo"
 )
 
