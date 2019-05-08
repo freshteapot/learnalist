@@ -7,6 +7,11 @@ import (
 	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
+const (
+	SimpleList = "v1"
+	FromToList = "v2"
+)
+
 // AlistItemTypeV2 Item in  AlistTypeV2
 type AlistItemTypeV2 struct {
 	From string `json:"from"`
@@ -82,13 +87,13 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 
 	jsonBytes, _ = json.Marshal(raw["data"])
 	switch aList.Info.ListType {
-	case "v1":
+	case SimpleList:
 		aList.Data, err = parseAlistTypeV1(jsonBytes)
 		if err != nil {
 			err = errors.New("Failed to pass list type v1.")
 			return err
 		}
-	case "v2":
+	case FromToList:
 		aList.Data, err = parseAlistTypeV2(jsonBytes)
 		if err != nil {
 			err = errors.New("Failed to pass list type v2.")

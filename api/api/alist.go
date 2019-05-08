@@ -55,6 +55,7 @@ func (env *Env) PostAlist(c echo.Context) error {
 	}
 	aList.Uuid = uuid
 	aList.User = user
+
 	err = alist.Validate(*aList)
 	if err != nil {
 		response := HttpResponseMessage{

@@ -1,90 +1,109 @@
 package models
 
 import (
-	"github.com/freshteapot/learnalist-api/api/uuid"
+	"errors"
+	"net/http"
+	"strings"
 )
 
-func NewLabel() *Label {
-	label := &Label{
-		Uuid: uuid.GetUUID("label"),
-	}
-	return label
+type UserLabel struct {
+	Label    string `db:"label"`
+	UserUuid string `db:"user_uuid"`
 }
 
-func (dal *DAL) GetLabel(Uuid string) (*Label, error) {
-	label := Label{}
-	query := `
-SELECT *
-FROM label
-WHERE uuid=$1
-`
-	err := dal.Db.Get(&label, query, Uuid)
+type AlistLabel struct {
+	Label     string `db:"label"`
+	UserUuid  string `db:"user_uuid"`
+	AlistUuid string `db:"alist_uuid"`
+}
+
+func NewUserLabel(label string, user string) *UserLabel {
+	userLabel := &UserLabel{
+		Label:    label,
+		UserUuid: user,
+	}
+	return userLabel
+}
+
+func NewAlistLabel(label string, user string, alist string) *AlistLabel {
+	alistLabel := &AlistLabel{
+		Label:     label,
+		UserUuid:  user,
+		AlistUuid: alist,
+	}
+	return alistLabel
+}
+
+func (dal *DAL) PostUserLabel(label *UserLabel) (int, error) {
+	statusCode := http.StatusBadRequest
+	if len(label.Label) > 20 {
+		return statusCode, errors.New(ValidationWarningLabelToLong)
+	}
+
+	query := "INSERT INTO user_labels(label, user_uuid) VALUES (:label, :user_uuid);"
+
+	_, err := dal.Db.NamedExec(query, label)
+	statusCode = http.StatusCreated
 	if err != nil {
-		return nil, err
+		statusCode = http.StatusBadRequest
+		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
+			statusCode = http.StatusOK
+		}
 	}
-	return &label, nil
+	return statusCode, err
 }
 
-func (dal *DAL) GetLabelsByUser(Uuid string) []Label {
-	labels := []Label{}
+// Parse in the user uuid and get back their labels
+func (dal *DAL) PostAlistLabel(label *AlistLabel) (int, error) {
+	statusCode := http.StatusBadRequest
+
+	if len(label.Label) > 20 {
+		return statusCode, errors.New(ValidationWarningLabelToLong)
+	}
+
+	query := "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (:label, :user_uuid, :alist_uuid);"
+
+	_, err := dal.Db.NamedExec(query, label)
+	statusCode = http.StatusCreated
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
+			statusCode = http.StatusOK
+		}
+	}
+	return statusCode, err
+}
+
+func (dal *DAL) GetUserLabels(uuid string) ([]string, error) {
+	var labels = []string{}
+	// How to handle this?
 	query := `
-SELECT l.*, al.alist_uuid
-FROM label as l
-LEFT JOIN alist_labels as al ON l.uuid=al.label_uuid
+SELECT label
+FROM user_labels
 WHERE user_uuid=$1
 `
-	rows, _ := dal.Db.Queryx(query, Uuid)
-	for rows.Next() {
-		label := Label{}
-		rows.StructScan(&label)
-		labels = append(labels, label)
-	}
-	return labels
-}
-
-// Save the label to the database
-// If the AlistUuid is set, it will also save this.
-func (dal *DAL) SaveLabel(label Label) error {
-	var err error
-	labelInsertQuery := "INSERT INTO label (uuid, label, user_uuid) VALUES (:uuid, :label, :user_uuid)"
-	labelLinkInsert := "INSERT INTO alist_labels (alist_uuid, label_uuid) VALUES (:alist_uuid, :label_uuid)"
-
-	link := &AlistLabelLink{
-		AlistUuid: label.AlistUuid,
-		LabelUuid: label.Uuid,
-	}
-
-	_, err = dal.Db.NamedExec(labelInsertQuery, label)
+	err := dal.Db.Select(&labels, query, uuid)
 	if err != nil {
-		if err.Error() != "UNIQUE constraint failed: label.label, label.user_uuid" {
-			return err
-		}
+		return labels, err
 	}
 
-	if label.AlistUuid != "" {
-		_, err = dal.Db.NamedExec(labelLinkInsert, link)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	query = `
+SELECT label
+FROM alist_labels
+WHERE user_uuid=$1
+`
+	err = dal.Db.Select(&labels, query, uuid)
+	return labels, err
 }
 
-func (dal *DAL) RemoveLabel(uuid string) error {
-	query1 := `
-DELETE
-FROM label
-WHERE uuid=$1
-`
-	query2 := `
-DELETE
-FROM alist_labels
-WHERE label_uuid=$1
-`
+// Pass in the label and the user (uuid) to remove them from the tables
+func (dal *DAL) RemoveUserLabel(label string, user string) error {
+	query1 := "DELETE FROM user_labels WHERE user_uuid=$1 AND label=$2"
+	query2 := "DELETE FROM alist_labels WHERE user_uuid=$1 AND label=$2"
+
 	tx := dal.Db.MustBegin()
-	tx.MustExec(query1, uuid)
-	tx.MustExec(query2, uuid)
+	tx.MustExec(query1, user, label)
+	tx.MustExec(query2, user, label)
 	err := tx.Commit()
 	return err
 }

@@ -15,18 +15,19 @@ type Datastore interface {
 
 type DatastoreLabels interface {
 	// Labels
-	GetLabelsByUser(Uuid string) []Label
-	SaveLabel(label Label) error
-	GetLabel(uuid string) (*Label, error)
-	RemoveLabel(uuid string) error
+	PostUserLabel(label *UserLabel) (int, error)
+	RemoveUserLabel(label string, uuid string) error
+	PostAlistLabel(label *AlistLabel) (int, error)
 }
 
 type DatastoreAlists interface {
 	// Lists
-	GetListsByLabels(labels string) ([]*alist.Alist, error)
+	GetUserLabels(uuid string) ([]string, error)
+	GetListsByUserAndLabel(uuid string, label string) ([]*alist.Alist, error)
 	GetListsBy(uuid string) ([]*alist.Alist, error)
 	GetAlist(uuid string) (*alist.Alist, error)
 	PostAlist(uuid string, aList alist.Alist) error
+	SaveAlist(aList alist.Alist) error
 	UpdateAlist(aList alist.Alist) error
 	RemoveAlist(uuid string) error
 }

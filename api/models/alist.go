@@ -8,8 +8,8 @@ import (
 	"github.com/freshteapot/learnalist-api/api/alist"
 )
 
-//TODO
-func (dal *DAL) GetListsByLabels(labels string) ([]*alist.Alist, error) {
+// TODO
+func (dal *DAL) GetListsByUserAndLabel(uuid string, label string) ([]*alist.Alist, error) {
 	return nil, nil
 }
 
@@ -110,5 +110,17 @@ func (dal *DAL) RemoveAlist(uuid string) error {
 
 	_, err = stmt.Exec(uuid)
 	checkErr(err)
+	return nil
+}
+
+// TODO
+func (dal *DAL) SaveAlist(aList alist.Alist) error {
+	current, _ := dal.GetAlist(aList.Uuid)
+	if current == nil {
+		dal.PostAlist(aList.Uuid, aList)
+	} else {
+		dal.UpdateAlist(aList)
+	}
+
 	return nil
 }

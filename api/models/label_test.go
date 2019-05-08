@@ -1,10 +1,9 @@
 package models
 
 import (
+	"net/http"
 	"testing"
 
-	"github.com/freshteapot/learnalist-api/api/authenticate"
-	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,70 +11,62 @@ func init() {
 	resetDatabase()
 }
 
-func TestGetLabel(t *testing.T) {
-	var labelA *Label
-	var labelB *Label
-	var err error
-
+func TestPostUserLabel(t *testing.T) {
 	resetDatabase()
-	loginUser := authenticate.LoginUser{
-		Username: "testUser",
-		Password: "password",
-	}
+	a := NewUserLabel("label1", "user2")
+	statusCode, _ := dal.PostUserLabel(a)
+	assert.Equal(t, http.StatusCreated, statusCode)
 
-	// Get a fake label.
-	uuid := "fake"
-	labelA, err = dal.GetLabel(uuid)
-	assert.Error(t, err)
+	statusCode, _ = dal.PostUserLabel(a)
+	assert.Equal(t, http.StatusOK, statusCode)
 
-	// Add a label
-	user, _ := dal.InsertNewUser(loginUser)
-
-	labelA = NewLabel()
-	labelA.Label = "a"
-	labelA.UserUuid = user.Uuid
-	dal.SaveLabel(*labelA)
-	labelB, err = dal.GetLabel(labelA.Uuid)
-	assert.NoError(t, err)
-	assert.Equal(t, labelB, labelA)
+	b := NewUserLabel("label_123456789_123456789_car_boat", "user2")
+	statusCode, err := dal.PostUserLabel(b)
+	assert.Equal(t, http.StatusBadRequest, statusCode)
+	assert.Equal(t, ValidationWarningLabelToLong, err.Error())
 }
 
-func TestSaveAndGetLabel(t *testing.T) {
+func TestPostAlistLabel(t *testing.T) {
 	resetDatabase()
+	a := NewAlistLabel("label1", "u:123", "u:456")
+	statusCode, _ := dal.PostAlistLabel(a)
+	assert.Equal(t, http.StatusCreated, statusCode)
 
-	var labels []Label
-	loginUser := authenticate.LoginUser{
-		Username: "testUser",
-		Password: "password",
-	}
-	user, _ := dal.InsertNewUser(loginUser)
-	// Empty
-	labels = dal.GetLabelsByUser(user.Uuid)
-	assert.Equal(t, 0, len(labels))
+	statusCode, _ = dal.PostAlistLabel(a)
+	assert.Equal(t, http.StatusOK, statusCode)
 
-	label := NewLabel()
-	label.Label = "a"
-	label.UserUuid = user.Uuid
-	dal.SaveLabel(*label)
-	labels = dal.GetLabelsByUser(user.Uuid)
-	assert.Equal(t, 1, len(labels))
+	b := NewAlistLabel("label_123456789_123456789_car_boat", "u:123", "u:456")
+	statusCode, err := dal.PostAlistLabel(b)
+	assert.Equal(t, http.StatusBadRequest, statusCode)
+	assert.Equal(t, ValidationWarningLabelToLong, err.Error())
+}
 
-	// Add label with a link, making sure it doesnt add the label twice
-	playList := uuid.NewPlaylist(user)
-	label.AlistUuid = playList.Uuid
-	dal.SaveLabel(*label)
+func TestGetUserLabels(t *testing.T) {
+	resetDatabase()
+	// Testing for an empty response
+	emptyList := make([]string, 0)
+	labels, _ := dal.GetUserLabels("u:123")
+	assert.Equal(t, emptyList, labels)
 
-	labels = dal.GetLabelsByUser(user.Uuid)
-	assert.Equal(t, 1, len(labels))
-	assert.Equal(t, label.AlistUuid, labels[0].AlistUuid)
+	a := NewUserLabel("label1", "u:123")
+	statusCode, _ := dal.PostUserLabel(a)
+	assert.Equal(t, http.StatusCreated, statusCode)
 
-	// Add another label
-	label = NewLabel()
-	label.Label = "b"
-	label.UserUuid = user.Uuid
+	labels, _ = dal.GetUserLabels("u:123")
 
-	dal.SaveLabel(*label)
-	// Confirm we have two results
-	labels = dal.GetLabelsByUser(user.Uuid)
+	b := NewAlistLabel("label2", "u:123", "u:456")
+	statusCode, _ = dal.PostAlistLabel(b)
+	assert.Equal(t, http.StatusCreated, statusCode)
+	// We add the same one, just to make sure we only get 2 back.
+	statusCode, _ = dal.PostAlistLabel(b)
+	labels, _ = dal.GetUserLabels("u:123")
 	assert.Equal(t, 2, len(labels))
+
+	// Test remove
+	dal.RemoveUserLabel("label2", "u:123")
+	labels, _ = dal.GetUserLabels("u:123")
+	assert.Equal(t, 1, len(labels))
+	dal.RemoveUserLabel("label1", "u:123")
+	labels, _ = dal.GetUserLabels("u:123")
+	assert.Equal(t, 0, len(labels))
 }

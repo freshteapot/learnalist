@@ -15,13 +15,13 @@ func Validate(aList Alist) error {
 		return err
 	}
 	switch aList.Info.ListType {
-	case "v1":
+	case SimpleList:
 		err = validateAlistTypeV1(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v1. %s", err.Error()))
 			return err
 		}
-	case "v2":
+	case FromToList:
 		err = validateAlistTypeV2(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
