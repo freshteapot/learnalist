@@ -76,7 +76,7 @@ func (dal *DAL) PostAlistLabel(label *AlistLabel) (int, error) {
 
 func (dal *DAL) GetUserLabels(uuid string) ([]string, error) {
 	var labels = []string{}
-	// How to handle this?
+
 	query := `
 SELECT label
 FROM user_labels

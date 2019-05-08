@@ -61,6 +61,7 @@ func (env *Env) GetUserLabels(c echo.Context) error {
 func (env *Env) RemoveUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
+	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 	label := strings.TrimPrefix(r.URL.Path, "/labels/")
 	fmt.Println("Sad times to need to do it.")
 	err := env.Datastore.RemoveUserLabel(label, user.Uuid)

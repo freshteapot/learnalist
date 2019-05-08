@@ -32,9 +32,7 @@ func NewTestDB() (*sqlx.DB, error) {
 
 // NewDB load up the database
 func NewDB(dataSourceName string) (*sqlx.DB, error) {
-
 	db, err := sqlx.Connect("sqlite3", dataSourceName)
-	// db, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {
 		return nil, err
 	}
