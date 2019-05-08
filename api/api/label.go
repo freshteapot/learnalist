@@ -26,7 +26,7 @@ func (env *Env) PostUserLabel(c echo.Context) error {
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: "Bad input.",
+			Message: PostUserLabelJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
