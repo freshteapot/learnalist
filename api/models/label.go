@@ -105,3 +105,16 @@ func (dal *DAL) RemoveUserLabel(label string, user string) error {
 	err := tx.Commit()
 	return err
 }
+
+func (dal *DAL) RemoveLabelsForAlist(uuid string) error {
+	if uuid == "" {
+		return nil
+	}
+
+	query := "DELETE FROM alist_labels WHERE alist_uuid=$1"
+
+	tx := dal.Db.MustBegin()
+	tx.MustExec(query, uuid)
+	err := tx.Commit()
+	return err
+}

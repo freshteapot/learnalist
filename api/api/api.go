@@ -81,7 +81,7 @@ func Run(env Env) {
 	//e.POST("/alist/v2", env.PostAlist)
 	//e.POST("/alist/v3", env.PostAlist)
 	//e.POST("/alist/v4", env.PostAlist)
-	e.POST("/alist", env.PostAlist)
+	e.POST("/alist", env.SaveAlist)
 	e.PUT("/alist/:uuid", env.PutAlist)
 	e.DELETE("/alist/:uuid", env.RemoveAlist)
 	// Labels

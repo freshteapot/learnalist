@@ -47,6 +47,9 @@ func validateAListInfo(info AlistInfo) error {
 		if item == "" {
 			feedback = append(feedback, fmt.Sprintf("Label can not be empty at position %d", index))
 		}
+		if len(item) > 20 {
+			feedback = append(feedback, fmt.Sprintf("Label must be 20 or less characters long at position %d", index))
+		}
 	}
 
 	if len(feedback) != 0 {

@@ -36,7 +36,7 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 	return c.JSON(http.StatusOK, *alist)
 }
 
-func (env *Env) PostAlist(c echo.Context) error {
+func (env *Env) SaveAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	playList := uuid.NewPlaylist(&user)
 	uuid := playList.Uuid
@@ -56,21 +56,20 @@ func (env *Env) PostAlist(c echo.Context) error {
 	aList.Uuid = uuid
 	aList.User = user
 
-	err = alist.Validate(*aList)
+	err = env.Datastore.SaveAlist(*aList)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: err.Error(),
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	// @todo input validation of the lists.
-	env.Datastore.PostAlist(uuid, *aList)
 	return c.JSON(http.StatusOK, *aList)
 }
 
 func (env *Env) PutAlist(c echo.Context) error {
 	var err error
 	var jsonBytes []byte
+	user := c.Get("loggedInUser").(uuid.User)
 	// @todo issue #11 do I not need to lock this down by logged in user?
 	uuid := c.Param("uuid")
 	defer c.Request().Body.Close()
@@ -86,11 +85,14 @@ func (env *Env) PutAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 	aList.Uuid = uuid
-	//@todo what happens if we are updating a list that doesnt exist?
-	//TODO does the uuid exist?
-	//TODO if yes = update
-	//TODO if no = insert
-	err = env.Datastore.UpdateAlist(*aList)
+	aList.User = user
+	err = env.Datastore.SaveAlist(*aList)
+	if err != nil {
+		response := HttpResponseMessage{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
 	return c.JSON(http.StatusOK, *aList)
 }
 

@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
@@ -64,17 +65,59 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	return aList, nil
 }
 
-// PostAlist Process user data and store as new in the db.
-func (dal *DAL) PostAlist(uuid string, aList alist.Alist) error {
+func (dal *DAL) RemoveAlist(uuid string) error {
+	var err error
+	var stmt *sql.Stmt
+	// @todo lock this down to the user as well.
+	stmt, err = dal.Db.Prepare("DELETE FROM alist_kv WHERE uuid=?")
+	checkErr(err)
+
+	_, err = stmt.Exec(uuid)
+	checkErr(err)
+	return nil
+}
+
+// TODO https://github.com/freshteapot/learnalist-api/issues/20
+func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	var err error
 	var jsonBytes []byte
-	var jsonAlist string
-	var stmt *sql.Stmt
+
+	err = alist.Validate(aList)
+	if err != nil {
+		return err
+	}
+
+	if aList.Uuid == "" {
+		return errors.New("Uuid is missing, possibly an internal error")
+	}
+
+	if aList.User.Uuid == "" {
+		return errors.New("User.Uuid is missing, possibly an internal error")
+	}
 
 	jsonBytes, err = json.Marshal(&aList)
 	checkErr(err)
-	jsonAlist = string(jsonBytes)
+	jsonAlist := string(jsonBytes)
 
+	current, _ := dal.GetAlist(aList.Uuid)
+	// TODO remove labels not on the new
+	dal.RemoveLabelsForAlist(aList.Uuid)
+	aList = dal.SaveLabelsForAlist(aList)
+
+	tx := dal.Db.MustBegin()
+	if current == nil {
+		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values($1, $2, $3, $4)"
+		tx.MustExec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
+	} else {
+		queryUpdate := "UPDATE alist_kv SET list_type=$1, body=$2, user_uuid=$3 WHERE uuid=$4"
+		tx.MustExec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
+	}
+
+	err = tx.Commit()
+	return err
+}
+
+func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) alist.Alist {
 	// Post the labels
 	cleanLabels := make([]string, 0)
 	for _, label := range aList.Info.Labels {
@@ -91,54 +134,5 @@ func (dal *DAL) PostAlist(uuid string, aList alist.Alist) error {
 		dal.PostAlistLabel(b)
 	}
 	aList.Info.Labels = cleanLabels
-
-	stmt, err = dal.Db.Prepare("INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?,?,?,?)")
-	checkErr(err)
-
-	_, err = stmt.Exec(uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
-	checkErr(err)
-
-	return nil
-}
-
-// UpdateAlist Process user data and store in db as an update.
-func (dal *DAL) UpdateAlist(aList alist.Alist) error {
-	var err error
-	var jsonBytes []byte
-	var stmt *sql.Stmt
-
-	jsonBytes, err = json.Marshal(&aList)
-	checkErr(err)
-	jsonAlist := string(jsonBytes)
-
-	stmt, err = dal.Db.Prepare("UPDATE alist_kv SET list_type=?, body=? WHERE uuid=?")
-	checkErr(err)
-
-	_, err = stmt.Exec(aList.Info.ListType, jsonAlist, aList.Uuid)
-	checkErr(err)
-	return nil
-}
-
-func (dal *DAL) RemoveAlist(uuid string) error {
-	var err error
-	var stmt *sql.Stmt
-	// @todo lock this down to the user as well.
-	stmt, err = dal.Db.Prepare("DELETE FROM alist_kv WHERE uuid=?")
-	checkErr(err)
-
-	_, err = stmt.Exec(uuid)
-	checkErr(err)
-	return nil
-}
-
-// TODO https://github.com/freshteapot/learnalist-api/issues/20
-func (dal *DAL) SaveAlist(aList alist.Alist) error {
-	current, _ := dal.GetAlist(aList.Uuid)
-	if current == nil {
-		dal.PostAlist(aList.Uuid, aList)
-	} else {
-		dal.UpdateAlist(aList)
-	}
-
-	return nil
+	return aList
 }
