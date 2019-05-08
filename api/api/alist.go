@@ -37,9 +37,21 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 }
 
 func (env *Env) SaveAlist(c echo.Context) error {
+	var inputUuid string
 	user := c.Get("loggedInUser").(uuid.User)
-	playList := uuid.NewPlaylist(&user)
-	uuid := playList.Uuid
+	method := c.Request().Method
+	if method == http.MethodPost {
+		playList := uuid.NewPlaylist(&user)
+		inputUuid = playList.Uuid
+	} else if method == http.MethodPut {
+		inputUuid = c.Param("uuid")
+	} else {
+		response := HttpResponseMessage{
+			Message: "This method is not supported.",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
@@ -53,39 +65,10 @@ func (env *Env) SaveAlist(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	aList.Uuid = uuid
+
+	aList.Uuid = inputUuid
 	aList.User = user
 
-	err = env.Datastore.SaveAlist(*aList)
-	if err != nil {
-		response := HttpResponseMessage{
-			Message: err.Error(),
-		}
-		return c.JSON(http.StatusBadRequest, response)
-	}
-	return c.JSON(http.StatusOK, *aList)
-}
-
-func (env *Env) PutAlist(c echo.Context) error {
-	var err error
-	var jsonBytes []byte
-	user := c.Get("loggedInUser").(uuid.User)
-	// @todo issue #11 do I not need to lock this down by logged in user?
-	uuid := c.Param("uuid")
-	defer c.Request().Body.Close()
-	jsonBytes, _ = ioutil.ReadAll(c.Request().Body)
-
-	aList := new(alist.Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	if err != nil {
-		message := fmt.Sprintf("Your Json has a problem. %s", err)
-		response := HttpResponseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusBadRequest, response)
-	}
-	aList.Uuid = uuid
-	aList.User = user
 	err = env.Datastore.SaveAlist(*aList)
 	if err != nil {
 		response := HttpResponseMessage{

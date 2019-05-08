@@ -100,7 +100,6 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	jsonAlist := string(jsonBytes)
 
 	current, _ := dal.GetAlist(aList.Uuid)
-	// TODO remove labels not on the new
 	dal.RemoveLabelsForAlist(aList.Uuid)
 	aList = dal.SaveLabelsForAlist(aList)
 
@@ -117,6 +116,8 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	return err
 }
 
+// Process the lists labels,
+// We post to both the user_labels and alist_labels table.
 func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) alist.Alist {
 	// Post the labels
 	cleanLabels := make([]string, 0)
