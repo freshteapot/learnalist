@@ -34,15 +34,15 @@ func (env *Env) PostUserLabel(c echo.Context) error {
 	label := models.NewUserLabel(input.Label, user.Uuid)
 	statusCode, err := env.Datastore.PostUserLabel(label)
 	if err != nil {
-		response := HttpResponseMessage{
-			Message: err.Error(),
+		if statusCode != http.StatusOK {
+			response := HttpResponseMessage{
+				Message: err.Error(),
+			}
+			return c.JSON(statusCode, response)
 		}
-		return c.JSON(statusCode, response)
 	}
-	// TODO maybe conver to sending all the labels back
-	response := make([]string, 0)
-	response = append(response, label.Label)
-	return c.JSON(http.StatusCreated, response)
+	labels, _ := env.Datastore.GetUserLabels(user.Uuid)
+	return c.JSON(statusCode, labels)
 }
 
 func (env *Env) GetUserLabels(c echo.Context) error {
