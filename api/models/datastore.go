@@ -23,7 +23,7 @@ type DatastoreLabels interface {
 type DatastoreAlists interface {
 	// Lists
 	GetUserLabels(uuid string) ([]string, error)
-	GetListsByUserAndLabel(uuid string, label string) ([]*alist.Alist, error)
+	GetListsByUserAndLabels(user_uuid string, labels string) ([]*alist.Alist, error)
 	GetListsBy(uuid string) ([]*alist.Alist, error)
 	GetAlist(uuid string) (*alist.Alist, error)
 	//PostAlist(uuid string, aList alist.Alist) error

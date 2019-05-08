@@ -5,13 +5,46 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/jmoiron/sqlx"
 )
 
-// TODO
-func (dal *DAL) GetListsByUserAndLabel(uuid string, label string) ([]*alist.Alist, error) {
-	return nil, nil
+// labels needs can be single or "," separated.
+func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) ([]*alist.Alist, error) {
+	var items = []*alist.Alist{}
+	lookUp := strings.Split(labels, ",")
+
+	query := `
+SELECT
+  body
+FROM alist_kv
+WHERE
+  uuid IN (
+SELECT
+  alist_uuid
+FROM
+  alist_labels
+WHERE
+	user_uuid = ?
+AND
+	label IN(?)
+)
+`
+	query, args, err := sqlx.In(query, user_uuid, lookUp)
+	query = dal.Db.Rebind(query)
+	rows, err := dal.Db.Query(query, args...)
+
+	for rows.Next() {
+		aList := new(alist.Alist)
+		var body string
+		err = rows.Scan(&body)
+		json.Unmarshal([]byte(body), &aList)
+		items = append(items, aList)
+	}
+
+	return items, err
 }
 
 // GetListsBy Get all alists by uuid

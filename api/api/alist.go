@@ -11,8 +11,16 @@ import (
 )
 
 func (env *Env) GetListsByMe(c echo.Context) error {
+	var err error
+	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
-	alists, err := env.Datastore.GetListsBy(user.Uuid)
+	filterByLabels := c.QueryParam("labels")
+	if filterByLabels == "" {
+		alists, err = env.Datastore.GetListsBy(user.Uuid)
+	} else {
+		alists, err = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
+	}
+
 	if err != nil {
 		message := fmt.Sprintf("Failed to find all lists.")
 		response := HttpResponseMessage{
