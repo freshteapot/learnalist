@@ -75,11 +75,29 @@ func (dal *DAL) PostAlist(uuid string, aList alist.Alist) error {
 	checkErr(err)
 	jsonAlist = string(jsonBytes)
 
+	// Post the labels
+	cleanLabels := make([]string, 0)
+	for _, label := range aList.Info.Labels {
+		if label == "" {
+			continue
+		}
+		if len(label) > 20 {
+			continue
+		}
+		cleanLabels = append(cleanLabels, label)
+		a := NewUserLabel(label, aList.User.Uuid)
+		b := NewAlistLabel(label, aList.User.Uuid, aList.Uuid)
+		dal.PostUserLabel(a)
+		dal.PostAlistLabel(b)
+	}
+	aList.Info.Labels = cleanLabels
+
 	stmt, err = dal.Db.Prepare("INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?,?,?,?)")
 	checkErr(err)
 
 	_, err = stmt.Exec(uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	checkErr(err)
+
 	return nil
 }
 
@@ -113,7 +131,7 @@ func (dal *DAL) RemoveAlist(uuid string) error {
 	return nil
 }
 
-// TODO
+// TODO https://github.com/freshteapot/learnalist-api/issues/20
 func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	current, _ := dal.GetAlist(aList.Uuid)
 	if current == nil {

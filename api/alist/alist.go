@@ -25,9 +25,10 @@ type AlistTypeV1 []string
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
-	Title    string `json:"title"`
-	ListType string `json:"type"`
-	From     string `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
+	Title    string   `json:"title"`
+	ListType string   `json:"type"`
+	Labels   []string `json:"labels,omitempty"`
+	From     string   `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
 }
 
 type InputAlist struct {

@@ -143,6 +143,23 @@ jq -r '.[] | .uuid' | \
 awk '{cmd="curl -s -w \"%{http_code}\\n\" -XDELETE http://127.0.0.1:1234/alist/"$1" -u'chris:test'";print(cmd);system(cmd)}'
 ```
 
+# Add a list with labels
+```sh
+curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'chris:test' -d'
+{
+    "data": ["car"],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1",
+        "labels": [
+          "car",
+          "water"
+        ]
+    }
+}'
+```
+
+
 # Add a label
 First time, it will return a 201
 ```sh

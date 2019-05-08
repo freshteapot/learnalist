@@ -81,18 +81,16 @@ func (dal *DAL) GetUserLabels(uuid string) ([]string, error) {
 SELECT label
 FROM user_labels
 WHERE user_uuid=$1
+UNION
+SELECT label
+FROM alist_labels
+WHERE user_uuid=$1
+
 `
 	err := dal.Db.Select(&labels, query, uuid)
 	if err != nil {
 		return labels, err
 	}
-
-	query = `
-SELECT label
-FROM alist_labels
-WHERE user_uuid=$1
-`
-	err = dal.Db.Select(&labels, query, uuid)
 	return labels, err
 }
 

@@ -43,6 +43,12 @@ func validateAListInfo(info AlistInfo) error {
 		feedback = append(feedback, "Title cannot be empty.")
 	}
 
+	for index, item := range info.Labels {
+		if item == "" {
+			feedback = append(feedback, fmt.Sprintf("Label can not be empty at position %d", index))
+		}
+	}
+
 	if len(feedback) != 0 {
 		feedbackMessage = strings.Join(feedback, "\n")
 		err = errors.New(feedbackMessage)
