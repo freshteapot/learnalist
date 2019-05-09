@@ -110,7 +110,6 @@ func (dal *DAL) RemoveAlist(uuid string) error {
 	return nil
 }
 
-// TODO https://github.com/freshteapot/learnalist-api/issues/20
 func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	var err error
 	var jsonBytes []byte
