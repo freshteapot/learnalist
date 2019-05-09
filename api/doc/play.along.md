@@ -68,3 +68,32 @@ Or an individual list.
 ```sh
 curl http://localhost:1234/alist/{uuid}
 ```
+
+#Create a list with a label or two
+```sh
+curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/alist -u'chris:test' -d'
+{
+    "data": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1",
+        "labels": [
+          "english"
+        ]
+    }
+}
+'
+```
+
+Now try querying for this list via the labels filter
+```sh
+curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/alist/by/me?labels=english' -u'chris:test'
+```
