@@ -40,7 +40,12 @@ cd ..
 rm -rf tmp
 ```
 
-## Update the database
+## Update the database with all changes.
+```sh
+ls db/*.sql | sort | xargs cat | sqlite3 server.db
+```
+
+## Update the database with a single file change.
 ```sh
 cat  db/201905052144-labels.sql | sqlite3 test.db
 ```

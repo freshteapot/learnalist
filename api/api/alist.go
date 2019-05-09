@@ -89,11 +89,12 @@ func (env *Env) SaveAlist(c echo.Context) error {
 
 func (env *Env) RemoveAlist(c echo.Context) error {
 	var message string
-	uuid := c.Param("uuid")
-	err := env.Datastore.RemoveAlist(uuid)
+	alist_uuid := c.Param("uuid")
+	user := c.Get("loggedInUser").(uuid.User)
+	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	response := HttpResponseMessage{}
 
-	message = fmt.Sprintf("List %s was removed.", uuid)
+	message = fmt.Sprintf("List %s was removed.", alist_uuid)
 	if err != nil {
 		message = fmt.Sprintf("Your Json has a problem. %s", err)
 		response.Message = message

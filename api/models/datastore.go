@@ -29,7 +29,7 @@ type DatastoreAlists interface {
 	//PostAlist(uuid string, aList alist.Alist) error
 	SaveAlist(aList alist.Alist) error
 	//UpdateAlist(aList alist.Alist) error
-	RemoveAlist(uuid string) error
+	RemoveAlist(alist_uuid string, user_uuid string) error
 }
 
 type DatastoreUsers interface {

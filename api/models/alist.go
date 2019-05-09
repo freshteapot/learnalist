@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,16 +97,26 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	return aList, nil
 }
 
-func (dal *DAL) RemoveAlist(uuid string) error {
-	var err error
-	var stmt *sql.Stmt
-	// @todo lock this down to the user as well.
-	stmt, err = dal.Db.Prepare("DELETE FROM alist_kv WHERE uuid=?")
-	checkErr(err)
-
-	_, err = stmt.Exec(uuid)
-	checkErr(err)
-	return nil
+func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
+	dal.RemoveLabelsForAlist(alist_uuid)
+	query := `
+DELETE
+FROM
+	alist_kv
+WHERE
+	uuid=(
+	SELECT uuid
+	FROM
+		alist_kv
+	WHERE
+		uuid=$1
+	AND
+		user_uuid=$2
+	LIMIT 1
+)
+`
+	err := dal.Db.QueryRowx(query, alist_uuid, user_uuid)
+	return err.Err()
 }
 
 func (dal *DAL) SaveAlist(aList alist.Alist) error {
