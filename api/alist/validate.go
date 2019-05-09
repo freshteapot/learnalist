@@ -15,13 +15,13 @@ func Validate(aList Alist) error {
 		return err
 	}
 	switch aList.Info.ListType {
-	case "v1":
+	case SimpleList:
 		err = validateAlistTypeV1(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v1. %s", err.Error()))
 			return err
 		}
-	case "v2":
+	case FromToList:
 		err = validateAlistTypeV2(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
@@ -41,6 +41,15 @@ func validateAListInfo(info AlistInfo) error {
 
 	if info.Title == "" {
 		feedback = append(feedback, "Title cannot be empty.")
+	}
+
+	for index, item := range info.Labels {
+		if item == "" {
+			feedback = append(feedback, fmt.Sprintf("Label can not be empty at position %d", index))
+		}
+		if len(item) > 20 {
+			feedback = append(feedback, fmt.Sprintf("Label must be 20 or less characters long at position %d", index))
+		}
 	}
 
 	if len(feedback) != 0 {

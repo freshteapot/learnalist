@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/api/api/models"
-	"github.com/labstack/echo"
+	"github.com/freshteapot/learnalist-api/api/models"
+	"github.com/labstack/echo/v4"
 )
 
 var env = Env{
@@ -27,7 +27,7 @@ func resetDatabase() {
 }
 
 func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {
-	req := httptest.NewRequest(http.MethodPost, "/register", strings.NewReader(body))
+	req := httptest.NewRequest(method, uri, strings.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()

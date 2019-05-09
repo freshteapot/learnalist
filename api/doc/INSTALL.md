@@ -39,3 +39,8 @@ mv go /usr/local
 cd ..
 rm -rf tmp
 ```
+
+## Update the database
+```sh
+cat  db/201905052144-labels.sql | sqlite3 test.db
+```

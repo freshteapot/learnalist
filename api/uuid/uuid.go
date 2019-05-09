@@ -29,20 +29,20 @@ func (p PlayList) ToString() string {
 
 func NewUser() User {
 	u := &User{
-		Uuid: getUUID("user"),
+		Uuid: GetUUID("user"),
 	}
 	return *u
 }
 
 func NewPlaylist(user *User) PlayList {
 	p := &PlayList{
-		Uuid: getUUID("playlist"),
+		Uuid: GetUUID("playlist"),
 		User: *user,
 	}
 	return *p
 }
 
-func getUUID(typeOf string) string {
+func GetUUID(typeOf string) string {
 	// @todo is this good enough?
 	var secret = uuid.NewV4()
 

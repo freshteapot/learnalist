@@ -11,8 +11,16 @@ import (
 )
 
 func (env *Env) GetListsByMe(c echo.Context) error {
+	var err error
+	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
-	alists, err := env.Datastore.GetListsBy(user.Uuid)
+	filterByLabels := c.QueryParam("labels")
+	if filterByLabels == "" {
+		alists, err = env.Datastore.GetListsBy(user.Uuid)
+	} else {
+		alists, err = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
+	}
+
 	if err != nil {
 		message := fmt.Sprintf("Failed to find all lists.")
 		response := HttpResponseMessage{
@@ -36,10 +44,22 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 	return c.JSON(http.StatusOK, *alist)
 }
 
-func (env *Env) PostAlist(c echo.Context) error {
+func (env *Env) SaveAlist(c echo.Context) error {
+	var inputUuid string
 	user := c.Get("loggedInUser").(uuid.User)
-	playList := uuid.NewPlaylist(&user)
-	uuid := playList.Uuid
+	method := c.Request().Method
+	if method == http.MethodPost {
+		playList := uuid.NewPlaylist(&user)
+		inputUuid = playList.Uuid
+	} else if method == http.MethodPut {
+		inputUuid = c.Param("uuid")
+	} else {
+		response := HttpResponseMessage{
+			Message: "This method is not supported.",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
@@ -53,43 +73,17 @@ func (env *Env) PostAlist(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	aList.Uuid = uuid
+
+	aList.Uuid = inputUuid
 	aList.User = user
-	err = alist.Validate(*aList)
+
+	err = env.Datastore.SaveAlist(*aList)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: err.Error(),
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	// @todo input validation of the lists.
-	env.Datastore.PostAlist(uuid, *aList)
-	return c.JSON(http.StatusOK, *aList)
-}
-
-func (env *Env) PutAlist(c echo.Context) error {
-	var err error
-	var jsonBytes []byte
-	// @todo issue #11 do I not need to lock this down by logged in user?
-	uuid := c.Param("uuid")
-	defer c.Request().Body.Close()
-	jsonBytes, _ = ioutil.ReadAll(c.Request().Body)
-
-	aList := new(alist.Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	if err != nil {
-		message := fmt.Sprintf("Your Json has a problem. %s", err)
-		response := HttpResponseMessage{
-			Message: message,
-		}
-		return c.JSON(http.StatusBadRequest, response)
-	}
-	aList.Uuid = uuid
-	//@todo what happens if we are updating a list that doesnt exist?
-	//TODO does the uuid exist?
-	//TODO if yes = update
-	//TODO if no = insert
-	err = env.Datastore.UpdateAlist(*aList)
 	return c.JSON(http.StatusOK, *aList)
 }
 
