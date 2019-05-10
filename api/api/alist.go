@@ -107,9 +107,17 @@ func (env *Env) RemoveAlist(c echo.Context) error {
 
 	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	if err != nil {
-		if err.Error() != i18n.InputDeleteAlistOperationOwnerOnly {
-			response.Message = i18n.InternalServerErrorDeleteAlist
+		if err.Error() == i18n.SuccessAlistNotFound {
+			response.Message = err.Error()
+			return c.JSON(http.StatusNotFound, response)
 		}
+
+		if err.Error() == i18n.InputDeleteAlistOperationOwnerOnly {
+			response.Message = err.Error()
+			return c.JSON(http.StatusForbidden, response)
+		}
+
+		response.Message = i18n.InternalServerErrorDeleteAlist
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
