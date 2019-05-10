@@ -50,23 +50,25 @@ func Run(env Env) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	authenticate.LookUp = env.Datastore.GetUserByCredentials
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 9,
 	}))
 
-	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
-		Skipper:   authenticate.SkipBasicAuth,
-		Validator: authenticate.ValidateBasicAuth,
-	}))
+	authenticate.LookUp = env.Datastore.GetUserByCredentials
 
 	if env.CorsAllowOrigins != "" {
 		allowOrigins := strings.Split(env.CorsAllowOrigins, ",")
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: allowOrigins,
-			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+			AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+			AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderOrigin, echo.HeaderContentType},
 		}))
 	}
+
+	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+		Skipper:   authenticate.SkipBasicAuth,
+		Validator: authenticate.ValidateBasicAuth,
+	}))
 
 	e.GET("/version", env.GetVersion)
 
