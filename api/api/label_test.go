@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -93,5 +92,5 @@ func TestDeleteUsersLabels(t *testing.T) {
 	c.Set("loggedInUser", user)
 	assert.NoError(t, env.RemoveUserLabel(c))
 	response := strings.TrimSpace(rec.Body.String())
-	fmt.Println(response)
+	assert.Equal(t, `{"message":"Label car was removed."}`, response)
 }
