@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,12 +54,12 @@ INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A904605244475255
 	// Check empty alist.uuid
 	aList.Uuid = ""
 	err = dal.SaveAlist(*aList)
-	assert.Equal(t, InternalServerErrorMissingAlistUuid, err.Error())
+	assert.Equal(t, i18n.InternalServerErrorMissingAlistUuid, err.Error())
 	aList.Uuid = alist_uuid
 	// Check empty user.uuid
 	aList.User.Uuid = ""
 	err = dal.SaveAlist(*aList)
-	assert.Equal(t, InternalServerErrorMissingUserUuid, err.Error())
+	assert.Equal(t, i18n.InternalServerErrorMissingUserUuid, err.Error())
 }
 
 func TestRemoveLabelsForAlistEmptyUuid(t *testing.T) {
@@ -82,9 +83,16 @@ INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f
 
 	aList, _ := dal.GetAlist(alist_uuid)
 	assert.Equal(t, alist.SimpleList, aList.Info.ListType)
-	dal.RemoveAlist(alist_uuid, user_uuid)
-	_, err := dal.GetAlist(alist_uuid)
-	assert.Equal(t, SuccessAlistNotFound, err.Error())
+
+	// Check removing a list of a different user.
+	err := dal.RemoveAlist(alist_uuid, "fake")
+	assert.Equal(t, i18n.InputDeleteAlistOperationOwnerOnly, err.Error())
+
+	// Check removing a list owned by the user
+	err = dal.RemoveAlist(alist_uuid, user_uuid)
+	assert.Nil(t, err)
+	_, err = dal.GetAlist(alist_uuid)
+	assert.Equal(t, i18n.SuccessAlistNotFound, err.Error())
 }
 
 func TestGetListsByUserAndLabels(t *testing.T) {

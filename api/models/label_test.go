@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,12 +27,12 @@ func TestPostUserLabel(t *testing.T) {
 	b := NewUserLabel("label_123456789_123456789_car_boat", "user2")
 	statusCode, err = dal.PostUserLabel(b)
 	assert.Equal(t, http.StatusBadRequest, statusCode)
-	assert.Equal(t, ValidationWarningLabelToLong, err.Error())
+	assert.Equal(t, i18n.ValidationWarningLabelToLong, err.Error())
 
 	c := NewUserLabel("", "user2")
 	statusCode, err = dal.PostUserLabel(c)
 	assert.Equal(t, http.StatusBadRequest, statusCode)
-	assert.Equal(t, ValidationWarningLabelNotEmpty, err.Error())
+	assert.Equal(t, i18n.ValidationWarningLabelNotEmpty, err.Error())
 }
 
 func TestPostAlistLabel(t *testing.T) {
@@ -46,7 +47,7 @@ func TestPostAlistLabel(t *testing.T) {
 	b := NewAlistLabel("label_123456789_123456789_car_boat", "u:123", "u:456")
 	statusCode, err := dal.PostAlistLabel(b)
 	assert.Equal(t, http.StatusBadRequest, statusCode)
-	assert.Equal(t, ValidationWarningLabelToLong, err.Error())
+	assert.Equal(t, i18n.ValidationWarningLabelToLong, err.Error())
 }
 
 func TestGetUserLabels(t *testing.T) {
