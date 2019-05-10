@@ -38,7 +38,7 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 	}
 	alist, err := env.Datastore.GetAlist(uuid)
 	if err != nil {
-		message := fmt.Sprintf("Failed to find alist with uuid: %s", uuid)
+		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
 		response := HttpResponseMessage{
 			Message: message,
 		}
@@ -60,7 +60,7 @@ func (env *Env) SaveAlist(c echo.Context) error {
 		inputUuid = strings.TrimPrefix(r.URL.Path, "/alist/")
 	} else {
 		response := HttpResponseMessage{
-			Message: "This method is not supported.",
+			Message: i18n.ApiMethodNotSupported,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -113,6 +113,6 @@ func (env *Env) RemoveAlist(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response.Message = fmt.Sprintf("List %s was removed.", alist_uuid)
+	response.Message = fmt.Sprintf(i18n.ApiDeleteAlistSuccess, alist_uuid)
 	return c.JSON(http.StatusOK, response)
 }

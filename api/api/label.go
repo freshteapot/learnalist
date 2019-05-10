@@ -71,6 +71,6 @@ func (env *Env) RemoveUserLabel(c echo.Context) error {
 		response.Message = err.Error()
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	response.Message = fmt.Sprintf(i18n.DeleteUserLabelSuccess, label)
+	response.Message = fmt.Sprintf(i18n.ApiDeleteUserLabelSuccess, label)
 	return c.JSON(http.StatusOK, response)
 }

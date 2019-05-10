@@ -8,8 +8,11 @@ const (
 	InternalServerErrorMissingUserUuid   = "User.Uuid is missing, possibly an internal error"
 	InternalServerErrorTalkingToDatabase = "Issue with talking to the database in %s."
 	InputDeleteAlistOperationOwnerOnly   = "Only the owner of the list can remove it."
-	DeleteUserLabelSuccess               = "Label %s was removed."
 	PostUserLabelJSONFailure             = "Your input is invalid json."
 	InputMissingListUuid                 = "The uuid is missing."
 	InternalServerErrorDeleteAlist       = "We have failed to remove your list."
+	ApiMethodNotSupported                = "This method is not supported."
+	ApiAlistNotFound                     = "Failed to find alist with uuid: %s"
+	ApiDeleteAlistSuccess                = "List %s was removed."
+	ApiDeleteUserLabelSuccess            = "Label %s was removed."
 )
