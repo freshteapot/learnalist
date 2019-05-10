@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -31,7 +32,7 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 	uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
 	if uuid == "" {
 		response := HttpResponseMessage{
-			Message: InputMissingListUuid,
+			Message: i18n.InputMissingListUuid,
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
@@ -97,21 +98,21 @@ func (env *Env) SaveAlist(c echo.Context) error {
 }
 
 func (env *Env) RemoveAlist(c echo.Context) error {
-	var message string
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 	alist_uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
 
 	user := c.Get("loggedInUser").(uuid.User)
-
-	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	response := HttpResponseMessage{}
 
-	message = fmt.Sprintf("List %s was removed.", alist_uuid)
+	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	if err != nil {
-		response.Message = InternalServerErrorDeleteAlist
+		if err.Error() != i18n.InputDeleteAlistOperationOwnerOnly {
+			response.Message = i18n.InternalServerErrorDeleteAlist
+		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	response.Message = message
+
+	response.Message = fmt.Sprintf("List %s was removed.", alist_uuid)
 	return c.JSON(http.StatusOK, response)
 }

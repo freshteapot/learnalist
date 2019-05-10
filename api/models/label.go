@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/freshteapot/learnalist-api/api/i18n"
 )
 
 type UserLabel struct {
@@ -36,11 +38,11 @@ func NewAlistLabel(label string, user string, alist string) *AlistLabel {
 
 func ValidateLabel(label string) error {
 	if label == "" {
-		return errors.New(ValidationWarningLabelNotEmpty)
+		return errors.New(i18n.ValidationWarningLabelNotEmpty)
 	}
 
 	if len(label) > 20 {
-		return errors.New(ValidationWarningLabelToLong)
+		return errors.New(i18n.ValidationWarningLabelToLong)
 	}
 	return nil
 }

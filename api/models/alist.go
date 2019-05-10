@@ -9,12 +9,13 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/jmoiron/sqlx"
 )
 
 type AlistKV struct {
-	Uuid string `db:"uuid"`
-	Body    string `db:"body"`
+	Uuid     string `db:"uuid"`
+	Body     string `db:"body"`
 	UserUuid string `db:"user_uuid"`
 	ListType string `db:"list_type"`
 }
@@ -49,16 +50,13 @@ AND
 	query = dal.Db.Rebind(query)
 	rows, err := dal.Db.Queryx(query, args...)
 	if err != nil {
-		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetListsByUserAndLabels"))
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserAndLabels"))
 		log.Println(err)
 	}
 
 	for rows.Next() {
-		aList := new(alist.Alist)
 		rows.StructScan(&row)
-
-		json.Unmarshal([]byte(row.Body), &aList)
-		aList.User.Uuid = row.UserUuid
+		aList := convertDbRowToAlist(row)
 		items = append(items, aList)
 	}
 
@@ -77,15 +75,13 @@ WHERE
 `
 	err := dal.Db.Select(&manyAlist, query, uuid)
 	if err != nil {
-		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetListsBy"))
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsBy"))
 		log.Println(err)
 	}
 
 	items := make([]*alist.Alist, 0)
 	for _, row := range manyAlist {
-		aList := new(alist.Alist)
-		json.Unmarshal([]byte(row.Body), &aList)
-		aList.User.Uuid = row.UserUuid
+		aList := convertDbRowToAlist(row)
 		items = append(items, aList)
 	}
 	return items
@@ -97,18 +93,16 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	query := "SELECT * FROM alist_kv WHERE uuid = ?"
 	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
-		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetAlist"))
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
 		log.Println(err)
 	}
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return nil, errors.New(SuccessAlistNotFound)
+			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
 	}
 
-	aList := new(alist.Alist)
-	json.Unmarshal([]byte(row.Body), &aList)
-	aList.User.Uuid = row.UserUuid
+	aList := convertDbRowToAlist(row)
 	return aList, nil
 }
 
@@ -117,7 +111,7 @@ func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
 	aList, _ := dal.GetAlist(alist_uuid)
 
 	if aList.User.Uuid != user_uuid {
-		return errors.New("Only the owner of the list can remove it.")
+		return errors.New(i18n.InputDeleteAlistOperationOwnerOnly)
 	}
 
 	dal.RemoveLabelsForAlist(alist_uuid)
@@ -134,7 +128,7 @@ AND
 	tx.MustExec(query, alist_uuid, user_uuid)
 	err := tx.Commit()
 	if err != nil {
-		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "RemoveAlist"))
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "RemoveAlist"))
 		log.Println(err)
 	}
 	return err
@@ -150,11 +144,11 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	}
 
 	if aList.Uuid == "" {
-		return errors.New(InternalServerErrorMissingAlistUuid)
+		return errors.New(i18n.InternalServerErrorMissingAlistUuid)
 	}
 
 	if aList.User.Uuid == "" {
-		return errors.New(InternalServerErrorMissingUserUuid)
+		return errors.New(i18n.InternalServerErrorMissingUserUuid)
 	}
 
 	jsonBytes, err = json.Marshal(&aList)
@@ -203,4 +197,15 @@ func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) error {
 		}
 	}
 	return err
+}
+
+// Make sure the database record for alist gets
+// the correct fields attached.
+// The json object saved in the db, should not be
+// relied on 100% for all the fields.
+func convertDbRowToAlist(row AlistKV) *alist.Alist {
+	aList := new(alist.Alist)
+	json.Unmarshal([]byte(row.Body), &aList)
+	aList.User.Uuid = row.UserUuid
+	return aList
 }

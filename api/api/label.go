@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
@@ -26,7 +27,7 @@ func (env *Env) PostUserLabel(c echo.Context) error {
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: PostUserLabelJSONFailure,
+			Message: i18n.PostUserLabelJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -70,6 +71,6 @@ func (env *Env) RemoveUserLabel(c echo.Context) error {
 		response.Message = err.Error()
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	response.Message = fmt.Sprintf(DeleteUserLabelSuccess, label)
+	response.Message = fmt.Sprintf(i18n.DeleteUserLabelSuccess, label)
 	return c.JSON(http.StatusOK, response)
 }
