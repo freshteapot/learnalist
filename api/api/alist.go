@@ -103,6 +103,7 @@ func (env *Env) RemoveAlist(c echo.Context) error {
 	alist_uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
 
 	user := c.Get("loggedInUser").(uuid.User)
+
 	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	response := HttpResponseMessage{}
 

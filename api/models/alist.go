@@ -12,9 +12,18 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type AlistKV struct {
+	Uuid string `db:"uuid"`
+	Body    string `db:"body"`
+	UserUuid string `db:"user_uuid"`
+	ListType string `db:"list_type"`
+}
+
 // labels needs can be single or "," separated.
 func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist {
 	var items = []*alist.Alist{}
+	var row AlistKV
+
 	if labels == "" {
 		return items
 	}
@@ -22,7 +31,7 @@ func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alis
 
 	query := `
 SELECT
-  body
+  *
 FROM alist_kv
 WHERE
   uuid IN (
@@ -38,16 +47,18 @@ AND
 `
 	query, args, err := sqlx.In(query, user_uuid, lookUp)
 	query = dal.Db.Rebind(query)
-	rows, err := dal.Db.Query(query, args...)
+	rows, err := dal.Db.Queryx(query, args...)
 	if err != nil {
 		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetListsByUserAndLabels"))
 		log.Println(err)
 	}
+
 	for rows.Next() {
 		aList := new(alist.Alist)
-		var body string
-		rows.Scan(&body)
-		json.Unmarshal([]byte(body), &aList)
+		rows.StructScan(&row)
+
+		json.Unmarshal([]byte(row.Body), &aList)
+		aList.User.Uuid = row.UserUuid
 		items = append(items, aList)
 	}
 
@@ -56,10 +67,10 @@ AND
 
 // GetListsByUser Get all alists by uuid (user)
 func (dal *DAL) GetListsByUser(uuid string) []*alist.Alist {
-	var manyAlist []string
+	var manyAlist []AlistKV
 	query := `
 SELECT
-	body
+	*
 FROM alist_kv
 WHERE
 	user_uuid = ?
@@ -71,9 +82,10 @@ WHERE
 	}
 
 	items := make([]*alist.Alist, 0)
-	for _, item := range manyAlist {
+	for _, row := range manyAlist {
 		aList := new(alist.Alist)
-		json.Unmarshal([]byte(item), &aList)
+		json.Unmarshal([]byte(row.Body), &aList)
+		aList.User.Uuid = row.UserUuid
 		items = append(items, aList)
 	}
 	return items
@@ -81,24 +93,33 @@ WHERE
 
 // GetAlist Get alist
 func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
-	var body []string
-	query := "SELECT body FROM alist_kv WHERE uuid = ?"
-	err := dal.Db.Select(&body, query, uuid)
+	row := AlistKV{}
+	query := "SELECT * FROM alist_kv WHERE uuid = ?"
+	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
 		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetAlist"))
 		log.Println(err)
 	}
-
-	if len(body) == 0 {
-		return nil, errors.New(SuccessAlistNotFound)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, errors.New(SuccessAlistNotFound)
+		}
 	}
 
 	aList := new(alist.Alist)
-	json.Unmarshal([]byte(body[0]), &aList)
+	json.Unmarshal([]byte(row.Body), &aList)
+	aList.User.Uuid = row.UserUuid
 	return aList, nil
 }
 
 func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
+
+	aList, _ := dal.GetAlist(alist_uuid)
+
+	if aList.User.Uuid != user_uuid {
+		return errors.New("Only the owner of the list can remove it.")
+	}
+
 	dal.RemoveLabelsForAlist(alist_uuid)
 	query := `
 DELETE
