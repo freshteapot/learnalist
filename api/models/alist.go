@@ -15,6 +15,9 @@ import (
 // labels needs can be single or "," separated.
 func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist {
 	var items = []*alist.Alist{}
+	if labels == "" {
+		return items
+	}
 	lookUp := strings.Split(labels, ",")
 
 	query := `
@@ -109,6 +112,10 @@ AND
 	tx := dal.Db.MustBegin()
 	tx.MustExec(query, alist_uuid, user_uuid)
 	err := tx.Commit()
+	if err != nil {
+		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "RemoveAlist"))
+		log.Println(err)
+	}
 	return err
 }
 

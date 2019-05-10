@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var dal *models.DAL
 var env = Env{
 	Port:         9090,
 	DatabaseName: "./test.db",
@@ -20,10 +21,10 @@ func resetDatabase() {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	env.Datastore = &models.DAL{
+	dal = &models.DAL{
 		Db: db,
 	}
+	env.Datastore = dal
 }
 
 func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {

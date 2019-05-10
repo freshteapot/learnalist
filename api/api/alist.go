@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/uuid"
@@ -13,18 +14,27 @@ import (
 func (env *Env) GetListsByMe(c echo.Context) error {
 	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
-	filterByLabels := c.QueryParam("labels")
-	if filterByLabels == "" {
-		alists = env.Datastore.GetListsByUser(user.Uuid)
+	r := c.Request()
+	params := r.URL.Query()
+	if filterByLabels, ok := params["labels"]; ok {
+		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels[0])
 	} else {
-		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
+		alists = env.Datastore.GetListsByUser(user.Uuid)
 	}
 
 	return c.JSON(http.StatusOK, alists)
 }
 
 func (env *Env) GetListByUUID(c echo.Context) error {
-	uuid := c.Param("uuid")
+	r := c.Request()
+	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
+	uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
+	if uuid == "" {
+		response := HttpResponseMessage{
+			Message: InputMissingListUuid,
+		}
+		return c.JSON(http.StatusNotFound, response)
+	}
 	alist, err := env.Datastore.GetAlist(uuid)
 	if err != nil {
 		message := fmt.Sprintf("Failed to find alist with uuid: %s", uuid)
@@ -44,7 +54,9 @@ func (env *Env) SaveAlist(c echo.Context) error {
 		playList := uuid.NewPlaylist(&user)
 		inputUuid = playList.Uuid
 	} else if method == http.MethodPut {
-		inputUuid = c.Param("uuid")
+		// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
+		r := c.Request()
+		inputUuid = strings.TrimPrefix(r.URL.Path, "/alist/")
 	} else {
 		response := HttpResponseMessage{
 			Message: "This method is not supported.",
@@ -76,21 +88,28 @@ func (env *Env) SaveAlist(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	return c.JSON(http.StatusOK, *aList)
+
+	statusCode := http.StatusOK
+	if method == http.MethodPost {
+		statusCode = http.StatusCreated
+	}
+	return c.JSON(statusCode, *aList)
 }
 
 func (env *Env) RemoveAlist(c echo.Context) error {
 	var message string
-	alist_uuid := c.Param("uuid")
+	r := c.Request()
+	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
+	alist_uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
+
 	user := c.Get("loggedInUser").(uuid.User)
 	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	response := HttpResponseMessage{}
 
 	message = fmt.Sprintf("List %s was removed.", alist_uuid)
 	if err != nil {
-		message = fmt.Sprintf("Your Json has a problem. %s", err)
-		response.Message = message
-		return c.JSON(http.StatusBadRequest, response)
+		response.Message = InternalServerErrorDeleteAlist
+		return c.JSON(http.StatusInternalServerError, response)
 	}
 	response.Message = message
 	return c.JSON(http.StatusOK, response)
