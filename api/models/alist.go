@@ -1,10 +1,11 @@
 package models
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/alist"
@@ -12,8 +13,11 @@ import (
 )
 
 // labels needs can be single or "," separated.
-func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) ([]*alist.Alist, error) {
+func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist {
 	var items = []*alist.Alist{}
+	if labels == "" {
+		return items
+	}
 	lookUp := strings.Split(labels, ",")
 
 	query := `
@@ -35,79 +39,84 @@ AND
 	query, args, err := sqlx.In(query, user_uuid, lookUp)
 	query = dal.Db.Rebind(query)
 	rows, err := dal.Db.Query(query, args...)
-
+	if err != nil {
+		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetListsByUserAndLabels"))
+		log.Println(err)
+	}
 	for rows.Next() {
 		aList := new(alist.Alist)
 		var body string
-		err = rows.Scan(&body)
+		rows.Scan(&body)
 		json.Unmarshal([]byte(body), &aList)
 		items = append(items, aList)
 	}
 
-	return items, err
+	return items
 }
 
-// GetListsBy Get all alists by uuid
-func (dal *DAL) GetListsBy(uuid string) ([]*alist.Alist, error) {
-	// @todo use userid and not return all lists.
-	stmt, err := dal.Db.Prepare("SELECT uuid FROM alist_kv WHERE user_uuid=?")
-	rows, err := stmt.Query(uuid)
+// GetListsByUser Get all alists by uuid (user)
+func (dal *DAL) GetListsByUser(uuid string) []*alist.Alist {
+	var manyAlist []string
+	query := `
+SELECT
+	body
+FROM alist_kv
+WHERE
+	user_uuid = ?
+`
+	err := dal.Db.Select(&manyAlist, query, uuid)
 	if err != nil {
-		return nil, err
+		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetListsBy"))
+		log.Println(err)
 	}
-	defer rows.Close()
 
 	items := make([]*alist.Alist, 0)
-	for rows.Next() {
-		var uuid string
-		err = rows.Scan(&uuid)
-		if err != nil {
-			return nil, err
-		}
-		var item *alist.Alist
-		item, err = dal.GetAlist(uuid)
-
-		if err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	for _, item := range manyAlist {
+		aList := new(alist.Alist)
+		json.Unmarshal([]byte(item), &aList)
+		items = append(items, aList)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+	return items
 }
 
 // GetAlist Get alist
 func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
-	stmt, err := dal.Db.Prepare("SELECT body FROM alist_kv WHERE uuid = ?")
+	var body []string
+	query := "SELECT body FROM alist_kv WHERE uuid = ?"
+	err := dal.Db.Select(&body, query, uuid)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "GetAlist"))
+		log.Println(err)
 	}
-	defer stmt.Close()
-	var body string
+
+	if len(body) == 0 {
+		return nil, errors.New(SuccessAlistNotFound)
+	}
 
 	aList := new(alist.Alist)
-	err = stmt.QueryRow(uuid).Scan(&body)
-	json.Unmarshal([]byte(body), &aList)
-
-	if err != nil {
-		return nil, err
-	}
-
+	json.Unmarshal([]byte(body[0]), &aList)
 	return aList, nil
 }
 
-func (dal *DAL) RemoveAlist(uuid string) error {
-	var err error
-	var stmt *sql.Stmt
-	// @todo lock this down to the user as well.
-	stmt, err = dal.Db.Prepare("DELETE FROM alist_kv WHERE uuid=?")
-	checkErr(err)
-
-	_, err = stmt.Exec(uuid)
-	checkErr(err)
-	return nil
+func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
+	dal.RemoveLabelsForAlist(alist_uuid)
+	query := `
+DELETE
+FROM
+	alist_kv
+WHERE
+	uuid=$1
+AND
+	user_uuid=$2
+`
+	tx := dal.Db.MustBegin()
+	tx.MustExec(query, alist_uuid, user_uuid)
+	err := tx.Commit()
+	if err != nil {
+		log.Println(fmt.Sprintf(InternalServerErrorTalkingToDatabase, "RemoveAlist"))
+		log.Println(err)
+	}
+	return err
 }
 
 func (dal *DAL) SaveAlist(aList alist.Alist) error {
@@ -120,11 +129,11 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	}
 
 	if aList.Uuid == "" {
-		return errors.New("Uuid is missing, possibly an internal error")
+		return errors.New(InternalServerErrorMissingAlistUuid)
 	}
 
 	if aList.User.Uuid == "" {
-		return errors.New("User.Uuid is missing, possibly an internal error")
+		return errors.New(InternalServerErrorMissingUserUuid)
 	}
 
 	jsonBytes, err = json.Marshal(&aList)
@@ -133,7 +142,10 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 
 	current, _ := dal.GetAlist(aList.Uuid)
 	dal.RemoveLabelsForAlist(aList.Uuid)
-	aList = dal.SaveLabelsForAlist(aList)
+	err = dal.SaveLabelsForAlist(aList)
+	if err != nil {
+		log.Println(err)
+	}
 
 	tx := dal.Db.MustBegin()
 	if current == nil {
@@ -150,22 +162,24 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 
 // Process the lists labels,
 // We post to both the user_labels and alist_labels table.
-func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) alist.Alist {
+func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) error {
 	// Post the labels
-	cleanLabels := make([]string, 0)
+	var statusCode int
+	var err error
+
 	for _, label := range aList.Info.Labels {
-		if label == "" {
-			continue
-		}
-		if len(label) > 20 {
-			continue
-		}
-		cleanLabels = append(cleanLabels, label)
 		a := NewUserLabel(label, aList.User.Uuid)
 		b := NewAlistLabel(label, aList.User.Uuid, aList.Uuid)
-		dal.PostUserLabel(a)
-		dal.PostAlistLabel(b)
+
+		statusCode, err = dal.PostUserLabel(a)
+		if statusCode == http.StatusBadRequest {
+			return err
+		}
+
+		statusCode, err = dal.PostAlistLabel(b)
+		if statusCode == http.StatusBadRequest {
+			return err
+		}
 	}
-	aList.Info.Labels = cleanLabels
-	return aList
+	return err
 }

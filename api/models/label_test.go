@@ -13,17 +13,25 @@ func init() {
 
 func TestPostUserLabel(t *testing.T) {
 	resetDatabase()
-	a := NewUserLabel("label1", "user2")
-	statusCode, _ := dal.PostUserLabel(a)
-	assert.Equal(t, http.StatusCreated, statusCode)
+	var statusCode int
+	var err error
 
+	a := NewUserLabel("label1", "user2")
+	statusCode, _ = dal.PostUserLabel(a)
+	assert.Equal(t, http.StatusCreated, statusCode)
+	// Check duplicate entry returns 200.
 	statusCode, _ = dal.PostUserLabel(a)
 	assert.Equal(t, http.StatusOK, statusCode)
 
 	b := NewUserLabel("label_123456789_123456789_car_boat", "user2")
-	statusCode, err := dal.PostUserLabel(b)
+	statusCode, err = dal.PostUserLabel(b)
 	assert.Equal(t, http.StatusBadRequest, statusCode)
 	assert.Equal(t, ValidationWarningLabelToLong, err.Error())
+
+	c := NewUserLabel("", "user2")
+	statusCode, err = dal.PostUserLabel(c)
+	assert.Equal(t, http.StatusBadRequest, statusCode)
+	assert.Equal(t, ValidationWarningLabelNotEmpty, err.Error())
 }
 
 func TestPostAlistLabel(t *testing.T) {

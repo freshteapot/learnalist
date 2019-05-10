@@ -34,15 +34,27 @@ func NewAlistLabel(label string, user string, alist string) *AlistLabel {
 	return alistLabel
 }
 
+func ValidateLabel(label string) error {
+	if label == "" {
+		return errors.New(ValidationWarningLabelNotEmpty)
+	}
+
+	if len(label) > 20 {
+		return errors.New(ValidationWarningLabelToLong)
+	}
+	return nil
+}
+
 func (dal *DAL) PostUserLabel(label *UserLabel) (int, error) {
 	statusCode := http.StatusBadRequest
-	if len(label.Label) > 20 {
-		return statusCode, errors.New(ValidationWarningLabelToLong)
+	err := ValidateLabel(label.Label)
+	if err != nil {
+		return statusCode, err
 	}
 
 	query := "INSERT INTO user_labels(label, user_uuid) VALUES (:label, :user_uuid);"
 
-	_, err := dal.Db.NamedExec(query, label)
+	_, err = dal.Db.NamedExec(query, label)
 	statusCode = http.StatusCreated
 	if err != nil {
 		statusCode = http.StatusBadRequest
@@ -56,14 +68,14 @@ func (dal *DAL) PostUserLabel(label *UserLabel) (int, error) {
 // Parse in the user uuid and get back their labels
 func (dal *DAL) PostAlistLabel(label *AlistLabel) (int, error) {
 	statusCode := http.StatusBadRequest
-
-	if len(label.Label) > 20 {
-		return statusCode, errors.New(ValidationWarningLabelToLong)
+	err := ValidateLabel(label.Label)
+	if err != nil {
+		return statusCode, err
 	}
 
 	query := "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (:label, :user_uuid, :alist_uuid);"
 
-	_, err := dal.Db.NamedExec(query, label)
+	_, err = dal.Db.NamedExec(query, label)
 	statusCode = http.StatusCreated
 	if err != nil {
 		statusCode = http.StatusBadRequest
