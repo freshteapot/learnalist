@@ -1,7 +1,12 @@
 package models
 
 const (
-	ValidationWarningLabelToLong = "The label cannot be longer than 20 characters."
+	ValidationWarningLabelToLong         = "The label cannot be longer than 20 characters."
+	ValidationWarningLabelNotEmpty       = "The label cannot be empty."
+	SuccessAlistNotFound                 = "List not found."
+	InternalServerErrorMissingAlistUuid  = "Uuid is missing, possibly an internal error"
+	InternalServerErrorMissingUserUuid   = "User.Uuid is missing, possibly an internal error"
+	InternalServerErrorTalkingToDatabase = "Issue with talking to the database in %s."
 )
 
 type SimpleEvent struct {
