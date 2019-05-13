@@ -72,7 +72,7 @@ func TestUnmarshalJSONUnsupportedListType(t *testing.T) {
 
 func TestMarshalJSON(t *testing.T) {
 	var jsonBytes []byte
-	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"v1"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"v1","labels":[]},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
 
 	jsonBytes = []byte(jsonStr)
 	aList := new(Alist)

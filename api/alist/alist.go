@@ -27,7 +27,7 @@ type AlistTypeV1 []string
 type AlistInfo struct {
 	Title    string   `json:"title"`
 	ListType string   `json:"type"`
-	Labels   []string `json:"labels,omitempty"`
+	Labels   []string `json:"labels"`
 	From     string   `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
 }
 
