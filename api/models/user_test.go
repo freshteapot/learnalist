@@ -23,28 +23,16 @@ func TestUser(t *testing.T) {
 		Username: "iamuser",
 		Password: "iampassword",
 	}
+	// Insert new user
 	newUserA, err = dal.InsertNewUser(loginUser)
 	assert.NoError(t, err)
-
+	// Confirm the user uuid is the same.
 	newUserB, err = dal.GetUserByCredentials(loginUser)
 	assert.Equal(t, newUserA, newUserB)
-
+	// Insert the same user and confirm it is rejected.
 	_, err = dal.InsertNewUser(loginUser)
 	assert.Equal(t, i18n.UserInsertUsernameExists, err.Error())
-	/*
-		loginUser.Password = "change"
-		newUserC, err := dal.InsertNewUser(loginUser)
-		fmt.Println(err)
-		fmt.Println(newUserC)
-		newUserC, err = dal.InsertNewUser(loginUser)
-		fmt.Println(err)
-		fmt.Println(newUserC)
-		assert.Equal(t, i18n.UserInsertAlreadyExistsPasswordNotMatch, err.Error())
-
-		loginUser.Username = "iamanotheruser"
-		_, err = dal.GetUserByCredentials(loginUser)
-		assert.Equal(t, i18n.DatabaseLookupNotFound, err.Error())
-	*/
+	// Confirm getting a user that is not the system is handled.
 	loginUser.Username = "iamanotheruser"
 	_, err = dal.GetUserByCredentials(loginUser)
 	assert.Equal(t, i18n.DatabaseLookupNotFound, err.Error())

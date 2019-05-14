@@ -56,7 +56,6 @@ func (env *Env) PostRegister(c echo.Context) error {
 				}
 				return c.JSON(http.StatusBadRequest, response)
 			}
-			statusCode = http.StatusCreated
 		}
 	} else {
 		statusCode = http.StatusOK

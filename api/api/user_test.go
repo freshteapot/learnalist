@@ -1,11 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -91,7 +93,7 @@ func TestPostRegisterValidPayloadThenFake(t *testing.T) {
 	resetDatabase()
 	input := `{"username":"chris", "password":"test"}`
 	fake := `{"username":"chris", "password":"test123"}`
-	expectedFakeResponse := `{"message":"Failed to save."}`
+	expectedFakeResponse := fmt.Sprintf(`{"message":"%s"}`, i18n.UserInsertUsernameExists)
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)

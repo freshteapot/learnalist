@@ -16,6 +16,6 @@ const (
 	ApiDeleteAlistSuccess                   = "List %s was removed."
 	ApiDeleteUserLabelSuccess               = "Label %s was removed."
 	UserInsertAlreadyExistsPasswordNotMatch = "Failed to save."
-	UserInsertUsernameExists                = "Username already exists"
+	UserInsertUsernameExists                = "Username already exists."
 	DatabaseLookupNotFound                  = "sql: no rows in result set"
 )
