@@ -16,10 +16,9 @@ func init() {
 func TestSaveAlist(t *testing.T) {
 	resetDatabase()
 	setup := `
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
+INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 `
 	dal.Db.MustExec(setup)
-
 	a := `
 {
     "data": [
@@ -72,7 +71,7 @@ func TestGetAndRemoveAlist(t *testing.T) {
 	resetDatabase()
 	setup := `
 INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
+INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 `
@@ -99,7 +98,7 @@ func TestGetListsByUserAndLabels(t *testing.T) {
 	resetDatabase()
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
+	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');
@@ -126,7 +125,7 @@ func TestGetListsByUserUuid(t *testing.T) {
 	resetDatabase()
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
+	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');

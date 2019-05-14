@@ -1,11 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -72,7 +74,7 @@ func TestPostRegisterValidPayload(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, http.StatusCreated, rec.Code)
 		responseA := strings.TrimSpace(rec.Body.String())
 
 		// Check we get the same userid
@@ -91,13 +93,13 @@ func TestPostRegisterValidPayloadThenFake(t *testing.T) {
 	resetDatabase()
 	input := `{"username":"chris", "password":"test"}`
 	fake := `{"username":"chris", "password":"test123"}`
-	expectedFakeResponse := `{"message":"Failed to save."}`
+	expectedFakeResponse := fmt.Sprintf(`{"message":"%s"}`, i18n.UserInsertUsernameExists)
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)
 
 	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, http.StatusCreated, rec.Code)
 
 		// Check we get the same userid
 		req, rec := setupFakeEndpoint(http.MethodPost, "/register", fake)
@@ -109,4 +111,20 @@ func TestPostRegisterValidPayloadThenFake(t *testing.T) {
 			assert.Equal(t, response, expectedFakeResponse)
 		}
 	}
+}
+
+func TestPostRegisterRepeat(t *testing.T) {
+	resetDatabase()
+	input := `{"username":"chris", "password":"test"}`
+	e := echo.New()
+	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
+	c := e.NewContext(req, rec)
+
+	env.PostRegister(c)
+	assert.Equal(t, http.StatusCreated, rec.Code)
+
+	req, rec = setupFakeEndpoint(http.MethodPost, "/register", input)
+	c = e.NewContext(req, rec)
+	env.PostRegister(c)
+	assert.Equal(t, http.StatusOK, rec.Code)
 }

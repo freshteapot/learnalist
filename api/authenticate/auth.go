@@ -61,6 +61,6 @@ func HashIt(user LoginUser) (string, error) {
 
 	h.Write([]byte(beforeHash))
 	hash := h.Sum64()
-	storedHash := fmt.Sprintf("A%d", hash)
+	storedHash := fmt.Sprintf("%d", hash)
 	return storedHash, nil
 }

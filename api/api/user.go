@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,6 +19,11 @@ type HttpRegisterResponse struct {
 	Uuid string `json:"uuid"`
 }
 
+/*
+When a user is created it returns a 201.
+When a user is created with the same username and password it returns a 200.
+When a user is created with a username in the system it returns a 400.
+*/
 func (env *Env) PostRegister(c echo.Context) error {
 	var input = &HttpRegisterInput{}
 
@@ -43,19 +49,24 @@ func (env *Env) PostRegister(c echo.Context) error {
 		Username: input.Username,
 		Password: input.Password,
 	}
-	newUser, err := env.Datastore.InsertNewUser(loginUser)
+
+	statusCode := http.StatusCreated
+	newUser, err := env.Datastore.GetUserByCredentials(loginUser)
 	if err != nil {
-		// Currently returns Failed to save. I wonder
-		// if it should give some more detail, as it
-		// is actually failing as the password doesnt
-		// match the username.
-		response := HttpResponseMessage{
-			Message: err.Error(),
+		if err.Error() == i18n.DatabaseLookupNotFound {
+			newUser, err = env.Datastore.InsertNewUser(loginUser)
+			if err != nil {
+				response := HttpResponseMessage{
+					Message: err.Error(),
+				}
+				return c.JSON(http.StatusBadRequest, response)
+			}
 		}
-		return c.JSON(http.StatusBadRequest, response)
+	} else {
+		statusCode = http.StatusOK
 	}
 
 	response := HttpRegisterResponse{
 		Uuid: newUser.Uuid}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(statusCode, response)
 }
