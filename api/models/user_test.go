@@ -32,6 +32,9 @@ func TestUser(t *testing.T) {
 	// Insert the same user and confirm it is rejected.
 	_, err = dal.InsertNewUser(loginUser)
 	assert.Equal(t, i18n.UserInsertUsernameExists, err.Error())
+	loginUser.Password = "fake"
+	_, err = dal.InsertNewUser(loginUser)
+	assert.Equal(t, i18n.UserInsertUsernameExists, err.Error())
 	// Confirm getting a user that is not the system is handled.
 	loginUser.Username = "iamanotheruser"
 	_, err = dal.GetUserByCredentials(loginUser)

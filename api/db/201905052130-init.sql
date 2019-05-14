@@ -19,8 +19,16 @@ CREATE TABLE IF NOT EXISTS alist_kv (
   )
 );
 CREATE TABLE IF NOT EXISTS user (
-  uuid CHARACTER(36) not null primary key,
-  hash CHARACTER(20),
+  uuid CHARACTER(36) not null primary key
+  CHECK(
+    typeof("uuid") = "text" AND
+    length("uuid") <= 36
+  ),
+  hash CHARACTER(20)
+  CHECK(
+    typeof("hash") = "text" AND
+    length("hash") <= 20
+  ),
   username text NOT NULL UNIQUE
 );
 COMMIT;
