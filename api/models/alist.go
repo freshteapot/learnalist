@@ -97,7 +97,7 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 		log.Println(err)
 	}
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
+		if err.Error() == i18n.DatabaseLookupNotFound {
 			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
 	}

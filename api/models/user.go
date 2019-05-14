@@ -1,52 +1,53 @@
 package models
 
 import (
-	"database/sql"
 	"errors"
 	"log"
 
 	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
+type DatabaseUser struct {
+	Uuid     string `db:"uuid"`
+	Username string `db:"username"`
+	Hash     string `db:"hash"`
+}
+
+func NewUser(username string, hash string) *DatabaseUser {
+	newUser := uuid.NewUser()
+	user := &DatabaseUser{
+		Uuid:     newUser.Uuid,
+		Hash:     hash,
+		Username: username,
+	}
+	return user
+}
+
 func (dal *DAL) InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, error) {
 	var hash string
-
 	var err error
-	var stmt *sql.Stmt
-
-	var savedUuid string
-	var savedHash string
-	var savedUsername string
 
 	hash, err = authenticate.HashIt(loginUser)
+	newUser := NewUser(loginUser.Username, hash)
+	query := "INSERT INTO user(uuid, hash, username) values(:uuid,:hash,:username);"
 
-	// Make sure user is unique.
-	stmt, err = dal.Db.Prepare("SELECT uuid, hash, username FROM user WHERE username = ?")
+	_, err = dal.Db.NamedExec(query, newUser)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
-	_ = stmt.QueryRow(loginUser.Username).Scan(&savedUuid, &savedHash, &savedUsername)
-
-	if savedUsername != "" {
-		user := &uuid.User{}
-		if savedHash != hash {
-			err = errors.New("Failed to save.")
-			return user, err
+		if err != nil {
+			if err.Error() == "UNIQUE constraint failed: user.username" {
+				return nil, errors.New(i18n.UserInsertUsernameExists)
+			}
+			// This is ugly
+			checkErr(err)
 		}
-		user.Uuid = savedUuid
-		return user, nil
 	}
 
-	newUser := uuid.NewUser()
-	stmt, err = dal.Db.Prepare("INSERT INTO user(uuid, hash, username) values(?,?,?)")
-	checkErr(err)
-
-	_, err = stmt.Exec(newUser.Uuid, hash, loginUser.Username)
-	checkErr(err)
-	return &newUser, nil
+	user := &uuid.User{
+		Uuid: newUser.Uuid,
+	}
+	return user, nil
 }
 
 func (dal *DAL) GetUserByCredentials(loginUser authenticate.LoginUser) (*uuid.User, error) {
