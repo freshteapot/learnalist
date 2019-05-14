@@ -19,6 +19,11 @@ type HttpRegisterResponse struct {
 	Uuid string `json:"uuid"`
 }
 
+/*
+When a user is created it returns a 201.
+When a user is created with the same username and password it returns a 200.
+When a user is created with a username in the system it returns a 400.
+*/
 func (env *Env) PostRegister(c echo.Context) error {
 	var input = &HttpRegisterInput{}
 
