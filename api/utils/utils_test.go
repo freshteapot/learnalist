@@ -38,3 +38,15 @@ func TestStringArrayIndexOf(t *testing.T) {
 	found = StringArrayIndexOf(items, "day")
 	assert.Equal(t, 2, found)
 }
+
+func TestStringArrayRemoveAtIndex(t *testing.T) {
+	items := []string{
+		"morning",
+		"evening",
+		"day",
+		"night",
+	}
+	index := 1
+	after := StringArrayRemoveAtIndex(items, index)
+	assert.Equal(t, 3, len(after))
+}

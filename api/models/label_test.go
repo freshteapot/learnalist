@@ -55,7 +55,7 @@ func TestGetUserLabels(t *testing.T) {
 	resetDatabase()
 	setup := `
 INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":[]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
+INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 `
 	dal.Db.MustExec(setup)
 	alist_uuid := "ada41576-b710-593a-9603-946aaadcb22d"
@@ -108,7 +108,7 @@ curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/alist -u'test1:test' -
 func TestRemoveLabelsFromExistingLists(t *testing.T) {
 	resetDatabase()
 	setup := `
-INSERT INTO user VALUES('c3d330fd-73b9-5d3c-840e-3bb59367b5ed','A4187246584872952904','test1');
+INSERT INTO user VALUES('c3d330fd-73b9-5d3c-840e-3bb59367b5ed','4187246584872952904','test1');
 INSERT INTO alist_kv VALUES('3c9394eb-7df1-5611-bce1-2bc3a198b2a6','v1','{"data":[],"info":{"title":"Days of the Week","type":"v1","labels":["label a","label b"]},"uuid":"3c9394eb-7df1-5611-bce1-2bc3a198b2a6"}','c3d330fd-73b9-5d3c-840e-3bb59367b5ed');
 INSERT INTO user_labels VALUES('label a','c3d330fd-73b9-5d3c-840e-3bb59367b5ed');
 INSERT INTO user_labels VALUES('label b','c3d330fd-73b9-5d3c-840e-3bb59367b5ed');
