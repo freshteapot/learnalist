@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
 type UserLabel struct {
@@ -110,13 +112,48 @@ WHERE user_uuid=$1
 
 // Pass in the label and the user (uuid) to remove them from the tables
 func (dal *DAL) RemoveUserLabel(label string, user string) error {
+	var err error
+	var aList *alist.Alist
+
+	queryForUuids := `
+SELECT
+	DISTINCT(alist_uuid)
+FROM
+	alist_labels
+WHERE
+	user_uuid=$1
+AND
+	label=$2
+`
+	var uuids = []string{}
+	err = dal.Db.Select(&uuids, queryForUuids, user, label)
+	if err != nil {
+		return err
+	}
+
+	for _, uuid := range uuids {
+		aList, err = dal.GetAlist(uuid)
+		found := utils.StringArrayIndexOf(aList.Info.Labels, label)
+		if found != -1 {
+			cleaned := []string{}
+			for _, item := range aList.Info.Labels {
+				if item != label {
+					cleaned = append(cleaned, item)
+				}
+			}
+			aList.Info.Labels = cleaned
+			dal.SaveAlist(*aList)
+		}
+	}
+
+	// Update each of them by removin the label in question.
 	query1 := "DELETE FROM user_labels WHERE user_uuid=$1 AND label=$2"
 	query2 := "DELETE FROM alist_labels WHERE user_uuid=$1 AND label=$2"
 
 	tx := dal.Db.MustBegin()
 	tx.MustExec(query1, user, label)
 	tx.MustExec(query2, user, label)
-	err := tx.Commit()
+	err = tx.Commit()
 	return err
 }
 
