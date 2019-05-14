@@ -19,11 +19,6 @@ func init() {
 
 func TestAlistApi(t *testing.T) {
 	resetDatabase()
-	setup := `
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','A9046052444752556320','chris');
-`
-	dal.Db.MustExec(setup)
-
 	// Post a list
 	lists := []string{`
 {
