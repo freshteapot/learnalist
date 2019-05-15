@@ -87,6 +87,11 @@ func (env *Env) SaveAlist(c echo.Context) error {
 		response := HttpResponseMessage{
 			Message: err.Error(),
 		}
+
+		if err.Error() == i18n.InputSaveAlistOperationOwnerOnly {
+			return c.JSON(http.StatusForbidden, response)
+		}
+
 		return c.JSON(http.StatusBadRequest, response)
 	}
 

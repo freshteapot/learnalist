@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -103,16 +104,25 @@ func (suite *ApiSuite) TestPostRegisterValidPayloadThenFake() {
 }
 
 func (suite *ApiSuite) TestPostRegisterRepeat() {
+	var statusCode int
 	input := `{"username":"chris", "password":"test"}`
+	_, statusCode = suite.createNewUserWithSuccess(input)
+	suite.Equal(http.StatusCreated, statusCode)
+
+	_, statusCode = suite.createNewUserWithSuccess(input)
+	suite.Equal(http.StatusOK, statusCode)
+}
+
+func (suite *ApiSuite) createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
+
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)
+	suite.NoError(env.PostRegister(c))
+	suite.Contains([]int{http.StatusOK, http.StatusCreated}, rec.Code)
 
-	env.PostRegister(c)
-	suite.Equal(http.StatusCreated, rec.Code)
-
-	req, rec = setupFakeEndpoint(http.MethodPost, "/register", input)
-	c = e.NewContext(req, rec)
-	env.PostRegister(c)
-	suite.Equal(http.StatusOK, rec.Code)
+	var raw map[string]interface{}
+	json.Unmarshal(rec.Body.Bytes(), &raw)
+	user_uuid := raw["uuid"].(string)
+	return user_uuid, rec.Code
 }
