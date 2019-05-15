@@ -6,19 +6,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	resetDatabase()
-}
-
-func TestAlistApi(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestAlistApi() {
 	// Post a list
 	lists := []string{`
 {
@@ -83,8 +76,8 @@ func TestAlistApi(t *testing.T) {
 		c = e.NewContext(req, rec)
 		c.Set("loggedInUser", user)
 
-		assert.NoError(t, env.SaveAlist(c))
-		assert.Equal(t, http.StatusCreated, rec.Code)
+		suite.NoError(env.SaveAlist(c))
+		suite.Equal(http.StatusCreated, rec.Code)
 		response := strings.TrimSpace(rec.Body.String())
 
 		json.Unmarshal([]byte(response), &listUuid)
@@ -96,83 +89,83 @@ func TestAlistApi(t *testing.T) {
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListByUUID(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListByUUID(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	// Check an empty uuid
 	uri = "/alist/"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListByUUID(c))
+	suite.NoError(env.GetListByUUID(c))
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, http.StatusNotFound, rec.Code)
-	assert.Equal(t, `{"message":"The uuid is missing."}`, response)
+	suite.Equal(http.StatusNotFound, rec.Code)
+	suite.Equal(`{"message":"The uuid is missing."}`, response)
 
 	uri = "/alist/fake123"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListByUUID(c))
+	suite.NoError(env.GetListByUUID(c))
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, http.StatusNotFound, rec.Code)
-	assert.True(t, strings.Contains(response, "Failed to find alist with uuid:"))
+	suite.Equal(http.StatusNotFound, rec.Code)
+	suite.True(strings.Contains(response, "Failed to find alist with uuid:"))
 
 	// Get my lists
 	uri = "/alist/by/me"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListsByMe(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListsByMe(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
 
 	json.Unmarshal([]byte(response), &listOfUuids)
-	assert.Equal(t, 4, len(listOfUuids))
+	suite.Equal(4, len(listOfUuids))
 
 	// Get my lists filter by labels
 	uri = "/alist/by/me?labels=water"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListsByMe(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListsByMe(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
 
 	json.Unmarshal([]byte(response), &listOfUuids)
-	assert.Equal(t, 2, len(listOfUuids))
+	suite.Equal(2, len(listOfUuids))
 
 	uri = "/alist/by/me?labels="
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListsByMe(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListsByMe(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
 
 	json.Unmarshal([]byte(response), &listOfUuids)
-	assert.Equal(t, 0, len(listOfUuids))
+	suite.Equal(0, len(listOfUuids))
 
 	uri = "/alist/by/me?labels=car,water"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListsByMe(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListsByMe(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
 
 	json.Unmarshal([]byte(response), &listOfUuids)
-	assert.Equal(t, 2, len(listOfUuids))
+	suite.Equal(2, len(listOfUuids))
 
 	uri = "/alist/by/me?labels=card"
 	req, rec = setupFakeEndpoint(http.MethodGet, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetListsByMe(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.GetListsByMe(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
 
 	json.Unmarshal([]byte(response), &listOfUuids)
-	assert.Equal(t, 0, len(listOfUuids))
+	suite.Equal(0, len(listOfUuids))
 
 	// Update a list
 	putListData := `
@@ -191,34 +184,34 @@ func TestAlistApi(t *testing.T) {
 	req, rec = setupFakeEndpoint(http.MethodPut, uri, putListData)
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.SaveAlist(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.SaveAlist(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	// Check bad data
 	uri = "/alist/" + uuids[0]
 	req, rec = setupFakeEndpoint(http.MethodPut, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.SaveAlist(c))
-	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	suite.NoError(env.SaveAlist(c))
+	suite.Equal(http.StatusBadRequest, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, `{"message":"Your Json has a problem. Failed to parse list."}`, response)
+	suite.Equal(`{"message":"Your Json has a problem. Failed to parse list."}`, response)
 	// Check unsupported method
 	uri = "/alist/" + uuids[0]
 	req, rec = setupFakeEndpoint(http.MethodDelete, uri, putListData)
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.SaveAlist(c))
-	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	suite.NoError(env.SaveAlist(c))
+	suite.Equal(http.StatusBadRequest, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, `{"message":"This method is not supported."}`, response)
+	suite.Equal(`{"message":"This method is not supported."}`, response)
 
 	// RemoveAlist
 	uri = "/alist/" + uuids[0]
 	req, rec = setupFakeEndpoint(http.MethodDelete, uri, "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.RemoveAlist(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.RemoveAlist(c))
+	suite.Equal(http.StatusOK, rec.Code)
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, fmt.Sprintf(`{"message":"List %s was removed."}`, uuids[0]), response)
+	suite.Equal(fmt.Sprintf(`{"message":"List %s was removed."}`, uuids[0]), response)
 }

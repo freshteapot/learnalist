@@ -2,7 +2,6 @@ package models
 
 import (
 	"io/ioutil"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
@@ -10,8 +9,17 @@ import (
 
 const PathToTestSqliteDb = "/tmp/test.db"
 
+func GetTables() []string {
+	tables := &[]string{
+		"alist_kv",
+		"user",
+		"user_labels",
+		"alist_labels",
+	}
+	return *tables
+}
+
 func NewTestDB() (*sqlx.DB, error) {
-	os.Remove(PathToTestSqliteDb)
 	dataSourceName := "file:" + PathToTestSqliteDb
 	db, _ := NewDB(dataSourceName)
 
