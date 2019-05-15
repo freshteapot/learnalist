@@ -24,12 +24,11 @@ type ApiSuite struct {
 }
 
 func (suite *ApiSuite) SetupSuite() {
-	// Init and set mysql cleanup engine
-	fmt.Println("Setup")
+	resetDatabase()
 }
 
 func (suite *ApiSuite) SetupTest() {
-	resetDatabase()
+
 }
 
 func (suite *ApiSuite) TearDownTest() {

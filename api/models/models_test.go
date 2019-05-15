@@ -14,12 +14,11 @@ type ModelSuite struct {
 }
 
 func (suite *ModelSuite) SetupSuite() {
-	// Init and set mysql cleanup engine
-	fmt.Println("Setup")
+	resetDatabase()
 }
 
 func (suite *ModelSuite) SetupTest() {
-	resetDatabase()
+
 }
 
 func (suite *ModelSuite) TearDownTest() {
