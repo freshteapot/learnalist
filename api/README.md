@@ -1,5 +1,6 @@
 # Learnalist - API
-![Code coverage, manually ran][./coverage_badge.png]
+
+![Code coverage, manually ran](./coverage_badge.png)
 
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
