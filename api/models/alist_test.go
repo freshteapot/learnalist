@@ -1,20 +1,12 @@
 package models
 
 import (
-	"testing"
-
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
-	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	resetDatabase()
-}
-
-func TestSaveAlist(t *testing.T) {
-	resetDatabase()
+func (suite *ModelSuite) TestSaveAlist() {
 	setup := `
 INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 `
@@ -53,22 +45,20 @@ INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556
 	// Check empty alist.uuid
 	aList.Uuid = ""
 	err = dal.SaveAlist(*aList)
-	assert.Equal(t, i18n.InternalServerErrorMissingAlistUuid, err.Error())
+	suite.Equal(i18n.InternalServerErrorMissingAlistUuid, err.Error())
 	aList.Uuid = alist_uuid
 	// Check empty user.uuid
 	aList.User.Uuid = ""
 	err = dal.SaveAlist(*aList)
-	assert.Equal(t, i18n.InternalServerErrorMissingUserUuid, err.Error())
+	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
 }
 
-func TestRemoveLabelsForAlistEmptyUuid(t *testing.T) {
-	resetDatabase()
+func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {
 	err := dal.RemoveLabelsForAlist("")
-	assert.Equal(t, nil, err)
+	suite.Equal(nil, err)
 }
 
-func TestGetAndRemoveAlist(t *testing.T) {
-	resetDatabase()
+func (suite *ModelSuite) TestGetAndRemoveAlist() {
 	setup := `
 INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
@@ -81,21 +71,20 @@ INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f
 	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
 
 	aList, _ := dal.GetAlist(alist_uuid)
-	assert.Equal(t, alist.SimpleList, aList.Info.ListType)
+	suite.Equal(alist.SimpleList, aList.Info.ListType)
 
 	// Check removing a list of a different user.
 	err := dal.RemoveAlist(alist_uuid, "fake")
-	assert.Equal(t, i18n.InputDeleteAlistOperationOwnerOnly, err.Error())
+	suite.Equal(i18n.InputDeleteAlistOperationOwnerOnly, err.Error())
 
 	// Check removing a list owned by the user
 	err = dal.RemoveAlist(alist_uuid, user_uuid)
-	assert.Nil(t, err)
+	suite.Nil(err)
 	_, err = dal.GetAlist(alist_uuid)
-	assert.Equal(t, i18n.SuccessAlistNotFound, err.Error())
+	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
 }
 
-func TestGetListsByUserAndLabels(t *testing.T) {
-	resetDatabase()
+func (suite *ModelSuite) TestGetListsByUserAndLabels() {
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
@@ -111,18 +100,17 @@ func TestGetListsByUserAndLabels(t *testing.T) {
 	labels := "english"
 
 	items := dal.GetListsByUserAndLabels(user_uuid, labels)
-	assert.Equal(t, 1, len(items))
+	suite.Equal(1, len(items))
 	items = dal.GetListsByUserAndLabels(user_uuid, "")
-	assert.Equal(t, 0, len(items))
+	suite.Equal(0, len(items))
 	items = dal.GetListsByUserAndLabels(user_uuid, "englishh")
-	assert.Equal(t, 0, len(items))
+	suite.Equal(0, len(items))
 
 	items = dal.GetListsByUserAndLabels(user_uuid, "water,english")
-	assert.Equal(t, 2, len(items))
+	suite.Equal(2, len(items))
 }
 
-func TestGetListsByUserUuid(t *testing.T) {
-	resetDatabase()
+func (suite *ModelSuite) TestGetListsByUserUuid() {
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
@@ -137,5 +125,5 @@ func TestGetListsByUserUuid(t *testing.T) {
 	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
 
 	items := dal.GetListsByUser(user_uuid)
-	assert.Equal(t, 2, len(items))
+	suite.Equal(2, len(items))
 }

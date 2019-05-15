@@ -5,21 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 // @todo this needs faking of the actual database commands.
 
-func init() {
-	resetDatabase()
-}
-
-func TestPostRegisterEmptyBody(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterEmptyBody() {
 	expected := `{"message":"Bad input."}`
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/register", strings.NewReader(""))
@@ -27,15 +20,14 @@ func TestPostRegisterEmptyBody(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusBadRequest, rec.Code)
+	if suite.NoError(env.PostRegister(c)) {
+		suite.Equal(http.StatusBadRequest, rec.Code)
 		response := strings.TrimSpace(rec.Body.String())
-		assert.Equal(t, expected, response)
+		suite.Equal(expected, response)
 	}
 }
 
-func TestPostRegisterNotValidJSON(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterNotValidJSON() {
 	badInput := `{username:"chris", password:"test"}`
 	expected := `{"message":"Bad input."}`
 
@@ -43,15 +35,14 @@ func TestPostRegisterNotValidJSON(t *testing.T) {
 	e := echo.New()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusBadRequest, rec.Code)
+	if suite.NoError(env.PostRegister(c)) {
+		suite.Equal(http.StatusBadRequest, rec.Code)
 		response := strings.TrimSpace(rec.Body.String())
-		assert.Equal(t, expected, response)
+		suite.Equal(expected, response)
 	}
 }
 
-func TestPostRegisterNotValidPayload(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterNotValidPayload() {
 	badInput := `{"username":"", "password":""}`
 	expected := `{"message":"Bad input."}`
 
@@ -59,38 +50,36 @@ func TestPostRegisterNotValidPayload(t *testing.T) {
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", badInput)
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusBadRequest, rec.Code)
+	if suite.NoError(env.PostRegister(c)) {
+		suite.Equal(http.StatusBadRequest, rec.Code)
 		response := strings.TrimSpace(rec.Body.String())
-		assert.Equal(t, expected, response)
+		suite.Equal(expected, response)
 	}
 }
 
-func TestPostRegisterValidPayload(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterValidPayload() {
 	input := `{"username":"chris", "password":"test"}`
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusCreated, rec.Code)
+	if suite.NoError(env.PostRegister(c)) {
+		suite.Equal(http.StatusCreated, rec.Code)
 		responseA := strings.TrimSpace(rec.Body.String())
 
 		// Check we get the same userid
 		req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 		c := e.NewContext(req, rec)
 
-		if assert.NoError(t, env.PostRegister(c)) {
-			assert.Equal(t, http.StatusOK, rec.Code)
+		if suite.NoError(env.PostRegister(c)) {
+			suite.Equal(http.StatusOK, rec.Code)
 			responseB := strings.TrimSpace(rec.Body.String())
-			assert.Equal(t, responseA, responseB)
+			suite.Equal(responseA, responseB)
 		}
 	}
 }
 
-func TestPostRegisterValidPayloadThenFake(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterValidPayloadThenFake() {
 	input := `{"username":"chris", "password":"test"}`
 	fake := `{"username":"chris", "password":"test123"}`
 	expectedFakeResponse := fmt.Sprintf(`{"message":"%s"}`, i18n.UserInsertUsernameExists)
@@ -98,33 +87,32 @@ func TestPostRegisterValidPayloadThenFake(t *testing.T) {
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, env.PostRegister(c)) {
-		assert.Equal(t, http.StatusCreated, rec.Code)
+	if suite.NoError(env.PostRegister(c)) {
+		suite.Equal(http.StatusCreated, rec.Code)
 
 		// Check we get the same userid
 		req, rec := setupFakeEndpoint(http.MethodPost, "/register", fake)
 		c := e.NewContext(req, rec)
 
-		if assert.NoError(t, env.PostRegister(c)) {
-			assert.Equal(t, http.StatusBadRequest, rec.Code)
+		if suite.NoError(env.PostRegister(c)) {
+			suite.Equal(http.StatusBadRequest, rec.Code)
 			response := strings.TrimSpace(rec.Body.String())
-			assert.Equal(t, response, expectedFakeResponse)
+			suite.Equal(response, expectedFakeResponse)
 		}
 	}
 }
 
-func TestPostRegisterRepeat(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostRegisterRepeat() {
 	input := `{"username":"chris", "password":"test"}`
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/register", input)
 	c := e.NewContext(req, rec)
 
 	env.PostRegister(c)
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	suite.Equal(http.StatusCreated, rec.Code)
 
 	req, rec = setupFakeEndpoint(http.MethodPost, "/register", input)
 	c = e.NewContext(req, rec)
 	env.PostRegister(c)
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.Equal(http.StatusOK, rec.Code)
 }

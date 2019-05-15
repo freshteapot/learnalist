@@ -4,19 +4,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	resetDatabase()
-}
-
-func TestPostLabel(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestPostLabel() {
 	inputA := `{"label": "car"}`
 	inputB := `{"label": "boat"}`
 
@@ -26,24 +19,23 @@ func TestPostLabel(t *testing.T) {
 
 	user := uuid.NewUser()
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.PostUserLabel(c))
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	suite.NoError(env.PostUserLabel(c))
+	suite.Equal(http.StatusCreated, rec.Code)
 
 	req, rec = setupFakeEndpoint(http.MethodPost, "/labels", inputA)
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.PostUserLabel(c))
-	assert.Equal(t, http.StatusOK, rec.Code)
+	suite.NoError(env.PostUserLabel(c))
+	suite.Equal(http.StatusOK, rec.Code)
 
 	req, rec = setupFakeEndpoint(http.MethodPost, "/labels", inputB)
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.PostUserLabel(c))
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	suite.NoError(env.PostUserLabel(c))
+	suite.Equal(http.StatusCreated, rec.Code)
 }
 
-func TestGetUsersLabels(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestGetUsersLabels() {
 	var req *http.Request
 	var rec *httptest.ResponseRecorder
 	var c echo.Context
@@ -53,10 +45,10 @@ func TestGetUsersLabels(t *testing.T) {
 	req, rec = setupFakeEndpoint(http.MethodGet, "/labels/by/me", "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetUserLabels(c))
+	suite.NoError(env.GetUserLabels(c))
 	response := strings.TrimSpace(rec.Body.String())
 	// Check it is an empty array
-	assert.Equal(t, "[]", response)
+	suite.Equal("[]", response)
 
 	// Post a label
 	input := []string{
@@ -68,19 +60,18 @@ func TestGetUsersLabels(t *testing.T) {
 		req, rec = setupFakeEndpoint(http.MethodPost, "/labels", item)
 		c = e.NewContext(req, rec)
 		c.Set("loggedInUser", user)
-		assert.NoError(t, env.PostUserLabel(c))
+		suite.NoError(env.PostUserLabel(c))
 	}
 
 	req, rec = setupFakeEndpoint(http.MethodGet, "/labels/by/me", "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.GetUserLabels(c))
+	suite.NoError(env.GetUserLabels(c))
 	response = strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, `["boat","car"]`, response)
+	suite.Equal(`["boat","car"]`, response)
 }
 
-func TestDeleteUsersLabels(t *testing.T) {
-	resetDatabase()
+func (suite *ApiSuite) TestDeleteUsersLabels() {
 	var req *http.Request
 	var rec *httptest.ResponseRecorder
 	var c echo.Context
@@ -90,7 +81,7 @@ func TestDeleteUsersLabels(t *testing.T) {
 	req, rec = setupFakeEndpoint(http.MethodDelete, "/labels/car", "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	assert.NoError(t, env.RemoveUserLabel(c))
+	suite.NoError(env.RemoveUserLabel(c))
 	response := strings.TrimSpace(rec.Body.String())
-	assert.Equal(t, `{"message":"Label car was removed."}`, response)
+	suite.Equal(`{"message":"Label car was removed."}`, response)
 }
