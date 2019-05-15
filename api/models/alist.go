@@ -159,7 +159,23 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	checkErr(err)
 	jsonAlist := string(jsonBytes)
 
-	current, _ := dal.GetAlist(aList.Uuid)
+	// TODO should we add post and put to the method.
+	// 1) saves doing a lookup for list.
+	// 2) makes it clearer if it is insert or edit.
+	current, err := dal.GetAlist(aList.Uuid)
+	if err != nil {
+		if err.Error() != i18n.SuccessAlistNotFound {
+			return errors.New(fmt.Sprintf("Failed to lookup list uuid:%s", aList.Uuid))
+		}
+	}
+
+	if current != nil {
+		if current.User.Uuid != aList.User.Uuid {
+			return errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+		}
+	}
+	// TODO Can we match, to see if the object has changed and avoid saving it?
+
 	dal.RemoveLabelsForAlist(aList.Uuid)
 	err = dal.SaveLabelsForAlist(aList)
 	if err != nil {
