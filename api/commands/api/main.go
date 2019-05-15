@@ -10,7 +10,7 @@ func main() {
 	database := flag.String("database", "/tmp/api.db", "The database.")
 	domain := flag.String("domain", "learnalist.net", "The domain.")
 	port := flag.Int("port", 80, "Port to listen on.")
-	corsAllowedOrigins := flag.String("cors-allowed-origins", "", "Use , beteen allowed domains.")
+	corsAllowedOrigins := flag.String("cors-allowed-origins", "", "Use , between allowed domains.")
 	flag.Parse()
 
 	api.SetDomain(*domain)
