@@ -1,4 +1,5 @@
 # Learnalist - API
+![Code coverage, manually ran][./coverage_badge.png]
 
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
@@ -121,7 +122,7 @@ Go [try some curl requests.](./doc/play.along.md)
 * https://gobyexample.com/json
 * [Like casting but not](https://golang.org/ref/spec#Type_assertions)
 * Interfaces http://go-book.appspot.com/interfaces.html
-
+* Pretty gopher badge at the top(https://github.com/jpoles1/gopherbadger).
 
 # Problems
 
