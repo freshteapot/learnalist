@@ -1,6 +1,7 @@
 package i18n
 
 const (
+	ValidationErrorList                     = "Failed to pass list info. %s"
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
 	SuccessAlistNotFound                    = "List not found."

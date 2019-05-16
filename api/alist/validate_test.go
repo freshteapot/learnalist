@@ -1,8 +1,10 @@
 package alist
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -102,7 +104,7 @@ func TestValidateAlist(t *testing.T) {
 
 	aList.Info = AlistInfo{}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list info. Title cannot be empty.")
+	assert.Equal(t, err.Error(), fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty."))
 
 	// We check the failed path, as we have specific tests for each lists validation.
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v1"}

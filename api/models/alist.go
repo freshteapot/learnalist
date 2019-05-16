@@ -10,6 +10,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -138,43 +139,60 @@ AND
 	return err
 }
 
-func (dal *DAL) SaveAlist(method string, aList alist.Alist) error {
+/*
+If empty user, we reject.
+If POST, we enforce a new uuid for the list.
+If empty uuid, we reject.
+If PUT, do a lookup to see if the list exists.
+
+*/
+func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error) {
 	var err error
 	var jsonBytes []byte
 
 	err = alist.Validate(aList)
 	if err != nil {
-		return err
-	}
-
-	if aList.Uuid == "" {
-		return errors.New(i18n.InternalServerErrorMissingAlistUuid)
+		return nil, err
 	}
 
 	if aList.User.Uuid == "" {
-		return errors.New(i18n.InternalServerErrorMissingUserUuid)
+		return nil, errors.New(i18n.InternalServerErrorMissingUserUuid)
 	}
 
+	// We set the uuid
+	if method == http.MethodPost {
+		user := &uuid.User{
+			Uuid: aList.User.Uuid,
+		}
+		playList := uuid.NewPlaylist(user)
+		aList.Uuid = playList.Uuid
+	}
+
+	if aList.Uuid == "" {
+		return nil, errors.New(i18n.InternalServerErrorMissingAlistUuid)
+	}
+	// This really shouldnt happen, but could do if called directly.
 	jsonBytes, err = json.Marshal(&aList)
 	checkErr(err)
 	jsonAlist := string(jsonBytes)
 
 	if method == http.MethodPut {
-		current, err := dal.GetAlist(aList.Uuid)
-		if err != nil {
-			if err.Error() != i18n.SuccessAlistNotFound {
-				return errors.New(fmt.Sprintf("Failed to lookup list uuid:%s", aList.Uuid))
-			}
+		current, _ := dal.GetAlist(aList.Uuid)
+		if current == nil {
+			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
 
 		if current != nil {
 			if current.User.Uuid != aList.User.Uuid {
-				return errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+				return nil, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
 			}
 		}
-		// TODO Can we match, to see if the object has changed and avoid saving it?
-		fmt.Println("Does it match")
-		fmt.Println(current == &aList)
+		// Check if what is about to be written is the same.
+		a, _ := json.Marshal(&aList)
+		b, _ := json.Marshal(current)
+		if string(a) == string(b) {
+			return &aList, nil
+		}
 	}
 
 	dal.RemoveLabelsForAlist(aList.Uuid)
@@ -183,17 +201,18 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) error {
 		log.Println(err)
 	}
 
-	tx := dal.Db.MustBegin()
 	if method == http.MethodPost {
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values($1, $2, $3, $4)"
-		tx.MustExec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
+		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
 		queryUpdate := "UPDATE alist_kv SET list_type=$1, body=$2, user_uuid=$3 WHERE uuid=$4"
-		tx.MustExec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
+		_, err = dal.Db.Exec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
 	}
 
-	err = tx.Commit()
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return &aList, nil
 }
 
 // Process the lists labels,
