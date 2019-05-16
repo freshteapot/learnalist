@@ -17,8 +17,9 @@ func (env *Env) GetListsByMe(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	params := r.URL.Query()
-	if filterByLabels, ok := params["labels"]; ok {
-		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels[0])
+	filterByLabels := params.Get("labels")
+	if filterByLabels != "" {
+		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
 	} else {
 		alists = env.Datastore.GetListsByUser(user.Uuid)
 	}
