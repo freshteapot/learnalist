@@ -108,7 +108,6 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 }
 
 func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
-
 	aList, err := dal.GetAlist(alist_uuid)
 
 	if err != nil {
@@ -129,13 +128,12 @@ WHERE
 AND
 	user_uuid=$2
 `
-	tx := dal.Db.MustBegin()
-	tx.MustExec(query, alist_uuid, user_uuid)
-	err = tx.Commit()
+	_, err = dal.Db.Exec(query, alist_uuid, user_uuid)
 	if err != nil {
 		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "RemoveAlist"))
 		log.Println(err)
 	}
+
 	return err
 }
 
