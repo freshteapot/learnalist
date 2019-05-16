@@ -37,7 +37,6 @@ func (suite *ApiSuite) TestPostLabel() {
 	suite.Equal(http.StatusBadRequest, statusCode)
 	json.Unmarshal(responseBytes, &raw)
 	suite.Equal(i18n.PostUserLabelJSONFailure, raw["message"].(string))
-	raw = nil
 }
 
 func (suite *ApiSuite) TestGetUsersLabels() {
