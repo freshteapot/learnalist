@@ -1,56 +1,159 @@
 package models
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
-	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
-func (suite *ModelSuite) TestSaveAlist() {
-	setup := `
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
-`
-	dal.Db.MustExec(setup)
+func (suite *ModelSuite) TestSaveAlistPost() {
+	userUUID := suite.UserUUID
 	a := `
-{
-    "data": [
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday"
-    ],
-    "info": {
-        "title": "Days of the Week",
-        "type": "v1"
-    }
-}
-`
-	user := uuid.NewUser()
-	user.Uuid = "7540fe5f-9847-5473-bdbd-2b20050da0c6"
-	playList := uuid.NewPlaylist(&user)
-	alist_uuid := playList.Uuid
+		{
+		    "data": [
+		        "monday",
+		        "tuesday",
+		        "wednesday",
+		        "thursday",
+		        "friday",
+		        "saturday",
+		        "sunday"
+		    ],
+		    "info": {
+		        "title": "Days of the Week",
+		        "type": "v1"
+		    }
+		}
+		`
 
 	aList := new(alist.Alist)
 	aList.UnmarshalJSON([]byte(a))
-	aList.Uuid = alist_uuid
-	aList.User = user
-	err := dal.SaveAlist(*aList)
+	aList.User.Uuid = userUUID
+
+	// TODO move this into own test
+	aList, err := dal.SaveAlist(http.MethodPost, *aList)
+	suite.NoError(err)
+
+	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.NoError(err)
 
 	aList.Info.Labels = []string{"test1", "test2"}
-	err = dal.SaveAlist(*aList)
-	// Test breaking
-	// Check empty alist.uuid
-	aList.Uuid = ""
-	err = dal.SaveAlist(*aList)
-	suite.Equal(i18n.InternalServerErrorMissingAlistUuid, err.Error())
-	aList.Uuid = alist_uuid
+	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.NoError(err)
+	suite.Equal(2, len(aList.Info.Labels))
+}
+
+func (suite *ModelSuite) TestSaveAListInternalIssues() {
+	var err error
+	userUUID := suite.UserUUID
+	a := `
+		{
+		    "data": [
+		        "monday",
+		        "tuesday",
+		        "wednesday",
+		        "thursday",
+		        "friday",
+		        "saturday",
+		        "sunday"
+		    ],
+		    "info": {
+		        "title": "Days of the Week",
+		        "type": "v1"
+		    }
+		}
+		`
+
+	aList := new(alist.Alist)
+	aList.UnmarshalJSON([]byte(a))
+
 	// Check empty user.uuid
 	aList.User.Uuid = ""
-	err = dal.SaveAlist(*aList)
+	_, err = dal.SaveAlist(http.MethodPost, *aList)
 	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
+
+	_, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
+	// Check empty alist Uuid
+	aList.User.Uuid = userUUID
+	aList.Uuid = ""
+	_, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.Equal(i18n.InternalServerErrorMissingAlistUuid, err.Error())
+}
+
+func (suite *ModelSuite) TestSaveAListViaPutWithSameData() {
+	userUUID := suite.UserUUID
+	a := `
+		{
+		    "data": [
+		        "monday",
+		        "tuesday",
+		        "wednesday",
+		        "thursday",
+		        "friday",
+		        "saturday",
+		        "sunday"
+		    ],
+		    "info": {
+		        "title": "Days of the Week",
+		        "type": "v1"
+		    }
+		}
+		`
+	aList := new(alist.Alist)
+	aList.UnmarshalJSON([]byte(a))
+	aList.User.Uuid = userUUID
+	aList, err := dal.SaveAlist(http.MethodPost, *aList)
+	suite.NoError(err)
+	aUUID := aList.Uuid
+	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.NoError(err)
+	bUUID := aList.Uuid
+	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	suite.NoError(err)
+	cUUID := aList.Uuid
+	// Make sure the uuid is the same
+	suite.Equal(aUUID, bUUID)
+	suite.Equal(bUUID, cUUID)
+}
+
+func (suite *ModelSuite) TestSaveAListViaPutWithNotFoundUuid() {
+	userUUID := suite.UserUUID
+	a := `
+		{
+		    "data": [
+		        "monday",
+		        "tuesday",
+		        "wednesday",
+		        "thursday",
+		        "friday",
+		        "saturday",
+		        "sunday"
+		    ],
+		    "info": {
+		        "title": "Days of the Week",
+		        "type": "v1"
+		    },
+				"uuid": "fake"
+		}
+		`
+
+	aList := new(alist.Alist)
+	aList.UnmarshalJSON([]byte(a))
+	aList.User.Uuid = userUUID
+	aList, err := dal.SaveAlist(http.MethodPut, *aList)
+	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
+}
+
+func (suite *ModelSuite) TestSaveAListEmptyList() {
+	userUUID := suite.UserUUID
+	input := new(alist.Alist)
+	input.User.Uuid = userUUID
+	aList, err := dal.SaveAlist(http.MethodPost, *input)
+	suite.Nil(aList)
+	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty."), err.Error())
 }
 
 func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {
@@ -59,35 +162,34 @@ func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {
 }
 
 func (suite *ModelSuite) TestGetAndRemoveAlist() {
+	userUUID := suite.UserUUID
 	setup := `
 INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 `
 	dal.Db.MustExec(setup)
 
-	alist_uuid := "ada41576-b710-593a-9603-946aaadcb22d"
-	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
+	alistUUID := "ada41576-b710-593a-9603-946aaadcb22d"
 
-	aList, _ := dal.GetAlist(alist_uuid)
+	aList, _ := dal.GetAlist(alistUUID)
 	suite.Equal(alist.SimpleList, aList.Info.ListType)
 
 	// Check removing a list of a different user.
-	err := dal.RemoveAlist(alist_uuid, "fake")
+	err := dal.RemoveAlist(alistUUID, "fake")
 	suite.Equal(i18n.InputDeleteAlistOperationOwnerOnly, err.Error())
 
 	// Check removing a list owned by the user
-	err = dal.RemoveAlist(alist_uuid, user_uuid)
+	err = dal.RemoveAlist(alistUUID, userUUID)
 	suite.Nil(err)
-	_, err = dal.GetAlist(alist_uuid)
+	_, err = dal.GetAlist(alistUUID)
 	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
 }
 
 func (suite *ModelSuite) TestGetListsByUserAndLabels() {
+	userUUID := suite.UserUUID
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');
@@ -96,24 +198,23 @@ func (suite *ModelSuite) TestGetListsByUserAndLabels() {
 	`
 	dal.Db.MustExec(setup)
 
-	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
 	labels := "english"
 
-	items := dal.GetListsByUserAndLabels(user_uuid, labels)
+	items := dal.GetListsByUserAndLabels(userUUID, labels)
 	suite.Equal(1, len(items))
-	items = dal.GetListsByUserAndLabels(user_uuid, "")
+	items = dal.GetListsByUserAndLabels(userUUID, "")
 	suite.Equal(0, len(items))
-	items = dal.GetListsByUserAndLabels(user_uuid, "englishh")
+	items = dal.GetListsByUserAndLabels(userUUID, "englishh")
 	suite.Equal(0, len(items))
 
-	items = dal.GetListsByUserAndLabels(user_uuid, "water,english")
+	items = dal.GetListsByUserAndLabels(userUUID, "water,english")
 	suite.Equal(2, len(items))
 }
 
 func (suite *ModelSuite) TestGetListsByUserUuid() {
+	userUUID := suite.UserUUID
 	setup := `
 	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556320','chris');
 	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
 	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
 	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');
@@ -122,8 +223,6 @@ func (suite *ModelSuite) TestGetListsByUserUuid() {
 	`
 	dal.Db.MustExec(setup)
 
-	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
-
-	items := dal.GetListsByUser(user_uuid)
+	items := dal.GetListsByUser(userUUID)
 	suite.Equal(2, len(items))
 }

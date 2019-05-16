@@ -142,14 +142,14 @@ AND
 				}
 			}
 			aList.Info.Labels = cleaned
-			dal.SaveAlist(*aList)
+			dal.SaveAlist(http.MethodPut, *aList)
 		}
 	}
 
 	// Update each of them by removin the label in question.
 	query1 := "DELETE FROM user_labels WHERE user_uuid=$1 AND label=$2"
 	query2 := "DELETE FROM alist_labels WHERE user_uuid=$1 AND label=$2"
-
+	// TODO MustExec will crash the server
 	tx := dal.Db.MustBegin()
 	tx.MustExec(query1, user, label)
 	tx.MustExec(query2, user, label)

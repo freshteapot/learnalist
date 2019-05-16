@@ -17,8 +17,9 @@ func (env *Env) GetListsByMe(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	params := r.URL.Query()
-	if filterByLabels, ok := params["labels"]; ok {
-		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels[0])
+	filterByLabels := params.Get("labels")
+	if filterByLabels != "" {
+		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
 	} else {
 		alists = env.Datastore.GetListsByUser(user.Uuid)
 	}
@@ -51,18 +52,20 @@ func (env *Env) SaveAlist(c echo.Context) error {
 	var inputUuid string
 	user := c.Get("loggedInUser").(uuid.User)
 	method := c.Request().Method
-	if method == http.MethodPost {
-		playList := uuid.NewPlaylist(&user)
-		inputUuid = playList.Uuid
-	} else if method == http.MethodPut {
+
+	if method != http.MethodPost {
+		if method != http.MethodPut {
+			response := HttpResponseMessage{
+				Message: i18n.ApiMethodNotSupported,
+			}
+			return c.JSON(http.StatusBadRequest, response)
+		}
+	}
+
+	if method == http.MethodPut {
 		// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 		r := c.Request()
 		inputUuid = strings.TrimPrefix(r.URL.Path, "/alist/")
-	} else {
-		response := HttpResponseMessage{
-			Message: i18n.ApiMethodNotSupported,
-		}
-		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	defer c.Request().Body.Close()
@@ -79,14 +82,22 @@ func (env *Env) SaveAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	aList.Uuid = inputUuid
 	aList.User = user
 
-	err = env.Datastore.SaveAlist(*aList)
+	if method == http.MethodPut {
+		aList.Uuid = inputUuid
+	}
+
+	aList, err = env.Datastore.SaveAlist(method, *aList)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: err.Error(),
 		}
+
+		if err.Error() == i18n.InputSaveAlistOperationOwnerOnly {
+			return c.JSON(http.StatusForbidden, response)
+		}
+
 		return c.JSON(http.StatusBadRequest, response)
 	}
 

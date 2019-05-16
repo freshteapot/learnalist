@@ -10,6 +10,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -107,7 +108,6 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 }
 
 func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
-
 	aList, err := dal.GetAlist(alist_uuid)
 
 	if err != nil {
@@ -128,55 +128,89 @@ WHERE
 AND
 	user_uuid=$2
 `
-	tx := dal.Db.MustBegin()
-	tx.MustExec(query, alist_uuid, user_uuid)
-	err = tx.Commit()
+	_, err = dal.Db.Exec(query, alist_uuid, user_uuid)
 	if err != nil {
 		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "RemoveAlist"))
 		log.Println(err)
 	}
+
 	return err
 }
 
-func (dal *DAL) SaveAlist(aList alist.Alist) error {
+/*
+If empty user, we reject.
+If POST, we enforce a new uuid for the list.
+If empty uuid, we reject.
+If PUT, do a lookup to see if the list exists.
+
+*/
+func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error) {
 	var err error
 	var jsonBytes []byte
 
 	err = alist.Validate(aList)
 	if err != nil {
-		return err
-	}
-
-	if aList.Uuid == "" {
-		return errors.New(i18n.InternalServerErrorMissingAlistUuid)
+		return nil, err
 	}
 
 	if aList.User.Uuid == "" {
-		return errors.New(i18n.InternalServerErrorMissingUserUuid)
+		return nil, errors.New(i18n.InternalServerErrorMissingUserUuid)
 	}
 
+	// We set the uuid
+	if method == http.MethodPost {
+		user := &uuid.User{
+			Uuid: aList.User.Uuid,
+		}
+		playList := uuid.NewPlaylist(user)
+		aList.Uuid = playList.Uuid
+	}
+
+	if aList.Uuid == "" {
+		return nil, errors.New(i18n.InternalServerErrorMissingAlistUuid)
+	}
+	// This really shouldnt happen, but could do if called directly.
 	jsonBytes, err = json.Marshal(&aList)
 	checkErr(err)
 	jsonAlist := string(jsonBytes)
 
-	current, _ := dal.GetAlist(aList.Uuid)
+	if method == http.MethodPut {
+		current, _ := dal.GetAlist(aList.Uuid)
+		if current == nil {
+			return nil, errors.New(i18n.SuccessAlistNotFound)
+		}
+
+		if current != nil {
+			if current.User.Uuid != aList.User.Uuid {
+				return nil, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+			}
+		}
+		// Check if what is about to be written is the same.
+		a, _ := json.Marshal(&aList)
+		b, _ := json.Marshal(current)
+		if string(a) == string(b) {
+			return &aList, nil
+		}
+	}
+
 	dal.RemoveLabelsForAlist(aList.Uuid)
 	err = dal.SaveLabelsForAlist(aList)
 	if err != nil {
 		log.Println(err)
 	}
 
-	tx := dal.Db.MustBegin()
-	if current == nil {
+	if method == http.MethodPost {
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values($1, $2, $3, $4)"
-		tx.MustExec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
+		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
 		queryUpdate := "UPDATE alist_kv SET list_type=$1, body=$2, user_uuid=$3 WHERE uuid=$4"
-		tx.MustExec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
+		_, err = dal.Db.Exec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
 	}
 
-	err = tx.Commit()
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return &aList, nil
 }
 
 // Process the lists labels,
