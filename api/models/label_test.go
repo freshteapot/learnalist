@@ -42,7 +42,6 @@ func (suite *ModelSuite) TestPostAlistLabel() {
 	suite.Equal(i18n.ValidationWarningLabelToLong, err.Error())
 }
 
-// TODO refactor to use sqlite, as this is annoying.
 func (suite *ModelSuite) TestGetUserLabels() {
 	setup := `
 INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":[]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');

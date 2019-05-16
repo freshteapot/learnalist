@@ -83,7 +83,7 @@ func (env *Env) SaveAlist(c echo.Context) error {
 	aList.Uuid = inputUuid
 	aList.User = user
 
-	err = env.Datastore.SaveAlist(*aList)
+	err = env.Datastore.SaveAlist(method, *aList)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: err.Error(),

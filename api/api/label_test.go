@@ -18,7 +18,7 @@ func (suite *ApiSuite) TestPostLabel() {
 	inputUserA := `{"username":"iamusera", "password":"test"}`
 	inputA := `{"label": "car"}`
 	inputB := `{"label": "boat"}`
-	inputC := `{"bad data"}`
+	inputC := `"bad data"`
 
 	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 

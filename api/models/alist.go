@@ -138,7 +138,7 @@ AND
 	return err
 }
 
-func (dal *DAL) SaveAlist(aList alist.Alist) error {
+func (dal *DAL) SaveAlist(method string, aList alist.Alist) error {
 	var err error
 	var jsonBytes []byte
 
@@ -159,22 +159,23 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	checkErr(err)
 	jsonAlist := string(jsonBytes)
 
-	// TODO should we add post and put to the method.
-	// 1) saves doing a lookup for list.
-	// 2) makes it clearer if it is insert or edit.
-	current, err := dal.GetAlist(aList.Uuid)
-	if err != nil {
-		if err.Error() != i18n.SuccessAlistNotFound {
-			return errors.New(fmt.Sprintf("Failed to lookup list uuid:%s", aList.Uuid))
+	if method == http.MethodPut {
+		current, err := dal.GetAlist(aList.Uuid)
+		if err != nil {
+			if err.Error() != i18n.SuccessAlistNotFound {
+				return errors.New(fmt.Sprintf("Failed to lookup list uuid:%s", aList.Uuid))
+			}
 		}
-	}
 
-	if current != nil {
-		if current.User.Uuid != aList.User.Uuid {
-			return errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+		if current != nil {
+			if current.User.Uuid != aList.User.Uuid {
+				return errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+			}
 		}
+		// TODO Can we match, to see if the object has changed and avoid saving it?
+		fmt.Println("Does it match")
+		fmt.Println(current == &aList)
 	}
-	// TODO Can we match, to see if the object has changed and avoid saving it?
 
 	dal.RemoveLabelsForAlist(aList.Uuid)
 	err = dal.SaveLabelsForAlist(aList)
@@ -183,7 +184,7 @@ func (dal *DAL) SaveAlist(aList alist.Alist) error {
 	}
 
 	tx := dal.Db.MustBegin()
-	if current == nil {
+	if method == http.MethodPost {
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values($1, $2, $3, $4)"
 		tx.MustExec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {

@@ -142,7 +142,7 @@ AND
 				}
 			}
 			aList.Info.Labels = cleaned
-			dal.SaveAlist(*aList)
+			dal.SaveAlist(http.MethodPut, *aList)
 		}
 	}
 

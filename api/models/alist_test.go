@@ -1,6 +1,8 @@
 package models
 
 import (
+	"net/http"
+
 	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
@@ -37,19 +39,19 @@ INSERT INTO user VALUES('7540fe5f-9847-5473-bdbd-2b20050da0c6','9046052444752556
 	aList.UnmarshalJSON([]byte(a))
 	aList.Uuid = alist_uuid
 	aList.User = user
-	err := dal.SaveAlist(*aList)
+	err := dal.SaveAlist(http.MethodPost, *aList)
 
 	aList.Info.Labels = []string{"test1", "test2"}
-	err = dal.SaveAlist(*aList)
+	err = dal.SaveAlist(http.MethodPut, *aList)
 	// Test breaking
 	// Check empty alist.uuid
 	aList.Uuid = ""
-	err = dal.SaveAlist(*aList)
+	err = dal.SaveAlist(http.MethodPut, *aList)
 	suite.Equal(i18n.InternalServerErrorMissingAlistUuid, err.Error())
 	aList.Uuid = alist_uuid
 	// Check empty user.uuid
 	aList.User.Uuid = ""
-	err = dal.SaveAlist(*aList)
+	err = dal.SaveAlist(http.MethodPut, *aList)
 	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
 }
 
