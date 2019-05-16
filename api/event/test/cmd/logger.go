@@ -3,10 +3,10 @@ package main
 import (
 	"io/ioutil"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/freshteapot/learnalist-api/api/event"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/rifflock/lfshook"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -23,11 +23,11 @@ func main() {
 }
 
 func setupLogging() {
-	eventLog := log.New()
+	eventLog := logrus.New()
 	eventLog.Out = ioutil.Discard
-	eventLog.Formatter = new(log.JSONFormatter)
+	// eventLog.Formatter = new(log.JSONFormatter)
 	eventLog.Hooks.Add(lfshook.NewHook(lfshook.PathMap{
-		log.InfoLevel: "/tmp/learnalist.event.test.log",
-	}))
+		logrus.InfoLevel: "/tmp/learnalist.event.test.log",
+	}, &logrus.JSONFormatter{}))
 	event.New(eventLog)
 }
