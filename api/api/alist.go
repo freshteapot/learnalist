@@ -19,10 +19,7 @@ func (env *Env) GetListsByMe(c echo.Context) error {
 	params := r.URL.Query()
 	filterByLabels := params.Get("labels")
 	listType := params.Get("list_type")
-	fmt.Println(listType)
-	fmt.Println(filterByLabels)
 	alists = env.Datastore.GetListsByUserWithFilters(user.Uuid, filterByLabels, listType)
-
 	return c.JSON(http.StatusOK, alists)
 }
 
