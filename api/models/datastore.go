@@ -24,6 +24,8 @@ type DatastoreAlists interface {
 	// Lists
 	GetUserLabels(uuid string) ([]string, error)
 	GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist
+
+	GetListsByUserWithFilters(uuid string, labels string, listType string) []*alist.Alist
 	GetListsByUser(uuid string) []*alist.Alist
 	GetAlist(uuid string) (*alist.Alist, error)
 	//PostAlist(uuid string, aList alist.Alist) error

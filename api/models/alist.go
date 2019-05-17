@@ -21,7 +21,87 @@ type AlistKV struct {
 	ListType string `db:"list_type"`
 }
 
-// labels needs can be single or "," separated.
+type GetListsByUserWithFiltersArgs struct {
+	Labels   []string `db:"labels"`
+	UserUuid string   `db:"user_uuid"`
+	ListType string   `db:"list_type"`
+}
+
+// GetListsByUserWithFilters Filter a list and return an array of lists.
+// Filter by:
+// - userUUID
+// - userUUID, labels
+// - userUUID, listType
+// - userUUID, labels, listType
+// Validation
+// - labels needs can be single or "," separated.
+// - uuid = User.Uuid
+// - listType = one of the types in alist (but if its not there, it will clearly not return anything.)
+func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType string) []*alist.Alist {
+	var items = []*alist.Alist{}
+	var row AlistKV
+	filterQueryWithListTypeLookup := "list_type = :list_type"
+
+	filterQueryWithLabelLookup := `
+		uuid IN (
+	SELECT
+	  alist_uuid
+	FROM
+	  alist_labels
+	WHERE
+		user_uuid = :user_uuid
+		AND
+		label IN(:labels)
+	)
+`
+
+	querySelect := `
+	SELECT
+	  *
+	FROM
+		alist_kv
+	WHERE
+		user_uuid = :user_uuid
+	`
+
+	filterQueryWithArgs := &GetListsByUserWithFiltersArgs{
+		Labels:   strings.Split(labels, ","),
+		UserUuid: uuid,
+		ListType: listType,
+	}
+	filterQueryWith := make([]string, 0)
+
+	if len(labels) >= 1 {
+		filterQueryWith = append(filterQueryWith, filterQueryWithLabelLookup)
+	}
+
+	if listType != "" {
+		filterQueryWith = append(filterQueryWith, filterQueryWithListTypeLookup)
+	}
+
+	query := querySelect
+	if len(filterQueryWith) > 0 {
+		query = querySelect + " AND " + strings.Join(filterQueryWith, " AND ")
+	}
+
+	query, args, err := sqlx.Named(query, filterQueryWithArgs)
+	query, args, err = sqlx.In(query, args...)
+	query = dal.Db.Rebind(query)
+	rows, err := dal.Db.Queryx(query, args...)
+	if err != nil {
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserWithFilters"))
+		log.Println(err)
+	}
+
+	for rows.Next() {
+		rows.StructScan(&row)
+		aList := convertDbRowToAlist(row)
+		items = append(items, aList)
+	}
+
+	return items
+}
+
 func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist {
 	var items = []*alist.Alist{}
 	var row AlistKV

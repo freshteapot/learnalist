@@ -18,11 +18,10 @@ func (env *Env) GetListsByMe(c echo.Context) error {
 	r := c.Request()
 	params := r.URL.Query()
 	filterByLabels := params.Get("labels")
-	if filterByLabels != "" {
-		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
-	} else {
-		alists = env.Datastore.GetListsByUser(user.Uuid)
-	}
+	listType := params.Get("list_type")
+	fmt.Println(listType)
+	fmt.Println(filterByLabels)
+	alists = env.Datastore.GetListsByUserWithFilters(user.Uuid, filterByLabels, listType)
 
 	return c.JSON(http.StatusOK, alists)
 }

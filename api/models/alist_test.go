@@ -226,3 +226,32 @@ func (suite *ModelSuite) TestGetListsByUserUuid() {
 	items := dal.GetListsByUser(userUUID)
 	suite.Equal(2, len(items))
 }
+
+func (suite *ModelSuite) TestGetListsByUserWithFilters() {
+	userUUID := suite.UserUUID
+	setup := `
+INSERT INTO alist_kv VALUES('0cf0f9de-c18f-52d5-8352-cee1ab7eab28','v1','{"data":["car"],"info":{"title":"Days of the Week","type":"v1","labels":[]},"uuid":"0cf0f9de-c18f-52d5-8352-cee1ab7eab28"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_kv VALUES('45bc50f7-1228-5bc2-9daa-2be6b6fbd1de','v2','{"data":[{"from":"car","to":"bil"}],"info":{"title":"Days of the Week","type":"v2","labels":[]},"uuid":"45bc50f7-1228-5bc2-9daa-2be6b6fbd1de"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_kv VALUES('292a4fd3-8835-5435-9e68-7085ab901730','v1','{"data":["car"],"info":{"title":"Days of the Week","type":"v1","labels":["car"]},"uuid":"292a4fd3-8835-5435-9e68-7085ab901730"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO user_labels VALUES('car','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_labels VALUES('292a4fd3-8835-5435-9e68-7085ab901730','7540fe5f-9847-5473-bdbd-2b20050da0c6','car');
+`
+	dal.Db.MustExec(setup)
+	items := dal.GetListsByUserWithFilters(userUUID, "", "")
+	suite.Equal(3, len(items))
+
+	items = dal.GetListsByUserWithFilters(userUUID, "car", "")
+	suite.Equal(1, len(items))
+	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
+
+	items = dal.GetListsByUserWithFilters(userUUID, "", "v1")
+	suite.Equal(2, len(items))
+
+	items = dal.GetListsByUserWithFilters(userUUID, "", "v2")
+	suite.Equal(1, len(items))
+	suite.Equal("45bc50f7-1228-5bc2-9daa-2be6b6fbd1de", items[0].Uuid)
+
+	items = dal.GetListsByUserWithFilters(userUUID, "car", "v1")
+	suite.Equal(1, len(items))
+	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
+}
