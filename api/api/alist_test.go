@@ -303,7 +303,6 @@ func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (s
 		uri = fmt.Sprintf("/alist/by/me?labels=%s&list_type=%s", labels, listType)
 	}
 
-	fmt.Println(uri)
 	user := &uuid.User{
 		Uuid: userUUID,
 	}
