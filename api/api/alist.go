@@ -12,18 +12,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+/*
+@Param labels filter lists by label: "car", "car,bil".
+@Param list_type filter lists by type: "v1", "v2".
+*/
 func (env *Env) GetListsByMe(c echo.Context) error {
 	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	params := r.URL.Query()
 	filterByLabels := params.Get("labels")
-	if filterByLabels != "" {
-		alists = env.Datastore.GetListsByUserAndLabels(user.Uuid, filterByLabels)
-	} else {
-		alists = env.Datastore.GetListsByUser(user.Uuid)
-	}
-
+	listType := params.Get("list_type")
+	alists = env.Datastore.GetListsByUserWithFilters(user.Uuid, filterByLabels, listType)
 	return c.JSON(http.StatusOK, alists)
 }
 

@@ -47,7 +47,7 @@ This will:
 
 	for _, uuid := range uuids {
 		fmt.Println(uuid)
-		lists := dal.GetListsByUser(uuid)
+		lists := dal.GetListsByUserWithFilters(uuid, "", "")
 		labels, _ := dal.GetUserLabels(uuid)
 		// What labels are missing already
 		for _, aList := range lists {
