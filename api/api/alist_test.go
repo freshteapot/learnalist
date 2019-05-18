@@ -181,7 +181,7 @@ func (suite *ApiSuite) TestMethodNotSupportedForSavingList() {
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.SaveAlist(c))
+	suite.NoError(env.V1SaveAlist(c))
 	suite.Equal(http.StatusBadRequest, rec.Code)
 	response := strings.TrimSpace(rec.Body.String())
 	suite.Equal(`{"message":"This method is not supported."}`, response)
@@ -248,7 +248,7 @@ func (suite *ApiSuite) TestDeleteAlistNotFound() {
 
 func (suite *ApiSuite) updateAlist(userUUID, alistUUID string, input string) (statusCode int, body []byte) {
 	method := http.MethodPut
-	uri := fmt.Sprintf("/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
 	user := &uuid.User{
 		Uuid: userUUID,
 	}
@@ -257,7 +257,7 @@ func (suite *ApiSuite) updateAlist(userUUID, alistUUID string, input string) (st
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.SaveAlist(c))
+	suite.NoError(env.V1SaveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -266,18 +266,18 @@ func (suite *ApiSuite) createAList(userUUID, input string) (statusCode int, resp
 		Uuid: userUUID,
 	}
 
-	req, rec := setupFakeEndpoint(http.MethodPost, "/alist", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/alist", input)
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
 
-	suite.NoError(env.SaveAlist(c))
+	suite.NoError(env.V1SaveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
 func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCode int, responseBytes []byte) {
 	method := http.MethodDelete
-	uri := fmt.Sprintf("/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
 
 	user := &uuid.User{
 		Uuid: userUUID,
@@ -286,21 +286,21 @@ func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCod
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.RemoveAlist(c))
+	suite.NoError(env.V1RemoveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
 func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := "/alist/by/me"
+	uri := "/v1/alist/by/me"
 	if labels != "" {
-		uri = fmt.Sprintf("/alist/by/me?labels=%s", labels)
+		uri = fmt.Sprintf("/v1/alist/by/me?labels=%s", labels)
 	}
 	if listType != "" {
-		uri = fmt.Sprintf("/alist/by/me?list_type=%s", listType)
+		uri = fmt.Sprintf("/v1/alist/by/me?list_type=%s", listType)
 	}
 	if listType != "" && labels != "" {
-		uri = fmt.Sprintf("/alist/by/me?labels=%s&list_type=%s", labels, listType)
+		uri = fmt.Sprintf("/v1/alist/by/me?labels=%s&list_type=%s", labels, listType)
 	}
 
 	user := &uuid.User{
@@ -310,13 +310,13 @@ func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (s
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.GetListsByMe(c))
+	suite.NoError(env.V1GetListsByMe(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
 func (suite *ApiSuite) getList(userUUID, alistUUID string) (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := fmt.Sprintf("/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
 	user := &uuid.User{
 		Uuid: userUUID,
 	}
@@ -324,6 +324,6 @@ func (suite *ApiSuite) getList(userUUID, alistUUID string) (statusCode int, resp
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.GetListByUUID(c))
+	suite.NoError(env.V1GetListByUUID(c))
 	return rec.Code, rec.Body.Bytes()
 }

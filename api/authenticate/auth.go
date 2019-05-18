@@ -14,7 +14,7 @@ var LookUp func(loginUser LoginUser) (*uuid.User, error)
 func SkipBasicAuth(c echo.Context) bool {
 	url := c.Request().URL.Path
 	method := c.Request().Method
-
+	url = strings.TrimPrefix(url, "/v1")
 	if url == "/" {
 		return true
 	}
