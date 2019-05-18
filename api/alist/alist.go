@@ -10,6 +10,7 @@ import (
 const (
 	SimpleList = "v1"
 	FromToList = "v2"
+	Concept2   = "v3"
 )
 
 // AlistItemTypeV2 Item in  AlistTypeV2
@@ -98,6 +99,12 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		aList.Data, err = parseAlistTypeV2(jsonBytes)
 		if err != nil {
 			err = errors.New("Failed to pass list type v2.")
+			return err
+		}
+	case Concept2:
+		aList.Data, err = parseTypeV3(jsonBytes)
+		if err != nil {
+			err = errors.New("Failed to pass list type v3.")
 			return err
 		}
 	default:

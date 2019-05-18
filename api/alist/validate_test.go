@@ -117,9 +117,37 @@ func TestValidateAlist(t *testing.T) {
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list type v2. Item cant be empty at position 0")
 
+	aList.Info = AlistInfo{Title: "I am a title", ListType: "v3"}
+	aList.Data = TypeV3{
+		When: "",
+		Overall: V3Split{
+			Time:     "3:00.0",
+			Spm:      15,
+			Distance: 1000,
+			P500:     "1:00.1",
+		},
+		Splits: []V3Split{},
+	}
+	err = Validate(*aList)
+	assert.Equal(t, err.Error(), "Failed to pass list type v3. When should be YYYY-MM-DD.")
+
 	// Make sure we handle Unsupported lists
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "na"}
 	aList.Data = nil
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Unsupported list type.")
+
+	// Validate labels
+	aList.Info = AlistInfo{
+		Title:    "I am a title",
+		ListType: "v1",
+		Labels: []string{
+			"",
+		}}
+	aList.Data = AlistTypeV1{""}
+	err = Validate(*aList)
+	assert.Equal(t, err.Error(), "Failed to pass list info. Label can not be empty at position 0")
+	aList.Info.Labels[0] = "iam a long label and should go over the allowed limit"
+	err = Validate(*aList)
+	assert.Equal(t, err.Error(), "Failed to pass list info. Label must be 20 or less characters long at position 0")
 }

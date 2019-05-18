@@ -58,6 +58,18 @@ func TestUnmarshalJSONBadParseV2(t *testing.T) {
 	assert.Equal(t, err.Error(), "Failed to pass list type v2.")
 }
 
+func TestUnmarshalJSONBadParseV3(t *testing.T) {
+	var err error
+	var jsonBytes []byte
+	var jsonStr = `{"data":[""],"info":{"title":"I am a list","type":"v3"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+
+	jsonBytes = []byte(jsonStr)
+
+	aList := new(Alist)
+	err = aList.UnmarshalJSON(jsonBytes)
+	assert.Equal(t, err.Error(), "Failed to pass list type v3.")
+}
+
 func TestUnmarshalJSONUnsupportedListType(t *testing.T) {
 	var err error
 	var jsonBytes []byte
