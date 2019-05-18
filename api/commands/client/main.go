@@ -14,7 +14,7 @@ func main() {
 	//@todo make this more secure, by at least hiding the password in a config file.
 	password := flag.String("password", "", "The password for the user.")
 
-	server := flag.String("server", "https://learnalist.net/api", "The server.")
+	server := flag.String("server", "https://learnalist.net/api/v1", "The server.")
 
 	showSupported := flag.Bool("show-supported", false, "When set, show the api endpoints supported by the client.")
 	runIntegrationTest := flag.Bool("run-integration-test", false, "When set, show the api endpoints supported by the client.")
