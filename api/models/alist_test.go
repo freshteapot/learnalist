@@ -186,43 +186,31 @@ INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f
 	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
 }
 
-func (suite *ModelSuite) TestGetListsByUserAndLabels() {
+func (suite *ModelSuite) TestGetListsByUserWithFilters() {
 	userUUID := suite.UserUUID
 	setup := `
-	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
-	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');
-	INSERT INTO user_labels VALUES('water','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO alist_kv VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["water"]},"uuid":"4e075960-5e97-56df-8e1a-c5fe7ea53a44"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	`
+INSERT INTO alist_kv VALUES('0cf0f9de-c18f-52d5-8352-cee1ab7eab28','v1','{"data":["car"],"info":{"title":"Days of the Week","type":"v1","labels":[]},"uuid":"0cf0f9de-c18f-52d5-8352-cee1ab7eab28"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_kv VALUES('45bc50f7-1228-5bc2-9daa-2be6b6fbd1de','v2','{"data":[{"from":"car","to":"bil"}],"info":{"title":"Days of the Week","type":"v2","labels":[]},"uuid":"45bc50f7-1228-5bc2-9daa-2be6b6fbd1de"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_kv VALUES('292a4fd3-8835-5435-9e68-7085ab901730','v1','{"data":["car"],"info":{"title":"Days of the Week","type":"v1","labels":["car"]},"uuid":"292a4fd3-8835-5435-9e68-7085ab901730"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO user_labels VALUES('car','7540fe5f-9847-5473-bdbd-2b20050da0c6');
+INSERT INTO alist_labels VALUES('292a4fd3-8835-5435-9e68-7085ab901730','7540fe5f-9847-5473-bdbd-2b20050da0c6','car');
+`
 	dal.Db.MustExec(setup)
+	items := dal.GetListsByUserWithFilters(userUUID, "", "")
+	suite.Equal(3, len(items))
 
-	labels := "english"
-
-	items := dal.GetListsByUserAndLabels(userUUID, labels)
+	items = dal.GetListsByUserWithFilters(userUUID, "car", "")
 	suite.Equal(1, len(items))
-	items = dal.GetListsByUserAndLabels(userUUID, "")
-	suite.Equal(0, len(items))
-	items = dal.GetListsByUserAndLabels(userUUID, "englishh")
-	suite.Equal(0, len(items))
+	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
 
-	items = dal.GetListsByUserAndLabels(userUUID, "water,english")
+	items = dal.GetListsByUserWithFilters(userUUID, "", "v1")
 	suite.Equal(2, len(items))
-}
 
-func (suite *ModelSuite) TestGetListsByUserUuid() {
-	userUUID := suite.UserUUID
-	setup := `
-	INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["english"]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO user_labels VALUES('english','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f-9847-5473-bdbd-2b20050da0c6','english');
-	INSERT INTO alist_labels VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','7540fe5f-9847-5473-bdbd-2b20050da0c6','water');
-	INSERT INTO user_labels VALUES('water','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	INSERT INTO alist_kv VALUES('4e075960-5e97-56df-8e1a-c5fe7ea53a44','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":["water"]},"uuid":"4e075960-5e97-56df-8e1a-c5fe7ea53a44"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-	`
-	dal.Db.MustExec(setup)
+	items = dal.GetListsByUserWithFilters(userUUID, "", "v2")
+	suite.Equal(1, len(items))
+	suite.Equal("45bc50f7-1228-5bc2-9daa-2be6b6fbd1de", items[0].Uuid)
 
-	items := dal.GetListsByUser(userUUID)
-	suite.Equal(2, len(items))
+	items = dal.GetListsByUserWithFilters(userUUID, "car", "v1")
+	suite.Equal(1, len(items))
+	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
 }

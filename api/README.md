@@ -61,7 +61,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | DELETE | /alist/{uuid} | Delete a list via uuid. |
 | PUT | /alist/{uuid} | Update all fields allowed to a list. |
 | GET | /alist/{uuid} | Get a list via uuid. |
-| GET | /alist/by/me | Get lists by the currently logged in user. |
+| GET | /alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. |
 | POST | /labels | Save a new label. |
 | GET | /labels/by/me | Get labels by the currently logged in user. |
 | DELETE | /labels/{uuid} | Delete a label via uuid. |

@@ -21,37 +21,75 @@ type AlistKV struct {
 	ListType string `db:"list_type"`
 }
 
-// labels needs can be single or "," separated.
-func (dal *DAL) GetListsByUserAndLabels(user_uuid string, labels string) []*alist.Alist {
+type GetListsByUserWithFiltersArgs struct {
+	Labels   []string `db:"labels"`
+	UserUuid string   `db:"user_uuid"`
+	ListType string   `db:"list_type"`
+}
+
+// GetListsByUserWithFilters Filter a list and return an array of lists.
+// Filter by:
+// - userUUID
+// - userUUID, labels
+// - userUUID, listType
+// - userUUID, labels, listType
+// Validation
+// - labels needs can be single or "," separated.
+// - uuid = User.Uuid
+// - listType = one of the types in alist (but if its not there, it will clearly not return anything.)
+func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType string) []*alist.Alist {
 	var items = []*alist.Alist{}
 	var row AlistKV
+	filterQueryWithListTypeLookup := "list_type = :list_type"
 
-	if labels == "" {
-		return items
-	}
-	lookUp := strings.Split(labels, ",")
-
-	query := `
-SELECT
-  *
-FROM alist_kv
-WHERE
-  uuid IN (
-SELECT
-  alist_uuid
-FROM
-  alist_labels
-WHERE
-	user_uuid = ?
-AND
-	label IN(?)
-)
+	filterQueryWithLabelLookup := `
+		uuid IN (
+	SELECT
+	  alist_uuid
+	FROM
+	  alist_labels
+	WHERE
+		user_uuid = :user_uuid
+		AND
+		label IN(:labels)
+	)
 `
-	query, args, err := sqlx.In(query, user_uuid, lookUp)
+
+	querySelect := `
+	SELECT
+	  *
+	FROM
+		alist_kv
+	WHERE
+		user_uuid = :user_uuid
+	`
+
+	filterQueryWithArgs := &GetListsByUserWithFiltersArgs{
+		Labels:   strings.Split(labels, ","),
+		UserUuid: uuid,
+		ListType: listType,
+	}
+	filterQueryWith := make([]string, 0)
+
+	if len(labels) >= 1 {
+		filterQueryWith = append(filterQueryWith, filterQueryWithLabelLookup)
+	}
+
+	if listType != "" {
+		filterQueryWith = append(filterQueryWith, filterQueryWithListTypeLookup)
+	}
+
+	query := querySelect
+	if len(filterQueryWith) > 0 {
+		query = querySelect + " AND " + strings.Join(filterQueryWith, " AND ")
+	}
+
+	query, args, err := sqlx.Named(query, filterQueryWithArgs)
+	query, args, err = sqlx.In(query, args...)
 	query = dal.Db.Rebind(query)
 	rows, err := dal.Db.Queryx(query, args...)
 	if err != nil {
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserAndLabels"))
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserWithFilters"))
 		log.Println(err)
 	}
 
@@ -61,30 +99,6 @@ AND
 		items = append(items, aList)
 	}
 
-	return items
-}
-
-// GetListsByUser Get all alists by uuid (user)
-func (dal *DAL) GetListsByUser(uuid string) []*alist.Alist {
-	var manyAlist []AlistKV
-	query := `
-SELECT
-	*
-FROM alist_kv
-WHERE
-	user_uuid = ?
-`
-	err := dal.Db.Select(&manyAlist, query, uuid)
-	if err != nil {
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsBy"))
-		log.Println(err)
-	}
-
-	items := make([]*alist.Alist, 0)
-	for _, row := range manyAlist {
-		aList := convertDbRowToAlist(row)
-		items = append(items, aList)
-	}
 	return items
 }
 

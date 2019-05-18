@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
@@ -91,28 +92,45 @@ func (suite *ApiSuite) TestAlistApi() {
 	suite.Equal(fmt.Sprintf(i18n.ApiAlistNotFound, "fake"), raw["message"].(string))
 	raw = nil
 	// Get my lists
-	statusCode, responseBytes = suite.getListsByMe(userUUID, "")
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "", "")
 	suite.Equal(http.StatusOK, statusCode)
 	json.Unmarshal(responseBytes, &listOfUuids)
 	suite.Equal(4, len(listOfUuids))
 
 	// Get my lists filter by labels
-	statusCode, responseBytes = suite.getListsByMe(userUUID, "water")
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "water", "")
 	suite.Equal(http.StatusOK, statusCode)
 	json.Unmarshal(responseBytes, &listOfUuids)
 	suite.Equal(2, len(listOfUuids))
 
-	statusCode, responseBytes = suite.getListsByMe(userUUID, "")
+	// Check filter via listType works.
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "", alist.SimpleList)
+	suite.Equal(http.StatusOK, statusCode)
+	json.Unmarshal(responseBytes, &listOfUuids)
+	suite.Equal(3, len(listOfUuids))
+
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "", alist.FromToList)
+	suite.Equal(http.StatusOK, statusCode)
+	json.Unmarshal(responseBytes, &listOfUuids)
+	suite.Equal(1, len(listOfUuids))
+
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "", "")
 	suite.Equal(http.StatusOK, statusCode)
 	json.Unmarshal(responseBytes, &listOfUuids)
 	suite.Equal(4, len(listOfUuids))
 
-	statusCode, responseBytes = suite.getListsByMe(userUUID, "car,water")
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "car,water", "")
 	suite.Equal(http.StatusOK, statusCode)
 	json.Unmarshal(responseBytes, &listOfUuids)
 	suite.Equal(2, len(listOfUuids))
 
-	statusCode, responseBytes = suite.getListsByMe(userUUID, "card")
+	// Check filter via labels and listType works.
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "car,water", "v2")
+	suite.Equal(http.StatusOK, statusCode)
+	json.Unmarshal(responseBytes, &listOfUuids)
+	suite.Equal(1, len(listOfUuids))
+
+	statusCode, responseBytes = suite.getListsByMe(userUUID, "card", "")
 	suite.Equal(http.StatusOK, statusCode)
 	json.Unmarshal(responseBytes, &listOfUuids)
 	suite.Equal(0, len(listOfUuids))
@@ -272,9 +290,19 @@ func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCod
 	return rec.Code, rec.Body.Bytes()
 }
 
-func (suite *ApiSuite) getListsByMe(userUUID, labels string) (statusCode int, responseBytes []byte) {
+func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := fmt.Sprintf("/alist/by/me?labels=%s", labels)
+	uri := "/alist/by/me"
+	if labels != "" {
+		uri = fmt.Sprintf("/alist/by/me?labels=%s", labels)
+	}
+	if listType != "" {
+		uri = fmt.Sprintf("/alist/by/me?list_type=%s", listType)
+	}
+	if listType != "" && labels != "" {
+		uri = fmt.Sprintf("/alist/by/me?labels=%s&list_type=%s", labels, listType)
+	}
+
 	user := &uuid.User{
 		Uuid: userUUID,
 	}
