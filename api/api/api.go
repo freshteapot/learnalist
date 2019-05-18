@@ -56,40 +56,41 @@ func Run(env Env) {
 
 	authenticate.LookUp = env.Datastore.GetUserByCredentials
 
+	v1 := e.Group("/v1")
 	if env.CorsAllowOrigins != "" {
 		allowOrigins := strings.Split(env.CorsAllowOrigins, ",")
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		v1.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: allowOrigins,
 			AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 			AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderOrigin, echo.HeaderContentType},
 		}))
 	}
 
-	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+	v1.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
 		Skipper:   authenticate.SkipBasicAuth,
 		Validator: authenticate.ValidateBasicAuth,
 	}))
 
-	e.GET("/version", env.GetVersion)
+	v1.GET("/version", env.V1GetVersion)
 
-	e.POST("/register", env.PostRegister)
+	v1.POST("/register", env.V1PostRegister)
 
 	// Route => handler
-	e.GET("/", env.GetRoot)
-	e.GET("/alist/:uuid", env.GetListByUUID)
-	e.GET("/alist/by/me", env.GetListsByMe)
+	v1.GET("/", env.V1GetRoot)
+	v1.GET("/alist/:uuid", env.V1GetListByUUID)
+	v1.GET("/alist/by/me", env.V1GetListsByMe)
 
-	//e.POST("/alist/v1", env.PostAlist)
-	//e.POST("/alist/v2", env.PostAlist)
-	//e.POST("/alist/v3", env.PostAlist)
-	//e.POST("/alist/v4", env.PostAlist)
-	e.POST("/alist", env.SaveAlist)
-	e.PUT("/alist/:uuid", env.SaveAlist)
-	e.DELETE("/alist/:uuid", env.RemoveAlist)
+	//e.POST("/alist/v1", env.V1PostAlist)
+	//e.POST("/alist/v2", env.V1PostAlist)
+	//e.POST("/alist/v3", env.V1PostAlist)
+	//e.POST("/alist/v4", env.V1PostAlist)
+	v1.POST("/alist", env.V1SaveAlist)
+	v1.PUT("/alist/:uuid", env.V1SaveAlist)
+	v1.DELETE("/alist/:uuid", env.V1RemoveAlist)
 	// Labels
-	e.POST("/labels", env.PostUserLabel)
-	e.GET("/labels/by/me", env.GetUserLabels)
-	e.DELETE("/labels/:uuid", env.RemoveUserLabel)
+	v1.POST("/labels", env.V1PostUserLabel)
+	v1.GET("/labels/by/me", env.V1GetUserLabels)
+	v1.DELETE("/labels/:uuid", env.V1RemoveUserLabel)
 
 	// Start server
 	listenOn := fmt.Sprintf(":%d", env.Port)

@@ -13,7 +13,7 @@ type HttpGetVersionResponse struct {
 	Version string `json:"version"`
 }
 
-func (env *Env) GetVersion(c echo.Context) error {
+func (env *Env) V1GetVersion(c echo.Context) error {
 	response := HttpGetVersionResponse{
 		GitHash: version.GetGitHash(),
 		GitDate: version.GetGitDate(),

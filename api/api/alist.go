@@ -16,7 +16,7 @@ import (
 @Param labels filter lists by label: "car", "car,bil".
 @Param list_type filter lists by type: "v1", "v2".
 */
-func (env *Env) GetListsByMe(c echo.Context) error {
+func (env *Env) V1GetListsByMe(c echo.Context) error {
 	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
@@ -27,10 +27,11 @@ func (env *Env) GetListsByMe(c echo.Context) error {
 	return c.JSON(http.StatusOK, alists)
 }
 
-func (env *Env) GetListByUUID(c echo.Context) error {
+func (env *Env) V1GetListByUUID(c echo.Context) error {
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
+	uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
+	fmt.Println(uuid)
 	if uuid == "" {
 		response := HttpResponseMessage{
 			Message: i18n.InputMissingListUuid,
@@ -48,7 +49,7 @@ func (env *Env) GetListByUUID(c echo.Context) error {
 	return c.JSON(http.StatusOK, *alist)
 }
 
-func (env *Env) SaveAlist(c echo.Context) error {
+func (env *Env) V1SaveAlist(c echo.Context) error {
 	var inputUuid string
 	user := c.Get("loggedInUser").(uuid.User)
 	method := c.Request().Method
@@ -65,7 +66,7 @@ func (env *Env) SaveAlist(c echo.Context) error {
 	if method == http.MethodPut {
 		// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 		r := c.Request()
-		inputUuid = strings.TrimPrefix(r.URL.Path, "/alist/")
+		inputUuid = strings.TrimPrefix(r.URL.Path, "/v1/alist/")
 	}
 
 	defer c.Request().Body.Close()
@@ -108,10 +109,10 @@ func (env *Env) SaveAlist(c echo.Context) error {
 	return c.JSON(statusCode, *aList)
 }
 
-func (env *Env) RemoveAlist(c echo.Context) error {
+func (env *Env) V1RemoveAlist(c echo.Context) error {
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	alist_uuid := strings.TrimPrefix(r.URL.Path, "/alist/")
+	alist_uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
 
 	user := c.Get("loggedInUser").(uuid.User)
 	response := HttpResponseMessage{}

@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (env *Env) GetRoot(c echo.Context) error {
+func (env *Env) V1GetRoot(c echo.Context) error {
 	message := "1, 2, 3. Lets go!"
 	response := HttpResponseMessage{
 		Message: message,
