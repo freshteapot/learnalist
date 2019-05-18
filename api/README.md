@@ -36,7 +36,7 @@ sh build.sh
 
 # Once the binary is running.
 ```sh
-curl -i http://localhost:1234
+curl -i http://localhost:1234/v1/
 ```
 
 Should produce something like
@@ -55,16 +55,16 @@ Go [try some curl requests.](./doc/play.along.md)
 
 | Method | Uri | Description |
 | --- | --- | --- |
-| GET | / | Replies with a simple message. |
-| GET | /version | Version informationn about the server. |
-| POST | /alist | Save a list. |
-| DELETE | /alist/{uuid} | Delete a list via uuid. |
-| PUT | /alist/{uuid} | Update all fields allowed to a list. |
-| GET | /alist/{uuid} | Get a list via uuid. |
-| GET | /alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. |
-| POST | /labels | Save a new label. |
-| GET | /labels/by/me | Get labels by the currently logged in user. |
-| DELETE | /labels/{uuid} | Delete a label via uuid. |
+| GET | /v1/ | Replies with a simple message. |
+| GET | /v1/version | Version informationn about the server. |
+| POST | /v1/alist | Save a list. |
+| DELETE | /v1/alist/{uuid} | Delete a list via uuid. |
+| PUT | /v1/alist/{uuid} | Update all fields allowed to a list. |
+| GET | /v1/alist/{uuid} | Get a list via uuid. |
+| GET | /v1/alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. |
+| POST | /v1/labels | Save a new label. |
+| GET | /v1/labels/by/me | Get labels by the currently logged in user. |
+| DELETE | /v1/labels/{uuid} | Delete a label via uuid. |
 
 
 

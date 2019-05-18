@@ -6,7 +6,7 @@ When the database is created, it is empty.
 
 ## You need a user first.
 ```sh
-curl -XPOST 127.0.0.1:1234/register -d'
+curl -XPOST 127.0.0.1:1234/v1/register -d'
 {
     "username":"chris",
     "password":"test"
@@ -17,7 +17,7 @@ curl -XPOST 127.0.0.1:1234/register -d'
 ### Add a list of type v1.
 
 ```sh
-curl -XPOST http://localhost:1234/alist -u'chris:test' -d'
+curl -XPOST http://localhost:1234/v1/alist -u'chris:test' -d'
 {
     "data": [
         "monday",
@@ -38,13 +38,13 @@ curl -XPOST http://localhost:1234/alist -u'chris:test' -d'
 
 ### Get all lists created by you.
 ```sh
-curl http://localhost:1234/alist/by/me
+curl http://localhost:1234/v1/alist/by/me
 ```
 
 ### Add a list of type v2.
 
 ```sh
-curl -XPOST http://localhost:1234/alist -uchris:test -d'
+curl -XPOST http://localhost:1234/v1/alist -uchris:test -d'
 {
     "data": [
         {
@@ -61,17 +61,17 @@ curl -XPOST http://localhost:1234/alist -uchris:test -d'
 
 Again, query all the lists by you.
 ```sh
-curl http://localhost:1234/alist/by/me
+curl http://localhost:1234/v1/alist/by/me
 ```
 
 Or an individual list.
 ```sh
-curl http://localhost:1234/alist/{uuid}
+curl http://localhost:1234/v1/alist/{uuid}
 ```
 
 #Create a list with a label or two
 ```sh
-curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/alist -u'chris:test' -d'
+curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'chris:test' -d'
 {
     "data": [
         "monday",
@@ -95,5 +95,5 @@ curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/alist -u'chris:test' -d
 
 Now try querying for this list via the labels filter
 ```sh
-curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/alist/by/me?labels=english' -u'chris:test'
+curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/v1/alist/by/me?labels=english' -u'chris:test'
 ```
