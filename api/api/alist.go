@@ -12,6 +12,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+/*
+@Param labels filter lists by label: "car", "car,bil".
+@Param list_type filter lists by type: "v1", "v2".
+*/
 func (env *Env) GetListsByMe(c echo.Context) error {
 	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
