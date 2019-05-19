@@ -4,6 +4,7 @@
 ![Code coverage, manually ran](./coverage_badge.png) <a href="https://goreportcard.com/report/github.com/freshteapot/learnalist-api" target="_blank">learnalist-api on goreportcard.</a> (In a new window).
 
 # Some documentation
+* [Question and Answers](./doc/qa.md)
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
 * [golang tips](./doc/tips.md)
