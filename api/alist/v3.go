@@ -10,7 +10,9 @@ import (
 )
 
 // TypeV3 Used for recording rowing machine times.
-type TypeV3 struct {
+type TypeV3 []TypeV3Item
+
+type TypeV3Item struct {
 	When    string    `json:"when"`
 	Overall V3Split   `json:"overall"`
 	Splits  []V3Split `json:"splits"`
@@ -65,29 +67,31 @@ func validateTypeV3(aList Alist) error {
 	var feedback []string
 
 	typeV3 := aList.Data.(TypeV3)
-	err = validateTypeV3When(typeV3.When)
-	if err != nil {
-		feedback = append(feedback, err.Error())
-	}
+	for _, item := range typeV3 {
+		err = validateTypeV3When(item.When)
+		if err != nil {
+			feedback = append(feedback, err.Error())
+		}
 
-	err = validateTypeV3Time(typeV3.Overall.Time)
-	if err != nil {
-		feedback = append(feedback, err.Error())
-	}
+		err = validateTypeV3Time(item.Overall.Time)
+		if err != nil {
+			feedback = append(feedback, err.Error())
+		}
 
-	err = validateTypeV3Distance(typeV3.Overall.Distance)
-	if err != nil {
-		feedback = append(feedback, err.Error())
-	}
+		err = validateTypeV3Distance(item.Overall.Distance)
+		if err != nil {
+			feedback = append(feedback, err.Error())
+		}
 
-	err = validateTypeV3Spm(typeV3.Overall.Spm)
-	if err != nil {
-		feedback = append(feedback, err.Error())
-	}
+		err = validateTypeV3Spm(item.Overall.Spm)
+		if err != nil {
+			feedback = append(feedback, err.Error())
+		}
 
-	err = validateTypeV3P500(typeV3.Overall.P500)
-	if err != nil {
-		feedback = append(feedback, err.Error())
+		err = validateTypeV3P500(item.Overall.P500)
+		if err != nil {
+			feedback = append(feedback, err.Error())
+		}
 	}
 
 	// TODO should we validate the splits

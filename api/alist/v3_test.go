@@ -13,7 +13,7 @@ func TestAlistTypeV3(t *testing.T) {
       "title": "Getting my row on.",
       "type": "v3"
   },
-  "data": {
+  "data": [{
     "when": "2019-05-06",
     "overall": {
       "time": "7:15.9",
@@ -29,50 +29,50 @@ func TestAlistTypeV3(t *testing.T) {
         "p500": "1:58.0"
       }
     ]
-  }
+  }]
 }
 `
 	jsonBytes := []byte(input)
 	aList := new(Alist)
 	err := aList.UnmarshalJSON(jsonBytes)
 	assert.Nil(t, err)
-	assert.Equal(t, "2019-05-06", aList.Data.(TypeV3).When)
+	assert.Equal(t, "2019-05-06", aList.Data.(TypeV3)[0].When)
 	// Confirm the enrichment happened.
 	assert.Equal(t, 2, len(aList.Info.Labels))
 
 	err = validateTypeV3(*aList)
 	assert.Nil(t, err)
 
-	typeV3 := aList.Data.(TypeV3)
-	typeV3.When = ""
-	aList.Data = typeV3
+	typeV3Item := aList.Data.(TypeV3)[0]
+	typeV3Item.When = ""
+	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "When should be YYYY-MM-DD.", err.Error())
-	typeV3.When = "2019-05-06"
+	typeV3Item.When = "2019-05-06"
 
-	typeV3.Overall.Distance = 0
-	aList.Data = typeV3
+	typeV3Item.Overall.Distance = 0
+	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "Distance should not be empty.", err.Error())
-	typeV3.Overall.Distance = 2000
+	typeV3Item.Overall.Distance = 2000
 
-	typeV3.Overall.Spm = 9
-	aList.Data = typeV3
+	typeV3Item.Overall.Spm = 9
+	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "Stroke per minute should be between the range 10 and 50.", err.Error())
-	typeV3.Overall.Spm = 28
+	typeV3Item.Overall.Spm = 28
 
-	typeV3.Overall.Time = "1.0"
-	aList.Data = typeV3
+	typeV3Item.Overall.Time = "1.0"
+	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "Time is not valid format.", err.Error())
-	typeV3.Overall.Time = "7:15.9"
+	typeV3Item.Overall.Time = "7:15.9"
 
-	typeV3.Overall.P500 = "1.0"
-	aList.Data = typeV3
+	typeV3Item.Overall.P500 = "1.0"
+	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "Per 500 is not valid format.", err.Error())
-	typeV3.Overall.P500 = "1:10.0"
+	typeV3Item.Overall.P500 = "1:10.0"
 
 	after := enrichTypeV3(*aList)
 	assert.Equal(t, 2, len(after.Info.Labels))
@@ -82,8 +82,7 @@ func TestAlistTypeV3(t *testing.T) {
 }
 
 func TestTypeV3(t *testing.T) {
-	input := `
-  {
+	input := `[{
     "when": "2019-05-06",
     "overall": {
       "time": "7:15.9",
@@ -99,7 +98,7 @@ func TestTypeV3(t *testing.T) {
         "p500": "1:58.0"
       }
     ]
-  }
+  }]
 `
 	jsonBytes := []byte(input)
 	_, err := parseTypeV3(jsonBytes)

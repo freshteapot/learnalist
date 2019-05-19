@@ -119,14 +119,16 @@ func TestValidateAlist(t *testing.T) {
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v3"}
 	aList.Data = TypeV3{
-		When: "",
-		Overall: V3Split{
-			Time:     "3:00.0",
-			Spm:      15,
-			Distance: 1000,
-			P500:     "1:00.1",
+		TypeV3Item{
+			When: "",
+			Overall: V3Split{
+				Time:     "3:00.0",
+				Spm:      15,
+				Distance: 1000,
+				P500:     "1:00.1",
+			},
+			Splits: []V3Split{},
 		},
-		Splits: []V3Split{},
 	}
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list type v3. When should be YYYY-MM-DD.")
