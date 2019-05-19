@@ -32,7 +32,7 @@ func (suite *ApiSuite) TestAlistV3Api() {
     },
     "splits": [
       {
-        "time": "1.46.4",
+        "time": "1:46.4",
         "distance": 500,
         "spm": 29,
         "p500": "1:58.0"
