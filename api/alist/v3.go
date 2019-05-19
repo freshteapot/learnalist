@@ -9,6 +9,23 @@ import (
 	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
+func NewTypeV3() *Alist {
+	aList := &Alist{}
+
+	aList.Info.ListType = Concept2
+	data := make(TypeV3, 0)
+	aList.Data = data
+
+	labels := []string{
+		"rowing",
+		"concept2",
+	}
+
+	aList.Info.Labels = labels
+
+	return aList
+}
+
 // TypeV3 Used for recording rowing machine times.
 type TypeV3 []TypeV3Item
 
