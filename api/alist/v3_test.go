@@ -1,11 +1,21 @@
 package alist
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestNewTypeV3(t *testing.T) {
+	aList := NewTypeV3()
+	assert.Equal(t, Concept2, aList.Info.ListType)
+	assert.Equal(t, "TypeV3", reflect.TypeOf(aList.Data).Name())
+	assert.Equal(t, 2, len(aList.Info.Labels))
+	assert.Equal(t, "rowing", aList.Info.Labels[0])
+	assert.Equal(t, "concept2", aList.Info.Labels[1])
+}
 
 func TestAlistTypeV3(t *testing.T) {
 	input := `
