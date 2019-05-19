@@ -3,6 +3,7 @@ package alist
 import (
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +24,7 @@ func TestAlistTypeV3(t *testing.T) {
     },
     "splits": [
       {
-        "time": "1.46.4",
+        "time": "1:46.4",
         "distance": 500,
         "spm": 29,
         "p500": "1:58.0"
@@ -47,31 +48,31 @@ func TestAlistTypeV3(t *testing.T) {
 	typeV3Item.When = ""
 	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
-	assert.Equal(t, "When should be YYYY-MM-DD.", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 	typeV3Item.When = "2019-05-06"
 
 	typeV3Item.Overall.Distance = 0
 	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
-	assert.Equal(t, "Distance should not be empty.", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 	typeV3Item.Overall.Distance = 2000
 
 	typeV3Item.Overall.Spm = 9
 	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
-	assert.Equal(t, "Stroke per minute should be between the range 10 and 50.", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 	typeV3Item.Overall.Spm = 28
 
 	typeV3Item.Overall.Time = "1.0"
 	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
-	assert.Equal(t, "Time is not valid format.", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 	typeV3Item.Overall.Time = "7:15.9"
 
 	typeV3Item.Overall.P500 = "1.0"
 	aList.Data.(TypeV3)[0] = typeV3Item
 	err = validateTypeV3(*aList)
-	assert.Equal(t, "Per 500 is not valid format.", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 	typeV3Item.Overall.P500 = "1:10.0"
 
 	after := enrichTypeV3(*aList)
@@ -79,6 +80,13 @@ func TestAlistTypeV3(t *testing.T) {
 	// Make sure we dont duplicate the labels
 	after = enrichTypeV3(after)
 	assert.Equal(t, 2, len(after.Info.Labels))
+
+	// Test a bad split
+	typeV3Item.Splits[0].Time = "1.0"
+	aList.Data.(TypeV3)[0] = typeV3Item
+	err = validateTypeV3(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
+	typeV3Item.Splits[0].Time = "1:0.0"
 }
 
 func TestTypeV3(t *testing.T) {

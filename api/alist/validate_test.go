@@ -131,7 +131,7 @@ func TestValidateAlist(t *testing.T) {
 		},
 	}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v3. When should be YYYY-MM-DD.")
+	assert.Equal(t, err.Error(), "Failed to pass list type v3. Please refer to the documentation on list type v3")
 
 	// Make sure we handle Unsupported lists
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "na"}

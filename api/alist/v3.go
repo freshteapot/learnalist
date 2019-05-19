@@ -63,44 +63,54 @@ func parseTypeV3(jsonBytes []byte) (TypeV3, error) {
 
 func validateTypeV3(aList Alist) error {
 	var err error
-	var feedbackMessage string
-	var feedback []string
+	var feedback = errors.New("Please refer to the documentation on list type v3")
 
 	typeV3 := aList.Data.(TypeV3)
 	for _, item := range typeV3 {
+
 		err = validateTypeV3When(item.When)
 		if err != nil {
-			feedback = append(feedback, err.Error())
+			return feedback
 		}
 
-		err = validateTypeV3Time(item.Overall.Time)
+		err = validateTypeV3Split(item.Overall)
 		if err != nil {
-			feedback = append(feedback, err.Error())
+			return feedback
 		}
 
-		err = validateTypeV3Distance(item.Overall.Distance)
-		if err != nil {
-			feedback = append(feedback, err.Error())
-		}
-
-		err = validateTypeV3Spm(item.Overall.Spm)
-		if err != nil {
-			feedback = append(feedback, err.Error())
-		}
-
-		err = validateTypeV3P500(item.Overall.P500)
-		if err != nil {
-			feedback = append(feedback, err.Error())
+		for _, split := range item.Splits {
+			err = validateTypeV3Split(split)
+			if err != nil {
+				return feedback
+			}
 		}
 	}
 
-	// TODO should we validate the splits
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
+	return nil
+}
+
+func validateTypeV3Split(split V3Split) error {
+	var err error
+	err = validateTypeV3Time(split.Time)
+	if err != nil {
+		return err
 	}
 
-	return err
+	err = validateTypeV3Distance(split.Distance)
+	if err != nil {
+		return err
+	}
+
+	err = validateTypeV3Spm(split.Spm)
+	if err != nil {
+		return err
+	}
+
+	err = validateTypeV3P500(split.P500)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func validateTypeV3Distance(input int) error {
