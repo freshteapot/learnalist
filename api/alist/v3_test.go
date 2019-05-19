@@ -37,6 +37,8 @@ func TestAlistTypeV3(t *testing.T) {
 	err := aList.UnmarshalJSON(jsonBytes)
 	assert.Nil(t, err)
 	assert.Equal(t, "2019-05-06", aList.Data.(TypeV3).When)
+	// Confirm the enrichment happened.
+	assert.Equal(t, 2, len(aList.Info.Labels))
 
 	err = validateTypeV3(*aList)
 	assert.Nil(t, err)
@@ -71,7 +73,14 @@ func TestAlistTypeV3(t *testing.T) {
 	err = validateTypeV3(*aList)
 	assert.Equal(t, "Per 500 is not valid format.", err.Error())
 	typeV3.Overall.P500 = "1:10.0"
+
+	after := enrichTypeV3(*aList)
+	assert.Equal(t, 2, len(after.Info.Labels))
+	// Make sure we dont duplicate the labels
+	after = enrichTypeV3(after)
+	assert.Equal(t, 2, len(after.Info.Labels))
 }
+
 func TestTypeV3(t *testing.T) {
 	input := `
   {

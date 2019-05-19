@@ -107,6 +107,8 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			err = errors.New("Failed to pass list type v3.")
 			return err
 		}
+		// TODO This is ugly
+		*aList = enrichTypeV3(*aList)
 	default:
 		err = errors.New("Unsupported list type.")
 		return err

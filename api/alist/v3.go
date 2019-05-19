@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/araddon/dateparse"
+	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
 // TypeV3 Used for recording rowing machine times.
@@ -39,6 +40,18 @@ type V3Split struct {
       },
       {
 */
+
+func enrichTypeV3(aList Alist) Alist {
+	labels := aList.Info.Labels
+	if !utils.StringArrayContains(labels, "rowing") {
+		labels = append(labels, "rowing")
+	}
+	if !utils.StringArrayContains(labels, "concept2") {
+		labels = append(labels, "concept2")
+	}
+	aList.Info.Labels = labels
+	return aList
+}
 
 func parseTypeV3(jsonBytes []byte) (TypeV3, error) {
 	listData := new(TypeV3)
