@@ -74,6 +74,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | --- | --- |
 | v1 | An array of a string.|
 | v2 | An array of object alist.AlistItemTypeV2 |
+| v3 | Record your rowing data from a concept2. TypeV3, made up of an array of alist.TypeV3Item |
 
 ### V1
 
@@ -107,6 +108,36 @@ Go [try some curl requests.](./doc/play.along.md)
     }
 }
 ```
+
+### V3
+```
+{
+  "data": [
+    {
+      "when": "2019-05-06",
+      "overall": {
+        "time": "7:15.9",
+        "distance": 2000,
+        "spm": 28,
+        "p500": "1:48.9"
+      },
+      "splits": [
+        {
+          "time": "1.46.4",
+          "distance": 500,
+          "spm": 29,
+          "p500": "1:58.0"
+        }
+      ]
+    }
+  ],
+  "info": {
+      "title": "A list to record rows.",
+      "type": "v3"
+  }
+}
+```
+
 
 # References as this becomes more useful.
 

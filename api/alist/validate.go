@@ -27,6 +27,12 @@ func Validate(aList Alist) error {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
 			return err
 		}
+	case Concept2:
+		err = validateTypeV3(aList)
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Failed to pass list type v3. %s", err.Error()))
+			return err
+		}
 	default:
 		err = errors.New("Unsupported list type.")
 		return err

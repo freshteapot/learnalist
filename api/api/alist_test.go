@@ -12,6 +12,52 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (suite *ApiSuite) TestAlistV3Api() {
+	var raw map[string]interface{}
+	var statusCode int
+	var responseBytes []byte
+	input := `
+{
+  "info": {
+      "title": "Getting my row on.",
+      "type": "v3"
+  },
+  "data": [{
+    "when": "2019-05-06",
+    "overall": {
+      "time": "7:15.9",
+      "distance": 2000,
+      "spm": 28,
+      "p500": "1:48.9"
+    },
+    "splits": [
+      {
+        "time": "1:46.4",
+        "distance": 500,
+        "spm": 29,
+        "p500": "1:58.0"
+      }
+    ]
+  }]
+}
+`
+	var aList alist.Alist
+	inputUserA := `{"username":"iamusera", "password":"test"}`
+	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
+	statusCode, responseBytes = suite.createAList(userUUID, input)
+	suite.Equal(http.StatusCreated, statusCode)
+	json.Unmarshal(responseBytes, &raw)
+	json.Unmarshal(responseBytes, &aList)
+
+	// Make sure the labels stay.
+	aList.Info.Labels = nil
+	updatedBytes, _ := aList.MarshalJSON()
+	statusCode, responseBytes = suite.updateAlist(userUUID, aList.Uuid, string(updatedBytes))
+
+	suite.Equal(http.StatusOK, statusCode)
+	fmt.Println(string(responseBytes))
+}
+
 func (suite *ApiSuite) TestAlistApi() {
 	var raw map[string]interface{}
 	var statusCode int

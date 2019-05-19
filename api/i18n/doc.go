@@ -4,6 +4,7 @@ const (
 	ValidationErrorList                     = "Failed to pass list info. %s"
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
+	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
 	SuccessAlistNotFound                    = "List not found."
 	InternalServerErrorMissingAlistUuid     = "Uuid is missing, possibly an internal error"
 	InternalServerErrorMissingUserUuid      = "User.Uuid is missing, possibly an internal error"
