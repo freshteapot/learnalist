@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -25,9 +26,8 @@ func (env *Env) V1ShareAlist(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
-		// TODO
 		response := HttpResponseMessage{
-			Message: "Wrong format",
+			Message: i18n.PostShareListJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -35,13 +35,19 @@ func (env *Env) V1ShareAlist(c echo.Context) error {
 	aList, _ := env.Datastore.GetAlist(input.AlistUUID)
 	if aList == nil {
 		response := HttpResponseMessage{
-			Message: "Wrong format",
+			Message: i18n.SuccessAlistNotFound,
 		}
-		return c.JSON(http.StatusBadRequest, response)
+		return c.JSON(http.StatusNotFound, response)
 	}
 
 	if aList.User.Uuid == user.Uuid {
 		if input.UserUUID != user.Uuid {
+			if !env.Datastore.UserExists(input.UserUUID) {
+				response := HttpResponseMessage{
+					Message: i18n.SuccessUserNotFound,
+				}
+				return c.JSON(http.StatusNotFound, response)
+			}
 			if input.Action == "grant" {
 				env.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
 			}

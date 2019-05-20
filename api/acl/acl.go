@@ -85,7 +85,6 @@ func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
 }
 
 func (acl Acl) HasUserListReadAccess(userUUID string, aList *alist.Alist) bool {
-	fmt.Println(fmt.Sprintf("check access to list %s by user %s", aList.Uuid, userUUID))
 	if userUUID == aList.User.Uuid {
 		return true
 	}
