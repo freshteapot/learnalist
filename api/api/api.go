@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
@@ -18,6 +19,7 @@ type Env struct {
 	Port             int
 	DatabaseName     string
 	CorsAllowOrigins string
+	Acl              acl.Acl
 }
 
 type HttpResponseMessage struct {
@@ -40,7 +42,8 @@ func Run(env Env) {
 	}
 
 	env.Datastore = &models.DAL{
-		Db: db,
+		Db:  db,
+		Acl: &env.Acl,
 	}
 
 	// Echo instance
@@ -85,6 +88,7 @@ func Run(env Env) {
 	//e.POST("/alist/v3", env.V1PostAlist)
 	//e.POST("/alist/v4", env.V1PostAlist)
 	v1.POST("/alist", env.V1SaveAlist)
+	v1.POST("/share/alist", env.V1ShareAlist)
 	v1.PUT("/alist/:uuid", env.V1SaveAlist)
 	v1.DELETE("/alist/:uuid", env.V1RemoveAlist)
 	// Labels

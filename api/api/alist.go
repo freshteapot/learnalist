@@ -28,6 +28,7 @@ func (env *Env) V1GetListsByMe(c echo.Context) error {
 }
 
 func (env *Env) V1GetListByUUID(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 	uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
@@ -45,6 +46,13 @@ func (env *Env) V1GetListByUUID(c echo.Context) error {
 			Message: message,
 		}
 		return c.JSON(http.StatusNotFound, response)
+	}
+	// TODO write test
+	if !env.Acl.HasUserListReadAccess(user.Uuid, alist) {
+		response := HttpResponseMessage{
+			Message: "Access Denied",
+		}
+		return c.JSON(http.StatusForbidden, response)
 	}
 	return c.JSON(http.StatusOK, *alist)
 }

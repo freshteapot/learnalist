@@ -224,6 +224,8 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	if err != nil {
 		return nil, err
 	}
+
+	dal.Acl.CreateListRole(aList.Uuid)
 	return &aList, nil
 }
 
