@@ -14,22 +14,36 @@ type Acl struct {
 	Enforcer *casbin.Enforcer
 }
 
-func NewAclFromConfig(config string, dataSourceName string) *Acl {
+func NewAclFromModel(dataSourceName string) *Acl {
+	// rbac_model.conf
+	modelText := `
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`
+
 	// TODO share the same from database creation
 	dataSourceName = "file:" + dataSourceName
-	// TODO check if it exits?
-	//config = "./rbac_model.conf"
 	adapter := sqlxadapter.NewAdapter("sqlite3", dataSourceName)
-	e := casbin.NewEnforcer(config, adapter)
-	acl := NewAcl(e)
-	e.LoadPolicy()
-	return acl
-}
-
-func NewAcl(enforcer *casbin.Enforcer) *Acl {
+	model := casbin.NewModel(modelText)
+	enforcer := casbin.NewEnforcer(model, adapter)
 	acl := &Acl{
 		Enforcer: enforcer,
 	}
+	enforcer.LoadPolicy()
+
+	acl.Init()
 	return acl
 }
 

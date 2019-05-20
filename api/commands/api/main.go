@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	casbinConfig := flag.String("casbin-config", "./rbac_model.conf", "Path to the casbin config.")
 	database := flag.String("database", "/tmp/api.db", "The database.")
 	domain := flag.String("domain", "learnalist.net", "The domain.")
 	port := flag.Int("port", 80, "Port to listen on.")
@@ -17,8 +16,7 @@ func main() {
 
 	api.SetDomain(*domain)
 	// Setup access to casbin, and then run Init().
-	acl := acl.NewAclFromConfig(*casbinConfig, *database)
-	acl.Init()
+	acl := acl.NewAclFromModel(*database)
 	env := api.Env{
 		Port:             *port,
 		DatabaseName:     *database,

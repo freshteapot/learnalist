@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
@@ -48,10 +49,13 @@ func resetDatabase() {
 	if err != nil {
 		log.Panic(err)
 	}
+	acl := acl.NewAclFromModel("/tmp/test.db")
 	dal = &models.DAL{
-		Db: db,
+		Db:  db,
+		Acl: acl,
 	}
 	env.Datastore = dal
+	env.Acl = *acl
 }
 
 func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {

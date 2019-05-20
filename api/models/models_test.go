@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"testing"
-
+	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -36,8 +36,10 @@ func TestRunSuite(t *testing.T) {
 
 func resetDatabase() {
 	db, _ := NewTestDB()
+	acl := acl.NewAclFromModel(PathToTestSqliteDb)
 	dal = &DAL{
-		Db: db,
+		Db:  db,
+		Acl: acl,
 	}
 }
 
