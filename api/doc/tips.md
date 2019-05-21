@@ -18,3 +18,16 @@ item := &alist.AlistItemTypeV2{From: "Hi", To: "Hello"}
 aListV2Data = append(aListV2Data, *item)
 aList.Data = aListV2Data
 ```
+
+# Working with casbin
+p = policy
+
+Get all policies, loop over them and get the policy detail.
+```go
+allNamedObjects := acl.Enforcer.GetAllNamedObjects("p")
+for _, policy := range allNamedObjects {
+  fmt.Println(policy)
+  filteredPolicy = acl.Enforcer.GetFilteredPolicy(1, policy)
+  fmt.Println(filteredPolicy)
+}
+```

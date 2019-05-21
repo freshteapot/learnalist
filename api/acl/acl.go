@@ -69,6 +69,10 @@ func (acl Acl) GrantListPublicWriteAccess(userUUID string) {
 	acl.Enforcer.AddRoleForUser(userUUID, "public:write")
 }
 
+func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
+	acl.Enforcer.DeleteRoleForUser(userUUID, "public:write")
+}
+
 // GrantListReadAccess grant access to the user to be able to read the list.
 func (acl Acl) GrantListReadAccess(userUUID string, alistUUID string) {
 	// TODO should I always try and create the roles?

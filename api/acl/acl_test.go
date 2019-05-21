@@ -1,8 +1,10 @@
 package acl
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/alist"
 	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/suite"
@@ -16,7 +18,8 @@ type AclSuite struct {
 }
 
 func (suite *AclSuite) SetupSuite() {
-	resetDatabase()
+	db = database.NewTestDB()
+	acl = NewAclFromModel(database.PathToTestSqliteDb)
 }
 
 func (suite *AclSuite) SetupTest() {
@@ -31,7 +34,78 @@ func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(AclSuite))
 }
 
-func resetDatabase() {
-	db = database.NewTestDB()
-	acl = NewAclFromModel(database.PathToTestSqliteDb)
+func (suite *AclSuite) TestPublicWrite() {
+	acl.createPublicRole()
+	a := acl.Enforcer.GetPolicy()
+	policy := a[0]
+	sub := policy[0]
+	obj := policy[1]
+	act := policy[2]
+	suite.Equal("public:write", sub)
+	suite.Equal("public", obj)
+	suite.Equal("write", act)
+}
+
+func (suite *AclSuite) TestCreateListRole() {
+	alistUUID := "fake123"
+	acl.CreateListRole(alistUUID)
+
+	filteredPolicy := acl.Enforcer.GetFilteredPolicy(1, "fake123")
+	policyRead := filteredPolicy[0]
+	policyReadSub := policyRead[0]
+	policyReadObj := policyRead[1]
+	policyReadAct := policyRead[2]
+
+	policyWrite := filteredPolicy[1]
+	policyWriteSub := policyWrite[0]
+	policyWriteObj := policyWrite[1]
+	policyWriteAct := policyWrite[2]
+
+	read := fmt.Sprintf("%s:read", alistUUID)
+	write := fmt.Sprintf("%s:write", alistUUID)
+
+	suite.Equal(policyWriteSub, write)
+	suite.Equal(policyWriteObj, alistUUID)
+	suite.Equal(policyWriteAct, "write")
+
+	suite.Equal(policyReadSub, read)
+	suite.Equal(policyReadObj, alistUUID)
+	suite.Equal(policyReadAct, "read")
+}
+
+func (suite *AclSuite) TestGrantListPublicWriteAccess() {
+	userUUID := "fakeUser123"
+	acl.GrantListPublicWriteAccess(userUUID)
+	roles := acl.Enforcer.GetRolesForUser(userUUID)
+	suite.Equal("public:write", roles[0])
+	suite.True(acl.HasUserPublicWriteAccess(userUUID))
+
+	acl.RevokeListPublicWriteAccess(userUUID)
+	suite.False(acl.HasUserPublicWriteAccess(userUUID))
+}
+
+func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
+	userUUID := "fakeUser123"
+	alistUUID := "fakeList123"
+	aList := alist.NewTypeV1()
+	aList.Uuid = alistUUID
+	acl.CreateListRole(alistUUID)
+	acl.GrantListReadAccess(userUUID, alistUUID)
+	roles := acl.Enforcer.GetRolesForUser(userUUID)
+	suite.Equal(1, len(roles))
+	suite.True(acl.Enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
+	suite.True(acl.Enforcer.Enforce(userUUID, alistUUID, "read"))
+	suite.True(acl.HasUserListReadAccess(userUUID, aList))
+
+	// Follow the path if the user is the owner of the list
+	aList.User.Uuid = userUUID
+	suite.True(acl.HasUserListReadAccess(userUUID, aList))
+	aList.User.Uuid = ""
+
+	acl.RevokeListReadAccess(userUUID, alistUUID)
+	roles = acl.Enforcer.GetRolesForUser(userUUID)
+	suite.Equal(0, len(roles))
+	suite.False(acl.Enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
+	suite.False(acl.Enforcer.Enforce(userUUID, alistUUID, "read"))
+	suite.False(acl.HasUserListReadAccess(userUUID, aList))
 }
