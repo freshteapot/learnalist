@@ -15,13 +15,11 @@ func main() {
 	flag.Parse()
 
 	api.SetDomain(*domain)
-	// Setup access to casbin, and then run Init().
-	acl := acl.NewAclFromModel(*database)
+
 	env := api.Env{
 		Port:             *port,
 		DatabaseName:     *database,
-		CorsAllowOrigins: *corsAllowedOrigins,
-		Acl:              *acl,
+		CorsAllowOrigins: *corsAllowedOrigins
 	}
 
 	api.Run(env)

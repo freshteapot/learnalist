@@ -1,9 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"testing"
+
 	"github.com/freshteapot/learnalist-api/api/acl"
+	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,11 +24,7 @@ func (suite *ModelSuite) SetupTest() {
 }
 
 func (suite *ModelSuite) TearDownTest() {
-	tables := GetTables()
-	for _, table := range tables {
-		query := fmt.Sprintf("DELETE FROM %s", table)
-		dal.Db.MustExec(query)
-	}
+	database.EmptyDatabase(dal.Db)
 }
 
 func TestRunSuite(t *testing.T) {
@@ -35,12 +32,9 @@ func TestRunSuite(t *testing.T) {
 }
 
 func resetDatabase() {
-	db, _ := NewTestDB()
-	acl := acl.NewAclFromModel(PathToTestSqliteDb)
-	dal = &DAL{
-		Db:  db,
-		Acl: acl,
-	}
+	db := database.NewTestDB()
+	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	dal = NewDAL(db, acl)
 }
 
 func setupUserViaSQL() string {

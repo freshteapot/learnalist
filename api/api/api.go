@@ -2,12 +2,12 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -36,15 +36,10 @@ func SetDomain(_domain string) {
 
 // Run This starts the api listening on the port supplied
 func Run(env Env) {
-	db, err := models.NewDB(env.DatabaseName)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	env.Datastore = &models.DAL{
-		Db:  db,
-		Acl: &env.Acl,
-	}
+	db := database.NewDB(env.DatabaseName)
+	// Setup access control layer.
+	acl := acl.NewAclFromModel(env.DatabaseName)
+	env.Datastore = models.NewDAL(db, acl)
 
 	// Echo instance
 	e := echo.New()

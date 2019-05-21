@@ -1,14 +1,13 @@
 package api
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/api/acl"
+	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
@@ -16,8 +15,8 @@ import (
 
 var dal *models.DAL
 var env = Env{
-	Port:         9090,
-	DatabaseName: "./test.db",
+	Port:         1234,
+	DatabaseName: database.PathToTestSqliteDb,
 }
 
 type ApiSuite struct {
@@ -33,11 +32,7 @@ func (suite *ApiSuite) SetupTest() {
 }
 
 func (suite *ApiSuite) TearDownTest() {
-	tables := models.GetTables()
-	for _, table := range tables {
-		query := fmt.Sprintf("DELETE FROM %s", table)
-		dal.Db.MustExec(query)
-	}
+	database.EmptyDatabase(dal.Db)
 }
 
 func TestRunSuite(t *testing.T) {
@@ -45,15 +40,9 @@ func TestRunSuite(t *testing.T) {
 }
 
 func resetDatabase() {
-	db, err := models.NewTestDB()
-	if err != nil {
-		log.Panic(err)
-	}
-	acl := acl.NewAclFromModel("/tmp/test.db")
-	dal = &models.DAL{
-		Db:  db,
-		Acl: acl,
-	}
+	db := database.NewTestDB()
+	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	dal = models.NewDAL(db, acl)
 	env.Datastore = dal
 	env.Acl = *acl
 }

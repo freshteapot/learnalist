@@ -11,6 +11,14 @@ type DAL struct {
 	Acl *acl.Acl
 }
 
+func NewDAL(db *sqlx.DB, acl *acl.Acl) *DAL {
+	dal := &DAL{
+		Db:  db,
+		Acl: acl,
+	}
+	return dal
+}
+
 func checkErr(err error) {
 	if err != nil {
 		panic(err)
