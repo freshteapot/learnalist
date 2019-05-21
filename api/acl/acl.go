@@ -51,10 +51,13 @@ func (acl Acl) Init() {
 	acl.createPublicRole()
 }
 
+// createPublicRole Internal method, "public:write", is the concept
+// that a user, is allowed to make public lists. By default, all lists are private.
 func (acl Acl) createPublicRole() {
 	acl.enforcer.AddPolicy("public:write", "public", "write")
 }
 
+// CreateListRole create roles, to allow users to have read or write access to a list.
 func (acl Acl) CreateListRole(alistUUID string) {
 	read := fmt.Sprintf("%s:read", alistUUID)
 	write := fmt.Sprintf("%s:write", alistUUID)
@@ -68,6 +71,7 @@ func (acl Acl) GrantListPublicWriteAccess(userUUID string) {
 	acl.enforcer.AddRoleForUser(userUUID, "public:write")
 }
 
+// RevokeListPublicWriteAccess remove a users access to creating public lists.
 func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
 	acl.enforcer.DeleteRoleForUser(userUUID, "public:write")
 }
