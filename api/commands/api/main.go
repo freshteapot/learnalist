@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 
-	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/freshteapot/learnalist-api/api/api"
 )
 
@@ -19,7 +18,7 @@ func main() {
 	env := api.Env{
 		Port:             *port,
 		DatabaseName:     *database,
-		CorsAllowOrigins: *corsAllowedOrigins
+		CorsAllowOrigins: *corsAllowedOrigins,
 	}
 
 	api.Run(env)
