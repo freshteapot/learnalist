@@ -89,15 +89,11 @@ func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
 
 // GrantListReadAccess grant access to the user to be able to read the list.
 func (acl Acl) GrantListReadAccess(userUUID string, alistUUID string) {
-	// TODO should I always try and create the roles?
-	// acl.createListRole(alistUUID)
 	read := fmt.Sprintf("%s:read", alistUUID)
 	acl.enforcer.AddRoleForUser(userUUID, read)
 }
 
 func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
-	// TODO should I always try and create the roles?
-	// acl.createListRole(alistUUID)
 	read := fmt.Sprintf("%s:read", alistUUID)
 	acl.enforcer.DeleteRoleForUser(userUUID, read)
 }
