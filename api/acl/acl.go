@@ -10,7 +10,6 @@ import (
 )
 
 type Acl struct {
-	// TODO do I want to keep this inside only
 	enforcer *casbin.Enforcer
 }
 
