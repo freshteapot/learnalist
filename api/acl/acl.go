@@ -11,7 +11,7 @@ import (
 
 type Acl struct {
 	// TODO do I want to keep this inside only
-	Enforcer *casbin.Enforcer
+	enforcer *casbin.Enforcer
 }
 
 func NewAclFromModel(dataSourceName string) *Acl {
@@ -39,7 +39,7 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	model := casbin.NewModel(modelText)
 	enforcer := casbin.NewEnforcer(model, adapter)
 	acl := &Acl{
-		Enforcer: enforcer,
+		enforcer: enforcer,
 	}
 	enforcer.LoadPolicy()
 
@@ -53,24 +53,24 @@ func (acl Acl) Init() {
 }
 
 func (acl Acl) createPublicRole() {
-	acl.Enforcer.AddPolicy("public:write", "public", "write")
+	acl.enforcer.AddPolicy("public:write", "public", "write")
 }
 
 func (acl Acl) CreateListRole(alistUUID string) {
 	read := fmt.Sprintf("%s:read", alistUUID)
 	write := fmt.Sprintf("%s:write", alistUUID)
-	acl.Enforcer.AddPolicy(read, alistUUID, "read")
-	acl.Enforcer.AddPolicy(write, alistUUID, "write")
+	acl.enforcer.AddPolicy(read, alistUUID, "read")
+	acl.enforcer.AddPolicy(write, alistUUID, "write")
 }
 
 // GrantListPublicWriteAccess will allow the user to publish lists to the public section.
 // By default all lists are private.
 func (acl Acl) GrantListPublicWriteAccess(userUUID string) {
-	acl.Enforcer.AddRoleForUser(userUUID, "public:write")
+	acl.enforcer.AddRoleForUser(userUUID, "public:write")
 }
 
 func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
-	acl.Enforcer.DeleteRoleForUser(userUUID, "public:write")
+	acl.enforcer.DeleteRoleForUser(userUUID, "public:write")
 }
 
 // GrantListReadAccess grant access to the user to be able to read the list.
@@ -78,23 +78,23 @@ func (acl Acl) GrantListReadAccess(userUUID string, alistUUID string) {
 	// TODO should I always try and create the roles?
 	// acl.createListRole(alistUUID)
 	read := fmt.Sprintf("%s:read", alistUUID)
-	acl.Enforcer.AddRoleForUser(userUUID, read)
+	acl.enforcer.AddRoleForUser(userUUID, read)
 }
 
 func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
 	// TODO should I always try and create the roles?
 	// acl.createListRole(alistUUID)
 	read := fmt.Sprintf("%s:read", alistUUID)
-	acl.Enforcer.DeleteRoleForUser(userUUID, read)
+	acl.enforcer.DeleteRoleForUser(userUUID, read)
 }
 
 func (acl Acl) HasUserListReadAccess(userUUID string, aList *alist.Alist) bool {
 	if userUUID == aList.User.Uuid {
 		return true
 	}
-	return acl.Enforcer.Enforce(userUUID, aList.Uuid, "read")
+	return acl.enforcer.Enforce(userUUID, aList.Uuid, "read")
 }
 
 func (acl Acl) HasUserPublicWriteAccess(userUUID string) bool {
-	return acl.Enforcer.Enforce(userUUID, "public", "write")
+	return acl.enforcer.Enforce(userUUID, "public", "write")
 }

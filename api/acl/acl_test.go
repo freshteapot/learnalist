@@ -36,7 +36,7 @@ func TestRunSuite(t *testing.T) {
 
 func (suite *AclSuite) TestPublicWrite() {
 	acl.createPublicRole()
-	a := acl.Enforcer.GetPolicy()
+	a := acl.enforcer.GetPolicy()
 	policy := a[0]
 	sub := policy[0]
 	obj := policy[1]
@@ -50,7 +50,7 @@ func (suite *AclSuite) TestCreateListRole() {
 	alistUUID := "fake123"
 	acl.CreateListRole(alistUUID)
 
-	filteredPolicy := acl.Enforcer.GetFilteredPolicy(1, "fake123")
+	filteredPolicy := acl.enforcer.GetFilteredPolicy(1, "fake123")
 	policyRead := filteredPolicy[0]
 	policyReadSub := policyRead[0]
 	policyReadObj := policyRead[1]
@@ -76,7 +76,7 @@ func (suite *AclSuite) TestCreateListRole() {
 func (suite *AclSuite) TestGrantListPublicWriteAccess() {
 	userUUID := "fakeUser123"
 	acl.GrantListPublicWriteAccess(userUUID)
-	roles := acl.Enforcer.GetRolesForUser(userUUID)
+	roles := acl.enforcer.GetRolesForUser(userUUID)
 	suite.Equal("public:write", roles[0])
 	suite.True(acl.HasUserPublicWriteAccess(userUUID))
 
@@ -91,10 +91,10 @@ func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
 	aList.Uuid = alistUUID
 	acl.CreateListRole(alistUUID)
 	acl.GrantListReadAccess(userUUID, alistUUID)
-	roles := acl.Enforcer.GetRolesForUser(userUUID)
+	roles := acl.enforcer.GetRolesForUser(userUUID)
 	suite.Equal(1, len(roles))
-	suite.True(acl.Enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
-	suite.True(acl.Enforcer.Enforce(userUUID, alistUUID, "read"))
+	suite.True(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
+	suite.True(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
 	suite.True(acl.HasUserListReadAccess(userUUID, aList))
 
 	// Follow the path if the user is the owner of the list
@@ -103,9 +103,9 @@ func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
 	aList.User.Uuid = ""
 
 	acl.RevokeListReadAccess(userUUID, alistUUID)
-	roles = acl.Enforcer.GetRolesForUser(userUUID)
+	roles = acl.enforcer.GetRolesForUser(userUUID)
 	suite.Equal(0, len(roles))
-	suite.False(acl.Enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
-	suite.False(acl.Enforcer.Enforce(userUUID, alistUUID, "read"))
+	suite.False(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
+	suite.False(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
 	suite.False(acl.HasUserListReadAccess(userUUID, aList))
 }
