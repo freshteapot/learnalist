@@ -47,10 +47,10 @@ func (suite *AclSuite) TestPublicWrite() {
 }
 
 func (suite *AclSuite) TestCreateListRole() {
-	alistUUID := "fake123"
+	alistUUID := "fakeList123"
 	acl.CreateListRole(alistUUID)
 
-	filteredPolicy := acl.enforcer.GetFilteredPolicy(1, "fake123")
+	filteredPolicy := acl.enforcer.GetFilteredPolicy(1, alistUUID)
 	policyRead := filteredPolicy[0]
 	policyReadSub := policyRead[0]
 	policyReadObj := policyRead[1]
@@ -71,6 +71,10 @@ func (suite *AclSuite) TestCreateListRole() {
 	suite.Equal(policyReadSub, read)
 	suite.Equal(policyReadObj, alistUUID)
 	suite.Equal(policyReadAct, "read")
+
+	acl.DeleteListRole(alistUUID)
+	filteredPolicy = acl.enforcer.GetFilteredPolicy(1, alistUUID)
+	suite.Equal(0, len(filteredPolicy))
 }
 
 func (suite *AclSuite) TestGrantListPublicWriteAccess() {
@@ -107,5 +111,21 @@ func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
 	suite.Equal(0, len(roles))
 	suite.False(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
 	suite.False(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
+	suite.False(acl.HasUserListReadAccess(userUUID, aList))
+}
+
+func (suite *AclSuite) TestDeleteRoleWithGrantSet() {
+	userUUID := "fakeUser123"
+	alistUUID := "fakeList123"
+	aList := alist.NewTypeV1()
+	aList.Uuid = alistUUID
+	acl.CreateListRole(alistUUID)
+	acl.GrantListReadAccess(userUUID, alistUUID)
+	suite.Equal(3, len(acl.enforcer.GetAllSubjects()))
+	suite.Equal(1, len(acl.enforcer.GetAllRoles()))
+	suite.True(acl.HasUserListReadAccess(userUUID, aList))
+	acl.DeleteListRole(alistUUID)
+	suite.Equal(1, len(acl.enforcer.GetAllSubjects()))
+	suite.Equal(0, len(acl.enforcer.GetAllRoles()))
 	suite.False(acl.HasUserListReadAccess(userUUID, aList))
 }

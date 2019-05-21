@@ -65,6 +65,17 @@ func (acl Acl) CreateListRole(alistUUID string) {
 	acl.enforcer.AddPolicy(write, alistUUID, "write")
 }
 
+func (acl Acl) DeleteListRole(alistUUID string) {
+	read := fmt.Sprintf("%s:read", alistUUID)
+	write := fmt.Sprintf("%s:write", alistUUID)
+	// Remove the policy
+	acl.enforcer.RemovePolicy(read, alistUUID, "read")
+	acl.enforcer.RemovePolicy(write, alistUUID, "write")
+	// Remove access to the deleted policy
+	acl.enforcer.RemoveFilteredGroupingPolicy(1, read)
+	acl.enforcer.RemoveFilteredGroupingPolicy(1, write)
+}
+
 // GrantListPublicWriteAccess will allow the user to publish lists to the public section.
 // By default all lists are private.
 func (acl Acl) GrantListPublicWriteAccess(userUUID string) {

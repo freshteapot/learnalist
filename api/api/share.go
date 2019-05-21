@@ -10,6 +10,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	ActionRevoke = "revoke"
+	ActionGrant  = "grant"
+)
+
 type HttpShareListWithUserInput struct {
 	UserUUID  string `json:"user_uuid"`
 	AlistUUID string `json:"alist_uuid"`
@@ -48,10 +53,10 @@ func (env *Env) V1ShareAlist(c echo.Context) error {
 				}
 				return c.JSON(http.StatusNotFound, response)
 			}
-			if input.Action == "grant" {
+			if input.Action == ActionGrant {
 				env.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
 			}
-			if input.Action == "revoke" {
+			if input.Action == ActionRevoke {
 				env.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
 			}
 		}

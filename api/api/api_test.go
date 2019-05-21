@@ -24,7 +24,11 @@ type ApiSuite struct {
 }
 
 func (suite *ApiSuite) SetupSuite() {
-	resetDatabase()
+	db := database.NewTestDB()
+	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	dal = models.NewDAL(db, acl)
+	env.Datastore = dal
+	env.Acl = *acl
 }
 
 func (suite *ApiSuite) SetupTest() {
@@ -37,14 +41,6 @@ func (suite *ApiSuite) TearDownTest() {
 
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(ApiSuite))
-}
-
-func resetDatabase() {
-	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
-	dal = models.NewDAL(db, acl)
-	env.Datastore = dal
-	env.Acl = *acl
 }
 
 func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {

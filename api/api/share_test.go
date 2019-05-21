@@ -30,7 +30,7 @@ func (suite *ApiSuite) TestV1ShareAlistBadInput() {
 	inputGrant := &HttpShareListWithUserInput{
 		UserUUID:  "fakeUser",
 		AlistUUID: "fakeList",
-		Action:    "grant",
+		Action:    ActionGrant,
 	}
 	a, _ := json.Marshal(inputGrant)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(a))
@@ -118,7 +118,7 @@ func (suite *ApiSuite) TestV1ShareAlist() {
 	inputGrant := &HttpShareListWithUserInput{
 		UserUUID:  userBUUID,
 		AlistUUID: alistUUID,
-		Action:    "grant",
+		Action:    ActionGrant,
 	}
 	a, _ := json.Marshal(inputGrant)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(a))
@@ -138,7 +138,7 @@ func (suite *ApiSuite) TestV1ShareAlist() {
 	inputRevoke := &HttpShareListWithUserInput{
 		UserUUID:  userBUUID,
 		AlistUUID: alistUUID,
-		Action:    "revoke",
+		Action:    ActionRevoke,
 	}
 	b, _ := json.Marshal(inputRevoke)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(b))

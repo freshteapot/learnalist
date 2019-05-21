@@ -148,6 +148,7 @@ AND
 		log.Println(err)
 	}
 
+	dal.Acl.DeleteListRole(aList.Uuid)
 	return err
 }
 

@@ -16,7 +16,9 @@ type ModelSuite struct {
 }
 
 func (suite *ModelSuite) SetupSuite() {
-	resetDatabase()
+	db := database.NewTestDB()
+	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	dal = NewDAL(db, acl)
 }
 
 func (suite *ModelSuite) SetupTest() {
@@ -29,12 +31,6 @@ func (suite *ModelSuite) TearDownTest() {
 
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(ModelSuite))
-}
-
-func resetDatabase() {
-	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
-	dal = NewDAL(db, acl)
 }
 
 func setupUserViaSQL() string {

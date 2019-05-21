@@ -47,7 +47,7 @@ func (env *Env) V1GetListByUUID(c echo.Context) error {
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
-	// TODO write test
+
 	if !env.Acl.HasUserListReadAccess(user.Uuid, alist) {
 		response := HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
