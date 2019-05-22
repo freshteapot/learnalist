@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/api/i18n"
@@ -14,98 +13,61 @@ import (
 // @todo this needs faking of the actual database commands.
 
 func (suite *ApiSuite) TestPostRegisterEmptyBody() {
-	expected := `{"message":"Bad input."}`
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/v1/register", strings.NewReader(""))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	if suite.NoError(env.V1PostRegister(c)) {
-		suite.Equal(http.StatusBadRequest, rec.Code)
-		response := strings.TrimSpace(rec.Body.String())
-		suite.Equal(expected, response)
-	}
+	var raw map[string]interface{}
+	statusCode, jsonBytes := suite.createNewUser("")
+	suite.Equal(http.StatusBadRequest, statusCode)
+	json.Unmarshal(jsonBytes, &raw)
+	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
 }
 
 func (suite *ApiSuite) TestPostRegisterNotValidJSON() {
 	badInput := `{username:"chris", password:"test"}`
-	expected := `{"message":"Bad input."}`
-
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", badInput)
-	e := echo.New()
-	c := e.NewContext(req, rec)
-
-	if suite.NoError(env.V1PostRegister(c)) {
-		suite.Equal(http.StatusBadRequest, rec.Code)
-		response := strings.TrimSpace(rec.Body.String())
-		suite.Equal(expected, response)
-	}
+	var raw map[string]interface{}
+	statusCode, jsonBytes := suite.createNewUser(badInput)
+	suite.Equal(http.StatusBadRequest, statusCode)
+	json.Unmarshal(jsonBytes, &raw)
+	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
 }
 
 func (suite *ApiSuite) TestPostRegisterNotValidPayload() {
 	badInput := `{"username":"", "password":""}`
-	expected := `{"message":"Bad input."}`
-
-	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", badInput)
-	c := e.NewContext(req, rec)
-
-	if suite.NoError(env.V1PostRegister(c)) {
-		suite.Equal(http.StatusBadRequest, rec.Code)
-		response := strings.TrimSpace(rec.Body.String())
-		suite.Equal(expected, response)
-	}
+	var raw map[string]interface{}
+	statusCode, jsonBytes := suite.createNewUser(badInput)
+	suite.Equal(http.StatusBadRequest, statusCode)
+	json.Unmarshal(jsonBytes, &raw)
+	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
 }
 
 func (suite *ApiSuite) TestPostRegisterValidPayload() {
-	input := `{"username":"chris", "password":"test"}`
-	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
-	c := e.NewContext(req, rec)
+	input := getValidUserRegisterInput("a")
 
-	if suite.NoError(env.V1PostRegister(c)) {
-		suite.Equal(http.StatusCreated, rec.Code)
-		responseA := strings.TrimSpace(rec.Body.String())
+	statusCode, jsonBytes := suite.createNewUser(input)
+	suite.Equal(http.StatusCreated, statusCode)
+	responseA := strings.TrimSpace(string(jsonBytes))
+	// Check we get the same userid
+	statusCode, jsonBytes = suite.createNewUser(input)
+	suite.Equal(http.StatusOK, statusCode)
+	responseB := strings.TrimSpace(string(jsonBytes))
 
-		// Check we get the same userid
-		req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
-		c := e.NewContext(req, rec)
-
-		if suite.NoError(env.V1PostRegister(c)) {
-			suite.Equal(http.StatusOK, rec.Code)
-			responseB := strings.TrimSpace(rec.Body.String())
-			suite.Equal(responseA, responseB)
-		}
-	}
+	suite.Equal(responseA, responseB)
 }
 
 func (suite *ApiSuite) TestPostRegisterValidPayloadThenFake() {
-	input := `{"username":"chris", "password":"test"}`
-	fake := `{"username":"chris", "password":"test123"}`
+	input := getValidUserRegisterInput("a")
+	fake := `{"username":"iamusera", "password":"test123456"}`
 	expectedFakeResponse := fmt.Sprintf(`{"message":"%s"}`, i18n.UserInsertUsernameExists)
-	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
-	c := e.NewContext(req, rec)
+	statusCode, _ := suite.createNewUser(input)
+	suite.Equal(http.StatusCreated, statusCode)
 
-	if suite.NoError(env.V1PostRegister(c)) {
-		suite.Equal(http.StatusCreated, rec.Code)
-
-		// Check we get the same userid
-		req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", fake)
-		c := e.NewContext(req, rec)
-
-		if suite.NoError(env.V1PostRegister(c)) {
-			suite.Equal(http.StatusBadRequest, rec.Code)
-			response := strings.TrimSpace(rec.Body.String())
-			suite.Equal(response, expectedFakeResponse)
-		}
-	}
+	statusCode, jsonBytes := suite.createNewUser(fake)
+	suite.Equal(http.StatusBadRequest, statusCode)
+	response := strings.TrimSpace(string(jsonBytes))
+	suite.Equal(response, expectedFakeResponse)
 }
 
 func (suite *ApiSuite) TestPostRegisterRepeat() {
 	var statusCode int
-	input := `{"username":"chris", "password":"test"}`
+	input := getValidUserRegisterInput("a")
 	_, statusCode = suite.createNewUserWithSuccess(input)
 	suite.Equal(http.StatusCreated, statusCode)
 
@@ -113,16 +75,28 @@ func (suite *ApiSuite) TestPostRegisterRepeat() {
 	suite.Equal(http.StatusOK, statusCode)
 }
 
-func (suite *ApiSuite) createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
-
+func (suite *ApiSuite) createNewUser(input string) (statusCode int, responseBytes []byte) {
 	e := echo.New()
 	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	suite.NoError(env.V1PostRegister(c))
-	suite.Contains([]int{http.StatusOK, http.StatusCreated}, rec.Code)
+	return rec.Code, rec.Body.Bytes()
+}
 
+func (suite *ApiSuite) createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
 	var raw map[string]interface{}
-	json.Unmarshal(rec.Body.Bytes(), &raw)
+	statusCode, jsonBytes := suite.createNewUser(input)
+	suite.Contains([]int{http.StatusOK, http.StatusCreated}, statusCode)
+	json.Unmarshal(jsonBytes, &raw)
 	user_uuid := raw["uuid"].(string)
-	return user_uuid, rec.Code
+	return user_uuid, statusCode
+}
+
+func getValidUserRegisterInput(which string) string {
+	if which == "b" {
+		return `{"username":"iamuserb", "password":"test123"}`
+	}
+
+	return `{"username":"iamusera", "password":"test123"}`
 }

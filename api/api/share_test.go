@@ -10,12 +10,7 @@ import (
 )
 
 func (suite *ApiSuite) TestV1ShareAlistBadInput() {
-	inputUserA := `
-{
-  "username":"iamusera",
-  "password":"test"
-}
-`
+	inputUserA := getValidUserRegisterInput("a")
 	userAUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 	var raw map[string]interface{}
 	var statusCode int
@@ -69,18 +64,9 @@ func (suite *ApiSuite) TestV1ShareAlistBadInput() {
 }
 
 func (suite *ApiSuite) TestV1ShareAlist() {
-	inputUserA := `
-{
-  "username":"iamusera",
-  "password":"test"
-}
-`
-	inputUserB := `
-{
-"username":"iamuserb",
-"password":"test"
-}
-`
+	inputUserA := getValidUserRegisterInput("a")
+	inputUserB := getValidUserRegisterInput("b")
+
 	inputAlist := `
 {
   "data": [

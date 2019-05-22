@@ -15,7 +15,7 @@ func (suite *ApiSuite) TestPostLabel() {
 	var raw map[string]interface{}
 	var statusCode int
 	var responseBytes []byte
-	inputUserA := `{"username":"iamusera", "password":"test"}`
+	inputUserA := getValidUserRegisterInput("a")
 	inputA := `{"label": "car"}`
 	inputB := `{"label": "boat"}`
 	inputC := `"bad data"`
@@ -44,7 +44,7 @@ func (suite *ApiSuite) TestGetUsersLabels() {
 	var responseBytes []byte
 	var response string
 
-	inputUserA := `{"username":"iamusera", "password":"test"}`
+	inputUserA := getValidUserRegisterInput("a")
 	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 
 	statusCode, responseBytes = suite.getLabels(userUUID)
