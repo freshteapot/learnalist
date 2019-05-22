@@ -5,7 +5,7 @@ const (
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
 	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
-	ValidationUserRegister                  = "Please refer to the documentation on user register"
+	ValidationUserRegister                  = "Please refer to the documentation on user registration"
 	SuccessAlistNotFound                    = "List not found."
 	SuccessUserNotFound                     = "User not found."
 	InternalServerErrorMissingAlistUuid     = "Uuid is missing, possibly an internal error"
