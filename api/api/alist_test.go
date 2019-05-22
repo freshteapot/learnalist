@@ -42,7 +42,7 @@ func (suite *ApiSuite) TestAlistV3Api() {
 }
 `
 	var aList alist.Alist
-	inputUserA := `{"username":"iamusera", "password":"test"}`
+	inputUserA := getValidUserRegisterInput("a")
 	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 	statusCode, responseBytes = suite.createAList(userUUID, input)
 	suite.Equal(http.StatusCreated, statusCode)
@@ -110,7 +110,7 @@ func (suite *ApiSuite) TestAlistApi() {
 	var listOfUuids listOfUuidsOnly
 	var listUuid uuidOnly
 
-	inputUserA := `{"username":"iamusera", "password":"test"}`
+	inputUserA := getValidUserRegisterInput("a")
 	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 
 	for _, item := range lists {
@@ -234,8 +234,8 @@ func (suite *ApiSuite) TestMethodNotSupportedForSavingList() {
 
 // Linked to https://github.com/freshteapot/learnalist-api/issues/12.
 func (suite *ApiSuite) TestOnlyOwnerOfTheListCanAlterIt() {
-	inputUserA := `{"username":"iamusera", "password":"test"}`
-	inputUserB := `{"username":"iamuserb", "password":"test"}`
+	inputUserA := getValidUserRegisterInput("a")
+	inputUserB := getValidUserRegisterInput("b")
 	inputAlist := `
 {
 	"data": [{"from":"car", "to": "bil"}],
@@ -281,7 +281,7 @@ func (suite *ApiSuite) TestOnlyOwnerOfTheListCanAlterIt() {
 
 func (suite *ApiSuite) TestDeleteAlistNotFound() {
 	var raw map[string]interface{}
-	inputUser := `{"username":"iamusera", "password":"test"}`
+	inputUser := getValidUserRegisterInput("a")
 	userUUID, _ := suite.createNewUserWithSuccess(inputUser)
 	alistUUID := "fake"
 	statusCode, responseBytes := suite.removeAlist(userUUID, alistUUID)

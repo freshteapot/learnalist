@@ -8,16 +8,20 @@ When the database is created, it is empty.
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/v1/register' -d'
 {
-    "username":"chris",
-    "password":"test"
+    "username":"iamchris",
+    "password":"test123"
 }
 '
+```
+Response is
+```sh
+{"uuid":"1ff95121-1570-5e96-8bd9-bb62fac0b999","username":"iamchris"}
 ```
 
 ### Add a list of type v1.
 
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'chris:test' -d'
+curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 {
     "data": [
         "monday",
@@ -44,7 +48,7 @@ curl 'http://localhost:1234/v1/alist/by/me'
 ### Add a list of type v2.
 
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'chris:test' -d'
+curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 {
     "data": [
         {
@@ -61,7 +65,7 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'chris:test' -d'
 
 ### Add a list of type v3 (concept2)
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'chris:test' -d'
+curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 {
   "data": [
     {
@@ -91,22 +95,22 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'chris:test' -d'
 
 Again, query all the lists by you.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me'  -u'chris:test'
+curl 'http://localhost:1234/v1/alist/by/me'  -u'iamchris:test123'
 ```
 
 Filter based on list type v3.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v3'  -u'chris:test'
+curl 'http://localhost:1234/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
 ```
 
 Or an individual list.
 ```sh
-curl 'http://localhost:1234/v1/alist/{uuid}' -u'chris:test'
+curl 'http://localhost:1234/v1/alist/{uuid}' -u'iamchris:test123'
 ```
 
 #Create a list with a label or two
 ```sh
-curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'chris:test' -d'
+curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'iamchris:test123' -d'
 {
     "data": [
         "monday",
@@ -130,7 +134,7 @@ curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'chris:test'
 
 Now try querying for this list via the labels filter
 ```sh
-curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/v1/alist/by/me?labels=english' -u'chris:test'
+curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/v1/alist/by/me?labels=english' -u'iamchris:test123'
 ```
 
 

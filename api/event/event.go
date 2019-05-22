@@ -1,8 +1,8 @@
 package event
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/freshteapot/learnalist-api/api/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type eventAction struct {

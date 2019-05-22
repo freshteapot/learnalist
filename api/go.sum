@@ -13,6 +13,10 @@ github.com/freshteapot/learnalist-api v0.0.0-20190514204622-689e67f4d146 h1:BbH+
 github.com/go-sql-driver/mysql v1.4.0 h1:7LxgVwFb2hIQtMm87NdgAVfXjnt4OePseqT1tKx+opk=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/gookit/filter v1.0.9 h1:59dNzVHJYjjLHx5NKGEsDDTl5dccC8tRXlOmlGSV1qk=
+github.com/gookit/filter v1.0.9/go.mod h1:dJvhTHD8/+idp3TqMBuHk0zvvUSdmIvA2XMR42jSUZU=
+github.com/gookit/validate v1.1.0 h1:xiQWdHjp0IgLu3OEOqBNhR6f6fhsDezjG/MJmUbMxKQ=
+github.com/gookit/validate v1.1.0/go.mod h1:qtQE0yQjYvA+58rpJ0IACdfNW3XYroSClmc6187SR5A=
 github.com/jmoiron/sqlx v1.2.0 h1:41Ip0zITnmWNR/vHV+S4m+VoUivnWY5E4OJfLZjCJMA=
 github.com/jmoiron/sqlx v1.2.0/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=

@@ -7,17 +7,9 @@ import (
 
 	"github.com/freshteapot/learnalist-api/api/authenticate"
 	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/freshteapot/learnalist-api/api/user"
 	"github.com/labstack/echo/v4"
 )
-
-type HttpRegisterInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type HttpRegisterResponse struct {
-	Uuid string `json:"uuid"`
-}
 
 /*
 When a user is created it returns a 201.
@@ -25,7 +17,8 @@ When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
 */
 func (env *Env) V1PostRegister(c echo.Context) error {
-	var input = &HttpRegisterInput{}
+	var input = &user.RegisterInput{}
+	var cleanedUser user.RegisterInput
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -33,21 +26,22 @@ func (env *Env) V1PostRegister(c echo.Context) error {
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: "Bad input.",
+			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	if input.Username == "" || input.Password == "" {
+	cleanedUser, err = user.Validate(*input)
+	if err != nil {
 		response := HttpResponseMessage{
-			Message: "Bad input.",
+			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	loginUser := authenticate.LoginUser{
-		Username: input.Username,
-		Password: input.Password,
+		Username: cleanedUser.Username,
+		Password: cleanedUser.Password,
 	}
 
 	statusCode := http.StatusCreated
@@ -66,7 +60,9 @@ func (env *Env) V1PostRegister(c echo.Context) error {
 		statusCode = http.StatusOK
 	}
 
-	response := HttpRegisterResponse{
-		Uuid: newUser.Uuid}
+	response := user.RegisterResponse{
+		Uuid:     newUser.Uuid,
+		Username: cleanedUser.Username,
+	}
 	return c.JSON(statusCode, response)
 }
