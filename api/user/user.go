@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+
 	"github.com/gookit/validate"
 )
 
@@ -11,8 +12,8 @@ type RegisterInput struct {
 }
 
 type RegisterResponse struct {
-	Uuid string `json:"uuid"`
-  Username string `json:"username"`
+	Uuid     string `json:"uuid"`
+	Username string `json:"username"`
 }
 
 /*
@@ -20,12 +21,12 @@ Username is required, needs to be at least 5 characters and can only be letters,
 Password is required, minimum length of 7.
 */
 func Validate(input RegisterInput) (RegisterInput, error) {
-  var cleaned RegisterInput
+	var cleaned RegisterInput
 	v := validate.New(input)
 	v.StopOnError = false
 	v.Sanitize()
 	if v.Validate() { // validate ok
-    v.BindSafeData(&cleaned)
+		v.BindSafeData(&cleaned)
 		return cleaned, nil
 	}
 	// TODO write the documentation and have it installed as a list
