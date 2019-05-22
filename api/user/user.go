@@ -29,16 +29,5 @@ func Validate(input RegisterInput) (RegisterInput, error) {
 		v.BindSafeData(&cleaned)
 		return cleaned, nil
 	}
-	// TODO write the documentation and have it installed as a list
 	return cleaned, errors.New("Please refer to the documentation.")
-	/*
-		if input.Username == "" || input.Password == "" {
-			return errors.New("Username and password should not be empty")
-		}
-
-		if strings.ToLower(input.Username) != input.Username {
-			return errors.New("username needs to be lower case")
-		}
-		return nil
-	*/
 }
