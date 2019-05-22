@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/api/acl"
 	"github.com/freshteapot/learnalist-api/api/authenticate"
+	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -18,6 +19,7 @@ type Env struct {
 	Port             int
 	DatabaseName     string
 	CorsAllowOrigins string
+	Acl              acl.Acl
 }
 
 type HttpResponseMessage struct {
@@ -34,14 +36,10 @@ func SetDomain(_domain string) {
 
 // Run This starts the api listening on the port supplied
 func Run(env Env) {
-	db, err := models.NewDB(env.DatabaseName)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	env.Datastore = &models.DAL{
-		Db: db,
-	}
+	db := database.NewDB(env.DatabaseName)
+	// Setup access control layer.
+	acl := acl.NewAclFromModel(env.DatabaseName)
+	env.Datastore = models.NewDAL(db, acl)
 
 	// Echo instance
 	e := echo.New()
@@ -85,6 +83,7 @@ func Run(env Env) {
 	//e.POST("/alist/v3", env.V1PostAlist)
 	//e.POST("/alist/v4", env.V1PostAlist)
 	v1.POST("/alist", env.V1SaveAlist)
+	v1.POST("/share/alist", env.V1ShareAlist)
 	v1.PUT("/alist/:uuid", env.V1SaveAlist)
 	v1.DELETE("/alist/:uuid", env.V1RemoveAlist)
 	// Labels

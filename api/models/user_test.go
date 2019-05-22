@@ -6,7 +6,7 @@ import (
 	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
-func (suite *ModelSuite) TestTestUser() {
+func (suite *ModelSuite) TestUser() {
 	var newUserA *uuid.User
 	var newUserB *uuid.User
 	var err error
@@ -31,4 +31,8 @@ func (suite *ModelSuite) TestTestUser() {
 	loginUser.Username = "iamanotheruser"
 	_, err = dal.GetUserByCredentials(loginUser)
 	suite.Equal(i18n.DatabaseLookupNotFound, err.Error())
+
+	// Check user exists
+	suite.Equal(false, dal.UserExists("fake"))
+	suite.Equal(true, dal.UserExists(newUserA.Uuid))
 }

@@ -52,10 +52,9 @@ func (suite *ApiSuite) TestAlistV3Api() {
 	// Make sure the labels stay.
 	aList.Info.Labels = nil
 	updatedBytes, _ := aList.MarshalJSON()
-	statusCode, responseBytes = suite.updateAlist(userUUID, aList.Uuid, string(updatedBytes))
+	statusCode, _ = suite.updateAlist(userUUID, aList.Uuid, string(updatedBytes))
 
 	suite.Equal(http.StatusOK, statusCode)
-	fmt.Println(string(responseBytes))
 }
 
 func (suite *ApiSuite) TestAlistApi() {

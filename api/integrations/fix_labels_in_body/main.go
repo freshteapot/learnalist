@@ -3,23 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 
+	"github.com/freshteapot/learnalist-api/api/acl"
+	"github.com/freshteapot/learnalist-api/api/database"
 	"github.com/freshteapot/learnalist-api/api/models"
 	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
 var dal *models.DAL
 
-func setUp(database string) *models.DAL {
-	db, err := models.NewDB(database)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	_dal := &models.DAL{
-		Db: db,
-	}
+func setUp(databaseName string) *models.DAL {
+	db := database.NewDB(databaseName)
+	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	_dal := models.NewDAL(db, acl)
 	return _dal
 }
 
@@ -37,8 +33,7 @@ func main() {
 	fmt.Println(`
 This will:
 - remove labels that are in the body of alist_kv, but not in the label tables.
-- make sure that the lists without a labels attribute in info, will get an empty one.
-`)
+- make sure that the lists without a labels attribute in info, will get an empty one.`)
 
 	dal = setUp(*database)
 
@@ -63,9 +58,8 @@ This will:
 			aList.Info.Labels = cleaned
 			err = dal.SaveLabelsForAlist(*aList)
 			fmt.Println(err)
-			err = dal.SaveAlist(*aList)
+			_, err = dal.SaveAlist("put", *aList)
 			fmt.Println(err)
-			fmt.Println("")
 		}
 	}
 }

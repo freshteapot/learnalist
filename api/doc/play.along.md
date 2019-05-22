@@ -132,3 +132,32 @@ Now try querying for this list via the labels filter
 ```sh
 curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/v1/alist/by/me?labels=english' -u'chris:test'
 ```
+
+
+# Share a list
+- Supports two actions (grant and revoke).
+
+```go
+type HttpShareListWithUserInput struct {
+	UserUUID  string `json:"user_uuid"`
+	AlistUUID string `json:"alist_uuid"`
+	Action    string `json:"action"`
+}
+```
+Grant example
+```sh
+curl 'http://localhost:1234/v1/share/alist' -u'iamusera:test' -d '{
+  "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
+  "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
+  "action": "grant"
+}'
+```
+
+Revoke example
+```sh
+curl 'http://localhost:1234/v1/share/alist' -u'iamusera:test' -d '{
+  "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
+  "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
+  "action": "revoke"
+}'
+```

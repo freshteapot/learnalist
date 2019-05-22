@@ -1,6 +1,7 @@
-package models
+package database
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"github.com/jmoiron/sqlx"
@@ -15,13 +16,14 @@ func GetTables() []string {
 		"user",
 		"user_labels",
 		"alist_labels",
+		"casbin_rule",
 	}
 	return *tables
 }
 
-func NewTestDB() (*sqlx.DB, error) {
+func NewTestDB() *sqlx.DB {
 	dataSourceName := "file:" + PathToTestSqliteDb
-	db, _ := NewDB(dataSourceName)
+	db := NewDB(dataSourceName)
 
 	pathToDbFiles := "../db/"
 	files, err := ioutil.ReadDir(pathToDbFiles)
@@ -35,22 +37,30 @@ func NewTestDB() (*sqlx.DB, error) {
 		db.MustExec(query)
 	}
 
-	return db, nil
+	return db
 }
 
 // NewDB load up the database
-func NewDB(dataSourceName string) (*sqlx.DB, error) {
+func NewDB(dataSourceName string) *sqlx.DB {
 	db, err := sqlx.Connect("sqlite3", dataSourceName)
+	// Very aggressive, but clearly a problem if I cant access the database.
+	checkErr(err)
+
+	err = db.Ping()
+	checkErr(err)
+	return db
+}
+
+func EmptyDatabase(db *sqlx.DB) {
+	tables := GetTables()
+	for _, table := range tables {
+		query := fmt.Sprintf("DELETE FROM %s", table)
+		db.MustExec(query)
+	}
+}
+
+func checkErr(err error) {
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	dbRef := &DAL{
-		Db: db,
-	}
-
-	return dbRef.Db, nil
 }

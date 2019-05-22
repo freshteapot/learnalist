@@ -35,4 +35,5 @@ type DatastoreUsers interface {
 	// User
 	InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, error)
 	GetUserByCredentials(loginUser authenticate.LoginUser) (*uuid.User, error)
+	UserExists(userUUID string) bool
 }

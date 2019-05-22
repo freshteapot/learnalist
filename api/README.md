@@ -66,6 +66,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | POST | /v1/labels | Save a new label. |
 | GET | /v1/labels/by/me | Get labels by the currently logged in user. |
 | DELETE | /v1/labels/{uuid} | Delete a label via uuid. |
+| POST | /v1/share/alist | Share a list with another user. |
 
 
 
