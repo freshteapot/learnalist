@@ -4,6 +4,8 @@
 ![Code coverage, manually ran](./coverage_badge.png) <a href="https://goreportcard.com/report/github.com/freshteapot/learnalist-api" target="_blank">learnalist-api on goreportcard.</a> (In a new window).
 
 # Some documentation
+* [Api](./doc/api.md)
+* [List types overview](./doc/list.types.md)
 * [Question and Answers](./doc/qa.md)
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
@@ -51,30 +53,6 @@ Content-Length: 31
 ```
 
 Go [try some curl requests.](./doc/play.along.md)
-
-# Api
-
-| Method | Uri | Description |
-| --- | --- | --- |
-| GET | /v1/ | Replies with a simple message. |
-| GET | /v1/version | Version informationn about the server. |
-| POST | /v1/alist | Save a list. |
-| DELETE | /v1/alist/{uuid} | Delete a list via uuid. |
-| PUT | /v1/alist/{uuid} | Update all fields allowed to a list. |
-| GET | /v1/alist/{uuid} | Get a list via uuid. |
-| GET | /v1/alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. |
-| POST | /v1/labels | Save a new label. |
-| GET | /v1/labels/by/me | Get labels by the currently logged in user. |
-| DELETE | /v1/labels/{uuid} | Delete a label via uuid. |
-| POST | /v1/share/alist | Share a list with another user. |
-
-
-# List types
-
-* [Simplelist v1](./doc/list.type.v1.md)
-* [FromToList v2](./doc/list.type.v2.md)
-* [Concept2 v3](./doc/list.type.v3.md)
-* [ContentAndUrl v4](./doc/list.type.v4.md)
 
 
 # References as this becomes more useful.
