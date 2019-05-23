@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +44,7 @@ func TestUnmarshalJSONBadParseV1(t *testing.T) {
 
 	aList := new(Alist)
 	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list type v1.")
+	assert.Equal(t, err.Error(), i18n.ValidationErrorListV1)
 }
 
 func TestUnmarshalJSONBadParseV2(t *testing.T) {
@@ -55,7 +56,7 @@ func TestUnmarshalJSONBadParseV2(t *testing.T) {
 
 	aList := new(Alist)
 	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list type v2.")
+	assert.Equal(t, err.Error(), i18n.ValidationErrorListV2)
 }
 
 func TestUnmarshalJSONBadParseV3(t *testing.T) {
@@ -67,7 +68,19 @@ func TestUnmarshalJSONBadParseV3(t *testing.T) {
 
 	aList := new(Alist)
 	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list type v3.")
+	assert.Equal(t, err.Error(), i18n.ValidationErrorListV3)
+}
+
+func TestUnmarshalJSONBadParseV4(t *testing.T) {
+	var err error
+	var jsonBytes []byte
+	var jsonStr = `{"data":[""],"info":{"title":"I am a list","type":"v4"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+
+	jsonBytes = []byte(jsonStr)
+
+	aList := new(Alist)
+	err = aList.UnmarshalJSON(jsonBytes)
+	assert.Equal(t, err.Error(), i18n.ValidationErrorListV4)
 }
 
 func TestUnmarshalJSONUnsupportedListType(t *testing.T) {
