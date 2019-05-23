@@ -35,7 +35,7 @@ func validateTypeV1(aList Alist) error {
 	for _, item := range items {
 		a := itemv1{Content: item}
 		v := validate.New(a)
-		if !v.Validate() { // validate ok
+		if !v.Validate() {
 			hasError = true
 		}
 	}

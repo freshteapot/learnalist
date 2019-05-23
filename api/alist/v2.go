@@ -40,7 +40,7 @@ func validateTypeV2(aList Alist) error {
 	items := aList.Data.(TypeV2)
 	for _, item := range items {
 		v := validate.New(item)
-		if !v.Validate() { // validate ok
+		if !v.Validate() {
 			hasError = true
 		}
 	}

@@ -17,7 +17,6 @@ func NewTypeV4() *Alist {
 	return aList
 }
 
-// TypeV3 Used for recording rowing machine times.
 type TypeV4 []TypeV4Item
 
 type TypeV4Item struct {
@@ -36,7 +35,7 @@ func validateTypeV4(aList Alist) error {
 	items := aList.Data.(TypeV4)
 	for _, item := range items {
 		v := validate.New(item)
-		if !v.Validate() { // validate ok
+		if !v.Validate() {
 			hasError = true
 		}
 	}
