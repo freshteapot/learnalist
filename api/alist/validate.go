@@ -22,7 +22,7 @@ func Validate(aList Alist) error {
 			return err
 		}
 	case FromToList:
-		err = validateAlistTypeV2(aList)
+		err = validateTypeV2(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
 			return err
@@ -80,26 +80,6 @@ func validateAlistTypeV1(aList Alist) error {
 	items := aList.Data.(AlistTypeV1)
 	for index, item := range items {
 		if item == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
-		}
-	}
-
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
-	}
-
-	return err
-}
-
-func validateAlistTypeV2(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
-
-	items := aList.Data.(AlistTypeV2)
-	for index, item := range items {
-		if item.From == "" && item.To == "" {
 			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
 		}
 	}

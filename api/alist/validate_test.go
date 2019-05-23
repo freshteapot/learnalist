@@ -60,7 +60,7 @@ func TestAlistTypeV2(t *testing.T) {
 	aList := new(Alist)
 	aList.UnmarshalJSON(jsonBytes)
 	// This is valid with data
-	err = validateAlistTypeV2(*aList)
+	err = validateTypeV2(*aList)
 	assert.Equal(t, err, nil)
 
 	// This is not valid as it has an empty record
@@ -72,7 +72,7 @@ func TestAlistTypeV2(t *testing.T) {
 	}
 	aList.Data = items
 
-	err = validateAlistTypeV2(*aList)
+	err = validateTypeV2(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
 
 	items = AlistTypeV2{
@@ -91,7 +91,7 @@ func TestAlistTypeV2(t *testing.T) {
 	}
 	aList.Data = items
 
-	err = validateAlistTypeV2(*aList)
+	err = validateTypeV2(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
 }
 
