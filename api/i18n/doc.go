@@ -2,9 +2,16 @@ package i18n
 
 const (
 	ValidationErrorList                     = "Failed to pass list info. %s"
+	ValidationErrorListV1                   = "Failed to pass list type v1."
+	ValidationErrorListV2                   = "Failed to pass list type v2."
+	ValidationErrorListV3                   = "Failed to pass list type v3."
+	ValidationErrorListV4                   = "Failed to pass list type v4."
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
+	ValidationAlistTypeV1                   = "Please refer to the documentation on list type v1"
+	ValidationAlistTypeV2                   = "Please refer to the documentation on list type v2"
 	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
+	ValidationAlistTypeV4                   = "Please refer to the documentation on list type v4"
 	ValidationUserRegister                  = "Please refer to the documentation on user registration"
 	SuccessAlistNotFound                    = "List not found."
 	SuccessUserNotFound                     = "User not found."

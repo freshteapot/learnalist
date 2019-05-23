@@ -12,9 +12,9 @@
 
 Get the Data object and add a single row to the v2 type data.
 ```go
-aListV2Data := aList.Data.(alist.AlistTypeV2)
+aListV2Data := aList.Data.(alist.TypeV2)
 
-item := &alist.AlistItemTypeV2{From: "Hi", To: "Hello"}
+item := &alist.TypeV2Item{From: "Hi", To: "Hello"}
 aListV2Data = append(aListV2Data, *item)
 aList.Data = aListV2Data
 ```

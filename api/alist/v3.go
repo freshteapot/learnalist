@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/araddon/dateparse"
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
@@ -80,7 +81,7 @@ func parseTypeV3(jsonBytes []byte) (TypeV3, error) {
 
 func validateTypeV3(aList Alist) error {
 	var err error
-	var feedback = errors.New("Please refer to the documentation on list type v3")
+	var feedback = errors.New(i18n.ValidationAlistTypeV3)
 
 	typeV3 := aList.Data.(TypeV3)
 	for _, item := range typeV3 {

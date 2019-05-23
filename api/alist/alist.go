@@ -4,25 +4,23 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/freshteapot/learnalist-api/api/i18n"
 	"github.com/freshteapot/learnalist-api/api/uuid"
 )
 
 const (
-	SimpleList = "v1"
-	FromToList = "v2"
-	Concept2   = "v3"
+	SimpleList    = "v1"
+	FromToList    = "v2"
+	Concept2      = "v3"
+	ContentAndUrl = "v4"
 )
 
-// AlistItemTypeV2 Item in  AlistTypeV2
-type AlistItemTypeV2 struct {
-	From string `json:"from"`
-	To   string `json:"to"`
+var allowedListTypes = []string{
+	SimpleList,
+	FromToList,
+	Concept2,
+	ContentAndUrl,
 }
-
-type AlistTypeV2 []AlistItemTypeV2
-
-// AlistTypeV1 list type v1
-type AlistTypeV1 []string
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
@@ -90,25 +88,31 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 	jsonBytes, _ = json.Marshal(raw["data"])
 	switch aList.Info.ListType {
 	case SimpleList:
-		aList.Data, err = parseAlistTypeV1(jsonBytes)
+		aList.Data, err = parseTypeV1(jsonBytes)
 		if err != nil {
-			err = errors.New("Failed to pass list type v1.")
+			err = errors.New(i18n.ValidationErrorListV1)
 			return err
 		}
 	case FromToList:
-		aList.Data, err = parseAlistTypeV2(jsonBytes)
+		aList.Data, err = parseTypeV2(jsonBytes)
 		if err != nil {
-			err = errors.New("Failed to pass list type v2.")
+			err = errors.New(i18n.ValidationErrorListV2)
 			return err
 		}
 	case Concept2:
 		aList.Data, err = parseTypeV3(jsonBytes)
 		if err != nil {
-			err = errors.New("Failed to pass list type v3.")
+			err = errors.New(i18n.ValidationErrorListV3)
 			return err
 		}
 		// TODO This is ugly
 		*aList = enrichTypeV3(*aList)
+	case ContentAndUrl:
+		aList.Data, err = parseTypeV4(jsonBytes)
+		if err != nil {
+			err = errors.New(i18n.ValidationErrorListV4)
+			return err
+		}
 	default:
 		err = errors.New("Unsupported list type.")
 		return err

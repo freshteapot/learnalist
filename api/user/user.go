@@ -25,7 +25,7 @@ func Validate(input RegisterInput) (RegisterInput, error) {
 	v := validate.New(input)
 	v.StopOnError = false
 	v.Sanitize()
-	if v.Validate() { // validate ok
+	if v.Validate() {
 		v.BindSafeData(&cleaned)
 		return cleaned, nil
 	}

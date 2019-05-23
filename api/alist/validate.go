@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
 func Validate(aList Alist) error {
@@ -14,27 +16,24 @@ func Validate(aList Alist) error {
 		err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
 		return err
 	}
+
+	if !utils.StringArrayContains(allowedListTypes, aList.Info.ListType) {
+		err = errors.New("Unsupported list type.")
+		return err
+	}
+
 	switch aList.Info.ListType {
 	case SimpleList:
-		err = validateAlistTypeV1(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v1. %s", err.Error()))
-			return err
-		}
+		err = validateTypeV1(aList)
 	case FromToList:
-		err = validateAlistTypeV2(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
-			return err
-		}
+		err = validateTypeV2(aList)
 	case Concept2:
 		err = validateTypeV3(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v3. %s", err.Error()))
-			return err
-		}
-	default:
-		err = errors.New("Unsupported list type.")
+	case ContentAndUrl:
+		err = validateTypeV4(aList)
+	}
+
+	if err != nil {
 		return err
 	}
 	return nil
@@ -55,46 +54,6 @@ func validateAListInfo(info AlistInfo) error {
 		}
 		if len(item) > 20 {
 			feedback = append(feedback, fmt.Sprintf("Label must be 20 or less characters long at position %d", index))
-		}
-	}
-
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
-	}
-
-	return err
-}
-
-func validateAlistTypeV1(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
-
-	items := aList.Data.(AlistTypeV1)
-	for index, item := range items {
-		if item == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
-		}
-	}
-
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
-	}
-
-	return err
-}
-
-func validateAlistTypeV2(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
-
-	items := aList.Data.(AlistTypeV2)
-	for index, item := range items {
-		if item.From == "" && item.To == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
 		}
 	}
 

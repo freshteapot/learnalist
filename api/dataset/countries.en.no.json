@@ -1,0 +1,782 @@
+{
+  "data": [
+    {
+      "from": "Afghanistan",
+      "to": "Afghanistan"
+    },
+    {
+      "from": "Albania",
+      "to": "Albania"
+    },
+    {
+      "from": "Algeria",
+      "to": "Algerie"
+    },
+    {
+      "from": "Andorra",
+      "to": "Andorra"
+    },
+    {
+      "from": "Angola",
+      "to": "Angola"
+    },
+    {
+      "from": "Antigua and Barbuda",
+      "to": "Antigua og Barbuda"
+    },
+    {
+      "from": "Argentina",
+      "to": "Argentina"
+    },
+    {
+      "from": "Armenia",
+      "to": "Armenia"
+    },
+    {
+      "from": "Australia",
+      "to": "Australia"
+    },
+    {
+      "from": "Austria",
+      "to": "Østerrike"
+    },
+    {
+      "from": "Azerbaijan",
+      "to": "Aserbajdsjan"
+    },
+    {
+      "from": "Bahamas",
+      "to": "Bahamas"
+    },
+    {
+      "from": "Bahrain",
+      "to": "Bahrain"
+    },
+    {
+      "from": "Bangladesh",
+      "to": "Bangladesh"
+    },
+    {
+      "from": "Barbados",
+      "to": "Barbados"
+    },
+    {
+      "from": "Belarus",
+      "to": "Hviterussland"
+    },
+    {
+      "from": "Belgium",
+      "to": "Belgia"
+    },
+    {
+      "from": "Belize",
+      "to": "Belize"
+    },
+    {
+      "from": "Benin",
+      "to": "Benin"
+    },
+    {
+      "from": "Bhutan",
+      "to": "Bhutan"
+    },
+    {
+      "from": "Bolivia",
+      "to": "Bolivia"
+    },
+    {
+      "from": "Bosnia and Herzegovina",
+      "to": "Bosnia-Hercegovina"
+    },
+    {
+      "from": "Botswana",
+      "to": "Botswana"
+    },
+    {
+      "from": "Brazil",
+      "to": "Brasil"
+    },
+    {
+      "from": "Brunei",
+      "to": "Brunei"
+    },
+    {
+      "from": "Bulgaria",
+      "to": "Bulgaria"
+    },
+    {
+      "from": "Burkina Faso",
+      "to": "Burkina Faso"
+    },
+    {
+      "from": "Burundi",
+      "to": "Burundi"
+    },
+    {
+      "from": "Cambodia",
+      "to": "Kambodsja"
+    },
+    {
+      "from": "Cameroon",
+      "to": "Kamerun"
+    },
+    {
+      "from": "Canada",
+      "to": "Canada"
+    },
+    {
+      "from": "Cape Verde",
+      "to": "Kapp Verde"
+    },
+    {
+      "from": "Central African Republic",
+      "to": "Den sentralafrikanske republikk"
+    },
+    {
+      "from": "Chad",
+      "to": "Tsjad"
+    },
+    {
+      "from": "Chile",
+      "to": "Chile"
+    },
+    {
+      "from": "China",
+      "to": "Kina"
+    },
+    {
+      "from": "Colombia",
+      "to": "Colombia"
+    },
+    {
+      "from": "Comoros",
+      "to": "Komorene"
+    },
+    {
+      "from": "Costa Rica",
+      "to": "Costa Rica"
+    },
+    {
+      "from": "Côte d’Ivoire",
+      "to": "Elfenbenskysten"
+    },
+    {
+      "from": "Croatia",
+      "to": "Kroatia"
+    },
+    {
+      "from": "Cuba",
+      "to": "Cuba"
+    },
+    {
+      "from": "Cyprus",
+      "to": "Kypros"
+    },
+    {
+      "from": "Czech Republic",
+      "to": "Tsjekkia"
+    },
+    {
+      "from": "Democratic Republic of the Congo",
+      "to": "Den demokratiske republikken Kongo"
+    },
+    {
+      "from": "Denmark",
+      "to": "Danmark"
+    },
+    {
+      "from": "Djibouti",
+      "to": "Djibouti"
+    },
+    {
+      "from": "Dominica",
+      "to": "Dominica"
+    },
+    {
+      "from": "Dominican Republic",
+      "to": "Den dominikanske republikk"
+    },
+    {
+      "from": "East Timor",
+      "to": "Øst-Timor"
+    },
+    {
+      "from": "Ecuador",
+      "to": "Ecuador"
+    },
+    {
+      "from": "Egypt",
+      "to": "Egypt"
+    },
+    {
+      "from": "El Salvador",
+      "to": "El Salvador"
+    },
+    {
+      "from": "Equatorial Guinea",
+      "to": "Ekvatorial-Guinea"
+    },
+    {
+      "from": "Eritrea",
+      "to": "Eritrea"
+    },
+    {
+      "from": "Estonia",
+      "to": "Estland"
+    },
+    {
+      "from": "Ethiopia",
+      "to": "Etiopia"
+    },
+    {
+      "from": "Fiji",
+      "to": "Fiji"
+    },
+    {
+      "from": "Finland",
+      "to": "Finland"
+    },
+    {
+      "from": "France",
+      "to": "Frankrike"
+    },
+    {
+      "from": "Gabon",
+      "to": "Gabon"
+    },
+    {
+      "from": "Gambia",
+      "to": "Gambia"
+    },
+    {
+      "from": "Georgia",
+      "to": "Georgia"
+    },
+    {
+      "from": "Germany",
+      "to": "Tyskland"
+    },
+    {
+      "from": "Ghana",
+      "to": "Ghana"
+    },
+    {
+      "from": "Greece",
+      "to": "Hellas"
+    },
+    {
+      "from": "Grenada",
+      "to": "Grenada"
+    },
+    {
+      "from": "Guatemala",
+      "to": "Guatemala"
+    },
+    {
+      "from": "Guinea",
+      "to": "Guinea"
+    },
+    {
+      "from": "Guinea-Bissau",
+      "to": "Guinea-Bissau"
+    },
+    {
+      "from": "Guyana",
+      "to": "Guyana"
+    },
+    {
+      "from": "Haiti",
+      "to": "Haiti"
+    },
+    {
+      "from": "Honduras",
+      "to": "Honduras"
+    },
+    {
+      "from": "Hungary",
+      "to": "Ungarn"
+    },
+    {
+      "from": "Iceland",
+      "to": "Island"
+    },
+    {
+      "from": "India",
+      "to": "India"
+    },
+    {
+      "from": "Indonesia",
+      "to": "Indonesia"
+    },
+    {
+      "from": "Iran",
+      "to": "Iran"
+    },
+    {
+      "from": "Iraq",
+      "to": "Irak"
+    },
+    {
+      "from": "Ireland",
+      "to": "Irland"
+    },
+    {
+      "from": "Israel",
+      "to": "Israel"
+    },
+    {
+      "from": "Italy",
+      "to": "Italia"
+    },
+    {
+      "from": "Jamaica",
+      "to": "Jamaica"
+    },
+    {
+      "from": "Japan",
+      "to": "Japan"
+    },
+    {
+      "from": "Jordan",
+      "to": "Jordan"
+    },
+    {
+      "from": "Kazakhstan",
+      "to": "Kasakhstan"
+    },
+    {
+      "from": "Kenya",
+      "to": "Kenya"
+    },
+    {
+      "from": "Kiribati",
+      "to": "Kiribati"
+    },
+    {
+      "from": "Kuwait",
+      "to": "Kuwait"
+    },
+    {
+      "from": "Kyrgyzstan",
+      "to": "Kirgisistan"
+    },
+    {
+      "from": "Laos",
+      "to": "Laos"
+    },
+    {
+      "from": "Latvia",
+      "to": "Latvia"
+    },
+    {
+      "from": "Lebanon",
+      "to": "Libanon"
+    },
+    {
+      "from": "Lesotho",
+      "to": "Lesotho"
+    },
+    {
+      "from": "Liberia",
+      "to": "Liberia"
+    },
+    {
+      "from": "Libya",
+      "to": "Libya"
+    },
+    {
+      "from": "Liechtenstein",
+      "to": "Liechtenstein"
+    },
+    {
+      "from": "Lithuania",
+      "to": "Litauen"
+    },
+    {
+      "from": "Luxembourg",
+      "to": "Luxembourg"
+    },
+    {
+      "from": "Madagascar",
+      "to": "Madagaskar"
+    },
+    {
+      "from": "Malawi",
+      "to": "Malawi"
+    },
+    {
+      "from": "Malaysia",
+      "to": "Malaysia"
+    },
+    {
+      "from": "Maldives",
+      "to": "Maldivene"
+    },
+    {
+      "from": "Mali",
+      "to": "Mali"
+    },
+    {
+      "from": "Malta",
+      "to": "Malta"
+    },
+    {
+      "from": "Marshall Islands",
+      "to": "Marshalløyene"
+    },
+    {
+      "from": "Mauritania",
+      "to": "Mauritania"
+    },
+    {
+      "from": "Mauritius",
+      "to": "Mauritius"
+    },
+    {
+      "from": "Mexico",
+      "to": "Mexico"
+    },
+    {
+      "from": "Micronesia",
+      "to": "Mikronesia"
+    },
+    {
+      "from": "Moldova",
+      "to": "Moldova"
+    },
+    {
+      "from": "Monaco",
+      "to": "Monaco"
+    },
+    {
+      "from": "Mongolia",
+      "to": "Mongolia"
+    },
+    {
+      "from": "Montenegro",
+      "to": "Montenegro"
+    },
+    {
+      "from": "Morocco",
+      "to": "Marokko"
+    },
+    {
+      "from": "Mozambique",
+      "to": "Mosambik"
+    },
+    {
+      "from": "Myanmar",
+      "to": "Myanmar"
+    },
+    {
+      "from": "Namibia",
+      "to": "Namibia"
+    },
+    {
+      "from": "Nauru",
+      "to": "Nauru"
+    },
+    {
+      "from": "Nepal",
+      "to": "Nepal"
+    },
+    {
+      "from": "Netherlands",
+      "to": "Nederland"
+    },
+    {
+      "from": "New Zealand",
+      "to": "New Zealand"
+    },
+    {
+      "from": "Nicaragua",
+      "to": "Nicaragua"
+    },
+    {
+      "from": "Niger",
+      "to": "Niger"
+    },
+    {
+      "from": "Nigeria",
+      "to": "Nigeria"
+    },
+    {
+      "from": "North Korea",
+      "to": "Nord-Korea"
+    },
+    {
+      "from": "Norway",
+      "to": "Norge"
+    },
+    {
+      "from": "Oman",
+      "to": "Oman"
+    },
+    {
+      "from": "Pakistan",
+      "to": "Pakistan"
+    },
+    {
+      "from": "Palau",
+      "to": "Palau"
+    },
+    {
+      "from": "Panama",
+      "to": "Panama"
+    },
+    {
+      "from": "Papua New Guinea",
+      "to": "Papua Ny-Guinea"
+    },
+    {
+      "from": "Paraguay",
+      "to": "Paraguay"
+    },
+    {
+      "from": "Peru",
+      "to": "Peru"
+    },
+    {
+      "from": "Philippines",
+      "to": "Filippinene"
+    },
+    {
+      "from": "Poland",
+      "to": "Polen"
+    },
+    {
+      "from": "Portugal",
+      "to": "Portugal"
+    },
+    {
+      "from": "Qatar",
+      "to": "Qatar"
+    },
+    {
+      "from": "Republic of the Congo",
+      "to": "Republikken Kongo"
+    },
+    {
+      "from": "Republic of Macedonia",
+      "to": "Republikken Makedonia"
+    },
+    {
+      "from": "Romania",
+      "to": "Romania"
+    },
+    {
+      "from": "Russia",
+      "to": "Russland"
+    },
+    {
+      "from": "Rwanda",
+      "to": "Rwanda"
+    },
+    {
+      "from": "Saint Kitts and Nevis",
+      "to": "Saint Kitts og Nevis"
+    },
+    {
+      "from": "Saint Lucia",
+      "to": "Saint Lucia"
+    },
+    {
+      "from": "Saint Vincent and the Grenadines",
+      "to": "Saint Vincent og Grenadinene"
+    },
+    {
+      "from": "Samoa",
+      "to": "Samoa"
+    },
+    {
+      "from": "San Marino",
+      "to": "San Marino"
+    },
+    {
+      "from": "Sao Tome and Principe",
+      "to": "São Tomé og Príncipe"
+    },
+    {
+      "from": "Saudi Arabia",
+      "to": "Saudi-Arabia"
+    },
+    {
+      "from": "Senegal",
+      "to": "Senegal"
+    },
+    {
+      "from": "Serbia",
+      "to": "Serbia"
+    },
+    {
+      "from": "Seychelles",
+      "to": "Seychellene"
+    },
+    {
+      "from": "Sierra Leone",
+      "to": "Sierra Leone"
+    },
+    {
+      "from": "Singapore",
+      "to": "Singapore"
+    },
+    {
+      "from": "Slovakia",
+      "to": "Slovakia"
+    },
+    {
+      "from": "Slovenia",
+      "to": "Slovenia"
+    },
+    {
+      "from": "Solomon Islands",
+      "to": "Salomonøyene"
+    },
+    {
+      "from": "Somalia",
+      "to": "Somalia"
+    },
+    {
+      "from": "South Africa",
+      "to": "Sør-Afrika"
+    },
+    {
+      "from": "South Korea",
+      "to": "Sør-Korea"
+    },
+    {
+      "from": "South Sudan",
+      "to": "Sør-Sudan"
+    },
+    {
+      "from": "Spain",
+      "to": "Spania"
+    },
+    {
+      "from": "Sri Lanka",
+      "to": "Sri Lanka"
+    },
+    {
+      "from": "Sudan",
+      "to": "Sudan"
+    },
+    {
+      "from": "Suriname",
+      "to": "Surinam"
+    },
+    {
+      "from": "Swaziland",
+      "to": "Swaziland"
+    },
+    {
+      "from": "Sweden",
+      "to": "Sverige"
+    },
+    {
+      "from": "Switzerland",
+      "to": "Sveits"
+    },
+    {
+      "from": "Syria",
+      "to": "Syria"
+    },
+    {
+      "from": "Tajikistan",
+      "to": "Tadsjikistan"
+    },
+    {
+      "from": "Tanzania",
+      "to": "Tanzania"
+    },
+    {
+      "from": "Thailand",
+      "to": "Thailand"
+    },
+    {
+      "from": "Togo",
+      "to": "Togo"
+    },
+    {
+      "from": "Tonga",
+      "to": "Tonga"
+    },
+    {
+      "from": "Trinidad and Tobago",
+      "to": "Trinidad og Tobago"
+    },
+    {
+      "from": "Tunisia",
+      "to": "Tunisia"
+    },
+    {
+      "from": "Turkey",
+      "to": "Tyrkia"
+    },
+    {
+      "from": "Turkmenistan",
+      "to": "Turkmenistan"
+    },
+    {
+      "from": "Tuvalu",
+      "to": "Tuvalu"
+    },
+    {
+      "from": "Uganda",
+      "to": "Uganda"
+    },
+    {
+      "from": "Ukraine",
+      "to": "Ukraina"
+    },
+    {
+      "from": "United Arab Emirates",
+      "to": "De forente arabiske emirater"
+    },
+    {
+      "from": "United Kingdom",
+      "to": "Storbritannia"
+    },
+    {
+      "from": "United States of America",
+      "to": "United States of America"
+    },
+    {
+      "from": "Uruguay",
+      "to": "Uruguay"
+    },
+    {
+      "from": "Uzbekistan",
+      "to": "Usbekistan"
+    },
+    {
+      "from": "Vanuatu",
+      "to": "Vanuatu"
+    },
+    {
+      "from": "Venezuela",
+      "to": "Venezuela"
+    },
+    {
+      "from": "Vietnam",
+      "to": "Vietnam"
+    },
+    {
+      "from": "Yemen",
+      "to": "Jemen"
+    },
+    {
+      "from": "Zambia",
+      "to": "Zambia"
+    },
+    {
+      "from": "Zimbabwe",
+      "to": "Zimbabwe"
+    }
+  ],
+  "info": {
+    "title": "",
+    "type": "v2",
+    "labels": []
+  },
+  "uuid": ""
+}

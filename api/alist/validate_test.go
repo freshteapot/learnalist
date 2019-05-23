@@ -9,7 +9,7 @@ import (
 )
 
 var validAListTypeV1 = `{"data":["a","b"],"info":{"title":"I am a list","type":"v1"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-var validAlistTypeV2 = `{"data":{"from":"car","to":"bil"},"info":{"title":"I am a list with items","type":"v2"},"uuid":"efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9"}`
+var validTypeV2 = `{"data":{"from":"car","to":"bil"},"info":{"title":"I am a list with items","type":"v2"},"uuid":"efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9"}`
 
 func TestValidateAlistInfo(t *testing.T) {
 	jsonBytes := []byte(validAListTypeV1)
@@ -23,76 +23,76 @@ func TestValidateAlistInfo(t *testing.T) {
 	assert.Equal(t, err.Error(), "Title cannot be empty.")
 }
 
-func TestAlistTypeV1(t *testing.T) {
+func TestTypeV1(t *testing.T) {
 	var err error
-	var items AlistTypeV1
+	var items TypeV1
 	jsonBytes := []byte(validAListTypeV1)
 	aList := new(Alist)
 	aList.UnmarshalJSON(jsonBytes)
 	// This is valid with data
-	err = validateAlistTypeV1(*aList)
+	err = validateTypeV1(*aList)
 	assert.Equal(t, err, nil)
 
 	// This is not valid as it has an empty record
-	items = AlistTypeV1{""}
+	items = TypeV1{""}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
+	err = validateTypeV1(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
-	items = AlistTypeV1{"", ""}
+	items = TypeV1{"", ""}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0\nItem cant be empty at position 1")
+	err = validateTypeV1(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
-	items = AlistTypeV1{"a", "", "c"}
+	items = TypeV1{"a", "", "c"}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
+	err = validateTypeV1(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 }
 
-func TestAlistTypeV2(t *testing.T) {
+func TestTypeV2(t *testing.T) {
 	var err error
-	var items AlistTypeV2
-	jsonBytes := []byte(validAlistTypeV2)
+	var items TypeV2
+	jsonBytes := []byte(validTypeV2)
 	aList := new(Alist)
 	aList.UnmarshalJSON(jsonBytes)
 	// This is valid with data
-	err = validateAlistTypeV2(*aList)
+	err = validateTypeV2(*aList)
 	assert.Equal(t, err, nil)
 
 	// This is not valid as it has an empty record
-	items = AlistTypeV2{
-		AlistItemTypeV2{
+	items = TypeV2{
+		TypeV2Item{
 			From: "",
 			To:   "",
 		},
 	}
 	aList.Data = items
 
-	err = validateAlistTypeV2(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
+	err = validateTypeV2(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 
-	items = AlistTypeV2{
-		AlistItemTypeV2{
+	items = TypeV2{
+		TypeV2Item{
 			From: "car",
 			To:   "bil",
 		},
-		AlistItemTypeV2{
+		TypeV2Item{
 			From: "",
 			To:   "",
 		},
-		AlistItemTypeV2{
+		TypeV2Item{
 			From: "water",
 			To:   "vann",
 		},
 	}
 	aList.Data = items
 
-	err = validateAlistTypeV2(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
+	err = validateTypeV2(*aList)
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 }
 
 func TestValidateAlist(t *testing.T) {
@@ -108,14 +108,14 @@ func TestValidateAlist(t *testing.T) {
 
 	// We check the failed path, as we have specific tests for each lists validation.
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v1"}
-	aList.Data = AlistTypeV1{""}
+	aList.Data = TypeV1{""}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v1. Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v2"}
-	aList.Data = AlistTypeV2{AlistItemTypeV2{From: "", To: ""}}
+	aList.Data = TypeV2{TypeV2Item{From: "", To: ""}}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v2. Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v3"}
 	aList.Data = TypeV3{
@@ -131,7 +131,7 @@ func TestValidateAlist(t *testing.T) {
 		},
 	}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v3. Please refer to the documentation on list type v3")
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 
 	// Make sure we handle Unsupported lists
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "na"}
@@ -146,7 +146,7 @@ func TestValidateAlist(t *testing.T) {
 		Labels: []string{
 			"",
 		}}
-	aList.Data = AlistTypeV1{""}
+	aList.Data = TypeV1{""}
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list info. Label can not be empty at position 0")
 	aList.Info.Labels[0] = "iam a long label and should go over the allowed limit"

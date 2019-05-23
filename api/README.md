@@ -4,6 +4,8 @@
 ![Code coverage, manually ran](./coverage_badge.png) <a href="https://goreportcard.com/report/github.com/freshteapot/learnalist-api" target="_blank">learnalist-api on goreportcard.</a> (In a new window).
 
 # Some documentation
+* [Api](./doc/api.md)
+* [List types overview](./doc/list.types.md)
 * [Question and Answers](./doc/qa.md)
 * [manual install instructions for me](./doc/INSTALL.md)
 * [client commands](./doc/client.md)
@@ -52,94 +54,6 @@ Content-Length: 31
 
 Go [try some curl requests.](./doc/play.along.md)
 
-# Api
-
-| Method | Uri | Description |
-| --- | --- | --- |
-| GET | /v1/ | Replies with a simple message. |
-| GET | /v1/version | Version informationn about the server. |
-| POST | /v1/alist | Save a list. |
-| DELETE | /v1/alist/{uuid} | Delete a list via uuid. |
-| PUT | /v1/alist/{uuid} | Update all fields allowed to a list. |
-| GET | /v1/alist/{uuid} | Get a list via uuid. |
-| GET | /v1/alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. |
-| POST | /v1/labels | Save a new label. |
-| GET | /v1/labels/by/me | Get labels by the currently logged in user. |
-| DELETE | /v1/labels/{uuid} | Delete a label via uuid. |
-| POST | /v1/share/alist | Share a list with another user. |
-
-
-
-# List types
-
-| Type | Description |
-| --- | --- |
-| v1 | An array of a string.|
-| v2 | An array of object alist.AlistItemTypeV2 |
-| v3 | Record your rowing data from a concept2. TypeV3, made up of an array of alist.TypeV3Item |
-
-### V1
-
-```
-{
-    "data": [
-        "a",
-        "b"
-    ],
-    "info": {
-        "title": "A list of strings",
-        "type": "v1"
-    }
-}
-'
-```
-
-### V2
-
-```
-{
-    "data": [
-        {
-            "from": "chris",
-            "to": "chris"
-        }
-    ],
-    "info": {
-        "title": "A list of key:value pairs.",
-        "type": "v2"
-    }
-}
-```
-
-### V3
-```
-{
-  "data": [
-    {
-      "when": "2019-05-06",
-      "overall": {
-        "time": "7:15.9",
-        "distance": 2000,
-        "spm": 28,
-        "p500": "1:48.9"
-      },
-      "splits": [
-        {
-          "time": "1.46.4",
-          "distance": 500,
-          "spm": 29,
-          "p500": "1:58.0"
-        }
-      ]
-    }
-  ],
-  "info": {
-      "title": "A list to record rows.",
-      "type": "v3"
-  }
-}
-```
-
 
 # References as this becomes more useful.
 
@@ -169,8 +83,3 @@ go install
 ```
 
 Thanks to http://stackoverflow.com/a/38296407.
-
-* Update all vendors
-```sh
-govendor fetch +v
-```
