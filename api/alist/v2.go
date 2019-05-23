@@ -1,16 +1,25 @@
 package alist
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 )
 
+// TypeV2Item Item in  TypeV2
+type TypeV2Item struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+}
+
+type TypeV2 []TypeV2Item
+
 func NewTypeV2() *Alist {
 	aList := &Alist{}
 
 	aList.Info.ListType = FromToList
-	data := make(AlistTypeV2, 0)
+	data := make(TypeV2, 0)
 	aList.Data = data
 
 	labels := make([]string, 0)
@@ -19,12 +28,18 @@ func NewTypeV2() *Alist {
 	return aList
 }
 
+func parseTypeV2(jsonBytes []byte) (TypeV2, error) {
+	listData := new(TypeV2)
+	err := json.Unmarshal(jsonBytes, &listData)
+	return *listData, err
+}
+
 func validateTypeV2(aList Alist) error {
 	var err error
 	var feedbackMessage string
 	var feedback []string = []string{}
 
-	items := aList.Data.(AlistTypeV2)
+	items := aList.Data.(TypeV2)
 	for index, item := range items {
 		if item.From == "" && item.To == "" {
 			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))

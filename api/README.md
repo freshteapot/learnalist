@@ -75,7 +75,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | Type | Description |
 | --- | --- |
 | v1 | An array of a string.|
-| v2 | An array of object alist.AlistItemTypeV2 |
+| v2 | An array of object alist.TypeV2Item |
 | v3 | Record your rowing data from a concept2. TypeV3, made up of an array of alist.TypeV3Item |
 | v4 | Record content and its url / reference. TypeV4, made up of an array of alist.TypeV4Item|
 

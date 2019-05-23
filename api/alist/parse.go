@@ -15,9 +15,3 @@ func parseAlistTypeV1(jsonBytes []byte) (AlistTypeV1, error) {
 	err := json.Unmarshal(jsonBytes, &listData)
 	return *listData, err
 }
-
-func parseAlistTypeV2(jsonBytes []byte) (AlistTypeV2, error) {
-	listData := new(AlistTypeV2)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
-}

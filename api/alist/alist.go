@@ -15,14 +15,6 @@ const (
 	ContentAndUrl = "v4"
 )
 
-// AlistItemTypeV2 Item in  AlistTypeV2
-type AlistItemTypeV2 struct {
-	From string `json:"from"`
-	To   string `json:"to"`
-}
-
-type AlistTypeV2 []AlistItemTypeV2
-
 // AlistTypeV1 list type v1
 type AlistTypeV1 []string
 
@@ -98,7 +90,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	case FromToList:
-		aList.Data, err = parseAlistTypeV2(jsonBytes)
+		aList.Data, err = parseTypeV2(jsonBytes)
 		if err != nil {
 			err = errors.New(i18n.ValidationErrorListV2)
 			return err

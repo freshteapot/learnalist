@@ -9,7 +9,7 @@ import (
 )
 
 var validAListTypeV1 = `{"data":["a","b"],"info":{"title":"I am a list","type":"v1"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-var validAlistTypeV2 = `{"data":{"from":"car","to":"bil"},"info":{"title":"I am a list with items","type":"v2"},"uuid":"efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9"}`
+var validTypeV2 = `{"data":{"from":"car","to":"bil"},"info":{"title":"I am a list with items","type":"v2"},"uuid":"efeb4a6e-9a03-5aff-b46d-7f2ba1d7e7f9"}`
 
 func TestValidateAlistInfo(t *testing.T) {
 	jsonBytes := []byte(validAListTypeV1)
@@ -53,10 +53,10 @@ func TestAlistTypeV1(t *testing.T) {
 	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
 }
 
-func TestAlistTypeV2(t *testing.T) {
+func TestTypeV2(t *testing.T) {
 	var err error
-	var items AlistTypeV2
-	jsonBytes := []byte(validAlistTypeV2)
+	var items TypeV2
+	jsonBytes := []byte(validTypeV2)
 	aList := new(Alist)
 	aList.UnmarshalJSON(jsonBytes)
 	// This is valid with data
@@ -64,8 +64,8 @@ func TestAlistTypeV2(t *testing.T) {
 	assert.Equal(t, err, nil)
 
 	// This is not valid as it has an empty record
-	items = AlistTypeV2{
-		AlistItemTypeV2{
+	items = TypeV2{
+		TypeV2Item{
 			From: "",
 			To:   "",
 		},
@@ -75,16 +75,16 @@ func TestAlistTypeV2(t *testing.T) {
 	err = validateTypeV2(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
 
-	items = AlistTypeV2{
-		AlistItemTypeV2{
+	items = TypeV2{
+		TypeV2Item{
 			From: "car",
 			To:   "bil",
 		},
-		AlistItemTypeV2{
+		TypeV2Item{
 			From: "",
 			To:   "",
 		},
-		AlistItemTypeV2{
+		TypeV2Item{
 			From: "water",
 			To:   "vann",
 		},
@@ -113,7 +113,7 @@ func TestValidateAlist(t *testing.T) {
 	assert.Equal(t, err.Error(), "Failed to pass list type v1. Item cant be empty at position 0")
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v2"}
-	aList.Data = AlistTypeV2{AlistItemTypeV2{From: "", To: ""}}
+	aList.Data = TypeV2{TypeV2Item{From: "", To: ""}}
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list type v2. Item cant be empty at position 0")
 
