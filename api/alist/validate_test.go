@@ -23,33 +23,33 @@ func TestValidateAlistInfo(t *testing.T) {
 	assert.Equal(t, err.Error(), "Title cannot be empty.")
 }
 
-func TestAlistTypeV1(t *testing.T) {
+func TestTypeV1(t *testing.T) {
 	var err error
-	var items AlistTypeV1
+	var items TypeV1
 	jsonBytes := []byte(validAListTypeV1)
 	aList := new(Alist)
 	aList.UnmarshalJSON(jsonBytes)
 	// This is valid with data
-	err = validateAlistTypeV1(*aList)
+	err = validateTypeV1(*aList)
 	assert.Equal(t, err, nil)
 
 	// This is not valid as it has an empty record
-	items = AlistTypeV1{""}
+	items = TypeV1{""}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
+	err = validateTypeV1(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
 
-	items = AlistTypeV1{"", ""}
+	items = TypeV1{"", ""}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
+	err = validateTypeV1(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 0\nItem cant be empty at position 1")
 
-	items = AlistTypeV1{"a", "", "c"}
+	items = TypeV1{"a", "", "c"}
 	aList.Data = items
 
-	err = validateAlistTypeV1(*aList)
+	err = validateTypeV1(*aList)
 	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
 }
 
@@ -108,7 +108,7 @@ func TestValidateAlist(t *testing.T) {
 
 	// We check the failed path, as we have specific tests for each lists validation.
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v1"}
-	aList.Data = AlistTypeV1{""}
+	aList.Data = TypeV1{""}
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list type v1. Item cant be empty at position 0")
 
@@ -146,7 +146,7 @@ func TestValidateAlist(t *testing.T) {
 		Labels: []string{
 			"",
 		}}
-	aList.Data = AlistTypeV1{""}
+	aList.Data = TypeV1{""}
 	err = Validate(*aList)
 	assert.Equal(t, err.Error(), "Failed to pass list info. Label can not be empty at position 0")
 	aList.Info.Labels[0] = "iam a long label and should go over the allowed limit"

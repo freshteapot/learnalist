@@ -16,7 +16,7 @@ func Validate(aList Alist) error {
 	}
 	switch aList.Info.ListType {
 	case SimpleList:
-		err = validateAlistTypeV1(aList)
+		err = validateTypeV1(aList)
 		if err != nil {
 			err = errors.New(fmt.Sprintf("Failed to pass list type v1. %s", err.Error()))
 			return err
@@ -61,26 +61,6 @@ func validateAListInfo(info AlistInfo) error {
 		}
 		if len(item) > 20 {
 			feedback = append(feedback, fmt.Sprintf("Label must be 20 or less characters long at position %d", index))
-		}
-	}
-
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
-	}
-
-	return err
-}
-
-func validateAlistTypeV1(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
-
-	items := aList.Data.(AlistTypeV1)
-	for index, item := range items {
-		if item == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
 		}
 	}
 

@@ -76,7 +76,7 @@ func (integrations *Client) postListTypeV1BadData() {
 
 func (integrations *Client) updateAlistV1WithData(aList alist.Alist) *alist.Alist {
 	fmt.Println("integrations.updateAlistV1WithData start")
-	items := aList.Data.(alist.AlistTypeV1)
+	items := aList.Data.(alist.TypeV1)
 	items = append(items, "apple")
 	aList.Data = items
 

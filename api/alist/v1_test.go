@@ -10,5 +10,5 @@ import (
 func TestNewTypeV1(t *testing.T) {
 	aList := NewTypeV1()
 	assert.Equal(t, SimpleList, aList.Info.ListType)
-	assert.Equal(t, "AlistTypeV1", reflect.TypeOf(aList.Data).Name())
+	assert.Equal(t, "TypeV1", reflect.TypeOf(aList.Data).Name())
 }

@@ -15,9 +15,6 @@ const (
 	ContentAndUrl = "v4"
 )
 
-// AlistTypeV1 list type v1
-type AlistTypeV1 []string
-
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
 	Title    string   `json:"title"`
@@ -84,7 +81,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 	jsonBytes, _ = json.Marshal(raw["data"])
 	switch aList.Info.ListType {
 	case SimpleList:
-		aList.Data, err = parseAlistTypeV1(jsonBytes)
+		aList.Data, err = parseTypeV1(jsonBytes)
 		if err != nil {
 			err = errors.New(i18n.ValidationErrorListV1)
 			return err
