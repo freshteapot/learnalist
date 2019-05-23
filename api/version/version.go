@@ -1,9 +1,12 @@
 package version
 
+import "fmt"
+
 var (
 	GitDate string
 	Version string
 	GitHash string
+	GitUrl  string
 )
 
 func GetGitDate() string {
@@ -25,4 +28,12 @@ func GetVersion() string {
 		return "n/a"
 	}
 	return Version
+}
+
+func GetGitURL() string {
+	hash := GetGitHash()
+	if hash == "n/a" {
+		hash = "n_a"
+	}
+	return fmt.Sprintf("https://github.com/freshteapot/learnalist-api/commit/%s", hash)
 }

@@ -15,6 +15,7 @@ func (suite *ApiSuite) TestGetVersion() {
 	suite.Equal("n/a", raw["gitHash"].(string))
 	suite.Equal("n/a", raw["gitDate"].(string))
 	suite.Equal("n/a", raw["version"].(string))
+	suite.Equal("https://github.com/freshteapot/learnalist-api/commit/n_a", raw["url"].(string))
 }
 
 func (suite *ApiSuite) getVersion() (statusCode int, responseBytes []byte) {
