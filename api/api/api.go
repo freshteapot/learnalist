@@ -57,7 +57,7 @@ func Run(env Env) {
 	v1 := e.Group("/v1")
 	if env.CorsAllowOrigins != "" {
 		allowOrigins := strings.Split(env.CorsAllowOrigins, ",")
-		v1.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: allowOrigins,
 			AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 			AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderOrigin, echo.HeaderContentType},
