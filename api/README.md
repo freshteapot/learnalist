@@ -83,8 +83,3 @@ go install
 ```
 
 Thanks to http://stackoverflow.com/a/38296407.
-
-* Update all vendors
-```sh
-govendor fetch +v
-```
