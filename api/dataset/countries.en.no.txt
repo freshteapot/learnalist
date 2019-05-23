@@ -1,0 +1,193 @@
+Afghanistan	Afghanistan
+Albania	Albania
+Algeria	Algerie
+Andorra	Andorra
+Angola	Angola
+Antigua and Barbuda	Antigua og Barbuda
+Argentina	Argentina
+Armenia	Armenia
+Australia	Australia
+Austria	Østerrike
+Azerbaijan	Aserbajdsjan
+Bahamas	Bahamas
+Bahrain	Bahrain
+Bangladesh	Bangladesh
+Barbados	Barbados
+Belarus	Hviterussland
+Belgium	Belgia
+Belize	Belize
+Benin	Benin
+Bhutan	Bhutan
+Bolivia	Bolivia
+Bosnia and Herzegovina	Bosnia-Hercegovina
+Botswana	Botswana
+Brazil	Brasil
+Brunei	Brunei
+Bulgaria	Bulgaria
+Burkina Faso	Burkina Faso
+Burundi	Burundi
+Cambodia	Kambodsja
+Cameroon	Kamerun
+Canada	Canada
+Cape Verde	Kapp Verde
+Central African Republic	Den sentralafrikanske republikk
+Chad	Tsjad
+Chile	Chile
+China	Kina
+Colombia	Colombia
+Comoros	Komorene
+Costa Rica	Costa Rica
+Côte d’Ivoire	Elfenbenskysten
+Croatia	Kroatia
+Cuba	Cuba
+Cyprus	Kypros
+Czech Republic	Tsjekkia
+Democratic Republic of the Congo	Den demokratiske republikken Kongo
+Denmark	Danmark
+Djibouti	Djibouti
+Dominica	Dominica
+Dominican Republic	Den dominikanske republikk
+East Timor	Øst-Timor
+Ecuador	Ecuador
+Egypt	Egypt
+El Salvador	El Salvador
+Equatorial Guinea	Ekvatorial-Guinea
+Eritrea	Eritrea
+Estonia	Estland
+Ethiopia	Etiopia
+Fiji	Fiji
+Finland	Finland
+France	Frankrike
+Gabon	Gabon
+Gambia	Gambia
+Georgia	Georgia
+Germany	Tyskland
+Ghana	Ghana
+Greece	Hellas
+Grenada	Grenada
+Guatemala	Guatemala
+Guinea	Guinea
+Guinea-Bissau	Guinea-Bissau
+Guyana	Guyana
+Haiti	Haiti
+Honduras	Honduras
+Hungary	Ungarn
+Iceland	Island
+India	India
+Indonesia	Indonesia
+Iran	Iran
+Iraq	Irak
+Ireland	Irland
+Israel	Israel
+Italy	Italia
+Jamaica	Jamaica
+Japan	Japan
+Jordan	Jordan
+Kazakhstan	Kasakhstan
+Kenya	Kenya
+Kiribati	Kiribati
+Kuwait	Kuwait
+Kyrgyzstan	Kirgisistan
+Laos	Laos
+Latvia	Latvia
+Lebanon	Libanon
+Lesotho	Lesotho
+Liberia	Liberia
+Libya	Libya
+Liechtenstein	Liechtenstein
+Lithuania	Litauen
+Luxembourg	Luxembourg
+Madagascar	Madagaskar
+Malawi	Malawi
+Malaysia	Malaysia
+Maldives	Maldivene
+Mali	Mali
+Malta	Malta
+Marshall Islands	Marshalløyene
+Mauritania	Mauritania
+Mauritius	Mauritius
+Mexico	Mexico
+Micronesia	Mikronesia
+Moldova	Moldova
+Monaco	Monaco
+Mongolia	Mongolia
+Montenegro	Montenegro
+Morocco	Marokko
+Mozambique	Mosambik
+Myanmar	Myanmar
+Namibia	Namibia
+Nauru	Nauru
+Nepal	Nepal
+Netherlands	Nederland
+New Zealand	New Zealand
+Nicaragua	Nicaragua
+Niger	Niger
+Nigeria	Nigeria
+North Korea	Nord-Korea
+Norway	Norge
+Oman	Oman
+Pakistan	Pakistan
+Palau	Palau
+Panama	Panama
+Papua New Guinea	Papua Ny-Guinea
+Paraguay	Paraguay
+Peru	Peru
+Philippines	Filippinene
+Poland	Polen
+Portugal	Portugal
+Qatar	Qatar
+Republic of the Congo	Republikken Kongo
+Republic of Macedonia	Republikken Makedonia
+Romania	Romania
+Russia	Russland
+Rwanda	Rwanda
+Saint Kitts and Nevis	Saint Kitts og Nevis
+Saint Lucia	Saint Lucia
+Saint Vincent and the Grenadines	Saint Vincent og Grenadinene
+Samoa	Samoa
+San Marino	San Marino
+Sao Tome and Principe	São Tomé og Príncipe
+Saudi Arabia	Saudi-Arabia
+Senegal	Senegal
+Serbia	Serbia
+Seychelles	Seychellene
+Sierra Leone	Sierra Leone
+Singapore	Singapore
+Slovakia	Slovakia
+Slovenia	Slovenia
+Solomon Islands	Salomonøyene
+Somalia	Somalia
+South Africa	Sør-Afrika
+South Korea	Sør-Korea
+South Sudan	Sør-Sudan
+Spain	Spania
+Sri Lanka	Sri Lanka
+Sudan	Sudan
+Suriname	Surinam
+Swaziland	Swaziland
+Sweden	Sverige
+Switzerland	Sveits
+Syria	Syria
+Tajikistan	Tadsjikistan
+Tanzania	Tanzania
+Thailand	Thailand
+Togo	Togo
+Tonga	Tonga
+Trinidad and Tobago	Trinidad og Tobago
+Tunisia	Tunisia
+Turkey	Tyrkia
+Turkmenistan	Turkmenistan
+Tuvalu	Tuvalu
+Uganda	Uganda
+Ukraine	Ukraina
+United Arab Emirates	De forente arabiske emirater
+United Kingdom	Storbritannia
+United States of America	United States of America
+Uruguay	Uruguay
+Uzbekistan	Usbekistan
+Vanuatu	Vanuatu
+Venezuela	Venezuela
+Vietnam	Vietnam
+Yemen	Jemen
+Zambia	Zambia
+Zimbabwe	Zimbabwe

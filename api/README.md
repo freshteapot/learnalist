@@ -69,97 +69,13 @@ Go [try some curl requests.](./doc/play.along.md)
 | POST | /v1/share/alist | Share a list with another user. |
 
 
-
 # List types
 
-| Type | Description |
-| --- | --- |
-| v1 | An array of a string.|
-| v2 | An array of object alist.TypeV2Item |
-| v3 | Record your rowing data from a concept2. TypeV3, made up of an array of alist.TypeV3Item |
-| v4 | Record content and its url / reference. TypeV4, made up of an array of alist.TypeV4Item|
+* [Simplelist v1](./doc/list.type.v1.md)
+* [FromToList v2](./doc/list.type.v2.md)
+* [Concept2 v3](./doc/list.type.v3.md)
+* [ContentAndUrl v4](./doc/list.type.v4.md)
 
-### V1
-
-```
-{
-    "data": [
-        "a",
-        "b"
-    ],
-    "info": {
-        "title": "A list of strings",
-        "type": "v1"
-    }
-}
-'
-```
-
-### V2
-
-```
-{
-    "data": [
-        {
-            "from": "chris",
-            "to": "chris"
-        }
-    ],
-    "info": {
-        "title": "A list of key:value pairs.",
-        "type": "v2"
-    }
-}
-```
-
-### V3
-```
-{
-  "data": [
-    {
-      "when": "2019-05-06",
-      "overall": {
-        "time": "7:15.9",
-        "distance": 2000,
-        "spm": 28,
-        "p500": "1:48.9"
-      },
-      "splits": [
-        {
-          "time": "1.46.4",
-          "distance": 500,
-          "spm": 29,
-          "p500": "1:58.0"
-        }
-      ]
-    }
-  ],
-  "info": {
-      "title": "A list to record rows.",
-      "type": "v3"
-  }
-}
-```
-
-### V4
-```
-{
-  "data": [
-    {
-      "content": "Im tough, Im ambitious, and I know exactly what I want. If that makes me a bitch, okay. ― Madonna",
-      "url":  "https://www.goodreads.com/quotes/54377-i-m-tough-i-m-ambitious-and-i-know-exactly-what-i"
-    },
-    {
-      "content": "Design is the art of arranging code to work today, and be changeable forever. – Sandi Metz",
-      "url":  "https://dave.cheney.net/paste/clear-is-better-than-clever.pdf"
-    }
-  ],
-  "info": {
-      "title": "A list of fine quotes.",
-      "type": "v4"
-  }
-}
-```
 
 # References as this becomes more useful.
 
