@@ -77,6 +77,7 @@ Go [try some curl requests.](./doc/play.along.md)
 | v1 | An array of a string.|
 | v2 | An array of object alist.AlistItemTypeV2 |
 | v3 | Record your rowing data from a concept2. TypeV3, made up of an array of alist.TypeV3Item |
+| v4 | Record content and its url / reference. TypeV4, made up of an array of alist.TypeV4Item|
 
 ### V1
 
@@ -140,6 +141,25 @@ Go [try some curl requests.](./doc/play.along.md)
 }
 ```
 
+### V4
+```
+{
+  "data": [
+    {
+      "content": "Im tough, Im ambitious, and I know exactly what I want. If that makes me a bitch, okay. ― Madonna",
+      "url":  "https://www.goodreads.com/quotes/54377-i-m-tough-i-m-ambitious-and-i-know-exactly-what-i"
+    },
+    {
+      "content": "Design is the art of arranging code to work today, and be changeable forever. – Sandi Metz",
+      "url":  "https://dave.cheney.net/paste/clear-is-better-than-clever.pdf"
+    }
+  ],
+  "info": {
+      "title": "A list of fine quotes.",
+      "type": "v4"
+  }
+}
+```
 
 # References as this becomes more useful.
 
