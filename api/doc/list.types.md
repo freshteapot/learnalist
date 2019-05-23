@@ -1,8 +1,8 @@
 # List types
-At the heart of learnalist are lists.
+At the heart of learnalist is the humble list.
 Naturally, many types of list can exist.
 
-Below are the ones currently supported.
+Below are the currently supported lists.
 
 * [Simplelist v1](./list.type.v1.md)
 * [FromToList v2](./list.type.v2.md)
