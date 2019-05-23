@@ -33,8 +33,8 @@ func parseTypeV4(jsonBytes []byte) (TypeV4, error) {
 
 func validateTypeV4(aList Alist) error {
 	hasError := false
-	typeV4 := aList.Data.(TypeV4)
-	for _, item := range typeV4 {
+	items := aList.Data.(TypeV4)
+	for _, item := range items {
 		v := validate.New(item)
 		if !v.Validate() { // validate ok
 			hasError = true

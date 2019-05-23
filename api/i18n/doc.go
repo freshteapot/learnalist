@@ -8,6 +8,8 @@ const (
 	ValidationErrorListV4                   = "Failed to pass list type v4."
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
+	ValidationAlistTypeV1                   = "Please refer to the documentation on list type v1"
+	ValidationAlistTypeV2                   = "Please refer to the documentation on list type v2"
 	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
 	ValidationAlistTypeV4                   = "Please refer to the documentation on list type v4"
 	ValidationUserRegister                  = "Please refer to the documentation on user registration"

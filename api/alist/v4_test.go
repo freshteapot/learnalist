@@ -47,7 +47,7 @@ func TestAlistTypeV4(t *testing.T) {
 	err = validateTypeV4(*aList)
 	assert.Equal(t, i18n.ValidationAlistTypeV4, err.Error())
 	err = Validate(*aList)
-	assert.Equal(t, "Failed to pass list type v4. Please refer to the documentation on list type v4", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV4, err.Error())
 	typeV4Item.Content = content
 
 	typeV4Item.Url = ""
@@ -55,6 +55,6 @@ func TestAlistTypeV4(t *testing.T) {
 	err = validateTypeV4(*aList)
 	assert.Equal(t, i18n.ValidationAlistTypeV4, err.Error())
 	err = Validate(*aList)
-	assert.Equal(t, "Failed to pass list type v4. Please refer to the documentation on list type v4", err.Error())
+	assert.Equal(t, i18n.ValidationAlistTypeV4, err.Error())
 	typeV4Item.Url = url
 }

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/freshteapot/learnalist-api/api/utils"
 )
 
 func Validate(aList Alist) error {
@@ -14,33 +16,24 @@ func Validate(aList Alist) error {
 		err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
 		return err
 	}
+
+	if !utils.StringArrayContains(allowedListTypes, aList.Info.ListType) {
+		err = errors.New("Unsupported list type.")
+		return err
+	}
+
 	switch aList.Info.ListType {
 	case SimpleList:
 		err = validateTypeV1(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v1. %s", err.Error()))
-			return err
-		}
 	case FromToList:
 		err = validateTypeV2(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v2. %s", err.Error()))
-			return err
-		}
 	case Concept2:
 		err = validateTypeV3(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v3. %s", err.Error()))
-			return err
-		}
 	case ContentAndUrl:
 		err = validateTypeV4(aList)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Failed to pass list type v4. %s", err.Error()))
-			return err
-		}
-	default:
-		err = errors.New("Unsupported list type.")
+	}
+
+	if err != nil {
 		return err
 	}
 	return nil

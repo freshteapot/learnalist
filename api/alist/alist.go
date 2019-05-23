@@ -15,6 +15,13 @@ const (
 	ContentAndUrl = "v4"
 )
 
+var allowedListTypes = []string{
+	SimpleList,
+	FromToList,
+	Concept2,
+	ContentAndUrl,
+}
+
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
 	Title    string   `json:"title"`

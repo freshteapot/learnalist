@@ -38,19 +38,19 @@ func TestTypeV1(t *testing.T) {
 	aList.Data = items
 
 	err = validateTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
 	items = TypeV1{"", ""}
 	aList.Data = items
 
 	err = validateTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0\nItem cant be empty at position 1")
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
 	items = TypeV1{"a", "", "c"}
 	aList.Data = items
 
 	err = validateTypeV1(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 }
 
 func TestTypeV2(t *testing.T) {
@@ -73,7 +73,7 @@ func TestTypeV2(t *testing.T) {
 	aList.Data = items
 
 	err = validateTypeV2(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 
 	items = TypeV2{
 		TypeV2Item{
@@ -92,7 +92,7 @@ func TestTypeV2(t *testing.T) {
 	aList.Data = items
 
 	err = validateTypeV2(*aList)
-	assert.Equal(t, err.Error(), "Item cant be empty at position 1")
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 }
 
 func TestValidateAlist(t *testing.T) {
@@ -110,12 +110,12 @@ func TestValidateAlist(t *testing.T) {
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v1"}
 	aList.Data = TypeV1{""}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v1. Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV1, err.Error())
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v2"}
 	aList.Data = TypeV2{TypeV2Item{From: "", To: ""}}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v2. Item cant be empty at position 0")
+	assert.Equal(t, i18n.ValidationAlistTypeV2, err.Error())
 
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "v3"}
 	aList.Data = TypeV3{
@@ -131,7 +131,7 @@ func TestValidateAlist(t *testing.T) {
 		},
 	}
 	err = Validate(*aList)
-	assert.Equal(t, err.Error(), "Failed to pass list type v3. Please refer to the documentation on list type v3")
+	assert.Equal(t, i18n.ValidationAlistTypeV3, err.Error())
 
 	// Make sure we handle Unsupported lists
 	aList.Info = AlistInfo{Title: "I am a title", ListType: "na"}

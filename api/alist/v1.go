@@ -3,8 +3,9 @@ package alist
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
+
+	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/gookit/validate"
 )
 
 // TypeV1 list type v1
@@ -24,23 +25,25 @@ func NewTypeV1() *Alist {
 }
 
 func validateTypeV1(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
+	// Little bit of a hack, due to the validate not working with slices.
+	type itemv1 struct {
+		Content string `json:"content" validate:"required"`
+	}
 
+	hasError := false
 	items := aList.Data.(TypeV1)
-	for index, item := range items {
-		if item == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
+	for _, item := range items {
+		a := itemv1{Content: item}
+		v := validate.New(a)
+		if !v.Validate() { // validate ok
+			hasError = true
 		}
 	}
 
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
+	if hasError {
+		return errors.New(i18n.ValidationAlistTypeV1)
 	}
-
-	return err
+	return nil
 }
 
 func parseTypeV1(jsonBytes []byte) (TypeV1, error) {

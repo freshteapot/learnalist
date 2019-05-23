@@ -3,14 +3,15 @@ package alist
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
+
+	"github.com/freshteapot/learnalist-api/api/i18n"
+	"github.com/gookit/validate"
 )
 
 // TypeV2Item Item in  TypeV2
 type TypeV2Item struct {
-	From string `json:"from"`
-	To   string `json:"to"`
+	From string `json:"from" validate:"required"`
+	To   string `json:"to" validate:"required"`
 }
 
 type TypeV2 []TypeV2Item
@@ -35,21 +36,17 @@ func parseTypeV2(jsonBytes []byte) (TypeV2, error) {
 }
 
 func validateTypeV2(aList Alist) error {
-	var err error
-	var feedbackMessage string
-	var feedback []string = []string{}
-
+	hasError := false
 	items := aList.Data.(TypeV2)
-	for index, item := range items {
-		if item.From == "" && item.To == "" {
-			feedback = append(feedback, fmt.Sprintf("Item cant be empty at position %d", index))
+	for _, item := range items {
+		v := validate.New(item)
+		if !v.Validate() { // validate ok
+			hasError = true
 		}
 	}
 
-	if len(feedback) != 0 {
-		feedbackMessage = strings.Join(feedback, "\n")
-		err = errors.New(feedbackMessage)
+	if hasError {
+		return errors.New(i18n.ValidationAlistTypeV2)
 	}
-
-	return err
+	return nil
 }
