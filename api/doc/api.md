@@ -1,7 +1,7 @@
 # Api
 
-| Method | Uri | Description | Status Codes
-| --- | --- | --- |
+| Method | Uri | Description | Status Codes |
+| --- | --- | --- | --- |
 | GET | /v1/ | Replies with a simple message. | 200 |
 | GET | /v1/version | Version informationn about the server. | 200 |
 | POST | /v1/alist | Save a list. | 201, 400, 403 |
