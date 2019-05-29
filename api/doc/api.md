@@ -5,7 +5,7 @@
 | GET | /v1/ | Replies with a simple message. | 200 |
 | GET | /v1/version | Version informationn about the server. | 200 |
 | POST | /v1/alist | Save a list. | 201, 400, 403 |
-| DELETE | /v1/alist/{uuid} | Delete a list via uuid. | 200, 404, 403, 500, |
+| DELETE | /v1/alist/{uuid} | Delete a list via uuid. | 200, 404, 403, 500 |
 | PUT | /v1/alist/{uuid} | Update all fields allowed to a list. | 200, 400, 403 |
 | GET | /v1/alist/{uuid} | Get a list via uuid. | 200, 404, 403 |
 | GET | /v1/alist/by/me(?labels=,list_type={v1,v2}) | Get lists by the currently logged in user. | 200 |
