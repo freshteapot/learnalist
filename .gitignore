@@ -7,3 +7,9 @@ api/vendor/**
 
 # www-ui
 www-ui/node_modules
+
+# alists
+alists/hugo/content/alists/
+alists/hugo/data/lists/
+alists/hugo/public-alist/
+alists/site-cache/
