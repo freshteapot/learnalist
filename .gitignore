@@ -2,14 +2,13 @@
 *.db
 
 # GO: Ignore all files in vendor
-api/vendor/**
-#!api/vendor/modules.txt
+server/vendor/
 
 # www-ui
 www-ui/node_modules
 
 # alists
-alists/hugo/content/alists/
-alists/hugo/data/lists/
-alists/hugo/public-alist/
-alists/site-cache/
+server/alists/hugo/content/alists/
+server/alists/hugo/data/lists/
+server/alists/hugo/public-alist/
+server/alists/site-cache/

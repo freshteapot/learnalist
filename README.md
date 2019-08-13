@@ -14,8 +14,8 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 # Getting Started
 
-## Api
-* look at [Readme](api/README.md).
+## Server
+* look at [Readme](server/README.md).
 
 ## Chrome Extension
 * [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
