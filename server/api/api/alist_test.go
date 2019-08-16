@@ -226,7 +226,7 @@ func (suite *ApiSuite) TestMethodNotSupportedForSavingList() {
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1SaveAlist(c))
+	suite.NoError(m.V1SaveAlist(c))
 	suite.Equal(http.StatusBadRequest, rec.Code)
 	response := strings.TrimSpace(rec.Body.String())
 	suite.Equal(`{"message":"This method is not supported."}`, response)
@@ -302,7 +302,7 @@ func (suite *ApiSuite) updateAlist(userUUID, alistUUID string, input string) (st
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1SaveAlist(c))
+	suite.NoError(m.V1SaveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -316,7 +316,7 @@ func (suite *ApiSuite) createAList(userUUID, input string) (statusCode int, resp
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
 
-	suite.NoError(env.V1SaveAlist(c))
+	suite.NoError(m.V1SaveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -331,7 +331,7 @@ func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCod
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1RemoveAlist(c))
+	suite.NoError(m.V1RemoveAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -355,7 +355,7 @@ func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (s
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1GetListsByMe(c))
+	suite.NoError(m.V1GetListsByMe(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -369,6 +369,6 @@ func (suite *ApiSuite) getList(userUUID, alistUUID string) (statusCode int, resp
 	req, rec := setupFakeEndpoint(method, uri, "")
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1GetListByUUID(c))
+	suite.NoError(m.V1GetListByUUID(c))
 	return rec.Code, rec.Body.Bytes()
 }

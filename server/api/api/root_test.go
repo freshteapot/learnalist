@@ -16,7 +16,7 @@ func (suite *ApiSuite) TestGetRoot() {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if suite.NoError(env.V1GetRoot(c)) {
+	if suite.NoError(m.V1GetRoot(c)) {
 		suite.Equal(http.StatusOK, rec.Code)
 		response := strings.TrimSpace(rec.Body.String())
 		suite.Equal(expected, response)

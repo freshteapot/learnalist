@@ -25,6 +25,6 @@ func (suite *ApiSuite) getVersion() (statusCode int, responseBytes []byte) {
 	req, rec := setupFakeEndpoint(method, uri, "")
 	e := echo.New()
 	c := e.NewContext(req, rec)
-	suite.NoError(env.V1GetVersion(c))
+	suite.NoError(m.V1GetVersion(c))
 	return rec.Code, rec.Body.Bytes()
 }

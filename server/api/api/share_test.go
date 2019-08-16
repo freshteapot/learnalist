@@ -152,6 +152,6 @@ func (suite *ApiSuite) shareAlist(userUUID string, input string) (statusCode int
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
 
-	suite.NoError(env.V1ShareAlist(c))
+	suite.NoError(m.V1ShareAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }

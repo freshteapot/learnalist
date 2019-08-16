@@ -5,7 +5,7 @@
 ## How can I get pretty print of the response?
 Add the query string "pretty"
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?pretty'
+curl 'http://localhost:1234/api/v1/alist/by/me?pretty'
 ```
 
 ## Getting the response "Please refer to the documentation on list type v3"?

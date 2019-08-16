@@ -16,7 +16,7 @@ When a user is created it returns a 201.
 When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
 */
-func (env *Env) V1PostRegister(c echo.Context) error {
+func (m *Manager) V1PostRegister(c echo.Context) error {
 	var input = &user.RegisterInput{}
 	var cleanedUser user.RegisterInput
 
@@ -45,10 +45,10 @@ func (env *Env) V1PostRegister(c echo.Context) error {
 	}
 
 	statusCode := http.StatusCreated
-	newUser, err := env.Datastore.GetUserByCredentials(loginUser)
+	newUser, err := m.Datastore.GetUserByCredentials(loginUser)
 	if err != nil {
 		if err.Error() == i18n.DatabaseLookupNotFound {
-			newUser, err = env.Datastore.InsertNewUser(loginUser)
+			newUser, err = m.Datastore.InsertNewUser(loginUser)
 			if err != nil {
 				response := HttpResponseMessage{
 					Message: err.Error(),

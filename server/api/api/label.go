@@ -17,7 +17,7 @@ type HttpLabelInput struct {
 	Label string `json:"label"`
 }
 
-func (env *Env) V1PostUserLabel(c echo.Context) error {
+func (m *Manager) V1PostUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	var input = &HttpLabelInput{}
 
@@ -33,7 +33,7 @@ func (env *Env) V1PostUserLabel(c echo.Context) error {
 	}
 
 	label := models.NewUserLabel(input.Label, user.Uuid)
-	statusCode, err := env.Datastore.PostUserLabel(label)
+	statusCode, err := m.Datastore.PostUserLabel(label)
 	if err != nil {
 		if statusCode != http.StatusOK {
 			response := HttpResponseMessage{
@@ -42,13 +42,13 @@ func (env *Env) V1PostUserLabel(c echo.Context) error {
 			return c.JSON(statusCode, response)
 		}
 	}
-	labels, _ := env.Datastore.GetUserLabels(user.Uuid)
+	labels, _ := m.Datastore.GetUserLabels(user.Uuid)
 	return c.JSON(statusCode, labels)
 }
 
-func (env *Env) V1GetUserLabels(c echo.Context) error {
+func (m *Manager) V1GetUserLabels(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	labels, err := env.Datastore.GetUserLabels(user.Uuid)
+	labels, err := m.Datastore.GetUserLabels(user.Uuid)
 	if err != nil {
 		// TODO log this
 		response := HttpResponseMessage{
@@ -59,13 +59,13 @@ func (env *Env) V1GetUserLabels(c echo.Context) error {
 	return c.JSON(http.StatusOK, labels)
 }
 
-func (env *Env) V1RemoveUserLabel(c echo.Context) error {
+func (m *Manager) V1RemoveUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 	label := strings.TrimPrefix(r.URL.Path, "/v1/labels/")
 	fmt.Println("Sad times to need to do it.")
-	err := env.Datastore.RemoveUserLabel(label, user.Uuid)
+	err := m.Datastore.RemoveUserLabel(label, user.Uuid)
 	response := HttpResponseMessage{}
 	if err != nil {
 		response.Message = err.Error()

@@ -14,7 +14,7 @@ type HttpGetVersionResponse struct {
 	Url     string `json:"url"`
 }
 
-func (env *Env) V1GetVersion(c echo.Context) error {
+func (m *Manager) V1GetVersion(c echo.Context) error {
 	response := HttpGetVersionResponse{
 		GitHash: version.GetGitHash(),
 		GitDate: version.GetGitDate(),

@@ -16,18 +16,18 @@ import (
 @Param labels filter lists by label: "car", "car,bil".
 @Param list_type filter lists by type: "v1", "v2".
 */
-func (env *Env) V1GetListsByMe(c echo.Context) error {
+func (m *Manager) V1GetListsByMe(c echo.Context) error {
 	var alists []*alist.Alist
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	params := r.URL.Query()
 	filterByLabels := params.Get("labels")
 	listType := params.Get("list_type")
-	alists = env.Datastore.GetListsByUserWithFilters(user.Uuid, filterByLabels, listType)
+	alists = m.Datastore.GetListsByUserWithFilters(user.Uuid, filterByLabels, listType)
 	return c.JSON(http.StatusOK, alists)
 }
 
-func (env *Env) V1GetListByUUID(c echo.Context) error {
+func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
@@ -39,7 +39,7 @@ func (env *Env) V1GetListByUUID(c echo.Context) error {
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
-	alist, err := env.Datastore.GetAlist(uuid)
+	alist, err := m.Datastore.GetAlist(uuid)
 	if err != nil {
 		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
 		response := HttpResponseMessage{
@@ -48,7 +48,7 @@ func (env *Env) V1GetListByUUID(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	if !env.Acl.HasUserListReadAccess(user.Uuid, alist) {
+	if !m.Acl.HasUserListReadAccess(user.Uuid, alist) {
 		response := HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
@@ -57,7 +57,7 @@ func (env *Env) V1GetListByUUID(c echo.Context) error {
 	return c.JSON(http.StatusOK, *alist)
 }
 
-func (env *Env) V1SaveAlist(c echo.Context) error {
+func (m *Manager) V1SaveAlist(c echo.Context) error {
 	var inputUuid string
 	user := c.Get("loggedInUser").(uuid.User)
 	method := c.Request().Method
@@ -97,7 +97,7 @@ func (env *Env) V1SaveAlist(c echo.Context) error {
 		aList.Uuid = inputUuid
 	}
 
-	aList, err = env.Datastore.SaveAlist(method, *aList)
+	aList, err = m.Datastore.SaveAlist(method, *aList)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: err.Error(),
@@ -117,7 +117,7 @@ func (env *Env) V1SaveAlist(c echo.Context) error {
 	return c.JSON(statusCode, *aList)
 }
 
-func (env *Env) V1RemoveAlist(c echo.Context) error {
+func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 	alist_uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
@@ -125,7 +125,7 @@ func (env *Env) V1RemoveAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	response := HttpResponseMessage{}
 
-	err := env.Datastore.RemoveAlist(alist_uuid, user.Uuid)
+	err := m.Datastore.RemoveAlist(alist_uuid, user.Uuid)
 	if err != nil {
 		if err.Error() == i18n.SuccessAlistNotFound {
 			response.Message = err.Error()

@@ -39,7 +39,7 @@ sh build.sh
 
 # Once the binary is running.
 ```sh
-curl -i http://localhost:1234/v1/
+curl -i http://localhost:1234/api/v1/
 ```
 
 Should produce something like

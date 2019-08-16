@@ -54,7 +54,7 @@ To create a list of type "v3", set type in the info object payload.
 # Post it
 This is an example of from and to, "from" English months "to" Norwegian.
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 {
   "info": {
       "title": "A day on the rowing machine.",
@@ -84,9 +84,9 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 # Get your lists by filtering on Concept2 / v3
 We add pretty to the query string, to return the json a little easier to read.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v3&pretty'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v3&pretty'  -u'iamchris:test123'
 ```
 or
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
 ```

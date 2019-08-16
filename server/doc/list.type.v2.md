@@ -30,7 +30,7 @@ To create a list of type "v2", set type in the info object payload.
 # Post it
 This is an example of from and to, "from" English months "to" Norwegian.
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 {
   "data": [
     {
@@ -97,11 +97,11 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 # Get your lists by filtering on FromToList / v2
 We add pretty to the query string, to return the json a little easier to read.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v2&pretty'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v2&pretty'  -u'iamchris:test123'
 ```
 or
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v2'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v2'  -u'iamchris:test123'
 ```
 
 # How this data was made:

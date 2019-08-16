@@ -14,10 +14,7 @@ import (
 )
 
 var dal *models.DAL
-var env = Env{
-	Port:         1234,
-	DatabaseName: database.PathToTestSqliteDb,
-}
+var m Manager
 
 type ApiSuite struct {
 	suite.Suite
@@ -27,8 +24,10 @@ func (suite *ApiSuite) SetupSuite() {
 	db := database.NewTestDB()
 	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
 	dal = models.NewDAL(db, acl)
-	env.Datastore = dal
-	env.Acl = *acl
+	m = Manager{
+		Datastore: dal,
+		Acl:       *acl,
+	}
 }
 
 func (suite *ApiSuite) SetupTest() {

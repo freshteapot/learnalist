@@ -80,7 +80,7 @@ func (suite *ApiSuite) createNewUser(input string) (statusCode int, responseByte
 	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
-	suite.NoError(env.V1PostRegister(c))
+	suite.NoError(m.V1PostRegister(c))
 	return rec.Code, rec.Body.Bytes()
 }
 

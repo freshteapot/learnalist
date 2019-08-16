@@ -25,7 +25,7 @@ func NewTestDB() *sqlx.DB {
 	dataSourceName := "file:" + PathToTestSqliteDb
 	db := NewDB(dataSourceName)
 
-	pathToDbFiles := "../db/"
+	pathToDbFiles := "../../db/"
 	files, err := ioutil.ReadDir(pathToDbFiles)
 	checkErr(err)
 

@@ -79,7 +79,7 @@ func (suite *ApiSuite) TestDeleteUsersLabels() {
 	req, rec = setupFakeEndpoint(http.MethodDelete, "/v1/labels/car", "")
 	c = e.NewContext(req, rec)
 	c.Set("loggedInUser", user)
-	suite.NoError(env.V1RemoveUserLabel(c))
+	suite.NoError(m.V1RemoveUserLabel(c))
 	response := strings.TrimSpace(rec.Body.String())
 	suite.Equal(`{"message":"Label car was removed."}`, response)
 }
@@ -95,7 +95,7 @@ func (suite *ApiSuite) postAlabel(userUUID string, input string) (statusCode int
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1PostUserLabel(c))
+	suite.NoError(m.V1PostUserLabel(c))
 	return rec.Code, rec.Body.Bytes()
 }
 
@@ -109,6 +109,6 @@ func (suite *ApiSuite) getLabels(userUUID string) (statusCode int, responseBytes
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
-	suite.NoError(env.V1GetUserLabels(c))
+	suite.NoError(m.V1GetUserLabels(c))
 	return rec.Code, rec.Body.Bytes()
 }

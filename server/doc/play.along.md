@@ -6,7 +6,7 @@ When the database is created, it is empty.
 
 ## You need a user first.
 ```sh
-curl -XPOST 'http://127.0.0.1:1234/v1/register' -d'
+curl -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
 {
     "username":"iamchris",
     "password":"test123"
@@ -21,7 +21,7 @@ Response is
 ### Add a list of type v1.
 
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 {
     "data": [
         "monday",
@@ -42,13 +42,13 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 
 ### Get all lists created by you.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me'
+curl 'http://localhost:1234/api/v1/alist/by/me'
 ```
 
 ### Add a list of type v2.
 
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 {
     "data": [
         {
@@ -65,7 +65,7 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 
 ### Add a list of type v3 (concept2)
 ```sh
-curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 {
   "data": [
     {
@@ -95,22 +95,22 @@ curl -XPOST 'http://localhost:1234/v1/alist' -u'iamchris:test123' -d'
 
 Again, query all the lists by you.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me'  -u'iamchris:test123'
 ```
 
 Filter based on list type v3.
 ```sh
-curl 'http://localhost:1234/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
 ```
 
 Or an individual list.
 ```sh
-curl 'http://localhost:1234/v1/alist/{uuid}' -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/{uuid}' -u'iamchris:test123'
 ```
 
 #Create a list with a label or two
 ```sh
-curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'iamchris:test123' -d'
+curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/api/v1/alist -u'iamchris:test123' -d'
 {
     "data": [
         "monday",
@@ -134,7 +134,7 @@ curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/v1/alist -u'iamchris:te
 
 Now try querying for this list via the labels filter
 ```sh
-curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/v1/alist/by/me?labels=english' -u'iamchris:test123'
+curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/api/v1/alist/by/me?labels=english' -u'iamchris:test123'
 ```
 
 
@@ -148,9 +148,20 @@ type HttpShareListWithUserInput struct {
 	Action    string `json:"action"`
 }
 ```
+
+Create new user
+```sh
+curl -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
+{
+    "username":"iamusera",
+    "password":"test123"
+}
+'
+```
+
 Grant example
 ```sh
-curl 'http://localhost:1234/v1/share/alist' -u'iamusera:test' -d '{
+curl 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
   "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
   "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
   "action": "grant"
@@ -159,7 +170,7 @@ curl 'http://localhost:1234/v1/share/alist' -u'iamusera:test' -d '{
 
 Revoke example
 ```sh
-curl 'http://localhost:1234/v1/share/alist' -u'iamusera:test' -d '{
+curl 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
   "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
   "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
   "action": "revoke"
