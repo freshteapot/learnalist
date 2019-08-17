@@ -11,46 +11,38 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type HttpResponseMessage struct {
+	Message string `json:"message"`
+}
+
 type Manager struct {
 	Acl              acl.Acl
 	StaticSiteFolder string
 }
 
 func (m *Manager) GetAlist(c echo.Context) error {
-	return m.serveFiles(c.Response().Writer, c.Request())
+	var pathToFile string
+	var err error
+	pathToFile, err = m.serveAlist(c.Request().URL.Path)
+	if pathToFile != "" {
+		return c.File(pathToFile)
+	}
+
+	pathToFile, err = m.serveStatic(c.Request().URL.Path)
+	if err == nil {
+		return c.File(pathToFile)
+	}
+	// TODO handle html or json
+	// TODO maybe better than nocontent
+	return c.NoContent(http.StatusNotFound)
 }
 
-func (m *Manager) serveFiles(w http.ResponseWriter, r *http.Request) error {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return nil
-	}
-
-	err := m.serveAlist(w, r)
-	if err == nil {
-		return nil
-	}
-	fmt.Println("Error after serveAlist")
-	fmt.Println(err)
-	err = m.serveStatic(w, r)
-	if err == nil {
-		return nil
-	}
-
-	fmt.Println("Error after serveStatic")
-	fmt.Println(err)
-
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "custom 404")
-	return nil
-}
-
-func (m *Manager) serveAlist(w http.ResponseWriter, r *http.Request) error {
-	parts := strings.Split(r.URL.Path, "/")
+func (m *Manager) serveAlist(urlPath string) (string, error) {
+	parts := strings.Split(urlPath, "/")
 	suffix := parts[len(parts)-1]
 	parts = strings.Split(suffix, ".")
 	if len(parts) != 2 {
-		return errors.New("List not found")
+		return "", errors.New("List not found")
 	}
 
 	uuid := parts[0]
@@ -60,19 +52,17 @@ func (m *Manager) serveAlist(w http.ResponseWriter, r *http.Request) error {
 
 	if _, err := os.Stat(path); err == nil {
 		// TODO at this point we can do acl look up.
-		http.ServeFile(w, r, path)
-		return nil
+
+		// http.ServeFile(w, r, path)
+		return path, nil
 	}
-	return errors.New("List not found")
+	return "", errors.New("List not found")
 }
 
-func (m *Manager) serveStatic(w http.ResponseWriter, r *http.Request) error {
-	// path/to/whatever does *not* exist
-	path := fmt.Sprintf("%s/%s", m.StaticSiteFolder, r.URL.Path[1:])
+func (m *Manager) serveStatic(urlPath string) (string, error) {
+	path := fmt.Sprintf("%s/%s", m.StaticSiteFolder, urlPath[1:])
 	if _, err := os.Stat(path); err == nil {
-		// path/to/whatever exists
-		http.ServeFile(w, r, path)
-		return nil
+		return path, nil
 	}
-	return errors.New("File not found")
+	return "", errors.New("File not found")
 }
