@@ -3,7 +3,6 @@ package server
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 
@@ -23,18 +22,21 @@ type Manager struct {
 func (m *Manager) GetAlist(c echo.Context) error {
 	var pathToFile string
 	var err error
-	pathToFile, err = m.serveAlist(c.Request().URL.Path)
+	uri := c.Request().URL.Path
+	pathToFile, err = m.serveAlist(uri)
 	if pathToFile != "" {
 		return c.File(pathToFile)
 	}
 
-	pathToFile, err = m.serveStatic(c.Request().URL.Path)
+	pathToFile, err = m.serveStatic(uri)
 	if err == nil {
 		return c.File(pathToFile)
 	}
 	// TODO handle html or json
-	// TODO maybe better than nocontent
-	return c.NoContent(http.StatusNotFound)
+	// Maybe use HTTPErrorHandler
+	// https://echo.labstack.com/guide/error-handling#custom-http-error-handler
+	pathToFile = fmt.Sprintf("%s/404.html", m.StaticSiteFolder)
+	return c.File(pathToFile)
 }
 
 func (m *Manager) serveAlist(urlPath string) (string, error) {
