@@ -7,7 +7,7 @@ uglyURLs=true
 publishDir="public-alist"
 
 # Without section, gives us a nice index page
-disableKinds=["404", "home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
+disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
 
 [outputs]
     page = ["HTML", "JSON"]
