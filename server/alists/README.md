@@ -11,6 +11,7 @@ go run cmd/server/main.go -static="/Users/tinkerbell/git/learnalist-api/alists/s
 
 # Get all my lists
 ```
+cd server/alists/
 mkdir -p ./site-cache/
 mkdir -p ./hugo/content/alists/
 mkdir -p ./hugo/data/lists/
