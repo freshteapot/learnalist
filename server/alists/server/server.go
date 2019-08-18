@@ -15,8 +15,8 @@ type HttpResponseMessage struct {
 }
 
 type Manager struct {
-	Acl              acl.Acl
-	StaticSiteFolder string
+	Acl             acl.Acl
+	SiteCacheFolder string
 }
 
 func (m *Manager) GetAlist(c echo.Context) error {
@@ -35,7 +35,7 @@ func (m *Manager) GetAlist(c echo.Context) error {
 	// TODO handle html or json
 	// Maybe use HTTPErrorHandler
 	// https://echo.labstack.com/guide/error-handling#custom-http-error-handler
-	pathToFile = fmt.Sprintf("%s/404.html", m.StaticSiteFolder)
+	pathToFile = fmt.Sprintf("%s/404.html", m.SiteCacheFolder)
 	return c.File(pathToFile)
 }
 
@@ -50,7 +50,7 @@ func (m *Manager) serveAlist(urlPath string) (string, error) {
 	uuid := parts[0]
 	isA := parts[1]
 	// This code should only serve the lists?
-	path := fmt.Sprintf("%s/alists/%s.%s", m.StaticSiteFolder, uuid, isA)
+	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, uuid, isA)
 
 	if _, err := os.Stat(path); err == nil {
 		// TODO at this point we can do acl look up.
@@ -62,7 +62,7 @@ func (m *Manager) serveAlist(urlPath string) (string, error) {
 }
 
 func (m *Manager) serveStatic(urlPath string) (string, error) {
-	path := fmt.Sprintf("%s/%s", m.StaticSiteFolder, urlPath[1:])
+	path := fmt.Sprintf("%s/%s", m.SiteCacheFolder, urlPath[1:])
 	if _, err := os.Stat(path); err == nil {
 		return path, nil
 	}

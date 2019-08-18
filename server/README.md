@@ -16,17 +16,27 @@
 
 * Grab the repo
 ```sh
-git clone https://github.com/freshteapot/learnalist.git
-cd learnalist/server
+git clone https://github.com/freshteapot/learnalist-api.git
+cd learnalist-api/server
 ```
 Then we need to fake a few things whilst go-plus improves its handling of go modules
 ```sh
 GO111MODULE=on go mod init
 GO111MODULE=on go mod vendor
 ```
+
+Build the database
+```
+ls db/*.sql | sort | xargs cat | sqlite3 /tmp/server.db
+```
+
 Now we can run the app
 ```sh
-go run commands/api/main.go --port=1234 --database=/tmp/api.db
+go run commands/api/main.go \
+--port=1234 \
+--database=/tmp/server.db \
+--site-builder-dir="/Users/tinkerbell/git/learnalist-api/server/alists/hugo" \
+--site-cache-dir="/Users/tinkerbell/git/learnalist-api/alists/site-cache"
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 

@@ -12,6 +12,7 @@ type Config struct {
 	Domain           string
 	CorsAllowOrigins string
 	StaticSiteFolder string
+	SiteCacheFolder  string
 }
 
 var server *echo.Echo
@@ -21,6 +22,7 @@ func Init(_config Config) {
 	config = _config
 	server = echo.New()
 	server.HideBanner = true
+	// TODO change those which should be to Pre
 	// Middleware
 	server.Use(middleware.RequestID())
 	server.Use(middleware.Logger())

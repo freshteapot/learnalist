@@ -20,6 +20,18 @@ rm ./hugo/data/lists/*
 go run cmd/get-all-my-lists/main.go -basic-auth="XXX=" -data-dir="$(pwd)/hugo/data/lists/"
 go run cmd/make-content/main.go --data-dir="$(pwd)/hugo/data/lists/" --content-dir="$(pwd)/hugo/content/alists/"
 go run cmd/build-static/main.go -static="$(pwd)/hugo"
+```
+
+```
+cd server/alists/
+mkdir -p ./site-cache/
+mkdir -p ./hugo/content/alists/
+mkdir -p ./hugo/data/lists/
+rm ./hugo/content/alists/*
+rm ./hugo/data/lists/*
+go run cmd/get-all-my-lists/main.go -basic-auth="XXX=" -data-dir="$(pwd)/hugo/data/lists/"
+go run cmd/make-content/main.go --data-dir="$(pwd)/hugo/data/lists/" --content-dir="$(pwd)/hugo/content/alists/"
+go run cmd/build-static/main.go -static="$(pwd)/hugo"
 cp -r ./hugo/public-alist/* ./site-cache/
 go run cmd/server/main.go -static="/Users/tinkerbell/git/learnalist-api/alists/site-cache"
 ```

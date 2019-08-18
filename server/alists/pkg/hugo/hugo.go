@@ -5,17 +5,25 @@ import (
 	"time"
 )
 
-type Job struct{}
+type JobConfig struct {
+	StaticSiteFolder string
+}
+
+type Job struct {
+	Config JobConfig
+}
 
 func (d Job) Run() {
-	ProcessContent()
+	ProcessContent(d.Config)
 }
 
-func RegisterContentCreationJob() Job {
-	return Job{}
+func RegisterContentCreationJob(config JobConfig) Job {
+	return Job{
+		Config: config,
+	}
 }
 
-func ProcessContent() {
+func ProcessContent(config JobConfig) {
 	now := time.Now()
-	fmt.Printf("Processing content @ %s\n", now)
+	fmt.Printf("Processing content within %s @ %s\n", config.StaticSiteFolder, now)
 }
