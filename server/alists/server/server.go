@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/labstack/echo/v4"
 )
@@ -17,6 +18,7 @@ type HttpResponseMessage struct {
 type Manager struct {
 	Acl             acl.Acl
 	SiteCacheFolder string
+	HugoHelper      hugo.HugoHelper
 }
 
 func (m *Manager) GetAlist(c echo.Context) error {

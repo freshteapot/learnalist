@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 )
@@ -10,6 +11,7 @@ type Manager struct {
 	Datastore    models.Datastore
 	Acl          acl.Acl
 	DatabaseName string
+	HugoHelper   hugo.HugoHelper
 }
 
 type HttpResponseMessage struct {

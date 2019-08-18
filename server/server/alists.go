@@ -7,14 +7,13 @@ import (
 	"github.com/robfig/cron"
 )
 
-func InitAlists(cron *cron.Cron, acl *acl.Acl) {
-	cron.AddJob("@every 1s", hugo.RegisterContentCreationJob(hugo.JobConfig{
-		StaticSiteFolder: config.StaticSiteFolder,
-	}))
+func InitAlists(cron *cron.Cron, acl *acl.Acl, hugoHelper *hugo.HugoHelper) {
+	cron.AddJob("@every 1s", hugoHelper.RegisterCron())
 
 	m := alists.Manager{
 		Acl:             *acl,
 		SiteCacheFolder: config.SiteCacheFolder,
+		HugoHelper:      *hugoHelper,
 	}
 
 	alists := server.Group("/alists")

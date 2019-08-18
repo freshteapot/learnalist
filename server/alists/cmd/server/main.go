@@ -22,7 +22,7 @@ const (
 )
 
 type siteConfig struct {
-	StaticSiteFolder string
+	HugoFolder string
 }
 
 var config siteConfig
@@ -43,7 +43,7 @@ func main() {
 	if *staticSiteFolder == "" {
 		log.Fatal("Will need the path to static site, add -static=XXX")
 	}
-	config.StaticSiteFolder = *staticSiteFolder
+	config.HugoFolder = *staticSiteFolder
 	//fs := http.FileServer(http.Dir(*staticSiteFolder))
 	//http.Handle("/", fs)
 	http.HandleFunc("/", serveFiles)
@@ -156,7 +156,7 @@ func serveAlist(w http.ResponseWriter, r *http.Request) error {
 	uuid := parts[0]
 	isA := parts[1]
 	// This code should only serve the lists?
-	path := fmt.Sprintf("%s/alists/%s.%s", config.StaticSiteFolder, uuid, isA)
+	path := fmt.Sprintf("%s/alists/%s.%s", config.HugoFolder, uuid, isA)
 
 	if _, err := os.Stat(path); err == nil {
 		// TODO at this point we can do acl look up.
@@ -168,7 +168,7 @@ func serveAlist(w http.ResponseWriter, r *http.Request) error {
 
 func serveStatic(w http.ResponseWriter, r *http.Request) error {
 	// path/to/whatever does *not* exist
-	path := fmt.Sprintf("%s/%s", config.StaticSiteFolder, r.URL.Path[1:])
+	path := fmt.Sprintf("%s/%s", config.HugoFolder, r.URL.Path[1:])
 	if _, err := os.Stat(path); err == nil {
 		// path/to/whatever exists
 		http.ServeFile(w, r, path)

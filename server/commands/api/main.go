@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
@@ -16,15 +17,16 @@ func main() {
 	domain := flag.String("domain", "learnalist.net", "The domain.")
 	port := flag.Int("port", 80, "Port to listen on.")
 	corsAllowedOrigins := flag.String("cors-allowed-origins", "", "Use , between allowed domains.")
-	staticSiteFolder := flag.String("site-builder-dir", "", "path to static site builder")
+
 	siteCacheFolder := flag.String("site-cache-dir", "", "path to site cache")
+	hugoFolder := flag.String("hugo-dir", "", "path to static site builder")
 	flag.Parse()
 
-	*staticSiteFolder = strings.TrimRight(*staticSiteFolder, "/")
+	*hugoFolder = strings.TrimRight(*hugoFolder, "/")
 	*siteCacheFolder = strings.TrimRight(*siteCacheFolder, "/")
 
-	if *staticSiteFolder == "" {
-		log.Fatal("Will need the path to site builder directory, add -site-builder-dir=XXX")
+	if *hugoFolder == "" {
+		log.Fatal("Will need the path to site builder directory, add -hugo-dir=XXX")
 	}
 
 	if *siteCacheFolder == "" {
@@ -35,17 +37,19 @@ func main() {
 		Port:             *port,
 		Domain:           *domain,
 		CorsAllowOrigins: *corsAllowedOrigins,
-		StaticSiteFolder: *staticSiteFolder,
+		HugoFolder:       *hugoFolder,
 		SiteCacheFolder:  *siteCacheFolder,
 	}
 	server.Init(serverConfig)
 
 	cron := cron.NewCron()
 	db := database.NewDB(*databaseName)
+	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder)
+
 	// Setup access control layer.
 	acl := acl.NewAclFromModel(*databaseName)
-	server.InitApi(db, acl)
-	server.InitAlists(cron, acl)
+	server.InitApi(db, acl, hugoHelper)
+	server.InitAlists(cron, acl, hugoHelper)
 
 	server.Run()
 }

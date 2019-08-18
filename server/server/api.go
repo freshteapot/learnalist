@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
@@ -14,11 +15,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitApi(db *sqlx.DB, acl *acl.Acl) {
+func InitApi(db *sqlx.DB, acl *acl.Acl, hugoHelper *hugo.HugoHelper) {
 	dal := models.NewDAL(db, acl)
 	m := api.Manager{
-		Datastore: dal,
-		Acl:       *acl,
+		Datastore:  dal,
+		Acl:        *acl,
+		HugoHelper: *hugoHelper,
 	}
 
 	authenticate.LookUp = m.Datastore.GetUserByCredentials

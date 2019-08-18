@@ -110,6 +110,8 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
+	// Save to hugo
+	m.HugoHelper.Write(aList)
 	statusCode := http.StatusOK
 	if method == http.MethodPost {
 		statusCode = http.StatusCreated

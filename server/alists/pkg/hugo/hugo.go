@@ -1,29 +1,21 @@
 package hugo
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-type JobConfig struct {
-	StaticSiteFolder string
+type HugoHelper struct {
+	Cwd              string
+	DataDirectory    string
+	ContentDirectory string
 }
 
-type Job struct {
-	Config JobConfig
-}
+func NewHugoHelper(cwd string) *HugoHelper {
+	// TODO make sure the dataDir exists
+	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
+	contentDirectory := fmt.Sprintf("%s/content/alists", cwd)
 
-func (d Job) Run() {
-	ProcessContent(d.Config)
-}
-
-func RegisterContentCreationJob(config JobConfig) Job {
-	return Job{
-		Config: config,
+	return &HugoHelper{
+		Cwd:              cwd,
+		DataDirectory:    dataDirectory,
+		ContentDirectory: contentDirectory,
 	}
-}
-
-func ProcessContent(config JobConfig) {
-	now := time.Now()
-	fmt.Printf("Processing content within %s @ %s\n", config.StaticSiteFolder, now)
 }

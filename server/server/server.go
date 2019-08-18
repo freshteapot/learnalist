@@ -11,7 +11,7 @@ type Config struct {
 	Port             int
 	Domain           string
 	CorsAllowOrigins string
-	StaticSiteFolder string
+	HugoFolder string
 	SiteCacheFolder  string
 }
 
