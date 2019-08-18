@@ -10,7 +10,7 @@ func InitAlists(acl *acl.Acl) {
 		Acl:              *acl,
 		StaticSiteFolder: config.StaticSiteFolder,
 	}
-
+	alists.InitListenForFiles()
 	alists := server.Group("/alists")
 
 	alists.GET("/*", m.GetAlist)

@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/memwey/casbin-sqlx-adapter v0.0.0-20190422174420-ca80b24eb615
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
+	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.1
 	github.com/stretchr/testify v1.3.0
