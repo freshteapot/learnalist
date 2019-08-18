@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
@@ -24,9 +25,15 @@ func (suite *ApiSuite) SetupSuite() {
 	db := database.NewTestDB()
 	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
 	dal = models.NewDAL(db, acl)
+
+	hugoHelper := new(mocks.HugoSiteBuilder)
+
+	// setup expectations with a placeholder in the argument list
+
 	m = Manager{
-		Datastore: dal,
-		Acl:       *acl,
+		Datastore:  dal,
+		Acl:        *acl,
+		HugoHelper: hugoHelper,
 	}
 }
 

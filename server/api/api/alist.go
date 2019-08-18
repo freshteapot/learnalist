@@ -31,7 +31,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
+	uuid := strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
 
 	if uuid == "" {
 		response := HttpResponseMessage{
@@ -74,7 +74,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	if method == http.MethodPut {
 		// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
 		r := c.Request()
-		inputUuid = strings.TrimPrefix(r.URL.Path, "/v1/alist/")
+		inputUuid = strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
 	}
 
 	defer c.Request().Body.Close()
@@ -122,7 +122,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	alist_uuid := strings.TrimPrefix(r.URL.Path, "/v1/alist/")
+	alist_uuid := strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
 
 	user := c.Get("loggedInUser").(uuid.User)
 	response := HttpResponseMessage{}

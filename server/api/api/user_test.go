@@ -77,7 +77,7 @@ func (suite *ApiSuite) TestPostRegisterRepeat() {
 
 func (suite *ApiSuite) createNewUser(input string) (statusCode int, responseBytes []byte) {
 	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/register", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	suite.NoError(m.V1PostRegister(c))

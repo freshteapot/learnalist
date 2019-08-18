@@ -147,7 +147,7 @@ func (suite *ApiSuite) shareAlist(userUUID string, input string) (statusCode int
 		Uuid: userUUID,
 	}
 
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/share/alist", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/share/alist", input)
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)

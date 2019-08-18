@@ -11,7 +11,7 @@ type Manager struct {
 	Datastore    models.Datastore
 	Acl          acl.Acl
 	DatabaseName string
-	HugoHelper   hugo.HugoHelper
+	HugoHelper   hugo.HugoSiteBuilder
 }
 
 type HttpResponseMessage struct {

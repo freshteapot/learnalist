@@ -10,6 +10,25 @@ git pull --rebase origin master
 cd server/
 GO111MODULE=on sh build.sh
 ```
+
+Create the files for hugo
+```
+mkdir -p /var/www/learnalist-api/hugo/{data/lists,content/alists}
+chown -R www-data:www-data /var/www/learnalist-api/
+```
+
+Do you need to update hugo?
+```
+cp -r /root/work/src/github.com/freshteapot/learnalist-api/server/alists/hugo /var/www/learnalist-api
+chown -R www-data:www-data /var/www/learnalist-api/
+```
+
+Make sure site-cache exists
+```
+mkdir -p /var/www/learnalist-api/site-cache
+chown -R www-data:www-data /var/www/learnalist-api/
+```
+
 Make a backup of the one running
 ```sh
 cp /root/work/bin/api api.last.working
@@ -17,7 +36,7 @@ cp /root/work/bin/api api.last.working
 
 Move it to where supervisor will find it.
 ```sh
-mv apiserver /root/work/bin/api
+mv apiserver /root/work/bin/server
 ```
 When ready, reload
 ```sh

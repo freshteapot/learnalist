@@ -20,7 +20,7 @@ func (suite *ApiSuite) TestGetVersion() {
 
 func (suite *ApiSuite) getVersion() (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := "/v1/version"
+	uri := "/api/v1/version"
 
 	req, rec := setupFakeEndpoint(method, uri, "")
 	e := echo.New()

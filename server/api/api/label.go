@@ -63,7 +63,7 @@ func (m *Manager) V1RemoveUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	r := c.Request()
 	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	label := strings.TrimPrefix(r.URL.Path, "/v1/labels/")
+	label := strings.TrimPrefix(r.URL.Path, "/api/v1/labels/")
 	fmt.Println("Sad times to need to do it.")
 	err := m.Datastore.RemoveUserLabel(label, user.Uuid)
 	response := HttpResponseMessage{}

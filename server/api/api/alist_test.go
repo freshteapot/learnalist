@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/mock"
 )
 
 func (suite *ApiSuite) TestAlistV3Api() {
@@ -109,6 +111,10 @@ func (suite *ApiSuite) TestAlistApi() {
 	type listOfUuidsOnly []uuidOnly
 	var listOfUuids listOfUuidsOnly
 	var listUuid uuidOnly
+
+	testHugoHelper := new(mocks.HugoSiteBuilder)
+	testHugoHelper.On("Write", mock.Anything)
+	m.HugoHelper = testHugoHelper
 
 	inputUserA := getValidUserRegisterInput("a")
 	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
@@ -293,7 +299,7 @@ func (suite *ApiSuite) TestDeleteAlistNotFound() {
 
 func (suite *ApiSuite) updateAlist(userUUID, alistUUID string, input string) (statusCode int, body []byte) {
 	method := http.MethodPut
-	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/api/v1/alist/%s", alistUUID)
 	user := &uuid.User{
 		Uuid: userUUID,
 	}
@@ -311,7 +317,7 @@ func (suite *ApiSuite) createAList(userUUID, input string) (statusCode int, resp
 		Uuid: userUUID,
 	}
 
-	req, rec := setupFakeEndpoint(http.MethodPost, "/v1/alist", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/alist", input)
 	e := echo.New()
 	c := e.NewContext(req, rec)
 	c.Set("loggedInUser", *user)
@@ -322,7 +328,7 @@ func (suite *ApiSuite) createAList(userUUID, input string) (statusCode int, resp
 
 func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCode int, responseBytes []byte) {
 	method := http.MethodDelete
-	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/api/v1/alist/%s", alistUUID)
 
 	user := &uuid.User{
 		Uuid: userUUID,
@@ -337,15 +343,15 @@ func (suite *ApiSuite) removeAlist(userUUID string, alistUUID string) (statusCod
 
 func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := "/v1/alist/by/me"
+	uri := "/api/v1/alist/by/me"
 	if labels != "" {
-		uri = fmt.Sprintf("/v1/alist/by/me?labels=%s", labels)
+		uri = fmt.Sprintf("/api/v1/alist/by/me?labels=%s", labels)
 	}
 	if listType != "" {
-		uri = fmt.Sprintf("/v1/alist/by/me?list_type=%s", listType)
+		uri = fmt.Sprintf("/api/v1/alist/by/me?list_type=%s", listType)
 	}
 	if listType != "" && labels != "" {
-		uri = fmt.Sprintf("/v1/alist/by/me?labels=%s&list_type=%s", labels, listType)
+		uri = fmt.Sprintf("/api/v1/alist/by/me?labels=%s&list_type=%s", labels, listType)
 	}
 
 	user := &uuid.User{
@@ -361,7 +367,7 @@ func (suite *ApiSuite) getListsByMe(userUUID, labels string, listType string) (s
 
 func (suite *ApiSuite) getList(userUUID, alistUUID string) (statusCode int, responseBytes []byte) {
 	method := http.MethodGet
-	uri := fmt.Sprintf("/v1/alist/%s", alistUUID)
+	uri := fmt.Sprintf("/api/v1/alist/%s", alistUUID)
 	user := &uuid.User{
 		Uuid: userUUID,
 	}

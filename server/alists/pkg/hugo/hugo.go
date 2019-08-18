@@ -3,8 +3,15 @@ package hugo
 import (
 	"fmt"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/robfig/cron/v3"
 )
+
+type HugoSiteBuilder interface {
+	MakeContent()
+	Build()
+	Write(aList *alist.Alist)
+}
 
 type HugoHelper struct {
 	Cwd              string
