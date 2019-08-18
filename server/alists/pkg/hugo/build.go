@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/otiai10/copy"
 )
 
 func (h HugoHelper) Build() {
@@ -48,17 +50,22 @@ func buildSite(staticSiteFolder string) {
 }
 
 func copyToSiteCache(staticSiteFolder string) {
-	destinationDir := "./public-alist/"
-	siteCacheDir := "../site-cache/"
 
-	parts := []string{"-r", destinationDir, siteCacheDir}
-	cmd := exec.Command("cp", parts...)
-	cmd.Dir = staticSiteFolder
-	out, err := cmd.Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(string(out))
+	destinationDir := staticSiteFolder + "/public-alist/"
+	siteCacheDir := staticSiteFolder + "/../site-cache/"
+
+	err := copy.Copy(destinationDir, siteCacheDir)
+	fmt.Println(err)
+	/*
+		parts := []string{"-r", destinationDir, siteCacheDir}
+		cmd := exec.Command("cp", parts...)
+		cmd.Dir = staticSiteFolder
+		out, err := cmd.Output()
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
+	//fmt.Println(string(out))
 }
 
 func emptyDestinationDir(staticSiteFolder string) {

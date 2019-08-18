@@ -11,6 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.5
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/memwey/casbin-sqlx-adapter v0.0.0-20190422174420-ca80b24eb615
+	github.com/otiai10/copy v1.0.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/satori/go.uuid v1.2.0
