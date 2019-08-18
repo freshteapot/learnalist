@@ -31,7 +31,7 @@ chown -R www-data:www-data /var/www/learnalist-api/
 
 Make a backup of the one running
 ```sh
-cp /root/work/bin/api api.last.working
+cp /root/work/bin/server server.last.working
 ```
 
 Move it to where supervisor will find it.
