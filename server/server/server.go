@@ -11,7 +11,7 @@ type Config struct {
 	Port             int
 	Domain           string
 	CorsAllowOrigins string
-	HugoFolder string
+	HugoFolder       string
 	SiteCacheFolder  string
 }
 
@@ -24,9 +24,9 @@ func Init(_config Config) {
 	server.HideBanner = true
 	// TODO change those which should be to Pre
 	// Middleware
-	server.Use(middleware.RequestID())
-	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
+	server.Use(middleware.Logger())
+	server.Use(middleware.RequestID())
 
 	server.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 9,
