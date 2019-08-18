@@ -42,14 +42,15 @@ func main() {
 	}
 	server.Init(serverConfig)
 
-	cron := cron.NewCron()
+	masterCron := cron.NewCron()
 	db := database.NewDB(*databaseName)
-	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder)
+	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron)
+	hugoHelper.RegisterCronJob()
 
 	// Setup access control layer.
 	acl := acl.NewAclFromModel(*databaseName)
 	server.InitApi(db, acl, hugoHelper)
-	server.InitAlists(cron, acl, hugoHelper)
+	server.InitAlists(acl, hugoHelper)
 
 	server.Run()
 }

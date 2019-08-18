@@ -16,4 +16,6 @@ func (h HugoHelper) Write(aList *alist.Alist) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	h.RegisterCronJob()
 }

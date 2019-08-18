@@ -1,14 +1,20 @@
 package hugo
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/robfig/cron/v3"
+)
 
 type HugoHelper struct {
 	Cwd              string
 	DataDirectory    string
 	ContentDirectory string
+	cronEntryID      cron.EntryID
+	cron             *cron.Cron
 }
 
-func NewHugoHelper(cwd string) *HugoHelper {
+func NewHugoHelper(cwd string, _cron *cron.Cron) *HugoHelper {
 	// TODO make sure the dataDir exists
 	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
 	contentDirectory := fmt.Sprintf("%s/content/alists", cwd)
@@ -17,5 +23,7 @@ func NewHugoHelper(cwd string) *HugoHelper {
 		Cwd:              cwd,
 		DataDirectory:    dataDirectory,
 		ContentDirectory: contentDirectory,
+		cronEntryID:      0,
+		cron:             _cron,
 	}
 }

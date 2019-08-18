@@ -14,6 +14,7 @@ func (h HugoHelper) Build() {
 	toPublish := getFilesToPublish(staticSiteFolder)
 	if len(toPublish) == 0 {
 		fmt.Println("Nothing to publish")
+		h.StopCronJob()
 		return
 	}
 

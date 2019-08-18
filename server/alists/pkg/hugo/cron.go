@@ -13,9 +13,22 @@ func (d Job) Run() {
 	d.Helper.ProcessContent()
 }
 
-func (h HugoHelper) RegisterCron() Job {
-	return Job{
+func (h HugoHelper) RegisterCronJob() {
+	if h.cronEntryID != 0 {
+		return
+	}
+
+	entryID, _ := h.cron.AddJob("@every 1s", Job{
 		Helper: &h,
+	})
+
+	h.cronEntryID = entryID
+}
+
+func (h HugoHelper) StopCronJob() {
+	if h.cronEntryID != 0 {
+		h.cron.Remove(h.cronEntryID)
+		h.cronEntryID = 0
 	}
 }
 
