@@ -140,7 +140,7 @@ func (acl Acl) MakeListPublic(alistUUID string) {
 func (acl Acl) MakeListPrivate(alistUUID string) {
 	share := getRoleKeyListShare(alistUUID)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
-	acl.enforcer.AddPolicy(share, alistUUID, "shared")
+	acl.enforcer.AddPolicy(share, alistUUID, "private")
 }
 
 // MakeListPrivateForOwner Make the list private for the owner to read
@@ -152,7 +152,7 @@ func (acl Acl) MakeListPrivateForOwner(alistUUID string) {
 
 	share := getRoleKeyListShare(alistUUID)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
-	acl.enforcer.AddPolicy(share, alistUUID, "private")
+	acl.enforcer.AddPolicy(share, alistUUID, "owner")
 }
 
 func (acl Acl) IsListPublic(alistUUID string) bool {
@@ -160,11 +160,11 @@ func (acl Acl) IsListPublic(alistUUID string) bool {
 }
 
 func (acl Acl) IsListPrivate(alistUUID string) bool {
-	return acl.isListShared(alistUUID, "private")
+	return acl.isListShared(alistUUID, "owner")
 }
 
 func (acl Acl) IsListShared(alistUUID string) bool {
-	return acl.isListShared(alistUUID, "shared")
+	return acl.isListShared(alistUUID, "private")
 }
 
 func (acl Acl) isListShared(alistUUID string, shareType string) bool {

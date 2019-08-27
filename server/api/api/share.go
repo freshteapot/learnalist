@@ -108,20 +108,24 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	message := ""
 	if input.Action == ActionShareWithPublic {
 		m.Acl.MakeListPublic(aList.Uuid)
+		message = "List is now public"
 	}
 
 	if input.Action == ActionShareWithOwner {
 		m.Acl.MakeListPrivateForOwner(aList.Uuid)
+		message = "List is now private to the owner"
 	}
 
 	if input.Action == ActionShareWithPrivate {
 		m.Acl.MakeListPrivate(aList.Uuid)
+		message = "List is now private to the owner and those granted access"
 	}
 
 	response := HttpResponseMessage{
-		Message: "List is now public",
+		Message: message,
 	}
 	return c.JSON(http.StatusOK, response)
 }
