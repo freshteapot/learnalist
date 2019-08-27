@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api"
+	"github.com/freshteapot/learnalist-api/server/api/api"
 )
 
 type Config struct {
