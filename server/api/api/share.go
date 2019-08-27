@@ -11,9 +11,17 @@ import (
 )
 
 const (
-	ActionRevoke = "revoke"
-	ActionGrant  = "grant"
+	ActionRevoke           = "revoke"
+	ActionGrant            = "grant"
+	ActionShareWithPublic  = "public"
+	ActionShareWithOwner   = "owner"
+	ActionShareWithPrivate = "private"
 )
+
+type HttpShareListReadAccessInput struct {
+	AlistUUID string `json:"alist_uuid"`
+	Action    string `json:"action"`
+}
 
 type HttpShareListWithUserInput struct {
 	UserUUID  string `json:"user_uuid"`
@@ -45,21 +53,75 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	if aList.User.Uuid == user.Uuid {
-		if input.UserUUID != user.Uuid {
-			if !m.Datastore.UserExists(input.UserUUID) {
-				response := HttpResponseMessage{
-					Message: i18n.SuccessUserNotFound,
-				}
-				return c.JSON(http.StatusNotFound, response)
+	if aList.User.Uuid != user.Uuid {
+		response := HttpResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	if input.UserUUID != user.Uuid {
+		if !m.Datastore.UserExists(input.UserUUID) {
+			response := HttpResponseMessage{
+				Message: i18n.SuccessUserNotFound,
 			}
-			if input.Action == ActionGrant {
-				m.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
-			}
-			if input.Action == ActionRevoke {
-				m.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
-			}
+			return c.JSON(http.StatusNotFound, response)
+		}
+		if input.Action == ActionGrant {
+			m.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
+		}
+		if input.Action == ActionRevoke {
+			m.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
 		}
 	}
+
 	return c.JSON(http.StatusOK, input)
+}
+
+func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	var input = &HttpShareListReadAccessInput{}
+
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	err := json.Unmarshal(jsonBytes, input)
+	if err != nil {
+		response := HttpResponseMessage{
+			Message: i18n.PostShareListJSONFailure,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
+	if aList == nil {
+		response := HttpResponseMessage{
+			Message: i18n.SuccessAlistNotFound,
+		}
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	if aList.User.Uuid != user.Uuid {
+		response := HttpResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	if input.Action == ActionShareWithPublic {
+		m.Acl.MakeListPublic(aList.Uuid)
+	}
+
+	if input.Action == ActionShareWithOwner {
+		m.Acl.MakeListPrivateForOwner(aList.Uuid)
+	}
+
+	if input.Action == ActionShareWithPrivate {
+		m.Acl.MakeListPrivate(aList.Uuid)
+	}
+
+	response := HttpResponseMessage{
+		Message: "List is now public",
+	}
+	return c.JSON(http.StatusOK, response)
 }

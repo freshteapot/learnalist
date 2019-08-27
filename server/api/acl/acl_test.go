@@ -276,7 +276,7 @@ func (suite *AclSuite) TestListShareAccessIsShared() {
 	aList := alist.NewTypeV1()
 	aList.Uuid = alistUUID
 	acl.CreateListRoles(alistUUID, userUUIDOwner)
-	acl.MakeListShared(alistUUID)
+	acl.MakeListPrivate(alistUUID)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	suite.False(acl.IsListPublic(alistUUID))
 	suite.True(acl.IsListShared(alistUUID))

@@ -148,6 +148,7 @@ AND
 		log.Println(err)
 	}
 
+	// TODO Should we trigger a cleanup of site-cache?
 	dal.Acl.DeleteListRoles(aList.Uuid)
 	return err
 }

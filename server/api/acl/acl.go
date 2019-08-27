@@ -129,18 +129,21 @@ func (acl Acl) HasUserPublicWriteAccess(userUUID string) bool {
 	return acl.enforcer.Enforce(userUUID, "public", "write")
 }
 
+// MakeListPublic Make the list readable by all
 func (acl Acl) MakeListPublic(alistUUID string) {
 	share := getRoleKeyListShare(alistUUID)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
 	acl.enforcer.AddPolicy(share, alistUUID, "public")
 }
 
-func (acl Acl) MakeListShared(alistUUID string) {
+// MakeListPrivate Make the list private for people with read access
+func (acl Acl) MakeListPrivate(alistUUID string) {
 	share := getRoleKeyListShare(alistUUID)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
 	acl.enforcer.AddPolicy(share, alistUUID, "shared")
 }
 
+// MakeListPrivateForOwner Make the list private for the owner to read
 func (acl Acl) MakeListPrivateForOwner(alistUUID string) {
 	// This magically removes the users, but not the actual policy
 	// Much to learn

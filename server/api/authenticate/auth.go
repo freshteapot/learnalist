@@ -62,17 +62,3 @@ func HashIt(user LoginUser) (string, error) {
 	storedHash := fmt.Sprintf("%d", hash)
 	return storedHash, nil
 }
-
-func ValidateUserViaBasicAuthIfExists(username string, password string, c echo.Context) (bool, error) {
-	loginUser := &LoginUser{
-		Username: username,
-		Password: password,
-	}
-	user, err := LookUp(*loginUser)
-	if err != nil {
-		return true, nil
-	}
-
-	c.Set("loggedInUser", *user)
-	return true, nil
-}

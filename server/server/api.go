@@ -53,6 +53,7 @@ func InitApi(db *sqlx.DB, acl *acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHe
 	//e.POST("/alist/v4", m.V1PostAlist)
 	v1.POST("/alist", m.V1SaveAlist)
 	v1.POST("/share/alist", m.V1ShareAlist)
+	v1.PUT("/share/readaccess", m.V1ShareListReadAccess)
 	v1.PUT("/alist/:uuid", m.V1SaveAlist)
 	v1.DELETE("/alist/:uuid", m.V1RemoveAlist)
 	// Labels

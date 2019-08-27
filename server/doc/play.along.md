@@ -161,7 +161,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
 
 Grant example
 ```sh
-curl 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
+curl -POST 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
   "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
   "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
   "action": "grant"
@@ -170,9 +170,33 @@ curl 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
 
 Revoke example
 ```sh
-curl 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
+curl -POST 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
   "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
   "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
   "action": "revoke"
 }'
 ```
+
+
+Share list with the public
+```sh
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
+  "action": "public"
+}'
+```
+
+Share list privately
+```sh
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
+  "action": "private"
+}'
+```
+
+Share list only with owner
+```sh
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
+  "action": "owner"
+}'

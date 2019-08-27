@@ -11,6 +11,7 @@ type HugoSiteBuilder interface {
 	MakeContent()
 	Build()
 	Write(aList *alist.Alist)
+	// TODO should we remove via here?
 }
 
 type HugoHelper struct {
