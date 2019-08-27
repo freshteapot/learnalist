@@ -31,3 +31,15 @@ for _, policy := range allNamedObjects {
   fmt.Println(filteredPolicy)
 }
 ```
+
+Filter policy on position 2 to get action
+
+```
+items := acl.enforcer.GetFilteredPolicy(2, "read")
+```
+
+Filter policy on position 1 to get obj
+
+```
+items := acl.enforcer.GetFilteredPolicy(1)
+```
