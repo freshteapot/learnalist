@@ -226,7 +226,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 		return nil, err
 	}
 
-	dal.Acl.CreateListRoles(aList.Uuid)
+	dal.Acl.CreateListRoles(aList.Uuid, aList.User.Uuid)
 	return &aList, nil
 }
 

@@ -15,8 +15,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitApi(db *sqlx.DB, acl *acl.Acl, hugoHelper *hugo.HugoHelper) {
-	dal := models.NewDAL(db, acl)
+func InitApi(db *sqlx.DB, acl *acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper) {
 	m := api.Manager{
 		Datastore:  dal,
 		Acl:        *acl,

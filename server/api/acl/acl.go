@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/casbin/casbin"
-	"github.com/freshteapot/learnalist-api/server/api/alist"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 )
@@ -58,26 +57,35 @@ func (acl Acl) createPublicRole() {
 }
 
 // CreateListRoles create roles, to allow users to have read or write access to a list.
-func (acl Acl) CreateListRoles(alistUUID string) {
+func (acl Acl) CreateListRoles(alistUUID string, userUUID string) {
 	read := getRoleKeyListRead(alistUUID)
 	write := getRoleKeyListWrite(alistUUID)
+	owner := getRoleKeyListOwner(alistUUID)
+
 	acl.enforcer.AddPolicy(read, alistUUID, "read")
 	acl.enforcer.AddPolicy(write, alistUUID, "write")
+	acl.enforcer.AddPolicy(owner, alistUUID, "owner")
 
 	acl.MakeListPrivateForOwner(alistUUID)
+
+	acl.enforcer.AddRoleForUser(userUUID, owner)
 }
 
 func (acl Acl) DeleteListRoles(alistUUID string) {
 	read := getRoleKeyListRead(alistUUID)
 	write := getRoleKeyListWrite(alistUUID)
 	share := getRoleKeyListShare(alistUUID)
+	owner := getRoleKeyListOwner(alistUUID)
+
 	// Remove the policy
 	acl.enforcer.RemovePolicy(read, alistUUID, "read")
 	acl.enforcer.RemovePolicy(write, alistUUID, "write")
+	acl.enforcer.RemovePolicy(owner, alistUUID, "owner")
 
 	// Remove access to the deleted policy
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, read)
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, write)
+	acl.enforcer.RemoveFilteredGroupingPolicy(1, owner)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
 
 }
@@ -105,11 +113,16 @@ func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
 	acl.enforcer.DeleteRoleForUser(userUUID, read)
 }
 
-func (acl Acl) HasUserListReadAccess(userUUID string, aList *alist.Alist) bool {
-	if userUUID == aList.User.Uuid {
+func (acl Acl) HasUserListReadAccess(userUUID string, alistUUID string) bool {
+	if acl.enforcer.Enforce(userUUID, alistUUID, "owner") {
 		return true
 	}
-	return acl.enforcer.Enforce(userUUID, aList.Uuid, "read")
+
+	if acl.enforcer.Enforce(userUUID, alistUUID, "read") {
+		return true
+	}
+
+	return acl.IsListPublic(alistUUID)
 }
 
 func (acl Acl) HasUserPublicWriteAccess(userUUID string) bool {
@@ -166,4 +179,8 @@ func getRoleKeyListWrite(alistUUID string) string {
 
 func getRoleKeyListShare(alistUUID string) string {
 	return fmt.Sprintf("%s:list:share", alistUUID)
+}
+
+func getRoleKeyListOwner(alistUUID string) string {
+	return fmt.Sprintf("%s:list:owner", alistUUID)
 }

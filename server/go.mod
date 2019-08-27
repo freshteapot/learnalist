@@ -8,6 +8,7 @@ require (
 	github.com/gookit/validate v1.1.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.5
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/memwey/casbin-sqlx-adapter v0.0.0-20190422174420-ca80b24eb615

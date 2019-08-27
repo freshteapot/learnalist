@@ -1,13 +1,15 @@
 package server
 
 import (
-	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/acl"
+	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,23 +19,39 @@ type HttpResponseMessage struct {
 
 type Manager struct {
 	Acl             acl.Acl
+	Datastore       models.Datastore
 	SiteCacheFolder string
 	HugoHelper      hugo.HugoHelper
 }
 
+type ErrorHttpCode int
+
 func (m *Manager) GetAlist(c echo.Context) error {
 	var pathToFile string
-	var err error
+	var err ErrorHttpCode
+
 	uri := c.Request().URL.Path
-	pathToFile, err = m.serveAlist(uri)
+	// Can this be null?
+	user := c.Get("loggedInUser")
+	userUUID := ""
+	if user != nil {
+		userUUID = user.(uuid.User).Uuid
+	}
+	pathToFile, err = m.serveAlist(userUUID, uri)
 	if pathToFile != "" {
 		return c.File(pathToFile)
 	}
 
-	pathToFile, err = m.serveStatic(uri)
-	if err == nil {
+	if err == http.StatusForbidden {
+		//TODO use a better warning
+		return c.String(http.StatusForbidden, "Not allowed access")
+	}
+
+	pathToFile, _ = m.serveStatic(uri)
+	if pathToFile != "" {
 		return c.File(pathToFile)
 	}
+
 	// TODO handle html or json
 	// Maybe use HTTPErrorHandler
 	// https://echo.labstack.com/guide/error-handling#custom-http-error-handler
@@ -41,32 +59,33 @@ func (m *Manager) GetAlist(c echo.Context) error {
 	return c.File(pathToFile)
 }
 
-func (m *Manager) serveAlist(urlPath string) (string, error) {
+func (m *Manager) serveAlist(userUUID string, urlPath string) (string, ErrorHttpCode) {
 	parts := strings.Split(urlPath, "/")
 	suffix := parts[len(parts)-1]
 	parts = strings.Split(suffix, ".")
 	if len(parts) != 2 {
-		return "", errors.New("List not found")
+		return "", http.StatusFound
 	}
 
-	uuid := parts[0]
+	alistUUID := parts[0]
 	isA := parts[1]
 	// This code should only serve the lists?
-	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, uuid, isA)
+	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(path); err == nil {
 		// TODO at this point we can do acl look up.
-
-		// http.ServeFile(w, r, path)
-		return path, nil
+		if !m.Acl.HasUserListReadAccess(userUUID, alistUUID) {
+			return "", http.StatusForbidden
+		}
+		return path, http.StatusOK
 	}
-	return "", errors.New("List not found")
+	return "", http.StatusNotFound
 }
 
-func (m *Manager) serveStatic(urlPath string) (string, error) {
+func (m *Manager) serveStatic(urlPath string) (string, ErrorHttpCode) {
 	path := fmt.Sprintf("%s/%s", m.SiteCacheFolder, urlPath[1:])
 	if _, err := os.Stat(path); err == nil {
-		return path, nil
+		return path, http.StatusOK
 	}
-	return "", errors.New("File not found")
+	return "", http.StatusNotFound
 }

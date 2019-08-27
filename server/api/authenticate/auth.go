@@ -33,9 +33,6 @@ func SkipBasicAuth(c echo.Context) bool {
 	return false
 }
 
-// TODO remove
-// var basicAuth = "chris:chris"
-
 func ValidateBasicAuth(username string, password string, c echo.Context) (bool, error) {
 	loginUser := &LoginUser{
 		Username: username,
@@ -64,4 +61,18 @@ func HashIt(user LoginUser) (string, error) {
 	hash := h.Sum64()
 	storedHash := fmt.Sprintf("%d", hash)
 	return storedHash, nil
+}
+
+func ValidateUserViaBasicAuthIfExists(username string, password string, c echo.Context) (bool, error) {
+	loginUser := &LoginUser{
+		Username: username,
+		Password: password,
+	}
+	user, err := LookUp(*loginUser)
+	if err != nil {
+		return true, nil
+	}
+
+	c.Set("loggedInUser", *user)
+	return true, nil
 }

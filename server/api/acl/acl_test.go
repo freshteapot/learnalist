@@ -47,8 +47,9 @@ func (suite *AclSuite) TestPublicWrite() {
 }
 
 func (suite *AclSuite) TestCreateListRoles() {
+	userUUIDOwner := "owner123"
 	alistUUID := "fakeList123"
-	acl.CreateListRoles(alistUUID)
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 
 	filteredPolicy := acl.enforcer.GetFilteredPolicy(1, alistUUID)
 	policyRead := filteredPolicy[0]
@@ -78,6 +79,13 @@ func (suite *AclSuite) TestCreateListRoles() {
 	suite.Equal(0, len(filteredPolicy))
 }
 
+func (suite *AclSuite) TestReadAccessForOwner() {
+	userUUIDOwner := "owner123"
+	alistUUID := "fakeList123"
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
+	suite.True(acl.HasUserListReadAccess(userUUIDOwner, alistUUID))
+}
+
 func (suite *AclSuite) TestGrantListPublicWriteAccess() {
 	userUUID := "fakeUser123"
 	acl.GrantListPublicWriteAccess(userUUID)
@@ -90,45 +98,43 @@ func (suite *AclSuite) TestGrantListPublicWriteAccess() {
 }
 
 func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fakeList123"
-	aList := alist.NewTypeV1()
-	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	roles := acl.enforcer.GetRolesForUser(userUUID)
 	suite.Equal(1, len(roles))
 	suite.True(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
 	suite.True(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
-	suite.True(acl.HasUserListReadAccess(userUUID, aList))
+	suite.True(acl.HasUserListReadAccess(userUUID, alistUUID))
 
 	// Follow the path if the user is the owner of the list
-	aList.User.Uuid = userUUID
-	suite.True(acl.HasUserListReadAccess(userUUID, aList))
-	aList.User.Uuid = ""
+	suite.True(acl.HasUserListReadAccess(userUUID, alistUUID))
 
 	acl.RevokeListReadAccess(userUUID, alistUUID)
 	roles = acl.enforcer.GetRolesForUser(userUUID)
 	suite.Equal(0, len(roles))
 	suite.False(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
 	suite.False(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
-	suite.False(acl.HasUserListReadAccess(userUUID, aList))
+	suite.False(acl.HasUserListReadAccess(userUUID, alistUUID))
 }
 
 func (suite *AclSuite) TestDeleteRoleWithGrantSet() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fakeList123"
-	aList := alist.NewTypeV1()
-	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
-	suite.Equal(4, len(acl.enforcer.GetAllSubjects()))
-	suite.Equal(1, len(acl.enforcer.GetAllRoles()))
-	suite.True(acl.HasUserListReadAccess(userUUID, aList))
+	suite.Equal(5, len(acl.enforcer.GetAllSubjects()))
+	suite.Equal(2, len(acl.enforcer.GetAllRoles()))
+	suite.True(acl.HasUserListReadAccess(userUUID, alistUUID))
 	acl.DeleteListRoles(alistUUID)
 	suite.Equal(1, len(acl.enforcer.GetAllSubjects()))
 	suite.Equal(0, len(acl.enforcer.GetAllRoles()))
-	suite.False(acl.HasUserListReadAccess(userUUID, aList))
+	suite.False(acl.HasUserListReadAccess(userUUID, alistUUID))
 }
 
 func (suite *AclSuite) TestGetAllForAUser() {
@@ -146,11 +152,11 @@ func (suite *AclSuite) TestGelAllLists() {
 		"fake345",
 		"fake567",
 	}
-
+	userUUIDOwner := "owner123"
 	for _, alistUUID := range alistUUIDs {
 		aList := alist.NewTypeV1()
 		aList.Uuid = alistUUID
-		acl.CreateListRoles(alistUUID)
+		acl.CreateListRoles(alistUUID, userUUIDOwner)
 	}
 
 	// array
@@ -163,6 +169,7 @@ func (suite *AclSuite) TestGelAllLists() {
 }
 
 func (suite *AclSuite) TestGetAllUsersForList() {
+	userUUIDOwner := "owner123"
 	userUUIDs := []string{
 		"fakeUser-123",
 		"fakeUser-456",
@@ -177,7 +184,7 @@ func (suite *AclSuite) TestGetAllUsersForList() {
 	for _, alistUUID := range alistUUIDs {
 		aList := alist.NewTypeV1()
 		aList.Uuid = alistUUID
-		acl.CreateListRoles(alistUUID)
+		acl.CreateListRoles(alistUUID, userUUIDOwner)
 	}
 
 	alistUUID := alistUUIDs[1]
@@ -193,6 +200,7 @@ func (suite *AclSuite) TestGetAllUsersForList() {
 }
 
 func (suite *AclSuite) TestGelAllReadListsForUser() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUIDs := []string{
 		"fake123",
@@ -206,7 +214,7 @@ func (suite *AclSuite) TestGelAllReadListsForUser() {
 	for _, alistUUID := range alistUUIDs {
 		aList := alist.NewTypeV1()
 		aList.Uuid = alistUUID
-		acl.CreateListRoles(alistUUID)
+		acl.CreateListRoles(alistUUID, userUUIDOwner)
 	}
 
 	alistUUID := alistUUIDs[0]
@@ -219,11 +227,12 @@ func (suite *AclSuite) TestGelAllReadListsForUser() {
 }
 
 func (suite *AclSuite) TestListShareAccessIsPublic() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fake123"
 	aList := alist.NewTypeV1()
 	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	acl.MakeListPublic(alistUUID)
 	suite.True(acl.IsListPublic(alistUUID))
@@ -232,11 +241,12 @@ func (suite *AclSuite) TestListShareAccessIsPublic() {
 }
 
 func (suite *AclSuite) TestListShareAccessIsPrivateByDefault() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fake123"
 	aList := alist.NewTypeV1()
 	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	suite.False(acl.IsListPublic(alistUUID))
 	suite.False(acl.IsListShared(alistUUID))
@@ -244,11 +254,12 @@ func (suite *AclSuite) TestListShareAccessIsPrivateByDefault() {
 }
 
 func (suite *AclSuite) TestListShareAccessIsPrivateAfterPublic() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fake123"
 	aList := alist.NewTypeV1()
 	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	acl.MakeListPublic(alistUUID)
 	suite.True(acl.IsListPublic(alistUUID))
@@ -259,11 +270,12 @@ func (suite *AclSuite) TestListShareAccessIsPrivateAfterPublic() {
 }
 
 func (suite *AclSuite) TestListShareAccessIsShared() {
+	userUUIDOwner := "owner123"
 	userUUID := "fakeUser123"
 	alistUUID := "fake123"
 	aList := alist.NewTypeV1()
 	aList.Uuid = alistUUID
-	acl.CreateListRoles(alistUUID)
+	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.MakeListShared(alistUUID)
 	acl.GrantListReadAccess(userUUID, alistUUID)
 	suite.False(acl.IsListPublic(alistUUID))

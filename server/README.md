@@ -36,7 +36,7 @@ go run commands/api/main.go \
 --port=1234 \
 --database=/tmp/server.db \
 --hugo-dir="/Users/tinkerbell/git/learnalist-api/server/alists/hugo" \
---site-cache-dir="/Users/tinkerbell/git/learnalist-api/alists/site-cache"
+--site-cache-dir="/Users/tinkerbell/git/learnalist-api/server/alists/site-cache"
 
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
