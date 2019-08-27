@@ -148,7 +148,7 @@ AND
 		log.Println(err)
 	}
 
-	dal.Acl.DeleteListRole(aList.Uuid)
+	dal.Acl.DeleteListRoles(aList.Uuid)
 	return err
 }
 
@@ -226,7 +226,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 		return nil, err
 	}
 
-	dal.Acl.CreateListRole(aList.Uuid)
+	dal.Acl.CreateListRoles(aList.Uuid)
 	return &aList, nil
 }
 

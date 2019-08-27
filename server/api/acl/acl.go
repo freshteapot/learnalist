@@ -57,23 +57,29 @@ func (acl Acl) createPublicRole() {
 	acl.enforcer.AddPolicy("public:write", "public", "write")
 }
 
-// CreateListRole create roles, to allow users to have read or write access to a list.
-func (acl Acl) CreateListRole(alistUUID string) {
-	read := fmt.Sprintf("%s:read", alistUUID)
-	write := fmt.Sprintf("%s:write", alistUUID)
+// CreateListRoles create roles, to allow users to have read or write access to a list.
+func (acl Acl) CreateListRoles(alistUUID string) {
+	read := getRoleKeyListRead(alistUUID)
+	write := getRoleKeyListWrite(alistUUID)
 	acl.enforcer.AddPolicy(read, alistUUID, "read")
 	acl.enforcer.AddPolicy(write, alistUUID, "write")
+
+	acl.MakeListPrivateForOwner(alistUUID)
 }
 
-func (acl Acl) DeleteListRole(alistUUID string) {
-	read := fmt.Sprintf("%s:read", alistUUID)
-	write := fmt.Sprintf("%s:write", alistUUID)
+func (acl Acl) DeleteListRoles(alistUUID string) {
+	read := getRoleKeyListRead(alistUUID)
+	write := getRoleKeyListWrite(alistUUID)
+	share := getRoleKeyListShare(alistUUID)
 	// Remove the policy
 	acl.enforcer.RemovePolicy(read, alistUUID, "read")
 	acl.enforcer.RemovePolicy(write, alistUUID, "write")
+
 	// Remove access to the deleted policy
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, read)
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, write)
+	acl.enforcer.RemoveFilteredPolicy(0, share)
+
 }
 
 // GrantListPublicWriteAccess will allow the user to publish lists to the public section.
@@ -89,12 +95,13 @@ func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
 
 // GrantListReadAccess grant access to the user to be able to read the list.
 func (acl Acl) GrantListReadAccess(userUUID string, alistUUID string) {
-	read := fmt.Sprintf("%s:read", alistUUID)
+	// TODO should I check shared access?
+	read := getRoleKeyListRead(alistUUID)
 	acl.enforcer.AddRoleForUser(userUUID, read)
 }
 
 func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
-	read := fmt.Sprintf("%s:read", alistUUID)
+	read := getRoleKeyListRead(alistUUID)
 	acl.enforcer.DeleteRoleForUser(userUUID, read)
 }
 
@@ -107,4 +114,56 @@ func (acl Acl) HasUserListReadAccess(userUUID string, aList *alist.Alist) bool {
 
 func (acl Acl) HasUserPublicWriteAccess(userUUID string) bool {
 	return acl.enforcer.Enforce(userUUID, "public", "write")
+}
+
+func (acl Acl) MakeListPublic(alistUUID string) {
+	share := getRoleKeyListShare(alistUUID)
+	acl.enforcer.RemoveFilteredPolicy(0, share)
+	acl.enforcer.AddPolicy(share, alistUUID, "public")
+}
+
+func (acl Acl) MakeListShared(alistUUID string) {
+	share := getRoleKeyListShare(alistUUID)
+	acl.enforcer.RemoveFilteredPolicy(0, share)
+	acl.enforcer.AddPolicy(share, alistUUID, "shared")
+}
+
+func (acl Acl) MakeListPrivateForOwner(alistUUID string) {
+	// This magically removes the users, but not the actual policy
+	// Much to learn
+	read := getRoleKeyListRead(alistUUID)
+	acl.enforcer.RemoveFilteredGroupingPolicy(1, read)
+
+	share := getRoleKeyListShare(alistUUID)
+	acl.enforcer.RemoveFilteredPolicy(0, share)
+	acl.enforcer.AddPolicy(share, alistUUID, "private")
+}
+
+func (acl Acl) IsListPublic(alistUUID string) bool {
+	return acl.isListShared(alistUUID, "public")
+}
+
+func (acl Acl) IsListPrivate(alistUUID string) bool {
+	return acl.isListShared(alistUUID, "private")
+}
+
+func (acl Acl) IsListShared(alistUUID string) bool {
+	return acl.isListShared(alistUUID, "shared")
+}
+
+func (acl Acl) isListShared(alistUUID string, shareType string) bool {
+	share := getRoleKeyListShare(alistUUID)
+	return acl.enforcer.HasPolicy(share, alistUUID, shareType)
+}
+
+func getRoleKeyListRead(alistUUID string) string {
+	return fmt.Sprintf("%s:read", alistUUID)
+}
+
+func getRoleKeyListWrite(alistUUID string) string {
+	return fmt.Sprintf("%s:write", alistUUID)
+}
+
+func getRoleKeyListShare(alistUUID string) string {
+	return fmt.Sprintf("%s:list:share", alistUUID)
 }
