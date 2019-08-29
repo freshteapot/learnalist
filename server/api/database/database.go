@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
@@ -43,6 +44,7 @@ func NewTestDB() *sqlx.DB {
 // NewDB load up the database
 func NewDB(dataSourceName string) *sqlx.DB {
 	db, err := sqlx.Connect("sqlite3", dataSourceName)
+
 	// Very aggressive, but clearly a problem if I cant access the database.
 	checkErr(err)
 

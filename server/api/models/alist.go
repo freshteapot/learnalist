@@ -138,9 +138,9 @@ DELETE
 FROM
 	alist_kv
 WHERE
-	uuid=$1
+	uuid=?
 AND
-	user_uuid=$2
+	user_uuid=?
 `
 	_, err = dal.Db.Exec(query, alist_uuid, user_uuid)
 	if err != nil {
@@ -217,10 +217,10 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 
 	if method == http.MethodPost {
 		dal.Acl.CreateListRoles(aList.Uuid, aList.User.Uuid)
-		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values($1, $2, $3, $4)"
+		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)"
 		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
-		queryUpdate := "UPDATE alist_kv SET list_type=$1, body=$2, user_uuid=$3 WHERE uuid=$4"
+		queryUpdate := "UPDATE alist_kv SET list_type=?, body=?, user_uuid=? WHERE uuid=?"
 		_, err = dal.Db.Exec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
 	}
 

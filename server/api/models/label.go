@@ -96,11 +96,11 @@ func (dal *DAL) GetUserLabels(uuid string) ([]string, error) {
 	query := `
 SELECT label
 FROM user_labels
-WHERE user_uuid=$1
+WHERE user_uuid=?
 UNION
 SELECT label
 FROM alist_labels
-WHERE user_uuid=$1
+WHERE user_uuid=?
 
 `
 	err := dal.Db.Select(&labels, query, uuid)
@@ -121,9 +121,9 @@ SELECT
 FROM
 	alist_labels
 WHERE
-	user_uuid=$1
+	user_uuid=?
 AND
-	label=$2
+	label=?
 `
 	var uuids = []string{}
 	err = dal.Db.Select(&uuids, queryForUuids, user, label)
@@ -147,8 +147,8 @@ AND
 	}
 
 	// Update each of them by removin the label in question.
-	query1 := "DELETE FROM user_labels WHERE user_uuid=$1 AND label=$2"
-	query2 := "DELETE FROM alist_labels WHERE user_uuid=$1 AND label=$2"
+	query1 := "DELETE FROM user_labels WHERE user_uuid=? AND label=?"
+	query2 := "DELETE FROM alist_labels WHERE user_uuid=? AND label=?"
 	// TODO MustExec will crash the server
 	tx := dal.Db.MustBegin()
 	tx.MustExec(query1, user, label)
@@ -162,7 +162,7 @@ func (dal *DAL) RemoveLabelsForAlist(uuid string) error {
 		return nil
 	}
 
-	query := "DELETE FROM alist_labels WHERE alist_uuid=$1"
+	query := "DELETE FROM alist_labels WHERE alist_uuid=?"
 
 	tx := dal.Db.MustBegin()
 	tx.MustExec(query, uuid)
