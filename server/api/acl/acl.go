@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/casbin/casbin"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 )
@@ -12,7 +13,7 @@ type Acl struct {
 	enforcer *casbin.Enforcer
 }
 
-func NewAclFromModel(dataSourceName string) *Acl {
+func NewAclFromModel(db *sqlx.DB) *Acl {
 	// rbac_model.conf
 	modelText := `
 [request_definition]
@@ -31,9 +32,8 @@ e = some(where (p.eft == allow))
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 `
 
-	// TODO share the same from database creation
-	dataSourceName = "file:" + dataSourceName
-	adapter := sqlxadapter.NewAdapter("sqlite3", dataSourceName)
+	adapter := sqlxadapter.NewAdapterByDB(db)
+
 	model := casbin.NewModel(modelText)
 	enforcer := casbin.NewEnforcer(model, adapter)
 	acl := &Acl{

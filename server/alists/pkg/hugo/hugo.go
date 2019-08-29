@@ -18,7 +18,7 @@ type HugoHelper struct {
 	Cwd              string
 	DataDirectory    string
 	ContentDirectory string
-	cronEntryID      cron.EntryID
+	cronEntryID      *cron.EntryID
 	cron             *cron.Cron
 }
 
@@ -26,12 +26,15 @@ func NewHugoHelper(cwd string, _cron *cron.Cron) *HugoHelper {
 	// TODO make sure the dataDir exists
 	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
 	contentDirectory := fmt.Sprintf("%s/content/alists", cwd)
+	// This is required to keep track of the memory, I think.
+	var empty cron.EntryID
+	empty = 0
 
 	return &HugoHelper{
 		Cwd:              cwd,
 		DataDirectory:    dataDirectory,
 		ContentDirectory: contentDirectory,
-		cronEntryID:      0,
+		cronEntryID:      &empty,
 		cron:             _cron,
 	}
 }

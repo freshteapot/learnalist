@@ -24,22 +24,25 @@ func (h HugoHelper) Build() {
 	buildSite(staticSiteFolder)
 	uuids := getPublishedFiles(staticSiteFolder)
 
-	// Copy each file over, including non alist files
+	// Copy each file over, including non alist files and directories
 	copyToSiteCache(staticSiteFolder)
 
 	// Empty hugo destination dir
-	emptyDestinationDir(staticSiteFolder)
+	// emptyDestinationDir(staticSiteFolder)
 
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
 	for _, uuid := range uuids {
 		// Remove from content
 		// Remove from data directory
+		// Remove from public-alist directory
 		deleteFiles(staticSiteFolder, uuid)
 	}
 }
 
 func buildSite(staticSiteFolder string) {
-	parts := strings.Split("--cleanDestinationDir -e alist --config=config/alist/config.toml", " ")
+	// This seems to be too aggressive
+	// parts := strings.Split("--cleanDestinationDir -e alist --config=config/alist/config.toml", " ")
+	parts := strings.Split("-e alist --config=config/alist/config.toml", " ")
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
 	out, err := cmd.Output()
@@ -151,13 +154,15 @@ func deleteFiles(staticSiteFolder string, uuid string) {
 	files := []string{
 		fmt.Sprintf("%s/content/alists/%s.md", staticSiteFolder, uuid),
 		fmt.Sprintf("%s/data/lists/%s.json", staticSiteFolder, uuid),
+		fmt.Sprintf("%s/public-alist/alists/%s.json", staticSiteFolder, uuid),
+		fmt.Sprintf("%s/public-alist/alists/%s.html", staticSiteFolder, uuid),
 	}
 
 	for _, path := range files {
 		fmt.Printf("Removing %s\n", path)
 		err := os.Remove(path)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(fmt.Sprintf("Failed to remove %s", err))
 		}
 	}
 }

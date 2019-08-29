@@ -1,5 +1,9 @@
 # Learnalist - API
 
+## Requirements
+* hugo to be installed (> v0.57.2)
+* golang (> go1.12.5)
+
 ## How ugly is the code?
 ![Code coverage, manually ran](./coverage_badge.png) <a href="https://goreportcard.com/report/github.com/freshteapot/learnalist-api" target="_blank">learnalist-api on goreportcard.</a> (In a new window).
 

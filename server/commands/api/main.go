@@ -49,7 +49,7 @@ func main() {
 	hugoHelper.RegisterCronJob()
 
 	// Setup access control layer.
-	acl := acl.NewAclFromModel(*databaseName)
+	acl := acl.NewAclFromModel(db)
 
 	dal := models.NewDAL(db, acl)
 	server.InitApi(db, acl, dal, hugoHelper)
