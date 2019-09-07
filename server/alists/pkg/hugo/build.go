@@ -124,7 +124,7 @@ func (h HugoHelper) getPublishedFiles() []string {
 // deleteFiles
 // 	- Remove from content
 // 	- Remove from data directory
-//  - Remove from public-alist directory
+//	- Remove from public-alist directory
 func (h HugoHelper) deleteFiles(uuid string) {
 	staticSiteFolder := h.Cwd
 	files := []string{
