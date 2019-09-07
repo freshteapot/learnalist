@@ -23,7 +23,6 @@ func (h HugoHelper) Build() {
 	h.buildSite()
 	uuids := h.getPublishedFiles()
 
-	// Copy each file over, including non alist files and directories
 	h.copyToSiteCache()
 
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
@@ -44,6 +43,7 @@ func (h HugoHelper) buildSite() {
 	fmt.Println(string(out))
 }
 
+// Copy each file over, including non alist files and directories
 func (h HugoHelper) copyToSiteCache() {
 	staticSiteFolder := h.Cwd
 	siteCacheDir := h.SiteCacheFolder
