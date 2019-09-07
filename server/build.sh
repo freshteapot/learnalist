@@ -1,4 +1,4 @@
-pathToVersion="github.com/freshteapot/learnalist-api/server/api/api/version"
+pathToVersion="github.com/freshteapot/learnalist-api/server/api/version"
 gitHash=$(git rev-parse HEAD)
 buildVersion="v0.0.1"
 # This is in UTC
