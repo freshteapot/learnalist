@@ -43,3 +43,25 @@ Filter policy on position 1 to get obj
 ```
 items := acl.enforcer.GetFilteredPolicy(1)
 ```
+
+
+# To run go run with the vendor folder
+
+```sh
+go mod download
+go mod vendor
+go run -mod=vendor *
+```
+
+# To run smoke test
+
+```sh
+cd e2e
+go test .
+```
+
+# Make smoke test binary
+```sh
+cd e2e
+go test -o smoke-test -c
+```
