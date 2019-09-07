@@ -13,19 +13,13 @@ GO111MODULE=on sh build.sh
 
 Create the files for hugo
 ```
-mkdir -p /var/www/learnalist-api/hugo/{data/lists,content/alists}
-chown -R www-data:www-data /var/www/learnalist-api/
-```
-
-Do you need to update hugo?
-```
-cp -r /root/work/src/github.com/freshteapot/learnalist-api/server/alists/hugo /var/www/learnalist-api
-chown -R www-data:www-data /var/www/learnalist-api/
-```
-
-Make sure site-cache exists
-```
 mkdir -p /var/www/learnalist-api/site-cache
+cp -r $(pwd)/alists/hugo /var/www/learnalist-api/hugo
+mkdir -p /var/www/learnalist-api/hugo/{public-alist,content/alists,data/lists}
+chown -R www-data:www-data /var/www/learnalist-api/
+```
+
+```
 chown -R www-data:www-data /var/www/learnalist-api/
 ```
 
@@ -41,6 +35,11 @@ mv apiserver /root/work/bin/server
 When ready, reload
 ```sh
 supervisorctl reload learnalist-api
+```
+
+Check the logs
+```
+supervisorctl tail -f  learnalist-api
 ```
 
 
