@@ -23,7 +23,7 @@ type ApiSuite struct {
 
 func (suite *ApiSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	acl := acl.NewAclFromModel(db)
 	dal = models.NewDAL(db, acl)
 
 	hugoHelper := new(mocks.HugoSiteBuilder)

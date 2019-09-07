@@ -17,7 +17,7 @@ type ModelSuite struct {
 
 func (suite *ModelSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(database.PathToTestSqliteDb)
+	acl := acl.NewAclFromModel(db)
 	dal = NewDAL(db, acl)
 }
 

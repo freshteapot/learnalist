@@ -103,7 +103,7 @@ FROM alist_labels
 WHERE user_uuid=?
 
 `
-	err := dal.Db.Select(&labels, query, uuid)
+	err := dal.Db.Select(&labels, query, uuid, uuid)
 	if err != nil {
 		return labels, err
 	}
