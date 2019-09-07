@@ -5,7 +5,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	casbinModel "github.com/casbin/casbin/v2/model"
-	sqlxadapter "github.com/freshteapot/casbin-sqlx-adapter"
+	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
