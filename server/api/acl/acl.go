@@ -3,10 +3,11 @@ package acl
 import (
 	"fmt"
 
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
+	casbinModel "github.com/casbin/casbin/v2/model"
+	sqlxadapter "github.com/freshteapot/casbin-sqlx-adapter"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
-	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 )
 
 type Acl struct {
@@ -34,8 +35,8 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 
 	adapter := sqlxadapter.NewAdapterByDB(db)
 
-	model := casbin.NewModel(modelText)
-	enforcer := casbin.NewEnforcer(model, adapter)
+	model, _ := casbinModel.NewModelFromString(modelText)
+	enforcer, _ := casbin.NewEnforcer(model, adapter)
 	acl := &Acl{
 		enforcer: enforcer,
 	}
@@ -114,19 +115,28 @@ func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
 }
 
 func (acl Acl) HasUserListReadAccess(userUUID string, alistUUID string) bool {
-	if acl.enforcer.Enforce(userUUID, alistUUID, "owner") {
+	var pass bool
+
+	pass, _ = acl.enforcer.Enforce(userUUID, alistUUID, "owner")
+	if pass {
 		return true
 	}
 
-	if acl.enforcer.Enforce(userUUID, alistUUID, "read") {
+	if acl.IsListPublic(alistUUID) {
 		return true
 	}
 
-	return acl.IsListPublic(alistUUID)
+	pass, _ = acl.enforcer.Enforce(userUUID, alistUUID, "read")
+	if pass {
+		return true
+	}
+
+	return false
 }
 
 func (acl Acl) HasUserPublicWriteAccess(userUUID string) bool {
-	return acl.enforcer.Enforce(userUUID, "public", "write")
+	pass, _ := acl.enforcer.Enforce(userUUID, "public", "write")
+	return pass
 }
 
 // MakeListPublic Make the list readable by all

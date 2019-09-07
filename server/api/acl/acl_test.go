@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	casbinErrors "github.com/casbin/casbin/v2/errors"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/jmoiron/sqlx"
@@ -23,7 +24,7 @@ func (suite *AclSuite) SetupSuite() {
 }
 
 func (suite *AclSuite) SetupTest() {
-	acl = NewAclFromModel(database.PathToTestSqliteDb)
+	acl = NewAclFromModel(db)
 }
 
 func (suite *AclSuite) TearDownTest() {
@@ -89,7 +90,8 @@ func (suite *AclSuite) TestReadAccessForOwner() {
 func (suite *AclSuite) TestGrantListPublicWriteAccess() {
 	userUUID := "fakeUser123"
 	acl.GrantListPublicWriteAccess(userUUID)
-	roles := acl.enforcer.GetRolesForUser(userUUID)
+	roles, err := acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal("public:write", roles[0])
 	suite.True(acl.HasUserPublicWriteAccess(userUUID))
 
@@ -104,7 +106,8 @@ func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
 
 	acl.CreateListRoles(alistUUID, userUUIDOwner)
 	acl.GrantListReadAccess(userUUID, alistUUID)
-	roles := acl.enforcer.GetRolesForUser(userUUID)
+	roles, err := acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal(1, len(roles))
 	suite.True(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
 	suite.True(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
@@ -114,7 +117,8 @@ func (suite *AclSuite) TestGrantAndRevokeListReadAccess() {
 	suite.True(acl.HasUserListReadAccess(userUUID, alistUUID))
 
 	acl.RevokeListReadAccess(userUUID, alistUUID)
-	roles = acl.enforcer.GetRolesForUser(userUUID)
+	roles, err = acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal(0, len(roles))
 	suite.False(acl.enforcer.HasRoleForUser(userUUID, "fakeList123:read"))
 	suite.False(acl.enforcer.Enforce(userUUID, alistUUID, "read"))
@@ -139,10 +143,12 @@ func (suite *AclSuite) TestDeleteRoleWithGrantSet() {
 
 func (suite *AclSuite) TestGetAllForAUser() {
 	userUUID := "fakeUser123"
-	roles := acl.enforcer.GetRolesForUser(userUUID)
+	roles, err := acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal(len(roles), 0)
 	acl.GrantListPublicWriteAccess(userUUID)
-	roles = acl.enforcer.GetRolesForUser(userUUID)
+	roles, err = acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal(roles[0], "public:write")
 }
 
@@ -189,13 +195,15 @@ func (suite *AclSuite) TestGetAllUsersForList() {
 
 	alistUUID := alistUUIDs[1]
 	read := fmt.Sprintf("%s:read", alistUUID)
-	users := acl.enforcer.GetUsersForRole(read)
+	users, err := acl.enforcer.GetUsersForRole(read)
+	suite.Equal(err, casbinErrors.ERR_NAME_NOT_FOUND)
 	suite.Equal(0, len(users))
 
 	for _, userUUID := range userUUIDs {
 		acl.GrantListReadAccess(userUUID, alistUUID)
 	}
-	users = acl.enforcer.GetUsersForRole(read)
+	users, err = acl.enforcer.GetUsersForRole(read)
+	suite.Nil(err)
 	suite.Equal(3, len(users))
 }
 
@@ -208,7 +216,8 @@ func (suite *AclSuite) TestGelAllReadListsForUser() {
 		"fake567",
 	}
 
-	roles := acl.enforcer.GetRolesForUser(userUUID)
+	roles, err := acl.enforcer.GetRolesForUser(userUUID)
+	suite.Nil(err)
 	suite.Equal(0, len(roles))
 
 	for _, alistUUID := range alistUUIDs {
@@ -219,10 +228,12 @@ func (suite *AclSuite) TestGelAllReadListsForUser() {
 
 	alistUUID := alistUUIDs[0]
 	read := fmt.Sprintf("%s:read", alistUUID)
-	users := acl.enforcer.GetUsersForRole(read)
+	users, err := acl.enforcer.GetUsersForRole(read)
+	suite.Equal(err, casbinErrors.ERR_NAME_NOT_FOUND)
 	suite.Equal(0, len(users))
 	acl.GrantListReadAccess(userUUID, alistUUID)
-	users = acl.enforcer.GetUsersForRole(read)
+	users, err = acl.enforcer.GetUsersForRole(read)
+	suite.Nil(err)
 	suite.Equal(1, len(users))
 }
 

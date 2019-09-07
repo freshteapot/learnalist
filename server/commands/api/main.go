@@ -45,7 +45,7 @@ func main() {
 
 	masterCron := cron.NewCron()
 
-	//*databaseName = "root:mysecretpassword@/learnalistapi"
+	// *databaseName = "root:mysecretpassword@/learnalistapi"
 	db := database.NewDB(*databaseName)
 	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron)
 	hugoHelper.RegisterCronJob()

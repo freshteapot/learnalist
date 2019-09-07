@@ -56,8 +56,8 @@ func TestSharePublic(t *testing.T) {
 	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
 
-	for i := 0; i <= 100; i++ {
-		go learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+	for j := 0; j <= 10; j++ {
+		learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
 	}
 }
 
