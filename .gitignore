@@ -3,6 +3,8 @@
 
 # GO: Ignore all files in vendor
 server/vendor/
+server/apiserver
+server/e2e/smoke-test
 
 # www-ui
 www-ui/node_modules
