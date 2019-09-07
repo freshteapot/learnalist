@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
 )
@@ -44,7 +44,6 @@ func NewTestDB() *sqlx.DB {
 // NewDB load up the database
 func NewDB(dataSourceName string) *sqlx.DB {
 	//z	dataSourceName = dataSourceName + "?cache=shared&_busy_timeout=5000&_journal_mode=WAL"
-	fmt.Println(dataSourceName)
 	db, err := sqlx.Connect("sqlite3", dataSourceName)
 	db.SetMaxOpenConns(1)
 	// Very aggressive, but clearly a problem if I cant access the database.

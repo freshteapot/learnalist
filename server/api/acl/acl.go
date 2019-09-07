@@ -5,9 +5,9 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	casbinModel "github.com/casbin/casbin/v2/model"
-	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // All the cool kids are doing it.
+	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 )
 
 type Acl struct {
@@ -88,7 +88,6 @@ func (acl Acl) DeleteListRoles(alistUUID string) {
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, write)
 	acl.enforcer.RemoveFilteredGroupingPolicy(1, owner)
 	acl.enforcer.RemoveFilteredPolicy(0, share)
-
 }
 
 // GrantListPublicWriteAccess will allow the user to publish lists to the public section.

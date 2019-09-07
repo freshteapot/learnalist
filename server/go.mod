@@ -5,7 +5,6 @@ go 1.12
 require (
 	github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92
 	github.com/casbin/casbin/v2 v2.0.2
-	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gookit/validate v1.1.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kr/pretty v0.1.0 // indirect
