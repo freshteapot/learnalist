@@ -39,6 +39,14 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
+
+	if !m.Acl.HasUserListReadAccess(user.Uuid, uuid) {
+		response := HttpResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
 	alist, err := m.Datastore.GetAlist(uuid)
 	if err != nil {
 		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
@@ -48,13 +56,6 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	// TODO swap the order
-	if !m.Acl.HasUserListReadAccess(user.Uuid, alist.Uuid) {
-		response := HttpResponseMessage{
-			Message: i18n.AclHttpAccessDeny,
-		}
-		return c.JSON(http.StatusForbidden, response)
-	}
 	return c.JSON(http.StatusOK, *alist)
 }
 

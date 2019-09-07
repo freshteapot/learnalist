@@ -138,9 +138,9 @@ func (suite *ApiSuite) TestAlistApi() {
 	raw = nil
 
 	statusCode, responseBytes = suite.getList(userUUID, "fake")
-	suite.Equal(http.StatusNotFound, statusCode)
+	suite.Equal(http.StatusForbidden, statusCode)
 	json.Unmarshal(responseBytes, &raw)
-	suite.Equal(fmt.Sprintf(i18n.ApiAlistNotFound, "fake"), raw["message"].(string))
+	suite.Equal(i18n.AclHttpAccessDeny, raw["message"].(string))
 	raw = nil
 	// Get my lists
 	statusCode, responseBytes = suite.getListsByMe(userUUID, "", "")
