@@ -26,8 +26,7 @@ func (h HugoHelper) RegisterCronJob() {
 
 func (h HugoHelper) StopCronJob() {
 	if *h.cronEntryID != 0 {
-		fmt.Println("stopping")
-		fmt.Println(*h.cronEntryID)
+		fmt.Println("stopping cronjob")
 		h.cron.Remove(*h.cronEntryID)
 		*h.cronEntryID = 0
 	}

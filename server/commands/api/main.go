@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
 )
 
@@ -30,8 +32,16 @@ func main() {
 		log.Fatal("Will need the path to site builder directory, add -hugo-dir=XXX")
 	}
 
+	if !utils.IsDir(*hugoFolder) {
+		log.Fatal(fmt.Sprintf("%s is not a directory", *hugoFolder))
+	}
+
 	if *siteCacheFolder == "" {
 		log.Fatal("Will need the path to site cache directory, add -site-cache-dir=XXX")
+	}
+
+	if !utils.IsDir(*siteCacheFolder) {
+		log.Fatal(fmt.Sprintf("%s is not a directory", *siteCacheFolder))
 	}
 
 	serverConfig := server.Config{
@@ -47,7 +57,7 @@ func main() {
 
 	// *databaseName = "root:mysecretpassword@/learnalistapi"
 	db := database.NewDB(*databaseName)
-	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron)
+	hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron, serverConfig.SiteCacheFolder)
 	hugoHelper.RegisterCronJob()
 
 	// Setup access control layer.

@@ -25,7 +25,7 @@ func (h HugoHelper) Build() {
 	uuids := getPublishedFiles(staticSiteFolder)
 
 	// Copy each file over, including non alist files and directories
-	copyToSiteCache(staticSiteFolder)
+	copyToSiteCache(staticSiteFolder, h.SiteCacheFolder)
 
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
 	for _, uuid := range uuids {
@@ -44,10 +44,8 @@ func buildSite(staticSiteFolder string) {
 	fmt.Println(string(out))
 }
 
-func copyToSiteCache(staticSiteFolder string) {
-
+func copyToSiteCache(staticSiteFolder string, siteCacheDir string) {
 	destinationDir := staticSiteFolder + "/public-alist/"
-	siteCacheDir := staticSiteFolder + "/../site-cache/"
 
 	err := copy.Copy(destinationDir, siteCacheDir)
 	fmt.Println(err)

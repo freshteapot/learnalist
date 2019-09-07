@@ -36,11 +36,15 @@ ls db/*.sql | sort | xargs cat | sqlite3 /tmp/server.db
 
 Now we can run the app
 ```sh
+mkdir -p /tmp/learnalist-api/site-cache
+cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
+mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}
+
 go run commands/api/main.go \
 --port=1234 \
 --database=/tmp/server.db \
---hugo-dir="/Users/tinkerbell/git/learnalist-api/server/alists/hugo" \
---site-cache-dir="/Users/tinkerbell/git/learnalist-api/server/alists/site-cache"
+--hugo-dir="/tmp/learnalist-api/hugo" \
+--site-cache-dir="/tmp/learnalist-api/site-cache"
 
 ```
 Your server should now be running on port 1234 with the database created at /tmp/api.db
