@@ -12,8 +12,7 @@ import (
 )
 
 func (h HugoHelper) Build() {
-	staticSiteFolder := h.Cwd
-	toPublish := getFilesToPublish(staticSiteFolder)
+	toPublish := h.getFilesToPublish()
 	if len(toPublish) == 0 {
 		fmt.Println("Nothing to publish")
 		h.StopCronJob()
@@ -21,19 +20,20 @@ func (h HugoHelper) Build() {
 	}
 
 	fmt.Printf("Build static site for %d lists\n", len(toPublish))
-	buildSite(staticSiteFolder)
-	uuids := getPublishedFiles(staticSiteFolder)
+	h.buildSite()
+	uuids := h.getPublishedFiles()
 
 	// Copy each file over, including non alist files and directories
-	copyToSiteCache(staticSiteFolder, h.SiteCacheFolder)
+	h.copyToSiteCache()
 
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
 	for _, uuid := range uuids {
-		deleteFiles(staticSiteFolder, uuid)
+		h.deleteFiles(uuid)
 	}
 }
 
-func buildSite(staticSiteFolder string) {
+func (h HugoHelper) buildSite() {
+	staticSiteFolder := h.Cwd
 	parts := strings.Split("-e alist --config=config/alist/config.toml", " ")
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
@@ -44,14 +44,17 @@ func buildSite(staticSiteFolder string) {
 	fmt.Println(string(out))
 }
 
-func copyToSiteCache(staticSiteFolder string, siteCacheDir string) {
+func (h HugoHelper) copyToSiteCache() {
+	staticSiteFolder := h.Cwd
+	siteCacheDir := h.SiteCacheFolder
 	destinationDir := staticSiteFolder + "/public-alist/"
 
 	err := copy.Copy(destinationDir, siteCacheDir)
 	fmt.Println(err)
 }
 
-func getFilesToPublish(staticSiteFolder string) []string {
+func (h HugoHelper) getFilesToPublish() []string {
+	staticSiteFolder := h.Cwd
 	dataDir := staticSiteFolder + "/content/alists"
 
 	var files []string
@@ -84,7 +87,8 @@ func getFilesToPublish(staticSiteFolder string) []string {
 	return uuids
 }
 
-func getPublishedFiles(staticSiteFolder string) []string {
+func (h HugoHelper) getPublishedFiles() []string {
+	staticSiteFolder := h.Cwd
 	dataDir := staticSiteFolder + "/public-alist"
 	var files []string
 	var uuids []string
@@ -121,7 +125,8 @@ func getPublishedFiles(staticSiteFolder string) []string {
 // 	- Remove from content
 // 	- Remove from data directory
 //  - Remove from public-alist directory
-func deleteFiles(staticSiteFolder string, uuid string) {
+func (h HugoHelper) deleteFiles(uuid string) {
+	staticSiteFolder := h.Cwd
 	files := []string{
 		fmt.Sprintf("%s/content/alists/%s.md", staticSiteFolder, uuid),
 		fmt.Sprintf("%s/data/lists/%s.json", staticSiteFolder, uuid),
