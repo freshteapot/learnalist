@@ -5,6 +5,7 @@
 server/vendor/
 server/apiserver
 server/e2e/smoke-test
+server/profile.cov
 
 # www-ui
 www-ui/node_modules
