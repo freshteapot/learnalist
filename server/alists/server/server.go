@@ -31,7 +31,6 @@ func (m *Manager) GetAlist(c echo.Context) error {
 	var err ErrorHttpCode
 
 	uri := c.Request().URL.Path
-	// Can this be null?
 	user := c.Get("loggedInUser")
 	userUUID := ""
 	if user != nil {
@@ -73,7 +72,6 @@ func (m *Manager) serveAlist(userUUID string, urlPath string) (string, ErrorHttp
 	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(path); err == nil {
-		// TODO at this point we can do acl look up.
 		if !m.Acl.HasUserListReadAccess(userUUID, alistUUID) {
 			return "", http.StatusForbidden
 		}

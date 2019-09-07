@@ -27,7 +27,6 @@ type HugoHelper struct {
 
 func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
-	// TODO make sure the dataDir exists
 	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
 	if !utils.IsDir(dataDirectory) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", dataDirectory))
