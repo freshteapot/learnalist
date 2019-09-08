@@ -29,18 +29,21 @@ GO111MODULE=on go mod init
 GO111MODULE=on go mod vendor
 ```
 
-Build the database
+Setup folder structure
+```sh
+rm -rf /tmp/learnalist-api
+mkdir -p /tmp/learnalist-api/site-cache
+cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
+mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}
 ```
-ls db/*.sql | sort | xargs cat | sqlite3 /tmp/server.db
+
+Build the database
+```sh
+ls db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
 ```
 
 Now we can run the app
 ```sh
-rm -rf /tmp/learnalist-api/
-mkdir -p /tmp/learnalist-api/site-cache
-cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
-mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}
-
 go run commands/api/main.go \
 --port=1234 \
 --database=/tmp/server.db \
