@@ -19,3 +19,14 @@ func (h HugoHelper) Write(aList *alist.Alist) {
 
 	h.RegisterCronJob()
 }
+
+// Remove delete cached files based on list uuid.
+func (h HugoHelper) Remove(uuid string) {
+	h.deleteBuildFiles(uuid)
+
+	files := []string{
+		fmt.Sprintf("%s/alists/%s.html", h.SiteCacheFolder, uuid),
+		fmt.Sprintf("%s/alists/%s.json", h.SiteCacheFolder, uuid),
+	}
+	h.deleteFiles(files)
+}

@@ -36,6 +36,7 @@ ls db/*.sql | sort | xargs cat | sqlite3 /tmp/server.db
 
 Now we can run the app
 ```sh
+rm -rf /tmp/learnalist-api/
 mkdir -p /tmp/learnalist-api/site-cache
 cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
 mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}

@@ -27,7 +27,7 @@ func (h HugoHelper) Build() {
 
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
 	for _, uuid := range uuids {
-		h.deleteFiles(uuid)
+		h.deleteBuildFiles(uuid)
 	}
 }
 
@@ -45,17 +45,15 @@ func (h HugoHelper) buildSite() {
 
 // Copy each file over, including non alist files and directories
 func (h HugoHelper) copyToSiteCache() {
-	staticSiteFolder := h.Cwd
 	siteCacheDir := h.SiteCacheFolder
-	destinationDir := staticSiteFolder + "/public-alist/"
+	destinationDir := h.PublishDirectory
 
 	err := copy.Copy(destinationDir, siteCacheDir)
 	fmt.Println(err)
 }
 
 func (h HugoHelper) getFilesToPublish() []string {
-	staticSiteFolder := h.Cwd
-	dataDir := staticSiteFolder + "/content/alists"
+	dataDir := h.ContentDirectory
 
 	var files []string
 	var uuids []string
@@ -88,8 +86,7 @@ func (h HugoHelper) getFilesToPublish() []string {
 }
 
 func (h HugoHelper) getPublishedFiles() []string {
-	staticSiteFolder := h.Cwd
-	dataDir := staticSiteFolder + "/public-alist"
+	dataDir := h.PublishDirectory
 	var files []string
 	var uuids []string
 	err := filepath.Walk(dataDir, func(path string, info os.FileInfo, err error) error {
@@ -125,15 +122,23 @@ func (h HugoHelper) getPublishedFiles() []string {
 // 	- Remove from content
 // 	- Remove from data directory
 //	- Remove from public-alist directory
-func (h HugoHelper) deleteFiles(uuid string) {
-	staticSiteFolder := h.Cwd
-	files := []string{
-		fmt.Sprintf("%s/content/alists/%s.md", staticSiteFolder, uuid),
-		fmt.Sprintf("%s/data/lists/%s.json", staticSiteFolder, uuid),
-		fmt.Sprintf("%s/public-alist/alists/%s.json", staticSiteFolder, uuid),
-		fmt.Sprintf("%s/public-alist/alists/%s.html", staticSiteFolder, uuid),
-	}
 
+func (h HugoHelper) getBuildFiles(uuid string) []string {
+	files := []string{
+		fmt.Sprintf("%s/%s.md", h.ContentDirectory, uuid),
+		fmt.Sprintf("%s/%s.json", h.DataDirectory, uuid),
+		fmt.Sprintf("%s/alists/%s.json", h.PublishDirectory, uuid),
+		fmt.Sprintf("%s/alists/%s.html", h.PublishDirectory, uuid),
+	}
+	return files
+}
+
+func (h HugoHelper) deleteBuildFiles(uuid string) {
+	files := h.getBuildFiles(uuid)
+	h.deleteFiles(files)
+}
+
+func (h HugoHelper) deleteFiles(files []string) {
 	for _, path := range files {
 		fmt.Printf("Removing %s\n", path)
 		err := os.Remove(path)

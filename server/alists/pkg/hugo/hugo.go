@@ -13,7 +13,8 @@ type HugoSiteBuilder interface {
 	MakeContent()
 	Build()
 	Write(aList *alist.Alist)
-	// TODO should we remove via here?
+	// Remove list via uuid
+	Remove(uuid string)
 }
 
 type HugoHelper struct {
@@ -21,6 +22,7 @@ type HugoHelper struct {
 	DataDirectory    string
 	ContentDirectory string
 	SiteCacheFolder  string
+	PublishDirectory string
 	cronEntryID      *cron.EntryID
 	cron             *cron.Cron
 }
@@ -36,6 +38,11 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 		log.Fatal(fmt.Sprintf("%s is not a directory", contentDirectory))
 	}
 
+	publishDirectory := fmt.Sprintf("%s/public-alist", cwd)
+	if !utils.IsDir(publishDirectory) {
+		log.Fatal(fmt.Sprintf("%s is not a directory", publishDirectory))
+	}
+
 	if !utils.IsDir(siteCacheFolder) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", siteCacheFolder))
 	}
@@ -48,6 +55,7 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 		DataDirectory:    dataDirectory,
 		ContentDirectory: contentDirectory,
 		SiteCacheFolder:  siteCacheFolder,
+		PublishDirectory: publishDirectory,
 		cronEntryID:      &empty,
 		cron:             _cron,
 	}
