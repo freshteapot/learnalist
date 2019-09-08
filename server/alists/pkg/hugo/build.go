@@ -143,7 +143,9 @@ func (h HugoHelper) deleteFiles(files []string) {
 		fmt.Printf("Removing %s\n", path)
 		err := os.Remove(path)
 		if err != nil {
-			fmt.Println(fmt.Sprintf("Failed to remove %s", err))
+			if !strings.HasSuffix(err.Error(), "no such file or directory") {
+				fmt.Println(fmt.Sprintf("Failed to remove %s", err))
+			}
 		}
 	}
 }

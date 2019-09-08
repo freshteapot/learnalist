@@ -114,6 +114,7 @@ func (suite *ApiSuite) TestAlistApi() {
 
 	testHugoHelper := new(mocks.HugoSiteBuilder)
 	testHugoHelper.On("Write", mock.Anything)
+	testHugoHelper.On("Remove", mock.Anything)
 	m.HugoHelper = testHugoHelper
 
 	inputUserA := getValidUserRegisterInput("a")

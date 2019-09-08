@@ -21,6 +21,11 @@ func (_m *HugoSiteBuilder) MakeContent() {
 	_m.Called()
 }
 
+// Remove provides a mock function with given fields: uuid
+func (_m *HugoSiteBuilder) Remove(uuid string) {
+	_m.Called(uuid)
+}
+
 // Write provides a mock function with given fields: aList
 func (_m *HugoSiteBuilder) Write(aList *alist.Alist) {
 	_m.Called(aList)

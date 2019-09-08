@@ -145,6 +145,8 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	// Remove from cache
+	m.HugoHelper.Remove(alist_uuid)
 	response.Message = fmt.Sprintf(i18n.ApiDeleteAlistSuccess, alist_uuid)
 	return c.JSON(http.StatusOK, response)
 }
