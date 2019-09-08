@@ -19,6 +19,7 @@ mkdir -p /var/www/learnalist-api/hugo/{public-alist,content/alists,data/lists}
 chown -R www-data:www-data /var/www/learnalist-api/
 ```
 
+Make sure the ownerships is www-data
 ```
 chown -R www-data:www-data /var/www/learnalist-api/
 ```

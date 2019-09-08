@@ -26,6 +26,34 @@ type Manager struct {
 
 type ErrorHttpCode int
 
+func (m *Manager) GetPlay(c echo.Context) error {
+	response := `
+function setup() {
+	// Turn the list into an object
+	let aList = JSON.parse(JSON.parse(document.querySelector("#data").innerHTML));
+
+	document.querySelector("#play").style.display = "none";
+	var b = document.createElement("my-thing");
+	b.aList = aList;
+	document.querySelector("#play").appendChild(b);
+
+	document.querySelector("#action-play").addEventListener("click", function(){
+		document.querySelector("#list-info").style.display = "none"
+		document.querySelector("#play").style.display = ""
+	})
+
+	document.querySelector("#play").addEventListener("click", function(){
+		document.querySelector("#list-info").style.display = ""
+		document.querySelector("#play").style.display = "none"
+	})
+}
+setup()
+`
+	c.Response().Header().Set("Content-Type", "application/javascript")
+	return c.String(http.StatusOK, response)
+
+}
+
 func (m *Manager) GetAlist(c echo.Context) error {
 	var pathToFile string
 	var err ErrorHttpCode

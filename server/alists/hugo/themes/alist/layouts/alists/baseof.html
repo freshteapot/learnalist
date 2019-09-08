@@ -18,6 +18,10 @@
     {{ range .Site.Params.custom_css }}
       <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
     {{ end }}
+    <!-- TODO dynamic -->
+    {{ $name := printf "alists/js/v1.js"}}
+    <script defer src="{{ relURL (printf "%s" $name) }}"></script>
+    <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
   </head>
 
   <body>

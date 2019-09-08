@@ -15,3 +15,7 @@ server/alists/hugo/content/alists/
 server/alists/hugo/data/lists/
 server/alists/hugo/public-alist/
 server/alists/site-cache/
+
+# svelte
+svelte/node_modules
+svelte/public

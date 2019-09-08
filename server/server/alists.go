@@ -25,5 +25,6 @@ func InitAlists(acl *acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper)
 		Validator: authenticate.ValidateBasicAuth,
 	}))
 
+	alists.GET("/js/play.js", m.GetPlay)
 	alists.GET("/*", m.GetAlist)
 }
