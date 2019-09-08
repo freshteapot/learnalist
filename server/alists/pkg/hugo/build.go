@@ -118,11 +118,6 @@ func (h HugoHelper) getPublishedFiles() []string {
 	return uuids
 }
 
-// deleteFiles
-// 	- Remove from content
-// 	- Remove from data directory
-//	- Remove from public-alist directory
-
 func (h HugoHelper) getBuildFiles(uuid string) []string {
 	files := []string{
 		fmt.Sprintf("%s/%s.md", h.ContentDirectory, uuid),
@@ -133,12 +128,18 @@ func (h HugoHelper) getBuildFiles(uuid string) []string {
 	return files
 }
 
+// deleteBuildFiles
+// 	- Remove from content
+// 	- Remove from data directory
+//	- Remove from hugo publishe directory
 func (h HugoHelper) deleteBuildFiles(uuid string) {
 	files := h.getBuildFiles(uuid)
 	h.deleteFiles(files)
 }
 
 func (h HugoHelper) deleteFiles(files []string) {
+	// TODO Create an issue about a command line option to purge lists that are not in the database
+	// Assume one day, this will get out of sync.
 	for _, path := range files {
 		fmt.Printf("Removing %s\n", path)
 		err := os.Remove(path)
