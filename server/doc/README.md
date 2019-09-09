@@ -8,3 +8,4 @@
 * [Golang tips](./tips.md)
 * [Try curl requests](./play.along.md)
 * [Manual testing of endpoints](./manual.test.md)
+* [developing with svelte, hugo and the server](./developing-with-svelte-hugo-server.md)

@@ -4,10 +4,8 @@
 {{ $interactAllowed := slice "v1"}}
 
 <div id="list-info" class="flex-l mt2 mw8 center">
-  <!-- Menu -->
-
+  <!-- Menu https://github.com/freshteapot/learnalist-api/issues/58 -->
   {{- if in $interactAllowed $aList.info.type -}}
-
   {{ partial (printf "alist/%s/menu.html" $aList.info.type) $aList }}
   {{- end -}}
   <article class="center cf pv5 ph3 ph4-ns mw7">

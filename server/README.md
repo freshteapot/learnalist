@@ -46,7 +46,7 @@ Now we can run the app
 ```sh
 go run commands/api/main.go \
 --port=1234 \
---database=/tmp/server.db \
+--database=/tmp/learnalist-api/server.db \
 --hugo-dir="/tmp/learnalist-api/hugo" \
 --site-cache-dir="/tmp/learnalist-api/site-cache"
 
