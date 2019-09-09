@@ -10,7 +10,10 @@
     ],
     "info": {
         "title": "Days of the Week",
-        "type": "v1"
+        "type": "v1",
+        "interact": {
+          "slideshow": "0"
+        }
     },
     "uuid": "5d4c9869-1d26-567d-82be-497c3521368aa"
 }

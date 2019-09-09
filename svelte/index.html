@@ -13,7 +13,15 @@
 	<script defer src='/v1.js'></script>
 </head>
 
-<body id="body">
-	<interact-v1></interact-v1>
+<body>
+	<v1-menu slideshow="0"></v1-menu>
+	<p id="list-info">Hello</p>
+
+	<div id="play">
+		<v1-slideshow></v1-slideshow>
+	</div>
+<script>
+document.querySelector("#play").style.display = "none";
+</script>
 </body>
 </html>

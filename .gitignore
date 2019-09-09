@@ -11,10 +11,9 @@ server/profile.cov
 www-ui/node_modules
 
 # alists
-server/alists/hugo/content/alists/
-server/alists/hugo/data/lists/
-server/alists/hugo/public-alist/
-server/alists/site-cache/
+hugo/content/alists/
+hugo/data/lists/
+hugo/public-alist/
 
 # svelte
 svelte/node_modules
