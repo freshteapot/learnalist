@@ -33,19 +33,9 @@ function setup() {
 	let aList = JSON.parse(JSON.parse(document.querySelector("#data").innerHTML));
 
 	document.querySelector("#play").style.display = "none";
-	var b = document.createElement("my-thing");
-	b.aList = aList;
-	document.querySelector("#play").appendChild(b);
-
-	document.querySelector("#action-play").addEventListener("click", function(){
-		document.querySelector("#list-info").style.display = "none"
-		document.querySelector("#play").style.display = ""
-	})
-
-	document.querySelector("#play").addEventListener("click", function(){
-		document.querySelector("#list-info").style.display = ""
-		document.querySelector("#play").style.display = "none"
-	})
+	var interact = document.createElement("v1-slideshow");
+	interact.aList = aList;
+	document.querySelector("#play").appendChild(interact);
 }
 setup()
 `

@@ -6,22 +6,25 @@
     <title>{{ block "title" . }}{{ .Site.Title }} {{ with .Params.Title }} | {{ . }}{{ end }}{{ end }}</title>
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
-
     <meta name="viewport" content="width=device-width,minimum-scale=1">
     <link rel="icon" href="{{ relURL (printf "alists/icon.png") }}">
-
-    {{ $stylesheet := .Site.Data.webpack_assets.app }}
-    {{ with $stylesheet.css }}
+    {{- $stylesheet := .Site.Data.webpack_assets.app -}}
+    {{- with $stylesheet.css -}}
       <link href="{{ relURL (printf "%s%s" "dist/" .) }}" rel="stylesheet">
-    {{ end }}
-
-    {{ range .Site.Params.custom_css }}
+    {{- end -}}
+    {{- range .Site.Params.custom_css -}}
       <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
-    {{ end }}
+    {{- end -}}
     <!-- TODO dynamic -->
-    {{ $name := printf "alists/js/v1.js"}}
-    <script defer src="{{ relURL (printf "%s" $name) }}"></script>
+    {{- with $.Params.Uuid -}}
+    {{ $aList := getJSON "data/lists/" $.Params.Uuid ".json" }}
+    {{ $allowed := slice "v1" }}
+    <!-- TODO make it optional -->
+    {{- if in $allowed $aList.info.type -}}
+    <script defer src="{{ relURL (printf "alists/js/%s.js" $aList.info.type) }}"></script>
     <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
+    {{- end -}}
+    {{- end -}}
   </head>
 
   <body>

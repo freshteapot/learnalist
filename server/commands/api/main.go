@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
@@ -43,6 +44,9 @@ func main() {
 	if !utils.IsDir(*siteCacheFolder) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", *siteCacheFolder))
 	}
+	// Convert paths to absolute, allowing /../x
+	*hugoFolder, _ = filepath.Abs(*hugoFolder)
+	*siteCacheFolder, _ = filepath.Abs(*siteCacheFolder)
 
 	serverConfig := server.Config{
 		Port:             *port,
