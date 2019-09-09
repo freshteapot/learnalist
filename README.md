@@ -21,7 +21,7 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 * [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
 
 ## Developing the Web UI
-* look at [Readme](server/doc/developing-with-svelte-hugo-server).
+* look at [Readme](server/doc/developing-with-svelte-hugo-server.md).
 
 ## Mobile app built with flutter
 * [learnalist-mobile](https://github.com/freshteapot/learnalist-mobile).
