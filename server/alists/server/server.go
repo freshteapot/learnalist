@@ -27,6 +27,10 @@ type Manager struct {
 type ErrorHttpCode int
 
 func (m *Manager) GetPlay(c echo.Context) error {
+	// TODO which list,
+	// TODO which list type,
+	// TODO what to include.
+	// TODO can this be static rendered based on the object?
 	response := `
 function setup() {
 	// Turn the list into an object

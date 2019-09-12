@@ -11,10 +11,17 @@
 	<link rel='stylesheet' href='/bundle.css'>
 
 	<script defer src='/v1.js'></script>
+	<script defer src='/user.js'></script>
 </head>
 
 <body>
+	<user-login></user-login>
+	<user-forgot-password></user-forgot-password>
+	<user-logout redirect="/login.html"></user-logout>
+	<user-register></user-register>
+
 	<v1-menu slideshow="0"></v1-menu>
+
 	<p id="list-info">Hello</p>
 
 	<div id="play">

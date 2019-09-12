@@ -17,4 +17,6 @@ hugo/public-alist/
 
 # svelte
 svelte/node_modules
-svelte/public
+svelte/public/*.js
+svelte/public/*.map
+svelte/public/*.css

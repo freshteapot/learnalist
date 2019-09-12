@@ -2,6 +2,19 @@
 
 ---
 
+```sh
+npm install
+```
+
+```sh
+npm run dev:user
+```
+
+```sh
+npm run dev:list:v1
+```
+
+
 # svelte app
 
 This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.

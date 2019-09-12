@@ -15,9 +15,13 @@
     "sirv-cli": "^0.4.4"
   },
   "scripts": {
-    "build": "rollup -c",
-    "autobuild": "rollup -c -w",
-    "dev": "run-p start:dev autobuild",
+    "build:user": "rollup -c rollup.config.user.js",
+    "build:list.v1": "rollup -c rollup.config.list.v1.js",
+    "build": "run-p build:user build:list.v1",
+    "autobuild:user": "rollup -c rollup.config.user.js -w",
+    "autobuild:list:v1": "rollup -c rollup.config.list.v1.js -w",
+    "dev:user": "run-p start:dev autobuild:user",
+    "dev:live:v1": "run-p start:dev autobuild:live:v1",
     "start": "sirv public --single",
     "start:dev": "sirv public --single --dev"
   }
