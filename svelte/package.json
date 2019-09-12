@@ -12,6 +12,7 @@
     "svelte": "^3.10.0"
   },
   "dependencies": {
+    "js-cookie": "^2.2.1",
     "sirv-cli": "^0.4.4"
   },
   "scripts": {
@@ -21,7 +22,7 @@
     "autobuild:user": "rollup -c rollup.config.user.js -w",
     "autobuild:list:v1": "rollup -c rollup.config.list.v1.js -w",
     "dev:user": "run-p start:dev autobuild:user",
-    "dev:live:v1": "run-p start:dev autobuild:live:v1",
+    "dev:list:v1": "run-p start:dev autobuild:list:v1",
     "start": "sirv public --single",
     "start:dev": "sirv public --single --dev"
   }

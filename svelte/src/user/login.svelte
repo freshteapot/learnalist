@@ -1,38 +1,46 @@
-<svelte:options tag="user-login"/>
+<svelte:options tag='user-login'/>
 <script>
-export let lastViewedKey="last.viewed";
-export let redirectOnLogin="/welcome.html";
+import AlreadyLoggedIn from './already-logged-in.svelte';
+import {logIn, loggedIn} from './shared.js'
+
+export let redirectOnLogin='/welcome.html';
 
 let email = '';
 let password = '';
 
 function handleSubmit() {
-	console.log("Try logging them in")
-	console.log("email is " + email)
-	console.log("password is " + password)
+	console.log('Try logging them in');
+	console.log('email is ' + email);
+	console.log('password is ' + password);
 
-	let lastViewed = localStorage.getItem(lastViewedKey);
-	if (!lastViewed) {
-		console.log(redirectOnLogin)
-		lastViewed = redirectOnLogin;
-	}
-
-	window.location = lastViewed;
+	// TODO success
+	console.log('// TODO: Get the token from the server');
+	logIn('abc123', redirectOnLogin)
 }
+
+let isLoggedIn = loggedIn();
 </script>
 
 <style>
 	input { display: block; width: 500px; max-width: 100%; }
 </style>
+
+{#if !isLoggedIn}
 <p>Login with</p>
 <form on:submit|preventDefault={handleSubmit}>
 	<label>Email</label>
-	<input type="text" bind:value={email} />
+	<input type='text' bind:value={email} />
 
 	<label>Password</label>
-	<input type="password" bind:value={password} />
+	<input type='password' bind:value={password} />
 
 	<button disabled={!email || !password} type=submit>
 		Login
 	</button>
+	<p>
+		or <a href="/register.html">register</a>
+	</p>
 </form>
+{:else}
+<AlreadyLoggedIn/>
+{/if}
