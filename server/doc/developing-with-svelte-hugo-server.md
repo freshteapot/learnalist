@@ -45,3 +45,8 @@ cd -
 cd hugo
 hugo server -e alist --config=config/alist/config.toml -w
 ```
+
+# Use a test to make a list and set it to public
+```sh
+go test -run TestSharePublic2 -v .
+```

@@ -7,7 +7,7 @@
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <link rel="icon" href="{{ relURL (printf "alists/icon.png") }}">
+    <link rel="icon" href="{{ relURL (printf "favicon.png") }}">
     {{- $stylesheet := .Site.Data.webpack_assets.app -}}
     {{- with $stylesheet.css -}}
       <link href="{{ relURL (printf "%s%s" "dist/" .) }}" rel="stylesheet">
@@ -15,13 +15,15 @@
     {{- range .Site.Params.custom_css -}}
       <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
     {{- end -}}
+
+    <script defer src="{{ relURL ("js/user.js") }}"></script>
     <!-- TODO dynamic -->
     {{- with $.Params.Uuid -}}
     {{ $aList := getJSON "data/lists/" $.Params.Uuid ".json" }}
     {{ $allowed := slice "v1" }}
     <!-- TODO make it optional -->
     {{- if in $allowed $aList.info.type -}}
-    <script defer src="{{ relURL (printf "alists/js/%s.js" $aList.info.type) }}"></script>
+    <script defer src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
     <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
     {{- end -}}
     {{- end -}}

@@ -49,8 +49,8 @@ go run commands/api/main.go \
 --database=/tmp/learnalist-api/server.db \
 --hugo-dir="/tmp/learnalist-api/hugo" \
 --site-cache-dir="/tmp/learnalist-api/site-cache"
-
 ```
+
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 
 
