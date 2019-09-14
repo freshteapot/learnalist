@@ -21,6 +21,7 @@ if (loggedIn()) {
 	input { display: block; width: 500px; max-width: 100%; }
 </style>
 {#if !isLoggedIn}
+
 <p>Register with email</p>
 <form on:submit|preventDefault={handleSubmit}>
 	<label>Email</label>

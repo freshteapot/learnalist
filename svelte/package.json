@@ -9,7 +9,8 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.0.3",
     "rollup-plugin-terser": "^4.0.4",
-    "svelte": "^3.10.0"
+    "svelte": "^3.10.0",
+    "tachyons": "^4.10.0"
   },
   "dependencies": {
     "js-cookie": "^2.2.1",

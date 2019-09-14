@@ -24,11 +24,35 @@ func main() {
 	rawStrings := string(data)
 	rows := strings.Split(rawStrings, "\n")
 	var aList *alist.Alist
-	if *listType == alist.FromToList {
+
+	switch *listType {
+	case alist.FromToList:
 		aList = parseTypeV2(rows)
+	case alist.SimpleList:
+		aList = parseTypeV1(rows)
+	default:
+		fmt.Println("Nothing todo")
+		return
 	}
+
 	jsonBytes, _ := aList.MarshalJSON()
 	fmt.Println(string(jsonBytes))
+}
+
+func parseTypeV1(rows []string) *alist.Alist {
+	aList := alist.NewTypeV1()
+	data := aList.Data.(alist.TypeV1)
+
+	for _, row := range rows {
+		row = strings.TrimSpace(row)
+		if row == "" {
+			continue
+		}
+		item := row
+		data = append(data, item)
+	}
+	aList.Data = data
+	return aList
 }
 
 func parseTypeV2(rows []string) *alist.Alist {
