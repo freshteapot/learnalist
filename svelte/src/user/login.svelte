@@ -19,7 +19,6 @@ function handleSubmit() {
 }
 
 let isLoggedIn = loggedIn();
-
 </script>
 
 <style>
