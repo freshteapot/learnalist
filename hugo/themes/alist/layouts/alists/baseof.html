@@ -16,6 +16,7 @@
       <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
     {{- end -}}
 
+    <link rel='stylesheet' href='/css/tachyons.min.css'>
     <script defer src="{{ relURL ("js/user.js") }}"></script>
     <!-- TODO dynamic -->
     {{- with $.Params.Uuid -}}
@@ -23,16 +24,16 @@
     {{ $allowed := slice "v1" }}
     <!-- TODO make it optional -->
     {{- if in $allowed $aList.info.type -}}
-    <script defer src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
+    <script src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
+    <!--
     <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
+    -->
     {{- end -}}
     {{- end -}}
   </head>
 
-  <body>
-
-    <main class="pb7" role="main">
-      {{ block "main" . }}{{ end }}
-    </main>
+  <body class="w-100 sans-serif bg-white">
+  	<user-menu></user-menu>
+    {{ block "main" . }}{{- end -}}
   </body>
 </html>

@@ -32,8 +32,12 @@ cd svelte
 # Copy to themes
 ```sh
 npm run build
-cp public/v1.js ../hugo/themes/alist/static/alists/js/
-cp public/v1.js.map ../hugo/themes/alist/static/alists/js/
+cp public/v1.js ../hugo/themes/alist/static/js/
+cp public/v1.js.map ../hugo/themes/alist/static/js/
+cp public/user.js ../hugo/themes/alist/static/js/
+cp public/user.js.map ../hugo/themes/alist/static/js/
+cp public/css/tachyons.min.css ../hugo/themes/alist/static/css/tachyons.min.css
+
 cd ../hugo/
 cp testdata/5d4c9869-1d26-567d-82be-497c3521368a.json data/lists/
 cp testdata/5d4c9869-1d26-567d-82be-497c3521368a.md content/alists/

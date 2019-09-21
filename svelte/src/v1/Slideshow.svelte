@@ -15,9 +15,27 @@
 
 	let loops = 0;
 	let index = -1;
-	let firstTime = 'Welcome, to beginning, click next, or use the right arrow key.';
+	let firstTime = 'Welcome, to beginning, click next, or use the right arrow key..';
 	let show = firstTime;
 	let nextTimeIsLoop = 0;
+
+	/**
+	 * Start / prepare the slideshow for first usage.
+	 * @param {DomElement} _listView
+	 * @param {DomElement} _playView
+	 */
+	export function start(_listElement, _playElement) {
+		show = firstTime;
+		loops = 0;
+		index = -1;
+		nextTimeIsLoop = 0;
+
+		playElement = _playElement;
+		listElement = _listElement;
+		playElement.style.display = '';
+		listElement.style.display = 'none';
+		window.addEventListener('keydown', handleKeydown);
+	};
 
 	function forward(event) {
 		index += 1;
@@ -68,24 +86,6 @@
 		}
 
 	}
-
-	/**
-	 * Start / prepare the slideshow for first usage.
-	 * @param {DomElement} _listView
-	 * @param {DomElement} _playView
-	 */
-	export function start(_listElement, _playElement) {
-		show = firstTime;
-		loops = 0;
-		index = -1;
-		nextTimeIsLoop = 0;
-
-		playElement = _playElement;
-		listElement = _listElement;
-		playElement.style.display = '';
-		listElement.style.display = 'none';
-		window.addEventListener('keydown', handleKeydown);
-	};
 </script>
 <style>
 @import url('/css/tachyons.min.css');

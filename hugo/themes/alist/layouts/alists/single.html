@@ -2,35 +2,40 @@
 {{ $aList := getJSON "data/lists/" .Params.Uuid ".json" }}
 {{ $allowed := slice "v1" "v2" "v3" "v4" }}
 {{ $interactAllowed := slice "v1"}}
-<user-logout redirect="{{ relURL ("login.html") }}"></user-logout>
-
-<div id="list-info" class="flex-l mt2 mw8 center">
+<main class="pa4 black-80">
+  <div id="list-info" class="measure center">
   <!-- Menu https://github.com/freshteapot/learnalist-api/issues/58 -->
-  {{- if in $interactAllowed $aList.info.type -}}
-  {{ partial (printf "alist/%s/menu.html" $aList.info.type) $aList }}
-  {{- end -}}
-  <article class="center cf pv5 ph3 ph4-ns mw7">
-    <header>
-      <h1 class="f1">
-        {{ $aList.info.title }}
-      </h1>
-    </header>
-    {{- with $aList.info.labels -}}
-    <h2>Labels</h2>
-    <ul>
-      {{- range $aList.info.labels -}}
-      <li>{{ . }}</li>
+  	<article >
+  			<header>
+  	      <h1 class="f2 measure">
+          {{- $aList.info.title -}}
+          </h1>
+          {{- with $aList.info.share -}}
+            {{- if in $interactAllowed $aList.info.type -}}
+              {{ partial (printf "alist/%s/menu.html" $aList.info.type) $aList }}
+            {{- end -}}
+          {{- end -}}
+        </header>
+      {{- with $aList.info.labels -}}
+      <h2>Labels</h2>
+      <ul>
+        {{- range $aList.info.labels -}}
+        <li>{{ . }}</li>
+        {{- end -}}
+      </ul>
       {{- end -}}
-    </ul>
-    {{- end -}}
 
-    {{- if in $allowed $aList.info.type -}}
-    <h2>Data</h2>
-    {{ $name := printf "alist/%s/data.html" $aList.info.type }}
-    {{ partial $name $aList }}
-    {{- end -}}
-  </article>
-</div>
-<div id="play"></div>
-<script id="data" type="application/json">{{ $aList | jsonify }}</script>
+      {{- if in $allowed $aList.info.type -}}
+      <h2>Data</h2>
+      {{ $name := printf "alist/%s/data.html" $aList.info.type }}
+      {{ partial $name $aList }}
+      {{- end -}}
+    </article>
+  </div>
+  <div id="play" class="measure center" style="display:none"></div>
+  <script id="data" type="application/json">{{ $aList | jsonify }}</script>
+  {{- if in $interactAllowed $aList.info.type -}}
+  {{ partial (printf "alist/%s/play.html" $aList.info.type) $aList }}
+  {{- end -}}
+</main>
 {{ end }}

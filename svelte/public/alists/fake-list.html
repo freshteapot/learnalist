@@ -44,6 +44,7 @@
 
 <script id="data" type="application/json">"{\"data\":[\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\",\"sunday\"],\"info\":{\"labels\":[],\"title\":\"Days of the Week\",\"type\":\"v1\"},\"uuid\":\"c8363d80-9013-5eeb-907f-67a729495b4a\"}"</script>
 <!-- HACK to access the data -->
+<!--
 <script>
 
 let aList = JSON.parse(JSON.parse(document.querySelector("#data").innerHTML));
@@ -51,5 +52,19 @@ var interact = document.createElement("v1-slideshow");
 interact.aList = aList;
 document.querySelector("#play").appendChild(interact);
 </script>
+-->
+<script>
+	function setup() {
+		// Turn the list into an object
+		let aList = JSON.parse(JSON.parse(document.querySelector("#data").innerHTML));
+
+		document.querySelector("#play").style.display = "none";
+		var interact = document.createElement("v1-slideshow");
+		interact.aList = aList;
+		document.querySelector("#play").appendChild(interact);
+	}
+	setup();
+</script>
+
 </body>
 </html>
