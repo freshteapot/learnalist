@@ -24,10 +24,15 @@ var allowedListTypes = []string{
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
-	Title    string   `json:"title"`
-	ListType string   `json:"type"`
-	Labels   []string `json:"labels"`
-	From     string   `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
+	Title    string    `json:"title"`
+	ListType string    `json:"type"`
+	Labels   []string  `json:"labels"`
+	From     string    `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
+	Interact *Interact `json:"interact,omitempty"`
+}
+
+type Interact struct {
+	Slideshow string `json:"slideshow"`
 }
 
 type InputAlist struct {

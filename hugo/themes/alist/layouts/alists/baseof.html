@@ -15,25 +15,23 @@
     {{- range .Site.Params.custom_css -}}
       <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
     {{- end -}}
-
     <link rel='stylesheet' href='/css/tachyons.min.css'>
     <script defer src="{{ relURL ("js/user.js") }}"></script>
     <!-- TODO dynamic -->
     {{- with $.Params.Uuid -}}
-    {{ $aList := getJSON "data/lists/" $.Params.Uuid ".json" }}
-    {{ $allowed := slice "v1" }}
+      {{- $aList := getJSON "data/lists/" $.Params.Uuid ".json" -}}
+      {{- $allowed := slice "v1" -}}
     <!-- TODO make it optional -->
-    {{- if in $allowed $aList.info.type -}}
-    <script src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
+      {{- if in $allowed $aList.info.type -}}
+        <script src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
     <!--
     <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
     -->
-    {{- end -}}
+      {{- end -}}
     {{- end -}}
   </head>
-
   <body class="w-100 sans-serif bg-white">
-  	<user-menu></user-menu>
-    {{ block "main" . }}{{- end -}}
-  </body>
+	   <user-menu></user-menu>
+     {{- block "main" . -}}{{- end -}}
+   </body>
 </html>

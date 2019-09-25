@@ -107,3 +107,16 @@ func TestMarshalJSON(t *testing.T) {
 
 	assert.Equal(t, jsonStr, string(jsonBytes))
 }
+
+func TestMarshalJSONInteract(t *testing.T) {
+	var jsonBytes []byte
+	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"v1","labels":[],"interact":{"slideshow":"1"}},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+
+	jsonBytes = []byte(jsonStr)
+	aList := new(Alist)
+	assert.NoError(t, aList.UnmarshalJSON(jsonBytes))
+
+	jsonBytes, _ = json.Marshal(aList)
+
+	assert.Equal(t, jsonStr, string(jsonBytes))
+}
