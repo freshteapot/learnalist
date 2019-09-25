@@ -24,6 +24,15 @@ go run commands/api/main.go \
 --site-cache-dir="/tmp/learnalist-api/site-cache"
 ```
 
+# Rebuild from existing database
+
+```
+go run commands/rebuild-static-site/main.go \
+--database=/tmp/learnalist-api/server.db \
+--hugo-dir="$(pwd)/../hugo" \
+--site-cache-dir="/tmp/learnalist-api/site-cache"
+```
+
 # Svelte
 ```
 cd svelte

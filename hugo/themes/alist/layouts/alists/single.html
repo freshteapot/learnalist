@@ -1,5 +1,5 @@
 {{- define "main" -}}
-{{- $aList := getJSON "data/lists/" .Params.Uuid ".json" -}}
+{{- $aList := . -}}
 {{- $allowed := slice "v1" "v2" "v3" "v4" -}}
 {{- $interactAllowed := slice "v1" -}}
 <main class="pa4 black-80">
