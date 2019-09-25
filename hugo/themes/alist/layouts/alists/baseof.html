@@ -17,11 +17,9 @@
     {{- end -}}
     <link rel='stylesheet' href='/css/tachyons.min.css'>
     <script defer src="{{ relURL ("js/user.js") }}"></script>
-    <!-- TODO dynamic -->
     {{- with $.Params.Uuid -}}
       {{- $aList := getJSON "data/lists/" $.Params.Uuid ".json" -}}
       {{- $allowed := slice "v1" -}}
-    <!-- TODO make it optional -->
       {{- if in $allowed $aList.info.type -}}
         <script src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
     <!--
