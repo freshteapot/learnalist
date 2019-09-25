@@ -10,7 +10,7 @@
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <link rel="icon" href="{{ relURL (printf "favicon.png") }}">
+    <link rel="icon" type="image/png" href="/favicon.png">
     {{- $stylesheet := $.Site.Data.webpack_assets.app -}}
     {{- with $stylesheet.css -}}
       <link href="{{ relURL (printf "%s%s" "dist/" .) }}" rel="stylesheet">
