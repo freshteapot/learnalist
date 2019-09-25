@@ -30,11 +30,11 @@
       {{- end -}}
     </article>
   </div>
-  <div id="play" class="measure center" style="display:none"></div>
-  <script id="data" type="application/json">{{ $aList | jsonify }}</script>
   {{- with $aList.info.interact -}}
     {{- if in $interactAllowed $aList.info.type -}}
-      {{ partial (printf "alist/%s/play.html" $aList.info.type) $aList }}
+    <div id="play" class="measure center" style="display:none"></div>
+    <script id="data" type="application/json">{{ $aList | jsonify }}</script>
+      {{- partial (printf "alist/%s/play.html" $aList.info.type) $aList -}}
     {{- end -}}
   {{- end -}}
 </main>
