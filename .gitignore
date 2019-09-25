@@ -1,6 +1,6 @@
 # Ignore all databases
 *.db
-
+*.DS_Store 
 # GO: Ignore all files in vendor
 server/vendor/
 server/apiserver
