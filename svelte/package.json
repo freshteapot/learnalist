@@ -1,0 +1,30 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "rollup": "^1.21.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-livereload": "^1.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-svelte": "^5.0.3",
+    "rollup-plugin-terser": "^4.0.4",
+    "svelte": "^3.10.0",
+    "tachyons": "^4.10.0"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.1",
+    "sirv-cli": "^0.4.4"
+  },
+  "scripts": {
+    "build:user": "rollup -c rollup.config.user.js",
+    "build:list.v1": "rollup -c rollup.config.list.v1.js",
+    "build": "run-p build:user build:list.v1",
+    "autobuild:user": "rollup -c rollup.config.user.js -w",
+    "autobuild:list:v1": "rollup -c rollup.config.list.v1.js -w",
+    "dev:user": "run-p start:dev autobuild:user",
+    "dev:list:v1": "run-p start:dev autobuild:list:v1",
+    "start": "sirv public --single",
+    "start:dev": "sirv public --single --dev"
+  }
+}

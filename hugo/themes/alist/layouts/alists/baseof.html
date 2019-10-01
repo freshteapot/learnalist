@@ -1,0 +1,35 @@
+{{- with $.Params.Uuid -}}
+{{- $aList := getJSON "data/lists/" $.Params.Uuid ".json" -}}
+{{- $allowed := slice "v1" -}}
+<!DOCTYPE html>
+<html lang="{{ $.Site.LanguageCode | default "en" }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{{ $aList.info.title }}</title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    {{- $stylesheet := $.Site.Data.webpack_assets.app -}}
+    {{- with $stylesheet.css -}}
+      <link href="{{ relURL (printf "%s%s" "dist/" .) }}" rel="stylesheet">
+    {{- end -}}
+    {{- range $.Site.Params.custom_css -}}
+      <link rel="stylesheet" href="{{ relURL ($.Site.BaseURL) }}{{ . }}">
+    {{- end -}}
+    <link rel='stylesheet' href='/css/tachyons.min.css'>
+    <script defer src="{{ relURL ("js/user.js") }}"></script>
+    {{- if in $allowed $aList.info.type -}}
+        <script src="{{ relURL (printf "js/%s.js" $aList.info.type) }}"></script>
+    <!--
+    <script defer src="{{ relURL (printf "alists/js/play.js") }}"></script>
+    -->
+    {{- end -}}
+  </head>
+  <body class="w-100 sans-serif bg-white">
+	   <user-menu></user-menu>
+     {{- block "main" $aList -}}{{- end -}}
+   </body>
+</html>
+{{- end -}}

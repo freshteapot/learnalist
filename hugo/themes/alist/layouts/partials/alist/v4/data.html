@@ -1,0 +1,8 @@
+<ul>
+  {{ range .data }}
+  <li>
+    <p>{{ .content }}</p>
+    <a target="_blank" href="{{ .url }}">{{ .url }}</a>
+  </li>
+  {{ end }}
+</ul>

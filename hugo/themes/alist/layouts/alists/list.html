@@ -1,0 +1,14 @@
+{{ define "main" }}
+<ul>
+{{- range $index, $page := where .Site.Pages "Type" "alists" -}}
+  {{ if $page.Params.uuid }}
+    {{ $path := printf "data/lists/%s.json" $page.Params.uuid }}
+    {{ $aList := getJSON $path }}
+    {{ $urlToPage := printf "alists/%s.html" $aList.uuid}}
+    <li>
+      <a target="_blank" href="{{ relURL $urlToPage }}">{{ $aList.info.title }}</a>
+    <li>
+  {{ end }}
+{{- end }}
+</ul>
+{{ end }}

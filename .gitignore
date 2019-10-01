@@ -1,9 +1,22 @@
 # Ignore all databases
 *.db
-
+*.DS_Store 
 # GO: Ignore all files in vendor
-api/vendor/**
-#!api/vendor/modules.txt
+server/vendor/
+server/apiserver
+server/e2e/smoke-test
+server/profile.cov
 
 # www-ui
 www-ui/node_modules
+
+# alists
+hugo/content/alists/
+hugo/data/lists/
+hugo/public-alist/
+
+# svelte
+svelte/node_modules
+svelte/public/*.js
+svelte/public/*.map
+svelte/public/*.css
