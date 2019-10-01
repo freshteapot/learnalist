@@ -26,28 +26,6 @@ type Manager struct {
 
 type ErrorHttpCode int
 
-func (m *Manager) GetPlay(c echo.Context) error {
-	// TODO which list,
-	// TODO which list type,
-	// TODO what to include.
-	// TODO can this be static rendered based on the object?
-	response := `
-function setup() {
-	// Turn the list into an object
-	let aList = JSON.parse(JSON.parse(document.querySelector("#data").innerHTML));
-
-	document.querySelector("#play").style.display = "none";
-	var interact = document.createElement("v1-slideshow");
-	interact.aList = aList;
-	document.querySelector("#play").appendChild(interact);
-}
-setup()
-`
-	c.Response().Header().Set("Content-Type", "application/javascript")
-	return c.String(http.StatusOK, response)
-
-}
-
 func (m *Manager) GetAlist(c echo.Context) error {
 	var pathToFile string
 	var err ErrorHttpCode
