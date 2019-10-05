@@ -216,7 +216,9 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	}
 
 	if method == http.MethodPost {
-		dal.Acl.CreateListRoles(aList.Uuid, aList.User.Uuid)
+		//dal.Acl.CreateListRoles(aList.Uuid, aList.User.Uuid)
+		dal.Acl2.ShareListWithPrivate(aList.Uuid)
+		dal.Acl2.GrantListReadAccess(aList.Uuid, aList.User.Uuid)
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)"
 		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {

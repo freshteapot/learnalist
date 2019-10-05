@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
@@ -66,9 +67,9 @@ func main() {
 
 	// Setup access control layer.
 	acl := acl.NewAclFromModel(db)
-
-	dal := models.NewDAL(db, acl)
-	server.InitApi(db, acl, dal, hugoHelper)
+	acl2 := aclSqlite.NewAcl(db)
+	dal := models.NewDAL(db, acl, acl2)
+	server.InitApi(db, acl, acl2, dal, hugoHelper)
 	server.InitAlists(acl, dal, hugoHelper)
 
 	server.Run()

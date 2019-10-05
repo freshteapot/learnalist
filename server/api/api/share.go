@@ -14,8 +14,8 @@ const (
 	ActionRevoke           = "revoke"
 	ActionGrant            = "grant"
 	ActionShareWithPublic  = "public"
-	ActionShareWithOwner   = "owner"
-	ActionShareWithPrivate = "private"
+	ActionShareWithOwner   = "private"
+	ActionShareWithPrivate = "friends"
 )
 
 type HttpShareListReadAccessInput struct {
@@ -68,10 +68,12 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 			return c.JSON(http.StatusNotFound, response)
 		}
 		if input.Action == ActionGrant {
-			m.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
+			//m.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
+			m.Acl2.GrantListReadAccess(input.AlistUUID, input.UserUUID)
 		}
 		if input.Action == ActionRevoke {
-			m.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
+			//m.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
+			m.Acl2.RevokeListReadAccess(input.AlistUUID, input.UserUUID)
 		}
 	}
 
@@ -110,17 +112,20 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 
 	message := ""
 	if input.Action == ActionShareWithPublic {
-		m.Acl.MakeListPublic(aList.Uuid)
+		//m.Acl.MakeListPublic(aList.Uuid)
+		m.Acl2.ShareListWithPublic(aList.Uuid)
 		message = "List is now public"
 	}
 
 	if input.Action == ActionShareWithOwner {
-		m.Acl.MakeListPrivateForOwner(aList.Uuid)
+		//m.Acl.MakeListPrivateForOwner(aList.Uuid)
+		m.Acl2.ShareListWithPrivate(aList.Uuid)
 		message = "List is now private to the owner"
 	}
 
 	if input.Action == ActionShareWithPrivate {
-		m.Acl.MakeListPrivate(aList.Uuid)
+		//m.Acl.MakeListPrivate(aList.Uuid)
+		m.Acl2.ShareListWithFriends(aList.Uuid)
 		message = "List is now private to the owner and those granted access"
 	}
 

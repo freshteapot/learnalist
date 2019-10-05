@@ -36,13 +36,11 @@ func (dal *DAL) InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, err
 
 	_, err = dal.Db.NamedExec(query, newUser)
 	if err != nil {
-		if err != nil {
-			if err.Error() == "UNIQUE constraint failed: user.username" {
-				return nil, errors.New(i18n.UserInsertUsernameExists)
-			}
-			// This is ugly
-			checkErr(err)
+		if err.Error() == "UNIQUE constraint failed: user.username" {
+			return nil, errors.New(i18n.UserInsertUsernameExists)
 		}
+		// This is ugly
+		checkErr(err)
 	}
 
 	user := &uuid.User{
