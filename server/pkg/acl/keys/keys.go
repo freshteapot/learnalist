@@ -14,4 +14,6 @@ const (
 	SharedWithPublic  = "public"
 	NotShared         = "private"
 	SharedWithFriends = "friends"
+	ActionRevoke      = "revoke"
+	ActionGrant       = "grant"
 )
