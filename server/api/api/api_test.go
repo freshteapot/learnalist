@@ -33,7 +33,6 @@ func (suite *ApiSuite) SetupSuite() {
 	m = Manager{
 		Datastore:  dal,
 		Acl:        acl,
-		Acl2:       acl,
 		HugoHelper: hugoHelper,
 	}
 }

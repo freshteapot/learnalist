@@ -12,7 +12,6 @@ import (
 func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) {
 	m := alists.Manager{
 		Acl:             acl,
-		Acl2:            acl,
 		Datastore:       dal,
 		SiteCacheFolder: config.SiteCacheFolder,
 		HugoHelper:      *hugoHelper,

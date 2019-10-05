@@ -7,16 +7,14 @@ import (
 
 // DB allowing us to build an abstraction layer
 type DAL struct {
-	Db   *sqlx.DB
-	Acl  acl.Acl
-	Acl2 acl.Acl
+	Db  *sqlx.DB
+	Acl acl.Acl
 }
 
 func NewDAL(db *sqlx.DB, acl acl.Acl) *DAL {
 	dal := &DAL{
-		Db:   db,
-		Acl:  acl,
-		Acl2: acl,
+		Db:  db,
+		Acl: acl,
 	}
 	return dal
 }

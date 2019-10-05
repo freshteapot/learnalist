@@ -19,7 +19,6 @@ type HttpResponseMessage struct {
 
 type Manager struct {
 	Acl             acl.Acl
-	Acl2            acl.Acl
 	Datastore       models.Datastore
 	SiteCacheFolder string
 	HugoHelper      hugo.HugoHelper
@@ -73,8 +72,7 @@ func (m *Manager) serveAlist(userUUID string, urlPath string) (string, ErrorHttp
 	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(path); err == nil {
-		/// TODO Swap to acl2
-		allow, err := m.Acl2.HasUserListReadAccess(userUUID, alistUUID)
+		allow, err := m.Acl.HasUserListReadAccess(userUUID, alistUUID)
 		if err != nil {
 			return "", http.StatusInternalServerError
 		}

@@ -68,10 +68,10 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 			return c.JSON(http.StatusNotFound, response)
 		}
 		if input.Action == ActionGrant {
-			m.Acl2.GrantUserListReadAccess(input.AlistUUID, input.UserUUID)
+			m.Acl.GrantUserListReadAccess(input.AlistUUID, input.UserUUID)
 		}
 		if input.Action == ActionRevoke {
-			m.Acl2.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
+			m.Acl.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
 		}
 	}
 
@@ -110,17 +110,17 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 
 	message := ""
 	if input.Action == ActionShareWithPublic {
-		m.Acl2.ShareListWithPublic(aList.Uuid)
+		m.Acl.ShareListWithPublic(aList.Uuid)
 		message = "List is now public"
 	}
 
 	if input.Action == ActionShareWithOwner {
-		m.Acl2.MakeListPrivate(aList.Uuid, aList.User.Uuid)
+		m.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		message = "List is now private to the owner"
 	}
 
 	if input.Action == ActionShareWithPrivate {
-		m.Acl2.ShareListWithFriends(aList.Uuid)
+		m.Acl.ShareListWithFriends(aList.Uuid)
 		message = "List is now private to the owner and those granted access"
 	}
 

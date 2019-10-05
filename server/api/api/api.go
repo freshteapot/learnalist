@@ -10,7 +10,6 @@ import (
 type Manager struct {
 	Datastore    models.Datastore
 	Acl          acl.Acl
-	Acl2         acl.Acl
 	DatabaseName string
 	HugoHelper   hugo.HugoSiteBuilder
 }

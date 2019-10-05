@@ -19,7 +19,6 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 	m := api.Manager{
 		Datastore:  dal,
 		Acl:        acl,
-		Acl2:       acl,
 		HugoHelper: *hugoHelper,
 	}
 

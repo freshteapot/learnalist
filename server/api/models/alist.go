@@ -149,7 +149,7 @@ AND
 	}
 
 	// TODO Should we trigger a cleanup of site-cache?
-	dal.Acl2.DeleteList(aList.Uuid)
+	dal.Acl.DeleteList(aList.Uuid)
 	return err
 }
 
@@ -216,8 +216,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	}
 
 	if method == http.MethodPost {
-		//dal.Acl.CreateListRoles(aList.Uuid, aList.User.Uuid)
-		dal.Acl2.MakeListPrivate(aList.Uuid, aList.User.Uuid)
+		dal.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)"
 		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
