@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/labstack/echo/v4"
 )
 
@@ -72,7 +72,12 @@ func (m *Manager) serveAlist(userUUID string, urlPath string) (string, ErrorHttp
 	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(path); err == nil {
-		if !m.Acl.HasUserListReadAccess(userUUID, alistUUID) {
+		allow, err := m.Acl.HasUserListReadAccess(userUUID, alistUUID)
+		if err != nil {
+			return "", http.StatusInternalServerError
+		}
+
+		if !allow {
 			return "", http.StatusForbidden
 		}
 		return path, http.StatusOK

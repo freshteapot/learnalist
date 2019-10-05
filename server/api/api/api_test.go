@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 )
@@ -23,7 +23,7 @@ type ApiSuite struct {
 
 func (suite *ApiSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(db)
+	acl := aclSqlite.NewAcl(db)
 	dal = models.NewDAL(db, acl)
 
 	hugoHelper := new(mocks.HugoSiteBuilder)
@@ -32,7 +32,7 @@ func (suite *ApiSuite) SetupSuite() {
 
 	m = Manager{
 		Datastore:  dal,
-		Acl:        *acl,
+		Acl:        acl,
 		HugoHelper: hugoHelper,
 	}
 }

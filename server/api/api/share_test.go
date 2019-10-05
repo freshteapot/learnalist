@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,7 +26,7 @@ func (suite *ApiSuite) TestV1ShareAlistBadInput() {
 	inputGrant := &HttpShareListWithUserInput{
 		UserUUID:  "fakeUser",
 		AlistUUID: "fakeList",
-		Action:    ActionGrant,
+		Action:    aclKeys.ActionGrant,
 	}
 	a, _ := json.Marshal(inputGrant)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(a))
@@ -84,6 +85,7 @@ func (suite *ApiSuite) TestV1ShareAlist() {
   }
 }
 `
+
 	userAUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 	userBUUID, _ := suite.createNewUserWithSuccess(inputUserB)
 	var raw map[string]interface{}
@@ -104,7 +106,7 @@ func (suite *ApiSuite) TestV1ShareAlist() {
 	inputGrant := &HttpShareListWithUserInput{
 		UserUUID:  userBUUID,
 		AlistUUID: alistUUID,
-		Action:    ActionGrant,
+		Action:    aclKeys.ActionGrant,
 	}
 	a, _ := json.Marshal(inputGrant)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(a))
@@ -124,7 +126,7 @@ func (suite *ApiSuite) TestV1ShareAlist() {
 	inputRevoke := &HttpShareListWithUserInput{
 		UserUUID:  userBUUID,
 		AlistUUID: alistUUID,
-		Action:    ActionRevoke,
+		Action:    aclKeys.ActionRevoke,
 	}
 	b, _ := json.Marshal(inputRevoke)
 	statusCode, responseBytes = suite.shareAlist(userAUUID, string(b))

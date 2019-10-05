@@ -4,14 +4,14 @@ import (
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	alists "github.com/freshteapot/learnalist-api/server/alists/server"
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitAlists(acl *acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) {
+func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) {
 	m := alists.Manager{
-		Acl:             *acl,
+		Acl:             acl,
 		Datastore:       dal,
 		SiteCacheFolder: config.SiteCacheFolder,
 		HugoHelper:      *hugoHelper,

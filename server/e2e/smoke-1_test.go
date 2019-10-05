@@ -51,7 +51,7 @@ func TestSharePublic(t *testing.T) {
 	assert.Equal(messageResponse.Message, "List is now public")
 	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 200)
-	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "private")
+	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "friends")
 	assert.Equal(messageResponse.Message, "List is now private to the owner and those granted access")
 	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
@@ -59,9 +59,8 @@ func TestSharePublic(t *testing.T) {
 	for j := 0; j <= 10; j++ {
 		learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
 	}
-
 	/*
-		for j := 0; j <= 10; j++ {
+		for j := 0; j <= 100; j++ {
 			go func() {
 				learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
 			}()

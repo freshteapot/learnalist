@@ -15,6 +15,7 @@
 * [client commands](./doc/client.md)
 * [golang tips](./doc/tips.md)
 * [Try curl requests](./doc/play.along.md)
+* [Explaining the sharing and access control](./doc/sharing.md)
 
 # Getting Started
 

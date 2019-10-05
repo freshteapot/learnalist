@@ -3,6 +3,8 @@ package database
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"strings"
 
 	// _ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -18,15 +20,26 @@ func GetTables() []string {
 		"user_labels",
 		"alist_labels",
 		"casbin_rule",
+		"acl_simple",
 	}
 	return *tables
 }
 
+func getPathToDatabaseFiles() string {
+	workingDir, _ := os.Getwd()
+	parts := strings.Split(workingDir, "/learnalist-api/")
+	if len(parts) < 2 {
+		panic("The code doesnt live under learnalist-api, this is breaking the sqlite backed tests")
+	}
+
+	return parts[0] + "/learnalist-api/server/db/"
+}
+
 func NewTestDB() *sqlx.DB {
 	dataSourceName := "file:" + PathToTestSqliteDb
-	db := NewDB(dataSourceName)
 
-	pathToDbFiles := "../../db/"
+	db := NewDB(dataSourceName)
+	pathToDbFiles := getPathToDatabaseFiles()
 	files, err := ioutil.ReadDir(pathToDbFiles)
 	checkErr(err)
 

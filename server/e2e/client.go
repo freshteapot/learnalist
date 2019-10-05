@@ -91,8 +91,8 @@ func (c Client) PostListV1(userInfo RegisterResponse, input string) AlistUuidRes
 		// handle err
 	}
 	defer resp.Body.Close()
-
 	var response AlistUuidResponse
+
 	data, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(data, &response)
 	return response

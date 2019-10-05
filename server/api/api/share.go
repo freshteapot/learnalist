@@ -7,15 +7,8 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/labstack/echo/v4"
-)
-
-const (
-	ActionRevoke           = "revoke"
-	ActionGrant            = "grant"
-	ActionShareWithPublic  = "public"
-	ActionShareWithOwner   = "owner"
-	ActionShareWithPrivate = "private"
 )
 
 type HttpShareListReadAccessInput struct {
@@ -67,11 +60,11 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 			}
 			return c.JSON(http.StatusNotFound, response)
 		}
-		if input.Action == ActionGrant {
-			m.Acl.GrantListReadAccess(input.UserUUID, input.AlistUUID)
+		if input.Action == aclKeys.ActionGrant {
+			m.Acl.GrantUserListReadAccess(input.AlistUUID, input.UserUUID)
 		}
-		if input.Action == ActionRevoke {
-			m.Acl.RevokeListReadAccess(input.UserUUID, input.AlistUUID)
+		if input.Action == aclKeys.ActionRevoke {
+			m.Acl.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
 		}
 	}
 
@@ -109,18 +102,18 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	}
 
 	message := ""
-	if input.Action == ActionShareWithPublic {
-		m.Acl.MakeListPublic(aList.Uuid)
+	if input.Action == aclKeys.SharedWithPublic {
+		m.Acl.ShareListWithPublic(aList.Uuid)
 		message = "List is now public"
 	}
 
-	if input.Action == ActionShareWithOwner {
-		m.Acl.MakeListPrivateForOwner(aList.Uuid)
+	if input.Action == aclKeys.NotShared {
+		m.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		message = "List is now private to the owner"
 	}
 
-	if input.Action == ActionShareWithPrivate {
-		m.Acl.MakeListPrivate(aList.Uuid)
+	if input.Action == aclKeys.SharedWithFriends {
+		m.Acl.ShareListWithFriends(aList.Uuid)
 		message = "List is now private to the owner and those granted access"
 	}
 
