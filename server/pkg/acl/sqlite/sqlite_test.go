@@ -19,7 +19,7 @@ var _ = Describe("Testing Acl", func() {
 	})
 
 	AfterEach(func() {
-		//database.EmptyDatabase(db)
+		database.EmptyDatabase(db)
 	})
 
 	When("Read access to a list", func() {
