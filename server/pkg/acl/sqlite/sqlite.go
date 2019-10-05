@@ -126,6 +126,11 @@ func (store *Sqlite) MakeListPrivate(alistUUID string, userUUID string) error {
 	return nil
 }
 
+func (store *Sqlite) DeleteList(alistUUID string) error {
+	_, err := store.db.Exec(deleteViaAlistUUID, alistUUID)
+	return err
+}
+
 func (store *Sqlite) ShareListWithFriends(alistUUID string) error {
 	accessPrivate := fmt.Sprintf(keys.ListSharePrivate, alistUUID)
 	accessFriends := fmt.Sprintf(keys.ListShareFriends, alistUUID)

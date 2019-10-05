@@ -1,14 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
@@ -25,10 +23,8 @@ type ApiSuite struct {
 
 func (suite *ApiSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(db)
-	acl2 := aclSqlite.NewAcl(db)
-	fmt.Println(acl2)
-	dal = models.NewDAL(db, acl, acl2)
+	acl := aclSqlite.NewAcl(db)
+	dal = models.NewDAL(db, acl)
 
 	hugoHelper := new(mocks.HugoSiteBuilder)
 
@@ -36,8 +32,8 @@ func (suite *ApiSuite) SetupSuite() {
 
 	m = Manager{
 		Datastore:  dal,
-		Acl:        *acl,
-		Acl2:       acl2,
+		Acl:        acl,
+		Acl2:       acl,
 		HugoHelper: hugoHelper,
 	}
 }

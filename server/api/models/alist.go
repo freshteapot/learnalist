@@ -149,7 +149,7 @@ AND
 	}
 
 	// TODO Should we trigger a cleanup of site-cache?
-	dal.Acl.DeleteListRoles(aList.Uuid)
+	dal.Acl2.DeleteList(aList.Uuid)
 	return err
 }
 

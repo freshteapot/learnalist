@@ -40,7 +40,6 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	//if !m.Acl.HasUserListReadAccess(user.Uuid, uuid) {
 	allow, err := m.Acl2.HasUserListReadAccess(uuid, user.Uuid)
 	if err != nil {
 		response := HttpResponseMessage{

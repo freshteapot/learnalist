@@ -5,22 +5,21 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	acl2 "github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitApi(db *sqlx.DB, acl *acl.Acl, acl2 acl2.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper) {
+func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper) {
 	m := api.Manager{
 		Datastore:  dal,
-		Acl:        *acl,
-		Acl2:       acl2,
+		Acl:        acl,
+		Acl2:       acl,
 		HugoHelper: *hugoHelper,
 	}
 

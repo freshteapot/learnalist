@@ -3,7 +3,6 @@ package models
 import (
 	"testing"
 
-	"github.com/freshteapot/learnalist-api/server/api/acl"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/stretchr/testify/suite"
@@ -18,9 +17,8 @@ type ModelSuite struct {
 
 func (suite *ModelSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := acl.NewAclFromModel(db)
-	acl2 := aclSqlite.NewAcl(db)
-	dal = NewDAL(db, acl, acl2)
+	acl := aclSqlite.NewAcl(db)
+	dal = NewDAL(db, acl)
 }
 
 func (suite *ModelSuite) SetupTest() {

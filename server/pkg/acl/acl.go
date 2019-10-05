@@ -22,6 +22,8 @@ type AclWriter interface {
 	MakeListPrivate(alistUUID string, userUUID string) error
 	// Share with friends
 	ShareListWithFriends(alistUUID string) error
+
+	DeleteList(alistUUID string) error
 }
 
 type AclReader interface {
