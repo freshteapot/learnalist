@@ -43,7 +43,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	allow, err := m.Acl.HasUserListReadAccess(uuid, user.Uuid)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: "I broke something",
+			Message: i18n.InternalServerErrorAclLookup,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
