@@ -1,12 +1,13 @@
 package keys
 
 var (
-	ListWriteAccessForUser = "list:%s:write:%s"
-	ListReadAccessForUser  = "list:%s:read:%s"
-	ListOwnerAccessForUser = "list:%s:owner:%s"
-	ListSharePublic        = "list:%s:share:public"
-	ListSharePrivate       = "list:%s:share:private"
-	ListShareFriends       = "list:%s:share:friends"
+	ListWriteAccessForUser = "api:list:%s:write:%s"
+	ListReadAccessForUser  = "api:list:%s:read:%s"
+	ListOwnerAccessForUser = "api:list:%s:owner:%s"
+	ListSharePublic        = "api:list:%s:share:public"
+	ListSharePrivate       = "api:list:%s:share:private"
+	ListShareFriends       = "api:list:%s:share:friends"
+	FilterListShare        = "api:list:%s:share:%%"
 )
 
 const (

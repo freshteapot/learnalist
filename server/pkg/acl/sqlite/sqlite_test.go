@@ -19,34 +19,34 @@ var _ = Describe("Testing Acl", func() {
 	})
 
 	AfterEach(func() {
-		database.EmptyDatabase(db)
+		//database.EmptyDatabase(db)
 	})
 
 	When("Read access to a list", func() {
 		It("Grant access", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			err := doorKeeper.GrantListReadAccess("a", "b")
+			err := doorKeeper.GrantUserListReadAccess("a", "b")
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
 		It("Revoke access", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListReadAccess("a", "b")
-			err := doorKeeper.RevokeListReadAccess("a", "b")
+			doorKeeper.GrantUserListReadAccess("a", "b")
+			err := doorKeeper.RevokeUserListReadAccess("a", "b")
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
 		It("Has Read access after being granted", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListReadAccess("a", "b")
+			doorKeeper.GrantUserListReadAccess("a", "b")
 			response, _ := doorKeeper.HasUserListReadAccess("a", "b")
 			Expect(response).Should(Equal(true))
 		})
 
 		It("Does not have read access after being revoked", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListReadAccess("a", "b")
-			doorKeeper.RevokeListReadAccess("a", "b")
+			doorKeeper.GrantUserListReadAccess("a", "b")
+			doorKeeper.RevokeUserListReadAccess("a", "b")
 			response, _ := doorKeeper.HasUserListReadAccess("a", "b")
 			Expect(response).Should(Equal(false))
 		})
@@ -55,29 +55,29 @@ var _ = Describe("Testing Acl", func() {
 	When("Write access to a list", func() {
 		It("Grant access", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			err := doorKeeper.GrantListWriteAccess("a", "b")
+			err := doorKeeper.GrantUserListWriteAccess("a", "b")
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
 		It("Revoke access", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListWriteAccess("a", "b")
-			err := doorKeeper.RevokeListWriteAccess("a", "b")
+			doorKeeper.GrantUserListWriteAccess("a", "b")
+			err := doorKeeper.RevokeUserListWriteAccess("a", "b")
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
 		It("Has Read access after being granted", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListWriteAccess("a", "b")
-			response, _ := doorKeeper.HasWriteAccess("a", "b")
+			doorKeeper.GrantUserListWriteAccess("a", "b")
+			response, _ := doorKeeper.HasUserListWriteAccess("a", "b")
 			Expect(response).Should(Equal(true))
 		})
 
 		It("Does not have read access after being revoked", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			doorKeeper.GrantListWriteAccess("a", "b")
-			doorKeeper.RevokeListWriteAccess("a", "b")
-			response, _ := doorKeeper.HasWriteAccess("a", "b")
+			doorKeeper.GrantUserListWriteAccess("a", "b")
+			doorKeeper.RevokeUserListWriteAccess("a", "b")
+			response, _ := doorKeeper.HasUserListWriteAccess("a", "b")
 			Expect(response).Should(Equal(false))
 		})
 	})
@@ -118,7 +118,7 @@ var _ = Describe("Testing Acl", func() {
 
 		It("Make it private", func() {
 			doorKeeper = aclSqlite.NewAcl(db)
-			err := doorKeeper.ShareListWithPrivate("a")
+			err := doorKeeper.MakeListPrivate("a", "b")
 			Expect(err).ShouldNot(HaveOccurred())
 
 			allow, _ = doorKeeper.IsListPublic("a")

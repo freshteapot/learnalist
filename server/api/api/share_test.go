@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -88,7 +87,6 @@ func (suite *ApiSuite) TestV1ShareAlist() {
 
 	userAUUID, _ := suite.createNewUserWithSuccess(inputUserA)
 	userBUUID, _ := suite.createNewUserWithSuccess(inputUserB)
-	fmt.Println("HI")
 	var raw map[string]interface{}
 	var statusCode int
 	var responseBytes []byte

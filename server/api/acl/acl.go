@@ -101,14 +101,14 @@ func (acl Acl) RevokeListPublicWriteAccess(userUUID string) {
 	acl.enforcer.DeleteRoleForUser(userUUID, "public:write")
 }
 
-// GrantListReadAccess grant access to the user to be able to read the list.
-func (acl Acl) GrantListReadAccess(userUUID string, alistUUID string) {
+// GrantUserListReadAccess grant access to the user to be able to read the list.
+func (acl Acl) GrantUserListReadAccess(userUUID string, alistUUID string) {
 	// TODO should I check shared access?
 	read := getRoleKeyListRead(alistUUID)
 	acl.enforcer.AddRoleForUser(userUUID, read)
 }
 
-func (acl Acl) RevokeListReadAccess(userUUID string, alistUUID string) {
+func (acl Acl) RevokeUserListReadAccess(userUUID string, alistUUID string) {
 	read := getRoleKeyListRead(alistUUID)
 	acl.enforcer.DeleteRoleForUser(userUUID, read)
 }

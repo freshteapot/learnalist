@@ -60,7 +60,7 @@ func TestSharePublic(t *testing.T) {
 		learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
 	}
 
-	for j := 0; j <= 200; j++ {
+	for j := 0; j <= 100; j++ {
 		go func() {
 			learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
 		}()
