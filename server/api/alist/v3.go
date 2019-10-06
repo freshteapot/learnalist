@@ -17,13 +17,7 @@ func NewTypeV3() *Alist {
 	data := make(TypeV3, 0)
 	aList.Data = data
 
-	labels := []string{
-		"rowing",
-		"concept2",
-	}
-
-	aList.Info.Labels = labels
-
+	*aList = enrichTypeV3(*aList)
 	return aList
 }
 
@@ -73,31 +67,32 @@ func enrichTypeV3(aList Alist) Alist {
 	return aList
 }
 
-func parseTypeV3(jsonBytes []byte) (TypeV3, error) {
+func ParseTypeV3(jsonBytes []byte) (TypeV3, error) {
 	listData := new(TypeV3)
 	err := json.Unmarshal(jsonBytes, &listData)
 	return *listData, err
 }
 
-func validateTypeV3(aList Alist) error {
+func ValidateTypeV3(typeV3 TypeV3) error {
 	var err error
 	var feedback = errors.New(i18n.ValidationAlistTypeV3)
 
-	typeV3 := aList.Data.(TypeV3)
 	for _, item := range typeV3 {
 
-		err = validateTypeV3When(item.When)
+		err = ValidateTypeV3When(item.When)
 		if err != nil {
 			return feedback
 		}
 
-		err = validateTypeV3Split(item.Overall)
+		// overall
+		err = ValidateTypeV3Split(item.Overall)
 		if err != nil {
 			return feedback
 		}
 
+		// Splits
 		for _, split := range item.Splits {
-			err = validateTypeV3Split(split)
+			err = ValidateTypeV3Split(split)
 			if err != nil {
 				return feedback
 			}
@@ -107,39 +102,39 @@ func validateTypeV3(aList Alist) error {
 	return nil
 }
 
-func validateTypeV3Split(split V3Split) error {
+func ValidateTypeV3Split(split V3Split) error {
 	var err error
-	err = validateTypeV3Time(split.Time)
+	err = ValidateTypeV3Time(split.Time)
 	if err != nil {
 		return err
 	}
 
-	err = validateTypeV3Distance(split.Distance)
+	err = ValidateTypeV3Distance(split.Distance)
 	if err != nil {
 		return err
 	}
 
-	err = validateTypeV3Spm(split.Spm)
+	err = ValidateTypeV3Spm(split.Spm)
 	if err != nil {
 		return err
 	}
 
-	err = validateTypeV3P500(split.P500)
+	err = ValidateTypeV3P500(split.P500)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func validateTypeV3Distance(input int) error {
+func ValidateTypeV3Distance(input int) error {
 	var err error
 	if input == 0 {
-		return errors.New("Distance should not be empty.")
+		return errors.New("Should not be empty.")
 	}
 	return err
 }
 
-func validateTypeV3Spm(input int) error {
+func ValidateTypeV3Spm(input int) error {
 	var err error
 	if input < 10 || input > 50 {
 		return errors.New("Stroke per minute should be between the range 10 and 50.")
@@ -147,24 +142,24 @@ func validateTypeV3Spm(input int) error {
 	return err
 }
 
-func validateTypeV3Time(input string) error {
+func ValidateTypeV3Time(input string) error {
 	var err error
 	if input == "" {
-		return errors.New("Time should not be empty.")
+		return errors.New("Should not be empty.")
 	}
 
 	if !strings.Contains(input, ":") {
-		return errors.New("Time is not valid format.")
+		return errors.New("Is not valid format.")
 	}
 
 	if !strings.Contains(input, ".") {
-		return errors.New("Time is not valid format.")
+		return errors.New("Is not valid format.")
 	}
 	// TODO maybe do a better check
 	return err
 }
 
-func validateTypeV3When(input string) error {
+func ValidateTypeV3When(input string) error {
 	var err error
 	if input == "" {
 		return errors.New("When should be YYYY-MM-DD.")
@@ -177,19 +172,6 @@ func validateTypeV3When(input string) error {
 	return err
 }
 
-func validateTypeV3P500(input string) error {
-	var err error
-	if input == "" {
-		return errors.New("Per 500 should not be empty.")
-	}
-
-	if !strings.Contains(input, ":") {
-		return errors.New("Per 500 is not valid format.")
-	}
-
-	if !strings.Contains(input, ".") {
-		return errors.New("Per 500 is not valid format.")
-	}
-	// TODO maybe do a better check
-	return err
+func ValidateTypeV3P500(input string) error {
+	return ValidateTypeV3Time(input)
 }

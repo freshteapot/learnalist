@@ -105,7 +105,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	case Concept2:
-		aList.Data, err = parseTypeV3(jsonBytes)
+		aList.Data, err = ParseTypeV3(jsonBytes)
 		if err != nil {
 			err = errors.New(i18n.ValidationErrorListV3)
 			return err

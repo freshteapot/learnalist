@@ -1,122 +1,110 @@
-package alist
+package alist_test
 
 import (
 	"encoding/json"
-	"testing"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestUnmarshalJSON(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	badRawJson := `{a}`
-	missingInfoJSON := `{"data": []}`
-	badInfo := `{"info": ""}`
-	missingDataJSON := `{"info": {"title": "I am a title"}}`
+var _ = Describe("Testing alist.Alist", func() {
+	When("Handling JSON", func() {
+		Context("Unmarshal input", func() {
+			It("Invalid json", func() {
+				input := `{a}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal("Failed to parse list."))
+			})
 
-	jsonBytes = []byte(badRawJson)
+			It("Missing info object", func() {
+				input := `{"data": []}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal("Failed to pass list. Info is missing."))
+			})
 
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to parse list.")
+			It("When info is not an object", func() {
+				input := `{"info": ""}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal("Failed to pass list. Something wrong with info object."))
+			})
 
-	jsonBytes = []byte(missingInfoJSON)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list. Info is missing.")
+			It("When data is missing", func() {
+				input := `{"info": {"title": "I am a title"}}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal("Failed to pass list. Data is missing."))
+			})
+		})
 
-	jsonBytes = []byte(badInfo)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list. Something wrong with info object.")
+		Context("Unmarshal invalid parsing of list types", func() {
+			It("V1", func() {
+				input := `{"data":[{}],"info":{"title":"I am a list","type":"v1"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal(i18n.ValidationErrorListV1))
+			})
 
-	jsonBytes = []byte(missingDataJSON)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Failed to pass list. Data is missing.")
-}
+			It("V2", func() {
+				input := `{"data":[""],"info":{"title":"I am a list","type":"v2"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal(i18n.ValidationErrorListV2))
+			})
 
-func TestUnmarshalJSONBadParseV1(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	var jsonStr = `{"data":[{}],"info":{"title":"I am a list","type":"v1"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+			It("V3", func() {
+				input := `{"data":[""],"info":{"title":"I am a list","type":"v3"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal(i18n.ValidationErrorListV3))
+			})
 
-	jsonBytes = []byte(jsonStr)
+			It("V4", func() {
+				input := `{"data":[""],"info":{"title":"I am a list","type":"v4"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal(i18n.ValidationErrorListV4))
+			})
 
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), i18n.ValidationErrorListV1)
-}
+			It("Unsupported list tyype", func() {
+				input := `{"data":[],"info":{"title":"I am a list","type":"na"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON([]byte(input))
+				Expect(err).Should(HaveOccurred())
+				Expect(err.Error()).To(Equal("Unsupported list type."))
+			})
+		})
 
-func TestUnmarshalJSONBadParseV2(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	var jsonStr = `{"data":[""],"info":{"title":"I am a list","type":"v2"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
+		Context("Marshal input", func() {
+			It("Valid json output based on json input", func() {
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON(validListTypeV1)
+				Expect(err).ShouldNot(HaveOccurred())
 
-	jsonBytes = []byte(jsonStr)
+				a, _ := json.Marshal(aList)
+				Expect(a).To(Equal(validListTypeV1))
+			})
 
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), i18n.ValidationErrorListV2)
-}
+			It("When the optional info.interact object is present", func() {
+				aList := new(alist.Alist)
+				err := aList.UnmarshalJSON(validListTypeV1WithInfoInteract)
+				Expect(err).ShouldNot(HaveOccurred())
 
-func TestUnmarshalJSONBadParseV3(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	var jsonStr = `{"data":[""],"info":{"title":"I am a list","type":"v3"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-
-	jsonBytes = []byte(jsonStr)
-
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), i18n.ValidationErrorListV3)
-}
-
-func TestUnmarshalJSONBadParseV4(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	var jsonStr = `{"data":[""],"info":{"title":"I am a list","type":"v4"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-
-	jsonBytes = []byte(jsonStr)
-
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), i18n.ValidationErrorListV4)
-}
-
-func TestUnmarshalJSONUnsupportedListType(t *testing.T) {
-	var err error
-	var jsonBytes []byte
-	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"na"},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-
-	jsonBytes = []byte(jsonStr)
-
-	aList := new(Alist)
-	err = aList.UnmarshalJSON(jsonBytes)
-	assert.Equal(t, err.Error(), "Unsupported list type.")
-}
-
-func TestMarshalJSON(t *testing.T) {
-	var jsonBytes []byte
-	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"v1","labels":[]},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-
-	jsonBytes = []byte(jsonStr)
-	aList := new(Alist)
-	assert.NoError(t, aList.UnmarshalJSON(jsonBytes))
-
-	jsonBytes, _ = json.Marshal(aList)
-
-	assert.Equal(t, jsonStr, string(jsonBytes))
-}
-
-func TestMarshalJSONInteract(t *testing.T) {
-	var jsonBytes []byte
-	var jsonStr = `{"data":[],"info":{"title":"I am a list","type":"v1","labels":[],"interact":{"slideshow":"1"}},"uuid":"230bf9f8-592b-55c1-8f72-9ea32fbdcdc4"}`
-
-	jsonBytes = []byte(jsonStr)
-	aList := new(Alist)
-	assert.NoError(t, aList.UnmarshalJSON(jsonBytes))
-
-	jsonBytes, _ = json.Marshal(aList)
-
-	assert.Equal(t, jsonStr, string(jsonBytes))
-}
+				a, _ := json.Marshal(aList)
+				Expect(a).To(Equal(validListTypeV1WithInfoInteract))
+			})
+		})
+	})
+})

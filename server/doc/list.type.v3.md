@@ -22,6 +22,21 @@ The data within, is to log information from using the Concept2 indoor rowing mac
 }
 ```
 
+# Validation
+## When
+- It needs to be YYYY-MM-DD
+- Will be rejected if it is not.
+- Will be rejected if an empty string.
+
+## Overall
+### Time and P500
+- Needs to be of the format "M:S.MS".
+- Will be rejected if it is not.
+- Will be rejected if an empty string.
+
+### spm (strokes per minute)
+Stroke per minute should be between the range 10 and 50.
+
 To create a list of type "v3", set type in the info object payload.
 
 # Full example

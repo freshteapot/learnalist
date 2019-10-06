@@ -28,7 +28,7 @@ func Validate(aList Alist) error {
 	case FromToList:
 		err = validateTypeV2(aList)
 	case Concept2:
-		err = validateTypeV3(aList)
+		err = ValidateTypeV3(aList.Data.(TypeV3))
 	case ContentAndUrl:
 		err = validateTypeV4(aList)
 	}

@@ -1,14 +1,17 @@
-package alist
+package alist_test
 
 import (
 	"reflect"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestNewTypeV2(t *testing.T) {
-	aList := NewTypeV2()
-	assert.Equal(t, FromToList, aList.Info.ListType)
-	assert.Equal(t, "TypeV2", reflect.TypeOf(aList.Data).Name())
-}
+var _ = Describe("Testing List type V2", func() {
+	It("Via New", func() {
+		aList := alist.NewTypeV2()
+		Expect(aList.Info.ListType).To(Equal(alist.FromToList))
+		Expect(reflect.TypeOf(aList.Data).Name()).To(Equal("TypeV2"))
+	})
+})
