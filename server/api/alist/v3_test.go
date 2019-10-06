@@ -9,15 +9,53 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func checkTypeV3Info(aList *alist.Alist) {
+	Expect(aList.Info.ListType).To(Equal(alist.Concept2))
+	Expect(reflect.TypeOf(aList.Data).Name()).To(Equal("TypeV3"))
+
+	Expect(len(aList.Info.Labels)).To(Equal(2))
+	Expect(aList.Info.Labels[0]).To(Equal("rowing"))
+	Expect(aList.Info.Labels[1]).To(Equal("concept2"))
+}
+
 var _ = Describe("Testing List type V3", func() {
 	It("Via New", func() {
 		aList := alist.NewTypeV3()
-		Expect(aList.Info.ListType).To(Equal(alist.Concept2))
-		Expect(reflect.TypeOf(aList.Data).Name()).To(Equal("TypeV3"))
-
-		Expect(len(aList.Info.Labels)).To(Equal(2))
-		Expect(aList.Info.Labels[0]).To(Equal("rowing"))
-		Expect(aList.Info.Labels[1]).To(Equal("concept2"))
+		checkTypeV3Info(aList)
+	})
+	When("Making sure we enrich the list with the correct labels", func() {
+		It("Adding the labels", func() {
+			input := `
+		{
+		  "info": {
+		      "title": "Getting my row on.",
+		      "type": "v3"
+		  },
+		  "data": [{
+		    "when": "2019-05-06",
+		    "overall": {
+		      "time": "7:15.9",
+		      "distance": 2000,
+		      "spm": 28,
+		      "p500": "1:48.9"
+		    },
+		    "splits": [
+		      {
+		        "time": "1:46.4",
+		        "distance": 500,
+		        "spm": 29,
+		        "p500": "1:58.0"
+		      }
+		    ]
+		  }]
+		}
+		`
+			jsonBytes := []byte(input)
+			aList := new(alist.Alist)
+			err := aList.UnmarshalJSON(jsonBytes)
+			Expect(err).ShouldNot(HaveOccurred())
+			checkTypeV3Info(aList)
+		})
 	})
 
 	When("Checking the data structure", func() {
@@ -126,14 +164,7 @@ var _ = Describe("Testing List type V3", func() {
 					Expect(err.Error()).To(Equal("When should be YYYY-MM-DD."))
 				})
 			})
-			/*
-			   type V3Split struct {
-			   	Time     string `json:"time"`
-			   	Distance int    `json:"distance"`
-			   	Spm      int    `json:"spm"`
-			   	P500     string `json:"p500"`
-			   }
-			*/
+
 			Context("Overall, a single split", func() {
 				var input alist.V3Split
 				BeforeEach(func() {
@@ -242,15 +273,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestNewTypeV3(t *testing.T) {
-	aList := NewTypeV3()
-	assert.Equal(t, Concept2, aList.Info.ListType)
-	assert.Equal(t, "TypeV3", reflect.TypeOf(aList.Data).Name())
-	assert.Equal(t, 2, len(aList.Info.Labels))
-	assert.Equal(t, "rowing", aList.Info.Labels[0])
-	assert.Equal(t, "concept2", aList.Info.Labels[1])
-}
 
 func TestAlistTypeV3(t *testing.T) {
 	input := `
