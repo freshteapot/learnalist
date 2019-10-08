@@ -8,6 +8,7 @@ const (
 	ValidationErrorListV4                   = "Failed to pass list type v4."
 	ValidationWarningLabelToLong            = "The label cannot be longer than 20 characters."
 	ValidationWarningLabelNotEmpty          = "The label cannot be empty."
+	ValidationUUIDMismatch                  = "The list uuid in the uri doesnt match that in the payload"
 	ValidationAlistTypeV1                   = "Please refer to the documentation on list type v1"
 	ValidationAlistTypeV2                   = "Please refer to the documentation on list type v2"
 	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
