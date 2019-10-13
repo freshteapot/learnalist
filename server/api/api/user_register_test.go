@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var _ = Describe("Testing User endpoints", func() {
+var _ = Describe("Testing Register user endpoint", func() {
 	AfterEach(emptyDatabase)
 
 	When("/register", func() {
