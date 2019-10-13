@@ -2,7 +2,6 @@ package api_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -14,7 +13,6 @@ import (
 )
 
 func emptyDatabase() {
-	fmt.Println("cleaning")
 	database.EmptyDatabase(dal.Db)
 }
 

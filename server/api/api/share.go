@@ -11,17 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type HttpShareListInput struct {
-	AlistUUID string `json:"alist_uuid"`
-	Action    string `json:"action"`
-}
-
-type HttpShareListWithUserInput struct {
-	UserUUID  string `json:"user_uuid"`
-	AlistUUID string `json:"alist_uuid"`
-	Action    string `json:"action"`
-}
-
 func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	// TODO maybe we support an array

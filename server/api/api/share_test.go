@@ -4,7 +4,6 @@ package api_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -44,7 +43,6 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			userB = &uuid.User{
 				Uuid: "fake-456",
 			}
-			fmt.Println(userB)
 
 			method = http.MethodPost
 			uri = "/api/v1/share/readaccess"
@@ -264,7 +262,6 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			userB = &uuid.User{
 				Uuid: "fake-456",
 			}
-			fmt.Println(userB)
 
 			method = http.MethodPost
 			uri = "/api/v1/share/alist"

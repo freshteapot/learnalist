@@ -17,13 +17,11 @@ When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
 */
 func (m *Manager) V1PostRegister(c echo.Context) error {
-	var input = &user.RegisterInput{}
-	var cleanedUser user.RegisterInput
-
+	var input HttpUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
-	err := json.Unmarshal(jsonBytes, input)
+	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
@@ -31,7 +29,12 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	cleanedUser, err = user.Validate(*input)
+	cleanedUser := user.RegisterInput{
+		Username: input.Username,
+		Password: input.Password,
+	}
+
+	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,

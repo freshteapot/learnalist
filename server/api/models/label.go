@@ -59,14 +59,13 @@ func (dal *DAL) PostUserLabel(label *UserLabel) (int, error) {
 	query := "INSERT INTO user_labels(label, user_uuid) VALUES (:label, :user_uuid);"
 
 	_, err = dal.Db.NamedExec(query, label)
-	statusCode = http.StatusCreated
 	if err != nil {
-		statusCode = http.StatusBadRequest
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
-			statusCode = http.StatusOK
+			return http.StatusOK, nil
 		}
+		return http.StatusInternalServerError, err
 	}
-	return statusCode, err
+	return http.StatusCreated, nil
 }
 
 // Parse in the user uuid and get back their labels

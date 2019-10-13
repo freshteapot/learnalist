@@ -14,6 +14,7 @@ const (
 	ValidationAlistTypeV3                   = "Please refer to the documentation on list type v3"
 	ValidationAlistTypeV4                   = "Please refer to the documentation on list type v4"
 	ValidationUserRegister                  = "Please refer to the documentation on user registration"
+	ValidationLabel                         = "Please refer to the documentation on label(s)"
 	SuccessAlistNotFound                    = "List not found."
 	SuccessUserNotFound                     = "User not found."
 	InternalServerErrorMissingAlistUuid     = "Uuid is missing, possibly an internal error"
