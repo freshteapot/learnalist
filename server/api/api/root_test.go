@@ -1,25 +1,25 @@
-package api
+package api_test
 
 import (
 	"net/http"
-	"net/http/httptest"
-	"strings"
 
 	"github.com/labstack/echo/v4"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func (suite *ApiSuite) TestGetRoot() {
-	expected := `{"message":"1, 2, 3. Lets go!"}`
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+var _ = Describe("Testing Root endpoint", func() {
+	It("Simple response", func() {
+		input := ""
+		method := http.MethodGet
+		uri := "/api/v1/"
+		req, rec := setupFakeEndpoint(method, uri, input)
 
-	if suite.NoError(m.V1GetRoot(c)) {
-		suite.Equal(http.StatusOK, rec.Code)
-		response := strings.TrimSpace(rec.Body.String())
-		suite.Equal(expected, response)
-	}
+		e := echo.New()
+		c := e.NewContext(req, rec)
 
-}
+		m.V1GetRoot(c)
+		Expect(rec.Code).To(Equal(http.StatusOK))
+		Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"1, 2, 3. Lets go!"}`))
+	})
+})
