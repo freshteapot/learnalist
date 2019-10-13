@@ -44,25 +44,34 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		Password: cleanedUser.Password,
 	}
 
-	statusCode := http.StatusCreated
-	newUser, err := m.Datastore.GetUserByCredentials(loginUser)
-	if err != nil {
-		if err.Error() == i18n.DatabaseLookupNotFound {
-			newUser, err = m.Datastore.InsertNewUser(loginUser)
-			if err != nil {
-				response := HttpResponseMessage{
-					Message: err.Error(),
-				}
-				return c.JSON(http.StatusBadRequest, response)
-			}
+	newUser, err := m.Datastore.InsertNewUser(loginUser)
+	if err == nil {
+		response := user.RegisterResponse{
+			Uuid:     newUser.Uuid,
+			Username: cleanedUser.Username,
 		}
-	} else {
-		statusCode = http.StatusOK
+		return c.JSON(http.StatusCreated, response)
+	}
+
+	if err.Error() != i18n.UserInsertUsernameExists {
+		response := HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	existingUser, err := m.Datastore.GetUserByCredentials(loginUser)
+	if err != nil {
+		response := HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+
 	}
 
 	response := user.RegisterResponse{
-		Uuid:     newUser.Uuid,
+		Uuid:     existingUser.Uuid,
 		Username: cleanedUser.Username,
 	}
-	return c.JSON(statusCode, response)
+	return c.JSON(http.StatusOK, response)
 }

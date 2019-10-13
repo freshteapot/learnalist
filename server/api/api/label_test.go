@@ -1,5 +1,6 @@
 package api
 
+/*
 import (
 	"encoding/json"
 	"net/http"
@@ -112,3 +113,4 @@ func (suite *ApiSuite) getLabels(userUUID string) (statusCode int, responseBytes
 	suite.NoError(m.V1GetUserLabels(c))
 	return rec.Code, rec.Body.Bytes()
 }
+*/

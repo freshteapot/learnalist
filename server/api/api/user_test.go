@@ -1,102 +1,149 @@
-package api
+package api_test
 
+//2, as I am being really lazy :(, once all moved over to ginkgo remove.
 import (
-	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
+	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/labstack/echo/v4"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
-// @todo this needs faking of the actual database commands.
+var _ = Describe("Testing User endpoints", func() {
+	AfterEach(emptyDatabase)
 
-func (suite *ApiSuite) TestPostRegisterEmptyBody() {
-	var raw map[string]interface{}
-	statusCode, jsonBytes := suite.createNewUser("")
-	suite.Equal(http.StatusBadRequest, statusCode)
-	json.Unmarshal(jsonBytes, &raw)
-	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
-}
+	When("/register", func() {
+		var userUUID string
+		var datastore *mockModels.Datastore
+		BeforeEach(func() {
+			datastore = &mockModels.Datastore{}
+			m.Datastore = datastore
+		})
 
-func (suite *ApiSuite) TestPostRegisterNotValidJSON() {
-	badInput := `{username:"chris", password:"test"}`
-	var raw map[string]interface{}
-	statusCode, jsonBytes := suite.createNewUser(badInput)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	json.Unmarshal(jsonBytes, &raw)
-	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
-}
+		It("POST'ing an invalid input", func() {
+			input := ""
+			req, rec := setupFakeEndpoint(http.MethodGet, "/api/v1/register", input)
+			e := echo.New()
+			c := e.NewContext(req, rec)
+			//c.Set("loggedInUser", *user)
+			m.V1PostRegister(c)
+			Expect(rec.Code).To(Equal(http.StatusBadRequest))
+			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+		})
 
-func (suite *ApiSuite) TestPostRegisterNotValidPayload() {
-	badInput := `{"username":"", "password":""}`
-	var raw map[string]interface{}
-	statusCode, jsonBytes := suite.createNewUser(badInput)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	json.Unmarshal(jsonBytes, &raw)
-	suite.Equal(i18n.ValidationUserRegister, raw["message"].(string))
-}
+		Context("POST'ing an invalid input", func() {
+			It("Invalid password", func() {
+				user := &uuid.User{
+					Uuid: userUUID,
+				}
+				input := `{"username":"iamusera", "password":"test1"}`
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				datastore.On("GetUserByCredentials", mock.Anything).Return(&uuid.User{}, errors.New("Fail"))
 
-func (suite *ApiSuite) TestPostRegisterValidPayload() {
-	input := getValidUserRegisterInput("a")
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusBadRequest))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+			})
 
-	statusCode, jsonBytes := suite.createNewUser(input)
-	suite.Equal(http.StatusCreated, statusCode)
-	responseA := strings.TrimSpace(string(jsonBytes))
-	// Check we get the same userid
-	statusCode, jsonBytes = suite.createNewUser(input)
-	suite.Equal(http.StatusOK, statusCode)
-	responseB := strings.TrimSpace(string(jsonBytes))
+			It("Invalid username", func() {
+				user := &uuid.User{
+					Uuid: userUUID,
+				}
+				inputs := []string{
+					`{"username":"iamu@", "password":"test123"}`,
+					`{"username":"iamu", "password":"test123"}`,
+				}
 
-	suite.Equal(responseA, responseB)
-}
+				for _, input := range inputs {
+					req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+					e := echo.New()
+					c := e.NewContext(req, rec)
+					c.Set("loggedInUser", *user)
+					datastore.On("GetUserByCredentials", mock.Anything).Return(&uuid.User{}, errors.New("Fail"))
 
-func (suite *ApiSuite) TestPostRegisterValidPayloadThenFake() {
-	input := getValidUserRegisterInput("a")
-	fake := `{"username":"iamusera", "password":"test123456"}`
-	expectedFakeResponse := fmt.Sprintf(`{"message":"%s"}`, i18n.UserInsertUsernameExists)
-	statusCode, _ := suite.createNewUser(input)
-	suite.Equal(http.StatusCreated, statusCode)
+					m.V1PostRegister(c)
+					Expect(rec.Code).To(Equal(http.StatusBadRequest))
+					Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+				}
+			})
+		})
 
-	statusCode, jsonBytes := suite.createNewUser(fake)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	response := strings.TrimSpace(string(jsonBytes))
-	suite.Equal(response, expectedFakeResponse)
-}
+		Context("Registering a valid user", func() {
+			It("New user", func() {
+				user := &uuid.User{
+					Uuid: "fake-123",
+				}
+				input := `{"username":"iamusera", "password":"test123"}`
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				datastore.On("InsertNewUser", mock.Anything).Return(user, nil)
 
-func (suite *ApiSuite) TestPostRegisterRepeat() {
-	var statusCode int
-	input := getValidUserRegisterInput("a")
-	_, statusCode = suite.createNewUserWithSuccess(input)
-	suite.Equal(http.StatusCreated, statusCode)
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusCreated))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
+			})
 
-	_, statusCode = suite.createNewUserWithSuccess(input)
-	suite.Equal(http.StatusOK, statusCode)
-}
+			It("New user, database issue via saving user", func() {
+				user := &uuid.User{
+					Uuid: "fake-123",
+				}
+				input := `{"username":"iamusera", "password":"test123"}`
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				datastore.On("GetUserByCredentials", mock.Anything).Return(user, errors.New(i18n.DatabaseLookupNotFound))
+				datastore.On("InsertNewUser", mock.Anything).Return(user, errors.New("Fake"))
 
-func (suite *ApiSuite) createNewUser(input string) (statusCode int, responseBytes []byte) {
-	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	c := e.NewContext(req, rec)
-	suite.NoError(m.V1PostRegister(c))
-	return rec.Code, rec.Body.Bytes()
-}
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			})
 
-func (suite *ApiSuite) createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
-	var raw map[string]interface{}
-	statusCode, jsonBytes := suite.createNewUser(input)
-	suite.Contains([]int{http.StatusOK, http.StatusCreated}, statusCode)
-	json.Unmarshal(jsonBytes, &raw)
-	user_uuid := raw["uuid"].(string)
-	return user_uuid, statusCode
-}
+			It("New user, but already exists, database issue", func() {
+				user := &uuid.User{
+					Uuid: "fake-123",
+				}
+				input := `{"username":"iamusera", "password":"test123"}`
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				datastore.On("InsertNewUser", mock.Anything).Return(user, errors.New(i18n.UserInsertUsernameExists))
+				datastore.On("GetUserByCredentials", mock.Anything).Return(user, errors.New("Fake"))
 
-func getValidUserRegisterInput(which string) string {
-	if which == "b" {
-		return `{"username":"iamuserb", "password":"test123"}`
-	}
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			})
 
-	return `{"username":"iamusera", "password":"test123"}`
-}
+			It("New user, but already exists", func() {
+				user := &uuid.User{
+					Uuid: "fake-123",
+				}
+				input := `{"username":"iamusera", "password":"test123"}`
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				datastore.On("InsertNewUser", mock.Anything).Return(user, errors.New(i18n.UserInsertUsernameExists))
+				datastore.On("GetUserByCredentials", mock.Anything).Return(user, nil)
+
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
+			})
+		})
+	})
+
+})

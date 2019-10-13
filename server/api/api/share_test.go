@@ -1,5 +1,6 @@
 package api
 
+/*
 import (
 	"encoding/json"
 	"net/http"
@@ -157,3 +158,4 @@ func (suite *ApiSuite) shareAlist(userUUID string, input string) (statusCode int
 	suite.NoError(m.V1ShareAlist(c))
 	return rec.Code, rec.Body.Bytes()
 }
+*/

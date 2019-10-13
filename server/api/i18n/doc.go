@@ -20,6 +20,7 @@ const (
 	InternalServerErrorMissingUserUuid      = "User.Uuid is missing, possibly an internal error"
 	InternalServerErrorTalkingToDatabase    = "Issue with talking to the database in %s."
 	InternalServerErrorAclLookup            = "Issue with talking to the database whilst doing acl lookup"
+	InternalServerErrorFunny                = "Sadly, our service has taken a nap."
 	InputDeleteAlistOperationOwnerOnly      = "Only the owner of the list can remove it."
 	InputSaveAlistOperationOwnerOnly        = "Only the owner of the list can modify it."
 	PostUserLabelJSONFailure                = "Your input is invalid json."

@@ -103,11 +103,13 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	aList.User = user
 
 	if method == http.MethodPut {
-		if inputUuid != aList.Uuid {
-			response := HttpResponseMessage{
-				Message: i18n.ValidationUUIDMismatch,
+		if aList.Uuid != "" {
+			if inputUuid != aList.Uuid {
+				response := HttpResponseMessage{
+					Message: i18n.ValidationUUIDMismatch,
+				}
+				return c.JSON(http.StatusBadRequest, response)
 			}
-			return c.JSON(http.StatusBadRequest, response)
 		}
 		aList.Uuid = inputUuid
 	}
