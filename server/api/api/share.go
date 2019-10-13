@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type HttpShareListReadAccessInput struct {
+type HttpShareListInput struct {
 	AlistUUID string `json:"alist_uuid"`
 	Action    string `json:"action"`
 }
@@ -22,7 +22,7 @@ type HttpShareListWithUserInput struct {
 	Action    string `json:"action"`
 }
 
-func (m *Manager) V1ShareAlist(c echo.Context) error {
+func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	// TODO maybe we support an array
 	var input = &HttpShareListWithUserInput{}
@@ -38,12 +38,31 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
-	if aList == nil {
+	switch input.Action {
+	case aclKeys.ActionGrant:
+		break
+	case aclKeys.ActionRevoke:
+		break
+	default:
 		response := HttpResponseMessage{
-			Message: i18n.SuccessAlistNotFound,
+			Message: i18n.ApiShareValidationError,
 		}
-		return c.JSON(http.StatusNotFound, response)
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	aList, err := m.Datastore.GetAlist(input.AlistUUID)
+	if err != nil {
+		if err.Error() == i18n.SuccessAlistNotFound {
+			response := HttpResponseMessage{
+				Message: i18n.SuccessAlistNotFound,
+			}
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
 	}
 
 	if aList.User.Uuid != user.Uuid {
@@ -53,27 +72,33 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
-	if input.UserUUID != user.Uuid {
-		if !m.Datastore.UserExists(input.UserUUID) {
-			response := HttpResponseMessage{
-				Message: i18n.SuccessUserNotFound,
-			}
-			return c.JSON(http.StatusNotFound, response)
+	if input.UserUUID == user.Uuid {
+		response := HttpResponseMessage{
+			Message: i18n.ApiShareYouCantShareWithYourself,
 		}
-		if input.Action == aclKeys.ActionGrant {
-			m.Acl.GrantUserListReadAccess(input.AlistUUID, input.UserUUID)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if !m.Datastore.UserExists(input.UserUUID) {
+		response := HttpResponseMessage{
+			Message: i18n.SuccessUserNotFound,
 		}
-		if input.Action == aclKeys.ActionRevoke {
-			m.Acl.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
-		}
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	switch input.Action {
+	case aclKeys.ActionGrant:
+		m.Acl.GrantUserListReadAccess(input.AlistUUID, input.UserUUID)
+	case aclKeys.ActionRevoke:
+		m.Acl.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
 	}
 
 	return c.JSON(http.StatusOK, input)
 }
 
-func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
+func (m *Manager) V1ShareAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	var input = &HttpShareListReadAccessInput{}
+	var input = &HttpShareListInput{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -82,6 +107,20 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: i18n.PostShareListJSONFailure,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	switch input.Action {
+	case aclKeys.SharedWithPublic:
+		break
+	case aclKeys.NotShared:
+		break
+	case aclKeys.SharedWithFriends:
+		break
+	default:
+		response := HttpResponseMessage{
+			Message: i18n.ApiShareValidationError,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -102,19 +141,16 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	}
 
 	message := ""
-	if input.Action == aclKeys.SharedWithPublic {
+	switch input.Action {
+	case aclKeys.SharedWithPublic:
 		m.Acl.ShareListWithPublic(aList.Uuid)
-		message = "List is now public"
-	}
-
-	if input.Action == aclKeys.NotShared {
+		message = i18n.ApiShareListSuccessWithPublic
+	case aclKeys.NotShared:
 		m.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
-		message = "List is now private to the owner"
-	}
-
-	if input.Action == aclKeys.SharedWithFriends {
+		message = i18n.ApiShareListSuccessPrivate
+	case aclKeys.SharedWithFriends:
 		m.Acl.ShareListWithFriends(aList.Uuid)
-		message = "List is now private to the owner and those granted access"
+		message = i18n.ApiShareListSuccessWithFriends
 	}
 
 	response := HttpResponseMessage{

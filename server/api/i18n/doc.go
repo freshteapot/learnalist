@@ -35,4 +35,9 @@ const (
 	UserInsertUsernameExists                = "Username already exists."
 	DatabaseLookupNotFound                  = "sql: no rows in result set"
 	AclHttpAccessDeny                       = "Access Denied"
+	ApiShareYouCantShareWithYourself        = "Today, we dont let you share with yourself"
+	ApiShareValidationError                 = "Please refer to the documentation on sharing a list"
+	ApiShareListSuccessWithPublic           = "List is now public"
+	ApiShareListSuccessWithFriends          = "List is now private to the owner and those granted access"
+	ApiShareListSuccessPrivate              = "List is now private to the owner"
 )

@@ -108,13 +108,13 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	query := "SELECT * FROM alist_kv WHERE uuid = ?"
 	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
-		log.Println(err)
-	}
-	if err != nil {
 		if err.Error() == i18n.DatabaseLookupNotFound {
 			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
+
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
+		log.Println(err)
+		return nil, err
 	}
 
 	aList := convertDbRowToAlist(row)

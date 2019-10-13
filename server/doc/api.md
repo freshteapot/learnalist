@@ -12,5 +12,5 @@
 | POST | /v1/labels | Save a new label. | 200, 201, 400 |
 | GET | /v1/labels/by/me | Get labels by the currently logged in user. | 200, 500 |
 | DELETE | /v1/labels/{uuid} | Delete a label via uuid. | 200, 500 |
-| POST | /v1/share/alist | Share a list with another user. | 200, 404, 400, 403 |
-| PUT | /v1/share/readaccess | Set the read access of a list. | 200, 404, 400, 403 |
+| PUT | /v1/share/alist | Share a list with public, self or friends. | 200, 404, 400, 403 |
+| PUT | /v1/share/readaccess | Give another users read access to your list. | 200, 404, 400, 403, 422 |
