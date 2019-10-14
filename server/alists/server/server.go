@@ -72,7 +72,7 @@ func (m *Manager) serveAlist(userUUID string, urlPath string) (string, ErrorHttp
 	path := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(path); err == nil {
-		allow, err := m.Acl.HasUserListReadAccess(userUUID, alistUUID)
+		allow, err := m.Acl.HasUserListReadAccess(alistUUID, userUUID)
 		if err != nil {
 			return "", http.StatusInternalServerError
 		}
