@@ -59,5 +59,5 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 	// Labels
 	v1.POST("/labels", m.V1PostUserLabel)
 	v1.GET("/labels/by/me", m.V1GetUserLabels)
-	v1.DELETE("/labels/:uuid", m.V1RemoveUserLabel)
+	v1.DELETE("/labels/:label", m.V1RemoveUserLabel)
 }

@@ -218,6 +218,10 @@ var _ = Describe("Testing Label endpoints", func() {
 				req, rec = setupFakeEndpoint(method, uri, "")
 				c = e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
+				c.SetPath("/api/v1/labels/:label")
+				c.Set("loggedInUser", *user)
+				c.SetParamNames("label")
+				c.SetParamValues("test")
 
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(errors.New("Failed"))
 				m.V1RemoveUserLabel(c)
@@ -231,6 +235,10 @@ var _ = Describe("Testing Label endpoints", func() {
 				req, rec = setupFakeEndpoint(method, uri, "")
 				c = e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
+				c.SetPath("/api/v1/labels/:label")
+				c.Set("loggedInUser", *user)
+				c.SetParamNames("label")
+				c.SetParamValues("test")
 
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(nil)
 				m.V1RemoveUserLabel(c)

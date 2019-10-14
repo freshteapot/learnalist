@@ -43,13 +43,6 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 	if method == http.MethodPut {
 		inputUuid = c.Param("uuid")
-		// Check via the server
-		// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-		/*
-			r := c.Request()
-			inputUuid = strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
-			fmt.Println(inputUuid)
-		*/
 		if inputUuid == "" {
 			response := HttpResponseMessage{
 				Message: i18n.ValidationAlists,

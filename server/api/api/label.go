@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/models"
@@ -68,11 +67,7 @@ func (m *Manager) V1GetUserLabels(c echo.Context) error {
 
 func (m *Manager) V1RemoveUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	r := c.Request()
-	// Might not need to do this.
-	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	label := strings.TrimPrefix(r.URL.Path, "/api/v1/labels/")
-	fmt.Println("Sad times to need to do it.")
+	label := c.Param("label")
 	err := m.Datastore.RemoveUserLabel(label, user.Uuid)
 	response := HttpResponseMessage{}
 	if err != nil {

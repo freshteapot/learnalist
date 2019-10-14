@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/e2e"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,10 +27,25 @@ var inputAlistV1 = `
   ],
   "info": {
       "title": "Days of the Week",
-      "type": "v1"
+      "type": "v1",
+			"shared_with": "%s"
   }
 }
 `
+
+func getInputListWithShare(sharedWith string) string {
+	// Set shared
+	with := ""
+	switch sharedWith {
+	case aclKeys.SharedWithPublic:
+		with = aclKeys.SharedWithPublic
+	case aclKeys.SharedWithFriends:
+		with = aclKeys.SharedWithFriends
+	case aclKeys.NotShared:
+		with = aclKeys.NotShared
+	}
+	return fmt.Sprintf(inputAlistV1, with)
+}
 
 func TestSharePublic(t *testing.T) {
 	var httpResponse e2e.HttpResponse
@@ -42,7 +58,7 @@ func TestSharePublic(t *testing.T) {
 	fmt.Println(userInfoOwner.Uuid)
 	userInfoReader := learnalistClient.Register(usernameReader, password)
 	fmt.Println(userInfoReader.Uuid)
-	listInfo := learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
 	fmt.Println(listInfo.Uuid)
 
 	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
@@ -57,7 +73,7 @@ func TestSharePublic(t *testing.T) {
 	assert.Equal(httpResponse.StatusCode, 403)
 	// Currently it doesnt handle too many requests
 	for j := 0; j <= 10; j++ {
-		learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
 	}
 	/*
 		for j := 0; j <= 100; j++ {
@@ -75,10 +91,7 @@ func TestSharePrivate(t *testing.T) {
 
 	userInfoOwner := learnalistClient.Register(usernameOwner, password)
 	userInfoReader := learnalistClient.Register(usernameReader, password)
-	listInfo := learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
-	fmt.Println(listInfo)
+	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
 	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
-	//httpResponse = learnalistClient.GetListByUuID(userInfoOwner, listInfo.Uuid)
-	//assert.Equal(httpResponse.StatusCode, 200)
 }
