@@ -36,10 +36,6 @@ type Interact struct {
 	Slideshow string `json:"slideshow"`
 }
 
-type Sharing struct {
-	With string `json:"with"`
-}
-
 type InputAlist struct {
 	*Alist
 }
