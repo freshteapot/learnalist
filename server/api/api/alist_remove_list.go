@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
@@ -11,14 +10,11 @@ import (
 )
 
 func (m *Manager) V1RemoveAlist(c echo.Context) error {
-	r := c.Request()
-	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	alist_uuid := strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
-
+	alistUUID := c.Param("uuid")
 	user := c.Get("loggedInUser").(uuid.User)
 	response := HttpResponseMessage{}
 
-	err := m.Datastore.RemoveAlist(alist_uuid, user.Uuid)
+	err := m.Datastore.RemoveAlist(alistUUID, user.Uuid)
 	if err != nil {
 		if err.Error() == i18n.SuccessAlistNotFound {
 			response.Message = err.Error()
@@ -35,7 +31,7 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	}
 
 	// Remove from cache
-	m.HugoHelper.Remove(alist_uuid)
-	response.Message = fmt.Sprintf(i18n.ApiDeleteAlistSuccess, alist_uuid)
+	m.HugoHelper.Remove(alistUUID)
+	response.Message = fmt.Sprintf(i18n.ApiDeleteAlistSuccess, alistUUID)
 	return c.JSON(http.StatusOK, response)
 }

@@ -232,6 +232,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Failed"}`))
 			})
 		})
+
 	})
 
 })
