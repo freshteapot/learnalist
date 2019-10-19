@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -28,10 +27,7 @@ func (m *Manager) V1GetListsByMe(c echo.Context) error {
 
 func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	r := c.Request()
-	// TODO Reference https://github.com/freshteapot/learnalist-api/issues/22
-	uuid := strings.TrimPrefix(r.URL.Path, "/api/v1/alist/")
-
+	uuid := c.Param("uuid")
 	if uuid == "" {
 		response := HttpResponseMessage{
 			Message: i18n.InputMissingListUuid,
@@ -55,6 +51,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 
 	alist, err := m.Datastore.GetAlist(uuid)
 	if err != nil {
+		// With the look up of access before, this one doesnt fully make sense anymore.
 		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
 		response := HttpResponseMessage{
 			Message: message,
