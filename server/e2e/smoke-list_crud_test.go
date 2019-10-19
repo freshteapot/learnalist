@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/e2e"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/stretchr/testify/assert"
@@ -279,4 +280,74 @@ func TestAlistFilter(t *testing.T) {
 	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "card", "")
 	assert.NoError(err)
 	assert.Equal(0, len(aLists))
+}
+
+func TestMethodNotSupportedForSavingList(t *testing.T) {
+	assert := assert.New(t)
+	username := generateUsername()
+	learnalistClient := e2e.NewClient(server)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+
+	uri := "/api/v1/alist"
+	resp, err := learnalistClient.RawV1(userInfoOwner, http.MethodDelete, uri, "")
+	assert.NoError(err)
+	assert.Equal(resp.StatusCode, http.StatusMethodNotAllowed)
+}
+
+func TestDeleteAlistNotFound(t *testing.T) {
+	var raw map[string]interface{}
+	assert := assert.New(t)
+	username := generateUsername()
+	learnalistClient := e2e.NewClient(server)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+
+	alistUUID := "fake"
+	resp, err := learnalistClient.RawDeleteListV1(userInfoOwner, alistUUID)
+	assert.NoError(err)
+	assert.Equal(resp.StatusCode, http.StatusNotFound)
+
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	assert.NoError(err)
+
+	json.Unmarshal(data, &raw)
+	assert.Equal(raw["message"].(string), i18n.SuccessAlistNotFound)
+}
+
+func TestOnlyOwnerOfTheListCanAlterIt(t *testing.T) {
+	var raw map[string]interface{}
+	assert := assert.New(t)
+	learnalistClient := e2e.NewClient(server)
+	userInfoOwner := learnalistClient.Register(usernameOwner, password)
+	userInfoReader := learnalistClient.Register(usernameReader, password)
+
+	aList, err := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+	assert.NoError(err)
+	assert.NotEmpty(aList.Uuid)
+
+	b, _ := json.Marshal(aList)
+	resp, err := learnalistClient.RawPutListV1(userInfoOwner, aList.Uuid, string(b))
+	assert.NoError(err)
+	assert.Equal(resp.StatusCode, http.StatusOK)
+
+	resp, err = learnalistClient.RawPutListV1(userInfoReader, aList.Uuid, string(b))
+	assert.NoError(err)
+	assert.Equal(resp.StatusCode, http.StatusForbidden)
+
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	assert.NoError(err)
+	json.Unmarshal(data, &raw)
+	assert.Equal(raw["message"].(string), i18n.InputSaveAlistOperationOwnerOnly)
+
+	resp, err = learnalistClient.RawDeleteListV1(userInfoReader, aList.Uuid)
+	assert.NoError(err)
+	assert.Equal(resp.StatusCode, http.StatusForbidden)
+	defer resp.Body.Close()
+	data, err = ioutil.ReadAll(resp.Body)
+	assert.NoError(err)
+	json.Unmarshal(data, &raw)
+	assert.Equal(raw["message"].(string), i18n.InputDeleteAlistOperationOwnerOnly)
 }

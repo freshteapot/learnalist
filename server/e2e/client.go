@@ -171,6 +171,22 @@ func (c Client) PutListV1(userInfo RegisterResponse, uuid string, input string) 
 	return response, nil
 }
 
+func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.Response, error) {
+	fmt.Println("Deleting a list via RawDeleteListV1")
+	var response *http.Response
+	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
+
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	if err != nil {
+		// handle err
+		return response, nil
+	}
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+
+	return c.httpClient.Do(req)
+}
+
 func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action string) MessageResponse {
 	body := strings.NewReader(fmt.Sprintf(`{
   "alist_uuid": "%s",
@@ -352,4 +368,20 @@ func (c Client) GetListsByMe(userInfo RegisterResponse, labels string, listType 
 		return response, err
 	}
 	return response, nil
+}
+
+func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, input string) (*http.Response, error) {
+	var response *http.Response
+
+	url := fmt.Sprintf("%s/%s", c.getServerURL(), strings.TrimPrefix(uri, "/"))
+	body := strings.NewReader(input)
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		// handle err
+		return response, nil
+	}
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+
+	return c.httpClient.Do(req)
 }
