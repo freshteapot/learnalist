@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/api"
@@ -34,12 +36,25 @@ type HttpResponse struct {
 }
 
 type Client struct {
-	server string
+	server     string
+	httpClient *http.Client
 }
 
 func NewClient(_server string) Client {
+	var netTransport = &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout: 1 * time.Millisecond,
+		}).Dial,
+		TLSHandshakeTimeout: 1 * time.Millisecond,
+	}
+	var netClient = &http.Client{
+		Timeout:   time.Millisecond * 5,
+		Transport: netTransport,
+	}
+
 	return Client{
-		server: _server,
+		server:     _server,
+		httpClient: netClient,
 	}
 }
 
@@ -65,17 +80,28 @@ func (c Client) Register(username string, password string) RegisterResponse {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		// handle err
+		fmt.Println("Failed NewRequest")
+		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
+		panic(err)
 	}
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle err
+		panic(err)
+	}
 	var response RegisterResponse
 	err = json.Unmarshal(data, &response)
+	if err != nil {
+		// handle err
+		panic(err)
+	}
 	response.BasicAuth = getBasicAuth(username, password)
 	return response
 }
@@ -92,7 +118,7 @@ func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Re
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
-	return http.DefaultClient.Do(req)
+	return c.httpClient.Do(req)
 }
 
 func (c Client) PostListV1(userInfo RegisterResponse, input string) (alist.Alist, error) {
@@ -124,7 +150,7 @@ func (c Client) RawPutListV1(userInfo RegisterResponse, uuid string, input strin
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
-	return http.DefaultClient.Do(req)
+	return c.httpClient.Do(req)
 }
 
 func (c Client) PutListV1(userInfo RegisterResponse, uuid string, input string) (alist.Alist, error) {
@@ -157,7 +183,7 @@ func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
 	}
@@ -168,7 +194,7 @@ func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action
 	return response
 }
 
-func (c Client) GetListByUuID(userInfo RegisterResponse, uuid string) HttpResponse {
+func (c Client) GetListByUUID(userInfo RegisterResponse, uuid string) HttpResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -176,7 +202,7 @@ func (c Client) GetListByUuID(userInfo RegisterResponse, uuid string) HttpRespon
 	}
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
 	}
@@ -207,7 +233,7 @@ func (c Client) RawPostLabelV1(userInfo RegisterResponse, label string) (*http.R
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
-	return http.DefaultClient.Do(req)
+	return c.httpClient.Do(req)
 }
 
 func (c Client) PostLabelV1(userInfo RegisterResponse, label string) ([]string, error) {
@@ -215,6 +241,41 @@ func (c Client) PostLabelV1(userInfo RegisterResponse, label string) ([]string, 
 	var response []string
 
 	resp, err := c.RawPostLabelV1(userInfo, label)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return response, err
+	}
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		return response, err
+	}
+	return response, nil
+}
+
+func (c Client) RawGetLabelsByMeV1(userInfo RegisterResponse) (*http.Response, error) {
+	var response *http.Response
+	fmt.Println("GET  labels via RawGetLabelsByMeV1")
+	url := fmt.Sprintf("%s/api/v1/labels/by/me", c.getServerURL())
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		// handle err
+		return response, nil
+	}
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+
+	return c.httpClient.Do(req)
+}
+
+func (c Client) GetLabelsByMeV1(userInfo RegisterResponse) ([]string, error) {
+	fmt.Println("GET  labels via GetLabelsByMeV1")
+	var response []string
+
+	resp, err := c.RawGetLabelsByMeV1(userInfo)
 	if err != nil {
 		return response, err
 	}
@@ -242,5 +303,19 @@ func (c Client) RawDeleteLabelV1(userInfo RegisterResponse, label string) (*http
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
-	return http.DefaultClient.Do(req)
+	return c.httpClient.Do(req)
+}
+
+func (c Client) RawGetListsByMe(userInfo RegisterResponse) (*http.Response, error) {
+	var response *http.Response
+	url := fmt.Sprintf("%s/api/v1/alist/by/me", c.getServerURL())
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		// handle err
+		return response, nil
+	}
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+
+	return c.httpClient.Do(req)
 }

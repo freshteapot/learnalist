@@ -4,48 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/e2e"
-	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/stretchr/testify/assert"
 )
-
-var usernameOwner = "iamchris"
-var password = "test123"
-var usernameReader = "iamusera"
-
-var server = "http://127.0.0.1:1234"
-var inputAlistV1 = `
-{
-  "data": [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday"
-  ],
-  "info": {
-      "title": "Days of the Week",
-      "type": "v1",
-			"shared_with": "%s"
-  }
-}
-`
-
-func getInputListWithShare(sharedWith string) string {
-	// Set shared
-	with := ""
-	switch sharedWith {
-	case aclKeys.SharedWithPublic:
-		with = aclKeys.SharedWithPublic
-	case aclKeys.SharedWithFriends:
-		with = aclKeys.SharedWithFriends
-	case aclKeys.NotShared:
-		with = aclKeys.NotShared
-	}
-	return fmt.Sprintf(inputAlistV1, with)
-}
 
 func TestSharePublic(t *testing.T) {
 	var httpResponse e2e.HttpResponse
@@ -58,22 +20,22 @@ func TestSharePublic(t *testing.T) {
 	fmt.Println(userInfoOwner.Uuid)
 	userInfoReader := learnalistClient.Register(usernameReader, password)
 	fmt.Println(userInfoReader.Uuid)
-	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
+	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	fmt.Println(listInfo.Uuid)
 
-	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
 	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "public")
 	assert.Equal(messageResponse.Message, "List is now public")
-	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 200)
 	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "friends")
 	assert.Equal(messageResponse.Message, "List is now private to the owner and those granted access")
-	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
 	// Currently it doesnt handle too many requests
 	for j := 0; j <= 10; j++ {
-		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
+		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	}
 	/*
 		for j := 0; j <= 100; j++ {
@@ -91,7 +53,7 @@ func TestSharePrivate(t *testing.T) {
 
 	userInfoOwner := learnalistClient.Register(usernameOwner, password)
 	userInfoReader := learnalistClient.Register(usernameReader, password)
-	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(""))
-	httpResponse = learnalistClient.GetListByUuID(userInfoReader, listInfo.Uuid)
+	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
 }
