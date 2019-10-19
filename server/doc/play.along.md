@@ -1,6 +1,3 @@
-
-
-
 # Play along.
 When the database is created, it is empty.
 
@@ -45,6 +42,10 @@ curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 curl 'http://localhost:1234/api/v1/alist/by/me'
 ```
 
+```sh
+curl 'http://localhost:1234/api/v1/alist/by/me' -u'iamchris:test123'
+```
+
 ### Add a list of type v2.
 
 ```sh
@@ -78,7 +79,7 @@ curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
       },
       "splits": [
         {
-          "time": "1.46.4",
+          "time": "1:46.4",
           "distance": 500,
           "spm": 29,
           "p500": "1:58.0"
@@ -151,28 +152,50 @@ type HttpShareListWithUserInput struct {
 
 Create new user
 ```sh
-curl -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
+curl -s -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
 {
     "username":"iamusera",
     "password":"test123"
 }
-'
+' | jq '.uuid'
 ```
 
-Grant example
 ```sh
-curl -POST 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
-  "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
-  "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+{
+    "data": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1"
+    }
+}
+' | jq '.uuid'
+```
+
+
+Grant example
+
+```sh
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+  "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
+  "user_uuid": "f3572f35-eb7d-5a16-a13f-925e3dd270f6",
   "action": "grant"
 }'
 ```
 
 Revoke example
 ```sh
-curl -POST 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
-  "alist_uuid": "4e63bfd2-067f-5b58-8b8a-80a07f520825",
-  "user_uuid": "5ce50aab-ae59-5a08-8483-5dabab92e563",
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+  "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
+  "user_uuid": "f3572f35-eb7d-5a16-a13f-925e3dd270f6",
   "action": "revoke"
 }'
 ```
@@ -180,23 +203,26 @@ curl -POST 'http://localhost:1234/api/v1/share/alist' -u'iamusera:test123' -d '{
 
 Share list with the public
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
-  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+  "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "action": "public"
 }'
 ```
 
-Share list privately
+curl -XGET 'http://localhost:1234/api/v1/alist/14ae1d04-f26a-524c-8539-2a7059f359e8' -u'iamusera:test123'
+
+Share list with friends
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
-  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
-  "action": "private"
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+  "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
+  "action": "friends"
 }'
 ```
 
 Share list only with owner
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
-  "alist_uuid": "942f561a-6156-552c-9619-f84d0fd41d21",
-  "action": "owner"
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+  "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
+  "action": "private"
 }'
+```
