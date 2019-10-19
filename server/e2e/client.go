@@ -41,14 +41,15 @@ type Client struct {
 }
 
 func NewClient(_server string) Client {
+	timeout := 30 * time.Millisecond
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 1 * time.Millisecond,
+			Timeout: timeout,
 		}).Dial,
-		TLSHandshakeTimeout: 1 * time.Millisecond,
+		TLSHandshakeTimeout: timeout,
 	}
 	var netClient = &http.Client{
-		Timeout:   time.Millisecond * 5,
+		Timeout:   timeout,
 		Transport: netTransport,
 	}
 
@@ -127,6 +128,7 @@ func (c Client) PostListV1(userInfo RegisterResponse, input string) (alist.Alist
 	resp, err := c.RawPostListV1(userInfo, input)
 	if err != nil {
 		// handle err
+		panic(err)
 		return response, nil
 	}
 	defer resp.Body.Close()
@@ -179,6 +181,7 @@ func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action
 	req, err := http.NewRequest("PUT", url, body)
 	if err != nil {
 		// handle err
+		panic(err)
 	}
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
@@ -186,6 +189,7 @@ func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
+		panic(err)
 	}
 	defer resp.Body.Close()
 	var response MessageResponse
@@ -199,12 +203,14 @@ func (c Client) GetListByUUID(userInfo RegisterResponse, uuid string) HttpRespon
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		// handle err
+		panic(err)
 	}
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
+		panic(err)
 	}
 
 	defer resp.Body.Close()
@@ -306,10 +312,20 @@ func (c Client) RawDeleteLabelV1(userInfo RegisterResponse, label string) (*http
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawGetListsByMe(userInfo RegisterResponse) (*http.Response, error) {
+func (c Client) RawGetListsByMe(userInfo RegisterResponse, labels string, listType string) (*http.Response, error) {
 	var response *http.Response
-	url := fmt.Sprintf("%s/api/v1/alist/by/me", c.getServerURL())
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	uri := fmt.Sprintf("%s/api/v1/alist/by/me", c.getServerURL())
+	if labels != "" {
+		uri = fmt.Sprintf("%s?labels=%s", uri, labels)
+	}
+	if listType != "" {
+		uri = fmt.Sprintf("%s?list_type=%s", uri, listType)
+	}
+	if listType != "" && labels != "" {
+		uri = fmt.Sprintf("%s?labels=%s&list_type=%s", uri, labels, listType)
+	}
+
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		// handle err
 		return response, nil
@@ -318,4 +334,22 @@ func (c Client) RawGetListsByMe(userInfo RegisterResponse) (*http.Response, erro
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
+}
+
+func (c Client) GetListsByMe(userInfo RegisterResponse, labels string, listType string) ([]*alist.Alist, error) {
+	var response []*alist.Alist
+	resp, err := c.RawGetListsByMe(userInfo, labels, listType)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return response, err
+	}
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		return response, err
+	}
+	return response, nil
 }

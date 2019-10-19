@@ -137,7 +137,7 @@ func TestUserHasEmptyLists(t *testing.T) {
 	learnalistClient := e2e.NewClient(server)
 	fmt.Printf("> Create user %s\n", username)
 	userInfoOwner := learnalistClient.Register(username, password)
-	resp, err := learnalistClient.RawGetListsByMe(userInfoOwner)
+	resp, err := learnalistClient.RawGetListsByMe(userInfoOwner, "", "")
 	assert.NoError(err)
 	assert.Equal(resp.StatusCode, http.StatusOK)
 
@@ -157,7 +157,7 @@ func TestUserHasTwoListV1AndV2(t *testing.T) {
 	learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.FromToList, ""))
 
-	resp, err := learnalistClient.RawGetListsByMe(userInfoOwner)
+	resp, err := learnalistClient.RawGetListsByMe(userInfoOwner, "", "")
 	assert.NoError(err)
 	assert.Equal(resp.StatusCode, http.StatusOK)
 
@@ -170,4 +170,113 @@ func TestUserHasTwoListV1AndV2(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(aLists[0].Info.ListType, alist.SimpleList)
 	assert.Equal(aLists[1].Info.ListType, alist.FromToList)
+}
+
+func TestAlistV3(t *testing.T) {
+	assert := assert.New(t)
+	username := generateUsername()
+	learnalistClient := e2e.NewClient(server)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+	aList, err := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.Concept2, ""))
+	assert.NoError(err)
+	assert.Equal(aList.Info.Labels, []string{"rowing", "concept2"})
+	aList.Info.Labels = []string{}
+	b, _ := json.Marshal(aList)
+	aList2, err := learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(b))
+	assert.NoError(err)
+	assert.Equal(aList.Uuid, aList2.Uuid)
+	assert.Equal(aList2.Info.Labels, []string{"rowing", "concept2"})
+}
+
+func TestAlistFilter(t *testing.T) {
+	var aLists []*alist.Alist
+	var err error
+	assert := assert.New(t)
+	username := generateUsername()
+	learnalistClient := e2e.NewClient(server)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+	lists := []string{`
+{
+	"data": ["car"],
+	"info": {
+		"title": "Days of the Week",
+		"type": "v1"
+	}
+}
+`,
+		`
+{
+	"data": [],
+	"info": {
+		"title": "Days of the Week 2",
+		"type": "v1"
+	}
+}
+`,
+		`{
+	"data": ["car"],
+	"info": {
+		"title": "Days of the Week",
+		"type": "v1",
+		"labels": [
+			"car",
+			"water"
+		]
+	}
+}`,
+		`{
+	"data": [{"from":"car", "to": "bil"}],
+	"info": {
+		"title": "Days of the Week",
+		"type": "v2",
+			"labels": [
+			"water"
+		]
+	}
+}`,
+	}
+
+	uuids := []string{}
+	type uuidOnly struct {
+		Uuid string `json:"uuid"`
+	}
+
+	for _, item := range lists {
+		aList, err := learnalistClient.PostListV1(userInfoOwner, item)
+		assert.NoError(err)
+		uuids = append(uuids, aList.Uuid)
+	}
+
+	// Get my lists
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", "")
+	assert.NoError(err)
+	assert.Equal(4, len(aLists))
+
+	// Get my lists filter by labels
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "water", "")
+	assert.NoError(err)
+	assert.Equal(2, len(aLists))
+
+	// Check filter via listType works.
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", alist.SimpleList)
+	assert.NoError(err)
+	assert.Equal(3, len(aLists))
+
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", alist.FromToList)
+	assert.NoError(err)
+	assert.Equal(1, len(aLists))
+
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "car,water", "")
+	assert.NoError(err)
+	assert.Equal(2, len(aLists))
+
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "car,water", alist.FromToList)
+	assert.NoError(err)
+	assert.Equal(1, len(aLists))
+
+	aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "card", "")
+	assert.NoError(err)
+	assert.Equal(0, len(aLists))
 }
