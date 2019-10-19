@@ -59,7 +59,6 @@ var _ = Describe("Testing Alist endpoints", func() {
 			})
 
 			It("Get, is not accepted", func() {
-				//datastore.On("GetUserByCredentials", mock.Anything).Return(user, nil)
 				input := ""
 				req, rec := setupFakeEndpoint(method, uri, input)
 				e := echo.New()

@@ -20,7 +20,6 @@ func createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
 	var raw map[string]interface{}
 	statusCode, jsonBytes := createNewUser(input)
 	Expect(statusCode).To(BeElementOf([]int{http.StatusOK, http.StatusCreated}))
-	//suite.Contains([]int{http.StatusOK, http.StatusCreated}, statusCode)
 	json.Unmarshal(jsonBytes, &raw)
 	user_uuid := raw["uuid"].(string)
 	return user_uuid, statusCode
