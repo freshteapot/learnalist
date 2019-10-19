@@ -15,7 +15,6 @@ func TestSharePublic(t *testing.T) {
 
 	assert := assert.New(t)
 	learnalistClient := e2e.NewClient(server)
-
 	userInfoOwner := learnalistClient.Register(usernameOwner, password)
 	fmt.Println(userInfoOwner.Uuid)
 	userInfoReader := learnalistClient.Register(usernameReader, password)

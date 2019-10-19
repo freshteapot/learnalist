@@ -15,8 +15,11 @@ import (
 
 func TestListCrud(t *testing.T) {
 	assert := assert.New(t)
+	username := generateUsername()
 	learnalistClient := e2e.NewClient(server)
-	userInfoOwner := learnalistClient.Register(usernameOwner, password)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+
 	aList, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	assert.NotEmpty(aList.Uuid)
 	b, _ := json.Marshal(aList)
@@ -32,8 +35,11 @@ func TestListSharing(t *testing.T) {
 	var input []byte
 
 	assert := assert.New(t)
+	username := generateUsername()
 	learnalistClient := e2e.NewClient(server)
-	userInfoOwner := learnalistClient.Register(usernameOwner, password)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
+
 	fmt.Println("> By default shared privately")
 	aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	assert.Equal(aList.Info.SharedWith, aclKeys.NotShared)
@@ -83,9 +89,10 @@ func TestLabelCrud(t *testing.T) {
 	var resp *http.Response
 
 	assert := assert.New(t)
+	username := generateUsername()
 	learnalistClient := e2e.NewClient(server)
-	fmt.Println("> Register user")
-	userInfoOwner := learnalistClient.Register(usernameOwner, password)
+	fmt.Printf("> Create user %s\n", username)
+	userInfoOwner := learnalistClient.Register(username, password)
 
 	fmt.Println("> Empty list of labels")
 	labels, err = learnalistClient.GetLabelsByMeV1(userInfoOwner)
@@ -141,7 +148,7 @@ func TestUserHasEmptyLists(t *testing.T) {
 	assert.Equal(cleanEchoJSONResponse(data), `[]`)
 }
 
-func TestUserHasTwoLists(t *testing.T) {
+func TestUserHasTwoListV1AndV2(t *testing.T) {
 	assert := assert.New(t)
 	username := generateUsername()
 	learnalistClient := e2e.NewClient(server)
@@ -157,5 +164,10 @@ func TestUserHasTwoLists(t *testing.T) {
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	assert.NoError(err)
-	fmt.Println(cleanEchoJSONResponse(data))
+
+	var aLists []*alist.Alist
+	err = json.Unmarshal(data, &aLists)
+	assert.NoError(err)
+	assert.Equal(aLists[0].Info.ListType, alist.SimpleList)
+	assert.Equal(aLists[1].Info.ListType, alist.FromToList)
 }

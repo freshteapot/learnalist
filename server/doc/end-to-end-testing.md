@@ -29,6 +29,7 @@ go run commands/api/main.go \
 Adding the clean testcache, makes sure it reconnects via http.
 
 ```
+cd e2e
 go clean -testcache && go test -test.v .
 ```
 
