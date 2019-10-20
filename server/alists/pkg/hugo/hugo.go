@@ -3,6 +3,7 @@ package hugo
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
@@ -10,6 +11,7 @@ import (
 )
 
 type HugoSiteBuilder interface {
+	ProcessContent()
 	MakeContent()
 	Build()
 	Write(aList *alist.Alist)
@@ -25,6 +27,7 @@ type HugoHelper struct {
 	PublishDirectory string
 	cronEntryID      *cron.EntryID
 	cron             *cron.Cron
+	inprogress       *sync.Mutex
 }
 
 func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
@@ -58,5 +61,6 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 		PublishDirectory: publishDirectory,
 		cronEntryID:      &empty,
 		cron:             _cron,
+		inprogress:       &sync.Mutex{},
 	}
 }

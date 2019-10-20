@@ -19,7 +19,7 @@ func TestSharePublic2(t *testing.T) {
 	userInfoOwner := learnalistClient.Register(username, password)
 
 	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "public")
+	messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "public")
 	assert.Equal(messageResponse.Message, "List is now public")
 	fmt.Println(fmt.Sprintf("http://localhost:1234/alists/%s.html", listInfo.Uuid))
 }

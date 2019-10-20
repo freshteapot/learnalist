@@ -41,7 +41,7 @@ type Client struct {
 }
 
 func NewClient(_server string) Client {
-	timeout := 30 * time.Millisecond
+	timeout := 100 * time.Millisecond
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: timeout,
@@ -187,7 +187,7 @@ func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.R
 	return c.httpClient.Do(req)
 }
 
-func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action string) MessageResponse {
+func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, action string) MessageResponse {
 	body := strings.NewReader(fmt.Sprintf(`{
   "alist_uuid": "%s",
   "action": "%s"
@@ -211,10 +211,14 @@ func (c Client) SetListShare(userInfo RegisterResponse, alistUUID string, action
 	var response MessageResponse
 	data, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(data, &response)
+	if err != nil {
+		// handle err
+		panic(err)
+	}
 	return response
 }
 
-func (c Client) GetListByUUID(userInfo RegisterResponse, uuid string) HttpResponse {
+func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) HttpResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -234,7 +238,7 @@ func (c Client) GetListByUUID(userInfo RegisterResponse, uuid string) HttpRespon
 	var response HttpResponse
 	response.StatusCode = resp.StatusCode
 	data, err := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(data, &response.Body)
+	response.Body = data
 	return response
 }
 
@@ -384,4 +388,65 @@ func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, inpu
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
+}
+
+func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (HttpResponse, error) {
+	var response HttpResponse
+	var err error
+	url := fmt.Sprintf("%s/alists/%s.html", c.getServerURL(), uuid)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		// handle err
+		return response, err
+	}
+
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		// handle err
+		return response, err
+	}
+
+	defer resp.Body.Close()
+
+	response.StatusCode = resp.StatusCode
+	data, err := ioutil.ReadAll(resp.Body)
+	response.Body = data
+	return response, err
+}
+
+func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, userUUID string, action string) (HttpResponse, error) {
+	var response HttpResponse
+	var err error
+	url := fmt.Sprintf("%s/api/v1/share/readaccess", c.getServerURL())
+
+	inputAccess := &api.HttpShareListWithUserInput{
+		UserUUID:  userUUID,
+		AlistUUID: alistUUID,
+		Action:    action,
+	}
+
+	b, _ := json.Marshal(inputAccess)
+	body := strings.NewReader(string(b))
+	req, err := http.NewRequest(http.MethodPut, url, body)
+	if err != nil {
+		// handle err
+		return response, err
+	}
+
+	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		// handle err
+		return response, err
+	}
+
+	defer resp.Body.Close()
+
+	response.StatusCode = resp.StatusCode
+	data, err := ioutil.ReadAll(resp.Body)
+	response.Body = data
+	return response, err
 }

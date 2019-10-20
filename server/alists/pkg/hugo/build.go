@@ -71,6 +71,8 @@ func (h HugoHelper) getFilesToPublish() []string {
 	})
 
 	if err != nil {
+		fmt.Println(len(files))
+		fmt.Println(err)
 		panic(err)
 	}
 
@@ -103,6 +105,8 @@ func (h HugoHelper) getPublishedFiles() []string {
 	})
 
 	if err != nil {
+		fmt.Println(len(files))
+		fmt.Println(err)
 		panic(err)
 	}
 

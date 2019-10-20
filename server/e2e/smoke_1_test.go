@@ -2,6 +2,7 @@ package e2e_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -22,27 +23,27 @@ func TestSharePublic(t *testing.T) {
 	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	fmt.Println(listInfo.Uuid)
 
-	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
-	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "public")
+	messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "public")
 	assert.Equal(messageResponse.Message, "List is now public")
-	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 200)
-	messageResponse = learnalistClient.SetListShare(userInfoOwner, listInfo.Uuid, "friends")
+	messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "friends")
 	assert.Equal(messageResponse.Message, "List is now private to the owner and those granted access")
-	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
+	httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 	assert.Equal(httpResponse.StatusCode, 403)
 	// Currently it doesnt handle too many requests
 	for j := 0; j <= 10; j++ {
 		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 	}
-	/*
-		for j := 0; j <= 100; j++ {
-			go func() {
-				learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
-			}()
-		}
-	*/
+
+	for j := 0; j <= 100; j++ {
+		go func() {
+			learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+		}()
+	}
+
 }
 
 func TestSharePrivate(t *testing.T) {
@@ -53,6 +54,6 @@ func TestSharePrivate(t *testing.T) {
 	userInfoOwner := learnalistClient.Register(usernameOwner, password)
 	userInfoReader := learnalistClient.Register(usernameReader, password)
 	listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-	httpResponse = learnalistClient.GetListByUUID(userInfoReader, listInfo.Uuid)
-	assert.Equal(httpResponse.StatusCode, 403)
+	httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
+	assert.Equal(httpResponse.StatusCode, http.StatusForbidden)
 }
