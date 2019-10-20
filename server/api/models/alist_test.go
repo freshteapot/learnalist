@@ -153,7 +153,7 @@ func (suite *ModelSuite) TestSaveAListEmptyList() {
 	input.User.Uuid = userUUID
 	aList, err := dal.SaveAlist(http.MethodPost, *input)
 	suite.Nil(aList)
-	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty."), err.Error())
+	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty.\nInvalid option for info.shared_with"), err.Error())
 }
 
 func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {

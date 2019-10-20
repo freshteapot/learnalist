@@ -7,15 +7,26 @@ mkdir -p /tmp/learnalist-api/site-cache
 ```
 
 ```sh
-cd server/
+rm -rf ./hugo/public-alist
+```
+
+```sh
+mkdir -p ./hugo/{public-alist,content/alists,data/lists}
+cp -rf ./hugo/themes/alist/static/ /tmp/learnalist-api/site-cache/
 ```
 
 # Build the database
 ```sh
-ls db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
+ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
 ```
 
+
 # Run the server
+```sh
+cd server/
+```
+
+
 ```sh
 go run commands/api/main.go \
 --port=1234 \

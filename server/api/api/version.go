@@ -7,13 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type HttpGetVersionResponse struct {
-	GitHash string `json:"gitHash"`
-	GitDate string `json:"gitDate"`
-	Version string `json:"version"`
-	Url     string `json:"url"`
-}
-
 func (m *Manager) V1GetVersion(c echo.Context) error {
 	response := HttpGetVersionResponse{
 		GitHash: version.GetGitHash(),

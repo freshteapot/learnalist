@@ -19,7 +19,6 @@ func GetTables() []string {
 		"user",
 		"user_labels",
 		"alist_labels",
-		"casbin_rule",
 		"acl_simple",
 	}
 	return *tables

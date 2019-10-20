@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/utils"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 )
 
 func Validate(aList Alist) error {
@@ -28,7 +29,7 @@ func Validate(aList Alist) error {
 	case FromToList:
 		err = validateTypeV2(aList)
 	case Concept2:
-		err = validateTypeV3(aList)
+		err = ValidateTypeV3(aList.Data.(TypeV3))
 	case ContentAndUrl:
 		err = validateTypeV4(aList)
 	}
@@ -46,6 +47,15 @@ func validateAListInfo(info AlistInfo) error {
 
 	if info.Title == "" {
 		feedback = append(feedback, "Title cannot be empty.")
+	}
+
+	switch info.SharedWith {
+	case aclKeys.NotShared:
+	case aclKeys.SharedWithPublic:
+	case aclKeys.SharedWithFriends:
+		break
+	default:
+		feedback = append(feedback, "Invalid option for info.shared_with")
 	}
 
 	for index, item := range info.Labels {

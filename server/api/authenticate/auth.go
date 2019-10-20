@@ -38,6 +38,7 @@ func ValidateBasicAuth(username string, password string, c echo.Context) (bool, 
 		Username: username,
 		Password: password,
 	}
+
 	user, err := LookUp(*loginUser)
 	if err != nil {
 		fmt.Println(err)

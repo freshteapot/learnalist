@@ -1,114 +1,250 @@
-package api
+package api_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 
-	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/api"
+	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	mockAcl "github.com/freshteapot/learnalist-api/server/pkg/acl/mocks"
 	"github.com/labstack/echo/v4"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
-func (suite *ApiSuite) TestPostLabel() {
-	var raw map[string]interface{}
-	var statusCode int
-	var responseBytes []byte
-	inputUserA := getValidUserRegisterInput("a")
-	inputA := `{"label": "car"}`
-	inputB := `{"label": "boat"}`
-	inputC := `"bad data"`
+var _ = Describe("Testing Label endpoints", func() {
+	AfterEach(emptyDatabase)
 
-	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
+	When("/labels", func() {
+		Context("Posting", func() {
+			var datastore *mockModels.Datastore
+			var acl *mockAcl.Acl
+			var user *uuid.User
+			var method string
+			var uri string
+			var e *echo.Echo
 
-	statusCode, responseBytes = suite.postAlabel(userUUID, inputA)
-	suite.Equal(http.StatusCreated, statusCode, "Label should have been created.")
-	suite.Equal(`["car"]`, strings.TrimSpace(string(responseBytes)))
+			BeforeEach(func() {
+				datastore = &mockModels.Datastore{}
+				acl = &mockAcl.Acl{}
+				m.Datastore = datastore
+				m.Acl = acl
 
-	statusCode, _ = suite.postAlabel(userUUID, inputA)
-	suite.Equal(http.StatusOK, statusCode)
+				user = &uuid.User{
+					Uuid: "fake-123",
+				}
 
-	statusCode, responseBytes = suite.postAlabel(userUUID, inputB)
-	suite.Equal(http.StatusCreated, statusCode)
-	suite.Equal(`["boat","car"]`, strings.TrimSpace(string(responseBytes)))
+				method = http.MethodPost
+				uri = "/api/v1/labels"
+				e = echo.New()
+			})
 
-	statusCode, responseBytes = suite.postAlabel(userUUID, inputC)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	json.Unmarshal(responseBytes, &raw)
-	suite.Equal(i18n.PostUserLabelJSONFailure, raw["message"].(string))
-}
+			It("Invalid json input", func() {
+				input := ""
+				req, rec := setupFakeEndpoint(method, uri, input)
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				m.V1PostUserLabel(c)
 
-func (suite *ApiSuite) TestGetUsersLabels() {
-	var statusCode int
-	var responseBytes []byte
-	var response string
+				Expect(rec.Code).To(Equal(http.StatusBadRequest))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+			})
 
-	inputUserA := getValidUserRegisterInput("a")
-	userUUID, _ := suite.createNewUserWithSuccess(inputUserA)
+			It("Valid json, invalid input", func() {
+				input := api.HttpLabelInput{
+					Label: "",
+				}
+				b, _ := json.Marshal(input)
 
-	statusCode, responseBytes = suite.getLabels(userUUID)
-	response = strings.TrimSpace(string(responseBytes))
-	// Check it is an empty array
-	suite.Equal("[]", response)
+				req, rec := setupFakeEndpoint(method, uri, string(b))
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
 
-	// Post a label
-	input := []string{
-		`{"label": "car"}`,
-		`{"label": "boat"}`,
-		`{"label": "car"}`,
-	}
-	expectStatusCode := []int{201, 201, 200}
-	for index, item := range input {
-		statusCode, _ = suite.postAlabel(userUUID, item)
-		suite.Equal(expectStatusCode[index], statusCode)
-	}
+				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusBadRequest, errors.New("Fail"))
+				m.V1PostUserLabel(c)
 
-	statusCode, responseBytes = suite.getLabels(userUUID)
-	response = strings.TrimSpace(string(responseBytes))
-	suite.Equal(`["boat","car"]`, response)
-}
+				Expect(rec.Code).To(Equal(http.StatusBadRequest))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on label(s)"}`))
+			})
 
-func (suite *ApiSuite) TestDeleteUsersLabels() {
-	var req *http.Request
-	var rec *httptest.ResponseRecorder
-	var c echo.Context
-	e := echo.New()
-	user := uuid.NewUser()
+			It("Valid input, failed to save", func() {
+				input := api.HttpLabelInput{
+					Label: "I am a label",
+				}
+				b, _ := json.Marshal(input)
 
-	req, rec = setupFakeEndpoint(http.MethodDelete, "/api/v1/labels/car", "")
-	c = e.NewContext(req, rec)
-	c.Set("loggedInUser", user)
-	suite.NoError(m.V1RemoveUserLabel(c))
-	response := strings.TrimSpace(rec.Body.String())
-	suite.Equal(`{"message":"Label car was removed."}`, response)
-}
+				req, rec := setupFakeEndpoint(method, uri, string(b))
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
 
-func (suite *ApiSuite) postAlabel(userUUID string, input string) (statusCode int, responseBytes []byte) {
-	user := &uuid.User{
-		Uuid: userUUID,
-	}
+				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusInternalServerError, errors.New("Fail"))
+				m.V1PostUserLabel(c)
 
-	method := http.MethodPost
-	uri := "/api/v1/labels"
-	req, rec := setupFakeEndpoint(method, uri, input)
-	e := echo.New()
-	c := e.NewContext(req, rec)
-	c.Set("loggedInUser", *user)
-	suite.NoError(m.V1PostUserLabel(c))
-	return rec.Code, rec.Body.Bytes()
-}
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			})
 
-func (suite *ApiSuite) getLabels(userUUID string) (statusCode int, responseBytes []byte) {
-	method := http.MethodGet
-	uri := "/api/v1/labels/by/me"
-	user := &uuid.User{
-		Uuid: userUUID,
-	}
-	req, rec := setupFakeEndpoint(method, uri, "")
-	e := echo.New()
-	c := e.NewContext(req, rec)
-	c.Set("loggedInUser", *user)
-	suite.NoError(m.V1GetUserLabels(c))
-	return rec.Code, rec.Body.Bytes()
-}
+			Context("Success, label saved", func() {
+				It("Its new", func() {
+					input := api.HttpLabelInput{
+						Label: "I am a label",
+					}
+					b, _ := json.Marshal(input)
+
+					req, rec := setupFakeEndpoint(method, uri, string(b))
+					c := e.NewContext(req, rec)
+					c.Set("loggedInUser", *user)
+
+					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusCreated, nil)
+					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					m.V1PostUserLabel(c)
+
+					Expect(rec.Code).To(Equal(http.StatusCreated))
+					Expect(cleanEchoJSONResponse(rec)).To(Equal(`["I am a label"]`))
+				})
+
+				It("Its already in the system", func() {
+					input := api.HttpLabelInput{
+						Label: "I am a label",
+					}
+					b, _ := json.Marshal(input)
+
+					req, rec := setupFakeEndpoint(method, uri, string(b))
+					c := e.NewContext(req, rec)
+					c.Set("loggedInUser", *user)
+
+					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusOK, nil)
+					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					m.V1PostUserLabel(c)
+
+					Expect(rec.Code).To(Equal(http.StatusOK))
+					Expect(cleanEchoJSONResponse(rec)).To(Equal(`["I am a label"]`))
+				})
+			})
+		})
+		Context("Get", func() {
+			var (
+				datastore *mockModels.Datastore
+				acl       *mockAcl.Acl
+				user      *uuid.User
+				method    string
+				uri       string
+				req       *http.Request
+				rec       *httptest.ResponseRecorder
+				e         *echo.Echo
+				c         echo.Context
+			)
+
+			BeforeEach(func() {
+				datastore = &mockModels.Datastore{}
+				acl = &mockAcl.Acl{}
+				m.Datastore = datastore
+				m.Acl = acl
+
+				user = &uuid.User{
+					Uuid: "fake-123",
+				}
+
+				method = http.MethodGet
+				uri = "/api/v1/labels/by/me"
+				e = echo.New()
+				req, rec = setupFakeEndpoint(method, uri, "")
+				c = e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+			})
+
+			It("User with no labels", func() {
+				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, nil)
+
+				m.V1GetUserLabels(c)
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`[]`))
+			})
+
+			It("User with labels", func() {
+				datastore.On("GetUserLabels", mock.Anything).Return([]string{
+					"wind",
+					"water",
+					"fire",
+					"earth",
+				}, nil)
+
+				m.V1GetUserLabels(c)
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`["wind","water","fire","earth"]`))
+			})
+
+			It("Something went wrong getting the data from the storage", func() {
+				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
+				m.V1GetUserLabels(c)
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			})
+		})
+
+		Context("DELETE", func() {
+			var (
+				datastore *mockModels.Datastore
+				acl       *mockAcl.Acl
+				user      *uuid.User
+				method    string
+				uri       string
+				req       *http.Request
+				rec       *httptest.ResponseRecorder
+				e         *echo.Echo
+				c         echo.Context
+			)
+
+			BeforeEach(func() {
+				datastore = &mockModels.Datastore{}
+				acl = &mockAcl.Acl{}
+				m.Datastore = datastore
+				m.Acl = acl
+
+				user = &uuid.User{
+					Uuid: "fake-123",
+				}
+
+				method = http.MethodGet
+			})
+
+			It("Failed to remove a label, due to storage failing", func() {
+				uri = "/api/v1/labels/test"
+				e = echo.New()
+				req, rec = setupFakeEndpoint(method, uri, "")
+				c = e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				c.SetPath("/api/v1/labels/:label")
+				c.Set("loggedInUser", *user)
+				c.SetParamNames("label")
+				c.SetParamValues("test")
+
+				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(errors.New("Failed"))
+				m.V1RemoveUserLabel(c)
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			})
+
+			It("Successfully removed a label", func() {
+				uri = "/api/v1/labels/test"
+				e = echo.New()
+				req, rec = setupFakeEndpoint(method, uri, "")
+				c = e.NewContext(req, rec)
+				c.Set("loggedInUser", *user)
+				c.SetPath("/api/v1/labels/:label")
+				c.Set("loggedInUser", *user)
+				c.SetParamNames("label")
+				c.SetParamValues("test")
+
+				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(nil)
+				m.V1RemoveUserLabel(c)
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Label test was removed."}`))
+			})
+		})
+	})
+})

@@ -42,7 +42,9 @@ func (h HugoHelper) MakeContent() {
 	})
 
 	if err != nil {
-		panic(err)
+		fmt.Print("Something has gone wrong in MakeContent, when looking for files to process")
+		fmt.Println(len(files))
+		fmt.Println(err)
 	}
 
 	for _, file := range files {

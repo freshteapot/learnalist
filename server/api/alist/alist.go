@@ -24,11 +24,12 @@ var allowedListTypes = []string{
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
-	Title    string    `json:"title"`
-	ListType string    `json:"type"`
-	Labels   []string  `json:"labels"`
-	From     string    `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
-	Interact *Interact `json:"interact,omitempty"`
+	Title      string    `json:"title"`
+	ListType   string    `json:"type"`
+	Labels     []string  `json:"labels"`
+	From       string    `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
+	Interact   *Interact `json:"interact,omitempty"`
+	SharedWith string    `json:"shared_with"`
 }
 
 type Interact struct {
@@ -105,7 +106,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	case Concept2:
-		aList.Data, err = parseTypeV3(jsonBytes)
+		aList.Data, err = ParseTypeV3(jsonBytes)
 		if err != nil {
 			err = errors.New(i18n.ValidationErrorListV3)
 			return err

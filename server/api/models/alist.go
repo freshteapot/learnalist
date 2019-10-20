@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -108,13 +109,13 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	query := "SELECT * FROM alist_kv WHERE uuid = ?"
 	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
-		log.Println(err)
-	}
-	if err != nil {
 		if err.Error() == i18n.DatabaseLookupNotFound {
 			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
+
+		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
+		log.Println(err)
+		return nil, err
 	}
 
 	aList := convertDbRowToAlist(row)
@@ -216,7 +217,6 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	}
 
 	if method == http.MethodPost {
-		dal.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)"
 		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
@@ -226,6 +226,18 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 
 	if err != nil {
 		return nil, err
+	}
+
+	// Set shared
+	switch aList.Info.SharedWith {
+	case aclKeys.SharedWithPublic:
+		dal.Acl.ShareListWithPublic(aList.Uuid)
+	case aclKeys.SharedWithFriends:
+		dal.Acl.ShareListWithFriends(aList.Uuid)
+	case aclKeys.NotShared:
+		fallthrough
+	default:
+		dal.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 	}
 
 	return &aList, nil
