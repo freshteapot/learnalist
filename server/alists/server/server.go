@@ -1,17 +1,13 @@
 package server
 
 import (
-	"fmt"
-	"net/http"
-	"os"
-	"strings"
 	"errors"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
-
 )
 
 type HttpResponseMessage struct {
@@ -25,17 +21,7 @@ type Manager struct {
 	HugoHelper      hugo.HugoHelper
 }
 
-type ErrorHttpCode int
-
-func (m *Manager) serveStatic(urlPath string) (string, ErrorHttpCode) {
-	path := fmt.Sprintf("%s/%s", m.SiteCacheFolder, urlPath[1:])
-	if _, err := os.Stat(path); err == nil {
-		return path, http.StatusOK
-	}
-	return "", http.StatusNotFound
-}
-
-func GetAlistUUIDFromUrl(input string) (string, string, error){
+func GetAlistUUIDFromURL(input string) (string, string, error) {
 	input = strings.TrimPrefix(input, "/alists/")
 	if strings.Contains(input, "/") {
 		return "", "", errors.New("Invalid uri")

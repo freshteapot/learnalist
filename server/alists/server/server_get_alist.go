@@ -22,7 +22,7 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		userUUID = user.(uuid.User).Uuid
 	}
 
-	alistUUID, isA, err = GetAlistUUIDFromUrl(uri)
+	alistUUID, isA, err = GetAlistUUIDFromURL(uri)
 
 	if err != nil {
 		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alists/404.html", m.SiteCacheFolder))
