@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -38,7 +39,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-
+	// TODO how do we know what the sharing is set too?
 	aList, err := m.Datastore.GetAlist(input.AlistUUID)
 	if err != nil {
 		if err.Error() == i18n.SuccessAlistNotFound {
@@ -68,6 +69,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
+	fmt.Println(aList.Info.SharedWith)
 	if !m.Datastore.UserExists(input.UserUUID) {
 		response := HttpResponseMessage{
 			Message: i18n.SuccessUserNotFound,
@@ -114,6 +116,8 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
+	// TODO how do we know what the sharing is set too?
+	// TODO we dont set it on change
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
 	if aList == nil {
 		response := HttpResponseMessage{
@@ -129,21 +133,28 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	if aList.Info.SharedWith == input.Action {
+		return c.JSON(http.StatusOK, HttpResponseMessage{
+			Message: i18n.ApiShareNoChange,
+		})
+	}
+
+	aList.Info.SharedWith = input.Action
+	m.Datastore.SaveAlist(http.MethodPut, *aList)
+	// Save to hugo
+	m.HugoHelper.Write(aList)
+
 	message := ""
 	switch input.Action {
 	case aclKeys.SharedWithPublic:
-		m.Acl.ShareListWithPublic(aList.Uuid)
 		message = i18n.ApiShareListSuccessWithPublic
 	case aclKeys.NotShared:
-		m.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		message = i18n.ApiShareListSuccessPrivate
 	case aclKeys.SharedWithFriends:
-		m.Acl.ShareListWithFriends(aList.Uuid)
 		message = i18n.ApiShareListSuccessWithFriends
 	}
 
-	response := HttpResponseMessage{
+	return c.JSON(http.StatusOK, HttpResponseMessage{
 		Message: message,
-	}
-	return c.JSON(http.StatusOK, response)
+	})
 }

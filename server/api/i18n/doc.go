@@ -43,4 +43,5 @@ const (
 	ApiShareListSuccessWithPublic           = "List is now public"
 	ApiShareListSuccessWithFriends          = "List is now private to the owner and those granted access"
 	ApiShareListSuccessPrivate              = "List is now private to the owner"
+	ApiShareNoChange                        = "No change made"
 )

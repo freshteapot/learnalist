@@ -159,7 +159,6 @@ If empty user, we reject.
 If POST, we enforce a new uuid for the list.
 If empty uuid, we reject.
 If PUT, do a lookup to see if the list exists.
-
 */
 func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error) {
 	var err error

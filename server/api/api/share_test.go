@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	mockHugo "github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -35,6 +36,11 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			acl = &mockAcl.Acl{}
 			m.Datastore = datastore
 			m.Acl = acl
+
+			testHugoHelper := &mockHugo.HugoSiteBuilder{}
+			testHugoHelper.On("Write", mock.Anything)
+			testHugoHelper.On("Remove", mock.Anything)
+			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{
 				Uuid: "fake-123",
@@ -255,6 +261,11 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.Datastore = datastore
 			m.Acl = acl
 
+			testHugoHelper := &mockHugo.HugoSiteBuilder{}
+			testHugoHelper.On("Write", mock.Anything)
+			testHugoHelper.On("Remove", mock.Anything)
+			m.HugoHelper = testHugoHelper
+
 			userA = &uuid.User{
 				Uuid: "fake-123",
 			}
@@ -350,8 +361,16 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				aList := alist.NewTypeV1()
 				aList.Uuid = inputObject.AlistUUID
 				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.NotShared
+
+				returnAlist := alist.NewTypeV1()
+				returnAlist.Uuid = inputObject.AlistUUID
+				returnAlist.User.Uuid = userA.Uuid
+				returnAlist.Info.SharedWith = aclKeys.SharedWithPublic
+
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				acl.On("ShareListWithPublic", aList.Uuid).Return(nil)
+				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
@@ -373,8 +392,15 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				aList := alist.NewTypeV1()
 				aList.Uuid = inputObject.AlistUUID
 				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.SharedWithPublic
+
+				returnAlist := alist.NewTypeV1()
+				returnAlist.Uuid = inputObject.AlistUUID
+				returnAlist.User.Uuid = userA.Uuid
+				returnAlist.Info.SharedWith = aclKeys.NotShared
+
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				acl.On("MakeListPrivate", aList.Uuid, aList.User.Uuid).Return(nil)
+				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
@@ -396,12 +422,49 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				aList := alist.NewTypeV1()
 				aList.Uuid = inputObject.AlistUUID
 				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.NotShared
+
+				returnAlist := alist.NewTypeV1()
+				returnAlist.Uuid = inputObject.AlistUUID
+				returnAlist.User.Uuid = userA.Uuid
+				returnAlist.Info.SharedWith = aclKeys.SharedWithFriends
+
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				acl.On("ShareListWithFriends", aList.Uuid).Return(nil)
+				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
 				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List is now private to the owner and those granted access"}`))
+			})
+
+			It("With friends when already set", func() {
+				inputObject := &api.HttpShareListInput{
+					AlistUUID: "fakeList",
+					Action:    aclKeys.SharedWithFriends,
+				}
+				a, _ := json.Marshal(inputObject)
+				input := string(a)
+
+				req, rec := setupFakeEndpoint(method, uri, input)
+				c := e.NewContext(req, rec)
+				c.Set("loggedInUser", *userA)
+
+				aList := alist.NewTypeV1()
+				aList.Uuid = inputObject.AlistUUID
+				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.SharedWithFriends
+
+				returnAlist := alist.NewTypeV1()
+				returnAlist.Uuid = inputObject.AlistUUID
+				returnAlist.User.Uuid = userA.Uuid
+				returnAlist.Info.SharedWith = aclKeys.SharedWithFriends
+
+				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
+				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+				m.V1ShareAlist(c)
+
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"No change made"}`))
 			})
 		})
 		/*

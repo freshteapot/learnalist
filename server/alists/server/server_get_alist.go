@@ -48,12 +48,6 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		return c.File(pathToAlist)
 	}
 
-	// Assumed it is a fast request (maybe e2e tests) so blindly trigger a new Build
-	// of any queued content.
-	// This is a really ugly hack :P
-	// The e2e client bubbled this up as I have the timeouts set stupidly low
-	go m.HugoHelper.ProcessContent()
-
 	data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alists/please-refresh.html", m.SiteCacheFolder))
 	return c.HTMLBlob(http.StatusOK, data)
 }
