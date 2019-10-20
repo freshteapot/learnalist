@@ -43,5 +43,6 @@ const (
 	ApiShareListSuccessWithPublic           = "List is now public"
 	ApiShareListSuccessWithFriends          = "List is now private to the owner and those granted access"
 	ApiShareListSuccessPrivate              = "List is now private to the owner"
+	ApiShareReadAccessInvalidWithNotShared  = "You cant grant or revoke read access when the list is shared as private"
 	ApiShareNoChange                        = "No change made"
 )

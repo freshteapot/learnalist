@@ -39,7 +39,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	// TODO how do we know what the sharing is set too?
+
 	aList, err := m.Datastore.GetAlist(input.AlistUUID)
 	if err != nil {
 		if err.Error() == i18n.SuccessAlistNotFound {
@@ -53,6 +53,12 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	if aList.Info.SharedWith == aclKeys.NotShared {
+		return c.JSON(http.StatusBadRequest, HttpResponseMessage{
+			Message: i18n.ApiShareReadAccessInvalidWithNotShared,
+		})
 	}
 
 	if aList.User.Uuid != user.Uuid {
