@@ -41,11 +41,10 @@ func (h HugoHelper) MakeContent() {
 		return nil
 	})
 
-	// TODO I suspect, I can ignore this
 	if err != nil {
+		fmt.Print("Something has gone wrong in MakeContent, when looking for files to process")
 		fmt.Println(len(files))
 		fmt.Println(err)
-		panic(err)
 	}
 
 	for _, file := range files {

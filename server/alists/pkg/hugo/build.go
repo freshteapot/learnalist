@@ -71,9 +71,9 @@ func (h HugoHelper) getFilesToPublish() []string {
 	})
 
 	if err != nil {
+		fmt.Print("Something has gone wrong in getFilesToPublish, when looking for files to process")
 		fmt.Println(len(files))
 		fmt.Println(err)
-		panic(err)
 	}
 
 	for _, file := range files {
@@ -105,9 +105,9 @@ func (h HugoHelper) getPublishedFiles() []string {
 	})
 
 	if err != nil {
+		fmt.Print("Something has gone wrong in getPublishedFiles, when looking for files to process")
 		fmt.Println(len(files))
 		fmt.Println(err)
-		panic(err)
 	}
 
 	for _, file := range files {
