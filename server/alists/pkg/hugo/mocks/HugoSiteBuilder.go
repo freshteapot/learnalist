@@ -21,6 +21,11 @@ func (_m *HugoSiteBuilder) MakeContent() {
 	_m.Called()
 }
 
+// ProcessContent provides a mock function with given fields:
+func (_m *HugoSiteBuilder) ProcessContent() {
+	_m.Called()
+}
+
 // Remove provides a mock function with given fields: uuid
 func (_m *HugoSiteBuilder) Remove(uuid string) {
 	_m.Called(uuid)
