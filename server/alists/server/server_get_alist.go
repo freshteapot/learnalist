@@ -42,7 +42,6 @@ func (m *Manager) GetAlist(c echo.Context) error {
 	}
 
 	// At this point, we assume the list is real
-	// This code should only serve the lists?
 	pathToAlist := fmt.Sprintf("%s/alists/%s.%s", m.SiteCacheFolder, alistUUID, isA)
 
 	if _, err := os.Stat(pathToAlist); err == nil {
@@ -57,10 +56,4 @@ func (m *Manager) GetAlist(c echo.Context) error {
 
 	data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alists/please-refresh.html", m.SiteCacheFolder))
 	return c.HTMLBlob(http.StatusOK, data)
-
-	// TODO handle html or json
-	// Maybe use HTTPErrorHandler
-	// https://echo.labstack.com/guide/error-handling#custom-http-error-handler
-	// pathToFile = fmt.Sprintf("%s/404.html", m.SiteCacheFolder)
-	// return c.File(pathToFile)
 }
