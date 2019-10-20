@@ -1,6 +1,5 @@
 package api_test
 
-//2, as I am being really lazy :(, once all moved over to ginkgo remove.
 import (
 	"errors"
 	"net/http"
