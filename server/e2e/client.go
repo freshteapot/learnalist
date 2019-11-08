@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -41,7 +42,7 @@ type Client struct {
 }
 
 func NewClient(_server string) Client {
-	timeout := 100 * time.Millisecond
+	timeout := 1 * time.Second
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: timeout,
@@ -79,6 +80,7 @@ func (c Client) Register(username string, password string) RegisterResponse {
 
 	url := fmt.Sprintf("%s/api/v1/register", c.getServerURL())
 	req, err := http.NewRequest("POST", url, body)
+	req = req.WithContext(context.Background())
 	if err != nil {
 		// handle err
 		fmt.Println("Failed NewRequest")
@@ -116,6 +118,7 @@ func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Re
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -149,6 +152,7 @@ func (c Client) RawPutListV1(userInfo RegisterResponse, uuid string, input strin
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -181,6 +185,7 @@ func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.R
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -199,6 +204,7 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 		// handle err
 		panic(err)
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -220,16 +226,20 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 
 func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) HttpResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
+	fmt.Println("here")
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		// handle err
+
 		panic(err)
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		// handle err
+		fmt.Println("here")
 		panic(err)
 	}
 
@@ -256,6 +266,7 @@ func (c Client) RawPostLabelV1(userInfo RegisterResponse, label string) (*http.R
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -291,6 +302,7 @@ func (c Client) RawGetLabelsByMeV1(userInfo RegisterResponse) (*http.Response, e
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -326,6 +338,7 @@ func (c Client) RawDeleteLabelV1(userInfo RegisterResponse, label string) (*http
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -350,6 +363,7 @@ func (c Client) RawGetListsByMe(userInfo RegisterResponse, labels string, listTy
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -384,6 +398,7 @@ func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, inpu
 		// handle err
 		return response, nil
 	}
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -400,6 +415,7 @@ func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (HttpRespon
 		return response, err
 	}
 
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(req)
@@ -435,6 +451,7 @@ func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, us
 		return response, err
 	}
 
+	req = req.WithContext(context.Background())
 	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(req)

@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -75,7 +74,6 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	fmt.Println(aList.Info.SharedWith)
 	if !m.Datastore.UserExists(input.UserUUID) {
 		response := HttpResponseMessage{
 			Message: i18n.SuccessUserNotFound,
@@ -122,8 +120,6 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	// TODO how do we know what the sharing is set too?
-	// TODO we dont set it on change
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
 	if aList == nil {
 		response := HttpResponseMessage{
