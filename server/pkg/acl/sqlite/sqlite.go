@@ -80,7 +80,6 @@ func (store *Sqlite) ShareListWithPublic(alistUUID string) error {
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, accessPublic)
 	if err != nil {
-		fmt.Println("He")
 		tx.Rollback()
 		return err
 	}
