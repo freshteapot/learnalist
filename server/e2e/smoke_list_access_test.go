@@ -41,11 +41,9 @@ func TestListAccess(t *testing.T) {
 	assert.Equal(httpResponse.StatusCode, http.StatusOK)
 	assert.True(strings.Contains(string(httpResponse.Body), "Please refresh"))
 	fmt.Println(">> A human wait, should have contents")
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(600 * time.Millisecond)
 
 	httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
-	assert.NoError(err)
-	assert.Equal(httpResponse.StatusCode, http.StatusOK)
 	assert.NoError(err)
 	assert.Equal(httpResponse.StatusCode, http.StatusOK)
 	assert.True(strings.Contains(string(httpResponse.Body), "<title>Days of the Week</title>"))
