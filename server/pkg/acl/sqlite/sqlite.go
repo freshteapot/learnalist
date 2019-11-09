@@ -62,26 +62,31 @@ func (store *Sqlite) ShareListWithPublic(alistUUID string) error {
 
 	tx, err := store.db.Beginx()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.Exec(deleteViaAccess, accessPrivate)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.Exec(deleteViaAccess, accessFriends)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, accessPublic)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -95,31 +100,37 @@ func (store *Sqlite) MakeListPrivate(alistUUID string, userUUID string) error {
 
 	tx, err := store.db.Beginx()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.Exec(deleteViaAlistUUID, alistUUID)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, read)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, owner)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, share)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -138,26 +149,31 @@ func (store *Sqlite) ShareListWithFriends(alistUUID string) error {
 
 	tx, err := store.db.Beginx()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.Exec(deleteViaAccess, accessPrivate)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.Exec(deleteViaAccess, accessPublic)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	_, err = insertTX(tx, alistUUID, noUserUUUID, accessFriends)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 

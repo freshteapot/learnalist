@@ -54,6 +54,12 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	if aList.Info.SharedWith == aclKeys.NotShared {
+		return c.JSON(http.StatusBadRequest, HttpResponseMessage{
+			Message: i18n.ApiShareReadAccessInvalidWithNotShared,
+		})
+	}
+
 	if aList.User.Uuid != user.Uuid {
 		response := HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
@@ -129,21 +135,28 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	if aList.Info.SharedWith == input.Action {
+		return c.JSON(http.StatusOK, HttpResponseMessage{
+			Message: i18n.ApiShareNoChange,
+		})
+	}
+
+	aList.Info.SharedWith = input.Action
+	m.Datastore.SaveAlist(http.MethodPut, *aList)
+	// Save to hugo
+	m.HugoHelper.Write(aList)
+
 	message := ""
 	switch input.Action {
 	case aclKeys.SharedWithPublic:
-		m.Acl.ShareListWithPublic(aList.Uuid)
 		message = i18n.ApiShareListSuccessWithPublic
 	case aclKeys.NotShared:
-		m.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 		message = i18n.ApiShareListSuccessPrivate
 	case aclKeys.SharedWithFriends:
-		m.Acl.ShareListWithFriends(aList.Uuid)
 		message = i18n.ApiShareListSuccessWithFriends
 	}
 
-	response := HttpResponseMessage{
+	return c.JSON(http.StatusOK, HttpResponseMessage{
 		Message: message,
-	}
-	return c.JSON(http.StatusOK, response)
+	})
 }

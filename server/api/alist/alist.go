@@ -42,11 +42,10 @@ type InputAlist struct {
 
 // Alist the outer wrapping of a list.
 type Alist struct {
-	Uuid     string `json:"uuid"`
-	User     uuid.User
-	ListType string
-	Info     AlistInfo   `json:"info"`
-	Data     interface{} `json:"data"`
+	Uuid string `json:"uuid"`
+	User uuid.User
+	Info AlistInfo   `json:"info"`
+	Data interface{} `json:"data"`
 }
 
 // MarshalJSON convert alist into json
