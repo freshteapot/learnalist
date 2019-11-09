@@ -6,7 +6,10 @@ server:
     allowedOrigins: "*"
   siteCacheDirectory: /tmp/learnalist-api/site-cache
   hugoDirectory: "./../hugo"
-
+  loginWith:
+    google:
+      clientID: "922982262824-el24pc3umf55d8cru7ks4uic8bhoqdr6.apps.googleusercontent.com"
+      clientSecret: "XXX"
 tools:
   rebuildStaticSite:
     sqlite:

@@ -12,6 +12,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
 )
@@ -20,6 +21,16 @@ var ServerCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
+		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
+			Key:    viper.GetString("server.loginWith.google.clientID"),
+			Secret: viper.GetString("server.loginWith.google.clientSecret"),
+			Server: "http://localhost:1234",
+		})
+
+		oauthHandlers := &oauth.Handlers{
+			Google: googleOauthConfig,
+		}
+
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
@@ -55,9 +66,14 @@ var ServerCmd = &cobra.Command{
 		// Setup access control layer.
 		acl := aclSqlite.NewAcl(db)
 		dal := models.NewDAL(db, acl)
-		server.InitApi(db, acl, dal, hugoHelper)
+		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		server.Run()
 	},
+}
+
+func init() {
+	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
+	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 }

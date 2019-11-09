@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS user_sessions (
+  token TEXT NOT NULL UNIQUE  PRIMARY KEY,
+  user_uuid TEXT NOT NULL  DEFAULT 'none',
+  created TIMESTAMP NOT NULL
+);

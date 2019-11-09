@@ -1,5 +1,7 @@
 package i18n
 
+import "errors"
+
 const (
 	ValidationErrorList                     = "Failed to pass list info. %s"
 	ValidationErrorListV1                   = "Failed to pass list type v1."
@@ -45,4 +47,9 @@ const (
 	ApiShareListSuccessPrivate              = "List is now private to the owner"
 	ApiShareReadAccessInvalidWithNotShared  = "You cant grant or revoke read access when the list is shared as private"
 	ApiShareNoChange                        = "No change made"
+)
+
+var (
+	ErrorCannotReadResponse = errors.New("Cannot read response.")
+	ErrorInternal           = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
 )

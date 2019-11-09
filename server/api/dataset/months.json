@@ -1,0 +1,58 @@
+{
+    "data": [
+        {
+            "from": "January",
+            "to": "Januar"
+        },
+        {
+            "from": "February",
+            "to": "Februar"
+        },
+        {
+            "from": "March",
+            "to": "Mars"
+        },
+        {
+            "from": "April",
+            "to": "April"
+        },
+        {
+            "from": "May",
+            "to": "Mai"
+        },
+        {
+            "from": "June",
+            "to": "Juni"
+        },
+        {
+            "from": "July",
+            "to": "Juli"
+        },
+        {
+            "from": "August",
+            "to": "August"
+        },
+        {
+            "from": "September",
+            "to": "September"
+        },
+        {
+            "from": "October",
+            "to": "Oktober"
+        },
+        {
+            "from": "November",
+            "to": "November"
+        },
+        {
+            "from": "December",
+            "to": "Desember"
+        }
+    ],
+    "info": {
+        "labels": [],
+        "title": "",
+        "type": "v2"
+    },
+    "uuid": ""
+}

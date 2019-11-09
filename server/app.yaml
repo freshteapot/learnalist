@@ -1,0 +1,11 @@
+origin: http://localhost
+oauth:
+  google:
+    key:
+    secret:
+databaseName: /tmp/api.db
+domain: learnalist.net
+port: 80
+corsAllowedOrigins:
+siteCacheFolder:
+hugoFolder:

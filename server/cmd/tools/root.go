@@ -12,4 +12,5 @@ var RootCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(rebuildStaticSiteCmd)
 	RootCmd.AddCommand(integrationTestsCmd)
+	RootCmd.AddCommand(stubSQLFileCmd)
 }
