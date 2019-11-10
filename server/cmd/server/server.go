@@ -2,10 +2,7 @@ package server
 
 import (
 	"fmt"
-
-	"log"
-	"path/filepath"
-	"strings"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,30 +23,18 @@ var ServerCmd = &cobra.Command{
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
-		siteCacheFolder := viper.GetString("server.siteCacheDirectory") // "path to site cache"
-		hugoFolder := viper.GetString("server.hugoDirectory")           // "path to static site builder
 
-		hugoFolder = strings.TrimRight(hugoFolder, "/")
-		siteCacheFolder = strings.TrimRight(siteCacheFolder, "/")
-
-		// Convert paths to absolute, allowing /../x
-		hugoFolder, _ = filepath.Abs(hugoFolder)
-		siteCacheFolder, _ = filepath.Abs(siteCacheFolder)
-
-		if hugoFolder == "" {
-			log.Fatal("You might have forgotten to set the path to hugo directory: server.hugoDirectory")
+		// "path to static site builder
+		hugoFolder, err := utils.CmdParsePathToFolder("server.hugoDirectory", viper.GetString("server.hugoDirectory"))
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
-
-		if !utils.IsDir(hugoFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", hugoFolder))
-		}
-
-		if siteCacheFolder == "" {
-			log.Fatal("You might have forgotten to set the path to site cache directory: server.siteCacheDirectory")
-		}
-
-		if !utils.IsDir(siteCacheFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", siteCacheFolder))
+		// "path to site cache"
+		siteCacheFolder, err := utils.CmdParsePathToFolder("server.siteCacheDirectory", viper.GetString("server.siteCacheDirectory"))
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		serverConfig := server.Config{

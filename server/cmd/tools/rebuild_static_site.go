@@ -3,9 +3,7 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-	"path/filepath"
-	"strings"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,34 +20,18 @@ var rebuildStaticSiteCmd = &cobra.Command{
 	Use:   "rebuild-static-site",
 	Short: "Rebuild the static site based on all lists in the database",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Rebuild static sites")
-		cfg := viper.Sub("tools.rebuildStaticSite")
-
-		databaseName := cfg.GetString("sqlite.database")
-		siteCacheFolder := cfg.GetString("siteCacheDirectory") // "path to site cache"
-		hugoFolder := cfg.GetString("hugoDirectory")           // "path to static site builder
-
-		hugoFolder = strings.TrimRight(hugoFolder, "/")
-		siteCacheFolder = strings.TrimRight(siteCacheFolder, "/")
-
-		// Convert paths to absolute, allowing /../x
-		hugoFolder, _ = filepath.Abs(hugoFolder)
-		siteCacheFolder, _ = filepath.Abs(siteCacheFolder)
-
-		if hugoFolder == "" {
-			log.Fatal("You might have forgotten to set the path to hugo directory: server.hugoDirectory")
+		databaseName := viper.GetString("tools.rebuildStaticSite.sqlite.database")
+		// "path to static site builder
+		hugoFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.hugoDirectory", viper.GetString("tools.rebuildStaticSite.hugoDirectory"))
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
-
-		if !utils.IsDir(hugoFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", hugoFolder))
-		}
-
-		if siteCacheFolder == "" {
-			log.Fatal("You might have forgotten to set the path to site cache directory: server.siteCacheDirectory")
-		}
-
-		if !utils.IsDir(siteCacheFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", siteCacheFolder))
+		// "path to site cache"
+		siteCacheFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.siteCacheDirectory", viper.GetString("tools.rebuildStaticSite.siteCacheDirectory"))
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		db := database.NewDB(databaseName)
