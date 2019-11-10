@@ -13,21 +13,22 @@ GO111MODULE=on sh build.sh
 
 Create the files for hugo
 ```
-mkdir -p /var/www/learnalist-api/site-cache
-cp -r $(pwd)/alists/hugo /var/www/learnalist-api/hugo
-mkdir -p /var/www/learnalist-api/hugo/{public-alist,content/alists,data/lists}
-chown -R www-data:www-data /var/www/learnalist-api/
+mkdir -p /srv/learnalist/{bin,site-cache}
+cp -r ./hugo /srv/learnalist/hugo
+mkdir -p /srv/learnalist/hugo/{public-alist,content/alists,data/lists}
 ```
 
 Make sure the ownerships is www-data
 ```
-chown -R www-data:www-data /var/www/learnalist-api/
+chown -R www-data:www-data /srv/learnalist/
 ```
 
 Make a backup of the one running
 ```sh
 cp /root/work/bin/server server.last.working
 ```
+
+cp /root/work/bin/server /srv/learnalist/bin/
 
 Move it to where supervisor will find it.
 ```sh
@@ -43,6 +44,10 @@ Check the logs
 supervisorctl tail -f  learnalist-api
 ```
 
+## Setup supervisor
+```
+cp config/supervisor.conf.learnalist.conf /etc/supervisor/conf.d/learnalist.conf
+```
 
 ## Change golang
 ```sh
