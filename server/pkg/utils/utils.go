@@ -1,6 +1,11 @@
 package utils
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 func IsDir(filename string) bool {
 	info, err := os.Stat(filename)
@@ -8,4 +13,19 @@ func IsDir(filename string) bool {
 		return false
 	}
 	return info.IsDir()
+}
+
+func CmdParsePathToFolder(key string, dir string) (string, error) {
+	dir = strings.TrimRight(dir, "/")
+	pathToFolder, _ := filepath.Abs(dir)
+
+	if pathToFolder == "" {
+		return "", fmt.Errorf("You might have forgotten to set the path for: %s", key)
+	}
+
+	if !IsDir(pathToFolder) {
+		return "", fmt.Errorf("%s is not a directory", key)
+	}
+
+	return pathToFolder, nil
 }

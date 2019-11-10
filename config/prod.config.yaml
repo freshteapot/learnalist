@@ -1,0 +1,19 @@
+server:
+  sqlite:
+    database: "/srv/learnalist/api.db"
+  port: "9090"
+  cors:
+    allowedOrigins: "*"
+  siteCacheDirectory: "/srv/learnalist/site-cache"
+  hugoDirectory: "/srv/learnalist/hugo"
+
+tools:
+  rebuildStaticSite:
+    sqlite:
+      database: "/srv/learnalist/api.db"
+    siteCacheDirectory: "/srv/learnalist/site-cache"
+    hugoDirectory: "/srv/learnalist/hugo"
+  integrationTests:
+    username: ""
+    password: ""
+    server: ""

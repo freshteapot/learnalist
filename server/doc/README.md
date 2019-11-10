@@ -3,6 +3,7 @@
 * [Api](./api.md)
 * [List types overview](./list.types.md)
 * [Question and Answers](./qa.md)
+* [Setup the server for development](./install-server-for-dev.md)
 * [Manual install instructions for me](./INSTALL.md)
 * [Client commands](./client.md)
 * [Golang tips](./tips.md)

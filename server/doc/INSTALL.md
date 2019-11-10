@@ -1,5 +1,24 @@
 # Manually Install on the server
 
+## Setup
+
+### Setup log files
+```
+mkdir -p /var/log/learnalist/
+chown -R root:root /var/log/learnalist/
+```
+
+### Copy config
+```
+cp config/prod.config.yaml /srv/learnalist/
+```
+
+### Setup supervisor
+```
+cp config/supervisor.conf.learnalist.conf /etc/supervisor/conf.d/learnalist.conf
+```
+
+
 Maybe get a ubuntu local copy so I dont need to do it from the server.
 
 ## Update the learnalist server
@@ -12,35 +31,36 @@ GO111MODULE=on sh build.sh
 ```
 
 Create the files for hugo
-```
-mkdir -p /var/www/learnalist-api/site-cache
-cp -r $(pwd)/alists/hugo /var/www/learnalist-api/hugo
-mkdir -p /var/www/learnalist-api/hugo/{public-alist,content/alists,data/lists}
-chown -R www-data:www-data /var/www/learnalist-api/
+```sh
+cd ..
+mkdir -p /srv/learnalist/{bin,site-cache}
+cp -r ./hugo /srv/learnalist
+mkdir -p /srv/learnalist/hugo/{public-alist,content/alists,data/lists}
 ```
 
 Make sure the ownerships is www-data
-```
-chown -R www-data:www-data /var/www/learnalist-api/
+```sh
+chown -R www-data:www-data /srv/learnalist/
 ```
 
 Make a backup of the one running
+
 ```sh
-cp /root/work/bin/server server.last.working
+cp /srv/learnalist/bin/learnalist-cli /srv/learnalist/learnalist-cli.last.working
 ```
 
 Move it to where supervisor will find it.
 ```sh
-mv apiserver /root/work/bin/server
+cp server/learnalist-cli /srv/learnalist/bin/learnalist-cli
 ```
 When ready, reload
 ```sh
-supervisorctl reload learnalist-api
+supervisorctl reload learnalist
 ```
 
 Check the logs
 ```
-supervisorctl tail -f  learnalist-api
+supervisorctl tail -f  learnalist
 ```
 
 

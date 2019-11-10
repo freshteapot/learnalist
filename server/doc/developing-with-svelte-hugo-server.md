@@ -1,51 +1,15 @@
-# Server
+# Get the server up and running
 
-Setup folder structure
-```sh
-rm -rf /tmp/learnalist-api
-mkdir -p /tmp/learnalist-api/site-cache
-```
-
-```sh
-rm -rf ./hugo/public-alist
-```
-
-```sh
-mkdir -p ./hugo/{public-alist,content/alists,data/lists}
-cp -rf ./hugo/themes/alist/static/ /tmp/learnalist-api/site-cache/
-```
-
-# Build the database
-```sh
-ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
-```
-
-
-# Run the server
-```sh
-cd server/
-```
-
-
-```sh
-go run commands/api/main.go \
---port=1234 \
---database=/tmp/learnalist-api/server.db \
---hugo-dir="$(pwd)/../hugo" \
---site-cache-dir="/tmp/learnalist-api/site-cache"
-```
+[Setup the server for development](./install-server-for-dev.md)
 
 # Rebuild from existing database
 
-```
-go run commands/rebuild-static-site/main.go \
---database=/tmp/learnalist-api/server.db \
---hugo-dir="$(pwd)/../hugo" \
---site-cache-dir="/tmp/learnalist-api/site-cache"
+```sh
+go run main.go tools rebuild-static-site --config=dev.config.yaml
 ```
 
 # Svelte
-```
+```sh
 cd svelte
 ```
 
