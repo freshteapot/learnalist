@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 pathToVersion="github.com/freshteapot/learnalist-api/server/api/version"
 gitHash=$(git rev-parse HEAD)
 buildVersion="v0.0.1"
