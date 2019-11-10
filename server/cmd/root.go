@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/freshteapot/learnalist-api/server/cmd/server"
+	"github.com/freshteapot/learnalist-api/server/cmd/tools"
 	"github.com/spf13/viper"
 )
 
@@ -30,6 +31,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.learnalist.yaml)")
 	rootCmd.AddCommand(server.ServerCmd)
+	rootCmd.AddCommand(tools.RootCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -43,11 +45,10 @@ func initConfig() {
 	viper.SetConfigFile(cfgFile)
 	viper.AutomaticEnv() // read in environment variables that match
 
-	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
