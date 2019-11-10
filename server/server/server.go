@@ -8,8 +8,7 @@ import (
 )
 
 type Config struct {
-	Port             int
-	Domain           string
+	Port             string
 	CorsAllowOrigins string
 	HugoFolder       string
 	SiteCacheFolder  string
@@ -34,6 +33,6 @@ func Init(_config Config) {
 
 func Run() {
 	// Start server
-	listenOn := fmt.Sprintf(":%d", config.Port)
+	listenOn := fmt.Sprintf(":%s", config.Port)
 	server.Logger.Fatal(server.Start(listenOn))
 }

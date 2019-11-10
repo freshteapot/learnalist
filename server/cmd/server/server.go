@@ -3,12 +3,12 @@ package server
 import (
 	"fmt"
 
-	"flag"
 	"log"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/database"
@@ -24,50 +24,47 @@ var ServerCmd = &cobra.Command{
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Start the server")
-		databaseName := flag.String("database", "/tmp/api.db", "The database.")
-		domain := flag.String("domain", "learnalist.net", "The domain.")
-		port := flag.Int("port", 80, "Port to listen on.")
-		corsAllowedOrigins := flag.String("cors-allowed-origins", "", "Use , between allowed domains.")
+		databaseName := viper.GetString("server.sqlite.database")
+		port := viper.GetString("server.port")
+		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
+		siteCacheFolder := viper.GetString("server.siteCacheDirectory") // "path to site cache"
+		hugoFolder := viper.GetString("server.hugoDirectory")           // "path to static site builder
 
-		siteCacheFolder := flag.String("site-cache-dir", "", "path to site cache")
-		hugoFolder := flag.String("hugo-dir", "", "path to static site builder")
-		flag.Parse()
+		hugoFolder = strings.TrimRight(hugoFolder, "/")
+		siteCacheFolder = strings.TrimRight(siteCacheFolder, "/")
 
-		*hugoFolder = strings.TrimRight(*hugoFolder, "/")
-		*siteCacheFolder = strings.TrimRight(*siteCacheFolder, "/")
-
-		if *hugoFolder == "" {
-			log.Fatal("Will need the path to site builder directory, add -hugo-dir=XXX")
-		}
-
-		if !utils.IsDir(*hugoFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", *hugoFolder))
-		}
-
-		if *siteCacheFolder == "" {
-			log.Fatal("Will need the path to site cache directory, add -site-cache-dir=XXX")
-		}
-
-		if !utils.IsDir(*siteCacheFolder) {
-			log.Fatal(fmt.Sprintf("%s is not a directory", *siteCacheFolder))
-		}
 		// Convert paths to absolute, allowing /../x
-		*hugoFolder, _ = filepath.Abs(*hugoFolder)
-		*siteCacheFolder, _ = filepath.Abs(*siteCacheFolder)
+		hugoFolder, _ = filepath.Abs(hugoFolder)
+		siteCacheFolder, _ = filepath.Abs(siteCacheFolder)
+
+		if hugoFolder == "" {
+			log.Fatal("You might have forgotten to set the path to hugo directory: server.hugoDirectory")
+		}
+
+		if !utils.IsDir(hugoFolder) {
+			log.Fatal(fmt.Sprintf("%s is not a directory", hugoFolder))
+		}
+
+		if siteCacheFolder == "" {
+			log.Fatal("You might have forgotten to set the path to site cache directory: server.siteCacheDirectory")
+		}
+
+		if !utils.IsDir(siteCacheFolder) {
+			log.Fatal(fmt.Sprintf("%s is not a directory", siteCacheFolder))
+		}
 
 		serverConfig := server.Config{
-			Port:             *port,
-			Domain:           *domain,
-			CorsAllowOrigins: *corsAllowedOrigins,
-			HugoFolder:       *hugoFolder,
-			SiteCacheFolder:  *siteCacheFolder,
+			Port:             port,
+			CorsAllowOrigins: corsAllowedOrigins,
+			HugoFolder:       hugoFolder,
+			SiteCacheFolder:  siteCacheFolder,
 		}
 		server.Init(serverConfig)
 
 		masterCron := cron.NewCron()
 
-		// *databaseName = "root:mysecretpassword@/learnalistapi"
-		db := database.NewDB(*databaseName)
+		// databaseName = "root:mysecretpassword@/learnalistapi"
+		db := database.NewDB(databaseName)
 		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron, serverConfig.SiteCacheFolder)
 		hugoHelper.RegisterCronJob()
 

@@ -18,7 +18,6 @@ import (
 
 func main() {
 	databaseName := flag.String("database", "/tmp/api.db", "The database.")
-	domain := flag.String("domain", "learnalist.net", "The domain.")
 	port := flag.Int("port", 80, "Port to listen on.")
 	corsAllowedOrigins := flag.String("cors-allowed-origins", "", "Use , between allowed domains.")
 
@@ -50,7 +49,6 @@ func main() {
 
 	serverConfig := server.Config{
 		Port:             *port,
-		Domain:           *domain,
 		CorsAllowOrigins: *corsAllowedOrigins,
 		HugoFolder:       *hugoFolder,
 		SiteCacheFolder:  *siteCacheFolder,
