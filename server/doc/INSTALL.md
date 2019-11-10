@@ -2,6 +2,12 @@
 
 ## Setup
 
+### Setup log files
+```
+mkdir -p /var/log/learnalist/
+chown -R root:root /var/log/learnalist/
+```
+
 ### Copy config
 ```
 cp config/prod.config.yaml /srv/learnalist/
@@ -40,7 +46,7 @@ chown -R www-data:www-data /srv/learnalist/
 Make a backup of the one running
 
 ```sh
-cp /srv/learnalist/learnalist-cli /srv/learnalist/learnalist-cli.last.working
+cp /srv/learnalist/bin/learnalist-cli /srv/learnalist/learnalist-cli.last.working
 ```
 
 Move it to where supervisor will find it.
@@ -81,12 +87,4 @@ ls db/*.sql | sort | xargs cat | sqlite3 server.db
 ## Update the database with a single file change.
 ```sh
 cat  db/201905052144-labels.sql | sqlite3 test.db
-```
-
-
-
-# First time
-```
-mkdir -p /var/log/learnalist/
-chown -R root:root /var/log/learnalist/
 ```
