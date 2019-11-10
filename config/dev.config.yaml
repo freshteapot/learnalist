@@ -8,7 +8,7 @@ server:
   hugoDirectory: "./../hugo"
   loginWith:
     google:
-      clientID: "922982262824-el24pc3umf55d8cru7ks4uic8bhoqdr6.apps.googleusercontent.com"
+      clientID: "XXX"
       clientSecret: "XXX"
 tools:
   rebuildStaticSite:
