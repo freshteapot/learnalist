@@ -1,9 +1,9 @@
 # Ignore all databases
 *.db
-*.DS_Store 
+*.DS_Store
 # GO: Ignore all files in vendor
 server/vendor/
-server/apiserver
+server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
 

@@ -1,5 +1,18 @@
 # Manually Install on the server
 
+## Setup
+
+### Copy config
+```
+cp config/prod.config.yaml /srv/learnalist/
+```
+
+### Setup supervisor
+```
+cp config/supervisor.conf.learnalist.conf /etc/supervisor/conf.d/learnalist.conf
+```
+
+
 Maybe get a ubuntu local copy so I dont need to do it from the server.
 
 ## Update the learnalist server
@@ -12,42 +25,38 @@ GO111MODULE=on sh build.sh
 ```
 
 Create the files for hugo
-```
+```sh
+cd ..
 mkdir -p /srv/learnalist/{bin,site-cache}
-cp -r ./hugo /srv/learnalist/hugo
+cp -r ./hugo /srv/learnalist
 mkdir -p /srv/learnalist/hugo/{public-alist,content/alists,data/lists}
 ```
 
 Make sure the ownerships is www-data
-```
+```sh
 chown -R www-data:www-data /srv/learnalist/
 ```
 
 Make a backup of the one running
-```sh
-cp /root/work/bin/server server.last.working
-```
 
-cp /root/work/bin/server /srv/learnalist/bin/
+```sh
+cp /srv/learnalist/learnalist-cli /srv/learnalist/learnalist-cli.last.working
+```
 
 Move it to where supervisor will find it.
 ```sh
-mv apiserver /root/work/bin/server
+cp server/learnalist-cli /srv/learnalist/bin/learnalist-cli
 ```
 When ready, reload
 ```sh
-supervisorctl reload learnalist-api
+supervisorctl reload learnalist
 ```
 
 Check the logs
 ```
-supervisorctl tail -f  learnalist-api
+supervisorctl tail -f  learnalist
 ```
 
-## Setup supervisor
-```
-cp config/supervisor.conf.learnalist.conf /etc/supervisor/conf.d/learnalist.conf
-```
 
 ## Change golang
 ```sh
@@ -72,4 +81,12 @@ ls db/*.sql | sort | xargs cat | sqlite3 server.db
 ## Update the database with a single file change.
 ```sh
 cat  db/201905052144-labels.sql | sqlite3 test.db
+```
+
+
+
+# First time
+```
+mkdir -p /var/log/learnalist/
+chown -R root:root /var/log/learnalist/
 ```

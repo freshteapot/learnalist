@@ -8,7 +8,7 @@ go build -ldflags "-s -w " -ldflags "
 -X ${pathToVersion}.GitHash=${gitHash}
 -X ${pathToVersion}.GitDate=${gitHashDate}
 -X ${pathToVersion}.Version=${buildVersion}
-" -o apiserver main.go
+" -o learnalist-cli main.go
 _EOF_
 )
 echo "Will run the command:"
