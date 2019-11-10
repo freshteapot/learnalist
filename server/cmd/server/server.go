@@ -23,7 +23,6 @@ var ServerCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Start the server")
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")

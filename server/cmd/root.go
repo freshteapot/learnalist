@@ -27,7 +27,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.learnalist.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Path to the config file")
 	rootCmd.AddCommand(server.ServerCmd)
 	rootCmd.AddCommand(tools.RootCmd)
 }
