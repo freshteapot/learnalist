@@ -1,11 +1,7 @@
 # Manual testing of endpoints
+## Get the server up and running
 
-```sh
-cd server/
-rm ./server.db
-ls db/*.sql | sort | xargs cat | sqlite3 ./server.db
-go run commands/api/main.go --port=1234 --database=./server.db
-```
+[Setup the server](./install-server-for-dev.md)
 
 # Add test user
 ```sh
