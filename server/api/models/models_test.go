@@ -5,6 +5,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	oauthSqlite "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/stretchr/testify/suite"
 )
@@ -21,7 +22,8 @@ func (suite *ModelSuite) SetupSuite() {
 	acl := aclSqlite.NewAcl(db)
 	userSession := userSqlite.NewUserSession(db)
 	userFromIDP := userSqlite.NewUserFromIDP(db)
-	dal = NewDAL(db, acl, userSession, userFromIDP)
+	oauthHandler := oauthSqlite.NewOAuthReadWriter(db)
+	dal = NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

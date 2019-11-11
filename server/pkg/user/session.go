@@ -2,17 +2,24 @@ package user
 
 import "time"
 
-type UserUUID string
+type UserInfoFromIDP struct {
+	UserUUID   string
+	IDP        string
+	Identifier string
+	Kind       string
+	Info       string
+	Created    time.Time
+}
 
 type UserInfo struct {
-	UserUUID  UserUUID
+	UserUUID  string
 	Challenge string
 	Created   time.Time
 }
 
 type UserSession struct {
 	Token     string
-	UserUUID  UserUUID
+	UserUUID  string
 	Challenge string
 	Created   time.Time
 }
@@ -36,13 +43,13 @@ type SessionMaintenance interface {
 }
 
 type UserWithUsernameAndPassword interface {
-	Register(username string, password string) (UserUUID, error)
+	Register(username string, password string) (userUUID string, err error)
 	// GetUserByCredentials look up the user based on username + password
-	Lookup(username string, hash string) (UserUUID, error)
+	Lookup(username string, hash string) (userUUID string, err error)
 }
 
 type UserFromIDP interface {
-	Register(from string, kind string, identifier string, info []byte) (UserUUID, error)
-	// GetUserByCredentials look up the user based on username + password
-	Lookup(from string, kind string, identifier string) (UserUUID, error)
+	Register(idp string, identifier string, info []byte) (userUUID string, err error)
+	Lookup(idp string, identifier string) (userUUID string, err error)
+	GetByUserUUID(userUUID string) (UserInfoFromIDP, error)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	oauthSqlite "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +27,8 @@ var _ = BeforeSuite(func() {
 	acl := aclSqlite.NewAcl(db)
 	userSession := userSqlite.NewUserSession(db)
 	userFromIDP := userSqlite.NewUserFromIDP(db)
-	dal = models.NewDAL(db, acl, userSession, userFromIDP)
+	oauthHandler := oauthSqlite.NewOAuthReadWriter(db)
+	dal = models.NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
 	hugoHelper := new(mocks.HugoSiteBuilder)
 
 	m = api.Manager{

@@ -13,6 +13,7 @@ import (
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	oauthSqlite "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
@@ -68,8 +69,9 @@ var ServerCmd = &cobra.Command{
 		acl := aclSqlite.NewAcl(db)
 		userSession := userSqlite.NewUserSession(db)
 		userFromIDP := userSqlite.NewUserFromIDP(db)
+		oauthHandler := oauthSqlite.NewOAuthReadWriter(db)
 		//userWithUsername := userSqlite.NewUserWithUsernameAndPassword(db)
-		dal := models.NewDAL(db, acl, userSession, userFromIDP)
+		dal := models.NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
 
 		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)
 		server.InitAlists(acl, dal, hugoHelper)

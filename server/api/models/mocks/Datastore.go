@@ -6,6 +6,7 @@ import alist "github.com/freshteapot/learnalist-api/server/api/alist"
 import authenticate "github.com/freshteapot/learnalist-api/server/api/authenticate"
 import mock "github.com/stretchr/testify/mock"
 import models "github.com/freshteapot/learnalist-api/server/api/models"
+import oauth "github.com/freshteapot/learnalist-api/server/pkg/oauth"
 import user "github.com/freshteapot/learnalist-api/server/pkg/user"
 import uuid "github.com/freshteapot/learnalist-api/server/api/uuid"
 
@@ -120,6 +121,22 @@ func (_m *Datastore) InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User
 	}
 
 	return r0, r1
+}
+
+// OAuthHandler provides a mock function with given fields:
+func (_m *Datastore) OAuthHandler() oauth.OAuthReadWriter {
+	ret := _m.Called()
+
+	var r0 oauth.OAuthReadWriter
+	if rf, ok := ret.Get(0).(func() oauth.OAuthReadWriter); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(oauth.OAuthReadWriter)
+		}
+	}
+
+	return r0
 }
 
 // PostAlistLabel provides a mock function with given fields: label

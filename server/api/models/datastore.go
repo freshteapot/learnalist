@@ -4,6 +4,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
@@ -13,13 +14,16 @@ type Datastore interface {
 	DatastoreAlists
 	DatastoreUsers
 	DatastoreUser
+	DatastoreOauth2
+}
+
+type DatastoreOauth2 interface {
+	OAuthHandler() oauth.OAuthReadWriter
 }
 
 type DatastoreUser interface {
 	UserSession() user.Session
 	UserFromIDP() user.UserFromIDP
-
-	//UserWithUsernameAndPassword() user.UserWithUsernameAndPassword
 }
 
 type DatastoreLabels interface {
