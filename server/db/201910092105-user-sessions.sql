@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS user_sessions (
-  token TEXT NOT NULL UNIQUE  PRIMARY KEY,
-  user_uuid TEXT NOT NULL  DEFAULT 'none',
-  created TIMESTAMP NOT NULL
+  challenge TEXT NOT NULL UNIQUE PRIMARY KEY,
+  token TEXT NOT NULL DEFAULT 'none',
+  user_uuid TEXT NOT NULL DEFAULT 'none',
+  created integer(4) not null default (strftime('%s','now'))
 );

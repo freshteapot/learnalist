@@ -23,6 +23,10 @@ func SkipBasicAuth(c echo.Context) bool {
 		return true
 	}
 
+	if strings.HasPrefix(url, "/oauth/") {
+		return true
+	}
+
 	// Allow some more
 	if strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1:") {
 		method := c.Request().Method
@@ -34,6 +38,7 @@ func SkipBasicAuth(c echo.Context) bool {
 }
 
 func ValidateBasicAuth(username string, password string, c echo.Context) (bool, error) {
+	//fmt.Println(c.Request().Header.Get("Authorization"))
 	loginUser := &LoginUser{
 		Username: username,
 		Password: password,

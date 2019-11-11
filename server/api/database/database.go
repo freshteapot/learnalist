@@ -20,6 +20,8 @@ func GetTables() []string {
 		"user_labels",
 		"alist_labels",
 		"acl_simple",
+		"oauth2_token_info",
+		"user_sessions",
 	}
 	return *tables
 }

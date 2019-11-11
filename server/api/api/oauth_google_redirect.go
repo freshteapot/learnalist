@@ -3,7 +3,9 @@ package api
 import (
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
 )
 
 func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
@@ -12,9 +14,15 @@ func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "this website has not configured Google OAuth")
 	}
 
-	r := c.Request()
-	token := r.FormValue("token")
 	// Validate the token is in the process, by looking it up.
-	url := googleConfig.AuthCodeURL(token)
+	challenge, err := m.Datastore.UserSession().Create()
+	if err != nil {
+		response := HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	url := googleConfig.AuthCodeURL(challenge, oauth2.AccessTypeOffline)
 	return c.Redirect(http.StatusFound, url)
 }

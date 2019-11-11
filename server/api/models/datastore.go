@@ -4,6 +4,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
 // Datastore allowing us to build an abstraction layer
@@ -11,6 +12,14 @@ type Datastore interface {
 	DatastoreLabels
 	DatastoreAlists
 	DatastoreUsers
+	DatastoreUser
+}
+
+type DatastoreUser interface {
+	UserSession() user.Session
+	UserFromIDP() user.UserFromIDP
+
+	//UserWithUsernameAndPassword() user.UserWithUsernameAndPassword
 }
 
 type DatastoreLabels interface {

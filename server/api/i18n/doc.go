@@ -50,6 +50,7 @@ const (
 )
 
 var (
-	ErrorCannotReadResponse = errors.New("Cannot read response.")
-	ErrorInternal           = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
+	ErrorCannotReadResponse  = errors.New("Cannot read response.")
+	ErrorInternal            = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
+	ErrorUserSessionActivate = errors.New("challenge doesnt exist or is active")
 )

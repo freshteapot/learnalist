@@ -5,6 +5,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,7 +19,9 @@ type ModelSuite struct {
 func (suite *ModelSuite) SetupSuite() {
 	db := database.NewTestDB()
 	acl := aclSqlite.NewAcl(db)
-	dal = NewDAL(db, acl)
+	userSession := userSqlite.NewUserSession(db)
+	userFromIDP := userSqlite.NewUserFromIDP(db)
+	dal = NewDAL(db, acl, userSession, userFromIDP)
 }
 
 func (suite *ModelSuite) SetupTest() {

@@ -3,8 +3,10 @@ module github.com/freshteapot/learnalist-api/server
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/gookit/validate v1.1.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo/v4 v4.1.5
