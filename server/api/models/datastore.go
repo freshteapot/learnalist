@@ -50,8 +50,3 @@ type DatastoreUsers interface {
 	GetUserByCredentials(loginUser authenticate.LoginUser) (*uuid.User, error)
 	UserExists(userUUID string) bool
 }
-
-type DatastoreUserSessions interface {
-	Get() (string, error)
-	Insert() (string, error)
-}
