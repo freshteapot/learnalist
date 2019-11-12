@@ -10,11 +10,11 @@ import (
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
-	oauthSqlite "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
-	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
 )
@@ -66,11 +66,11 @@ var ServerCmd = &cobra.Command{
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.
-		acl := aclSqlite.NewAcl(db)
-		userSession := userSqlite.NewUserSession(db)
-		userFromIDP := userSqlite.NewUserFromIDP(db)
-		oauthHandler := oauthSqlite.NewOAuthReadWriter(db)
-		//userWithUsername := userSqlite.NewUserWithUsernameAndPassword(db)
+		acl := aclStorage.NewAcl(db)
+		userSession := userStorage.NewUserSession(db)
+		userFromIDP := userStorage.NewUserFromIDP(db)
+		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
+		//userWithUsername := userStorage.NewUserWithUsernameAndPassword(db)
 		dal := models.NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
 
 		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)

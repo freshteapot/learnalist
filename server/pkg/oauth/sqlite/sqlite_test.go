@@ -8,7 +8,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
-	oauthSqlite "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/oauth2"
 
@@ -54,11 +54,11 @@ var _ = Describe("Testing Oauth", func() {
 		Context("Getting a record", func() {
 			It("When the user doesnt have any token info", func() {
 				want := sql.ErrNoRows
-				mockSql.ExpectQuery(oauthSqlite.SelectByUserUUID).
+				mockSql.ExpectQuery(oauthStorage.SelectByUserUUID).
 					WithArgs(userUUID).
 					WillReturnError(want)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				_, err = repoistory.GetTokenInfo(userUUID)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(sql.ErrNoRows))
@@ -73,11 +73,11 @@ var _ = Describe("Testing Oauth", func() {
 					"expiry",
 				}).
 					AddRow(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry)
-				mockSql.ExpectQuery(oauthSqlite.SelectByUserUUID).
+				mockSql.ExpectQuery(oauthStorage.SelectByUserUUID).
 					WithArgs(userUUID).
 					WillReturnRows(rs)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				found, err := repoistory.GetTokenInfo(userUUID)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found.AccessToken).To(Equal(token.AccessToken))
@@ -87,15 +87,15 @@ var _ = Describe("Testing Oauth", func() {
 		Context("Writing token info", func() {
 			It("Happy path", func() {
 				mockSql.ExpectBegin()
-				mockSql.ExpectExec(oauthSqlite.DeleteByUserUUID).
+				mockSql.ExpectExec(oauthStorage.DeleteByUserUUID).
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				mockSql.ExpectExec(oauthSqlite.InsertEntry).
+				mockSql.ExpectExec(oauthStorage.InsertEntry).
 					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectCommit()
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				err := repoistory.WriteTokenInfo(userUUID, token)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
@@ -104,7 +104,7 @@ var _ = Describe("Testing Oauth", func() {
 				want := errors.New("sql: TX")
 				mockSql.ExpectBegin().WillReturnError(want)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				err := repoistory.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
@@ -113,11 +113,11 @@ var _ = Describe("Testing Oauth", func() {
 			It("Fail on tx: deleting existing record", func() {
 				want := errors.New("sql: TX")
 				mockSql.ExpectBegin()
-				mockSql.ExpectExec(oauthSqlite.DeleteByUserUUID).
+				mockSql.ExpectExec(oauthStorage.DeleteByUserUUID).
 					WithArgs(userUUID).
 					WillReturnError(want)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				err := repoistory.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
@@ -126,13 +126,13 @@ var _ = Describe("Testing Oauth", func() {
 			It("Fail on tx: inserting token", func() {
 				want := errors.New("sql: TX")
 				mockSql.ExpectBegin()
-				mockSql.ExpectExec(oauthSqlite.DeleteByUserUUID).
+				mockSql.ExpectExec(oauthStorage.DeleteByUserUUID).
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				mockSql.ExpectExec(oauthSqlite.InsertEntry).
+				mockSql.ExpectExec(oauthStorage.InsertEntry).
 					WillReturnError(want)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				err := repoistory.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
@@ -141,16 +141,16 @@ var _ = Describe("Testing Oauth", func() {
 			It("Fail on tx: commit", func() {
 				want := errors.New("sql: TX")
 				mockSql.ExpectBegin()
-				mockSql.ExpectExec(oauthSqlite.DeleteByUserUUID).
+				mockSql.ExpectExec(oauthStorage.DeleteByUserUUID).
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				mockSql.ExpectExec(oauthSqlite.InsertEntry).
+				mockSql.ExpectExec(oauthStorage.InsertEntry).
 					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectCommit().
 					WillReturnError(want)
 
-				repoistory = oauthSqlite.NewOAuthReadWriter(dbCon)
+				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
 				err := repoistory.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
