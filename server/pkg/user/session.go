@@ -26,6 +26,7 @@ type UserSession struct {
 
 type Session interface {
 	// Create create a session with a unique challenge, send the challenge in the oauth2 flow
+	// The string returned is the actual challenge
 	Create() (string, error)
 	// Activate update the challenge with the userUUID and token
 	Activate(session UserSession) error
