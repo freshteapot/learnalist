@@ -1,7 +1,6 @@
 package sqlite
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -61,7 +60,6 @@ func (store *UserFromIDP) Register(idp string, identifier string, info []byte) (
 func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string, err error) {
 	var item DatabaseUserFromIDP
 	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
-	fmt.Println(item)
 	return item.UserUUID, err
 }
 

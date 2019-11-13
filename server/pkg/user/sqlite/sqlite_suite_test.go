@@ -9,5 +9,5 @@ import (
 
 func TestPackage(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Oauth Sqlite Test Suite")
+	RunSpecs(t, "User Sqlite Test Suite")
 }
