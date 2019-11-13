@@ -3,10 +3,10 @@ package sqlite_test
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	storage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
@@ -14,16 +14,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-func getMockDB() (*sqlx.DB, sqlmock.Sqlmock, error) {
-	mockDB, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		Fail(fmt.Sprintf("an error '%s' was not expected when opening a stub database connection", err.Error()))
-	}
-
-	sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
-	return sqlxDB, mock, err
-}
 
 var _ = Describe("Testing User", func() {
 	When("Working with the user session", func() {
@@ -35,7 +25,7 @@ var _ = Describe("Testing User", func() {
 		)
 
 		BeforeEach(func() {
-			dbCon, mockSql, err = getMockDB()
+			dbCon, mockSql, err = helper.GetMockDB()
 		})
 
 		AfterEach(func() {

@@ -3,28 +3,18 @@ package sqlite_test
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/oauth2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-func getMockDB() (*sqlx.DB, sqlmock.Sqlmock, error) {
-	mockDB, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		Fail(fmt.Sprintf("an error '%s' was not expected when opening a stub database connection", err.Error()))
-	}
-
-	sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
-	return sqlxDB, mock, err
-}
 
 var _ = Describe("Testing Oauth", func() {
 	var (
@@ -37,7 +27,7 @@ var _ = Describe("Testing Oauth", func() {
 	)
 
 	BeforeEach(func() {
-		dbCon, mockSql, err = getMockDB()
+		dbCon, mockSql, err = helper.GetMockDB()
 		token = new(oauth2.Token)
 		token.AccessToken = "fake-access-token"
 		token.TokenType = "Bearer"
