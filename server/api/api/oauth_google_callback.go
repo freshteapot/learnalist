@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 
@@ -134,5 +136,30 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	// One way would be to post a cookie
 	// Pass back a header
 	// Have it in the payload, or in the actual html page for javascript to pick up and handle
-	return c.String(http.StatusOK, "Todo how to share the session token")
+
+	vars := make(map[string]interface{})
+	vars["token"] = session.Token
+	vars["refreshRedirectURL"] = "//welcome.html"
+	vars["idp"] = "Google"
+
+	var tpl bytes.Buffer
+	oauthGoogleCallbackHtml200.Execute(&tpl, vars)
+
+	return c.HTMLBlob(http.StatusOK, tpl.Bytes())
 }
+
+var oauthGoogleCallbackHtml200 = template.Must(template.New("").Parse(`
+<!DOCTYPE html>
+<html>
+<head
+	data-redirectUri="{{.refreshRedirectURL}}"
+	data-token="{{.token}}"
+>
+<meta charset="utf-8" />
+</head>
+<body>
+<h1>You have succesfully logged in via {{.idp}}</h1>
+<p>You will now be redirected</p>
+</body>
+</html>
+`))
