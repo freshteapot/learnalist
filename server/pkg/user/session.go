@@ -37,12 +37,13 @@ type Session interface {
 }
 
 type SessionMaintenance interface {
-	// RemoveAllByUserUUID remove all sessions for a user
+	// RemoveSessionsForUser remove all sessions for a user
 	RemoveSessionsForUser(userUUID string) error
 	// RemoveExpiredChallenges remove challenges that were never activated
 	RemoveExpiredChallenges() error
 }
 
+// TODO
 type UserWithUsernameAndPassword interface {
 	Register(username string, password string) (userUUID string, err error)
 	// GetUserByCredentials look up the user based on username + password
