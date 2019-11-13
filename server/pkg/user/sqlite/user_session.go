@@ -2,12 +2,20 @@ package sqlite
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
+
+type DatabaseUserSession struct {
+	Challenge string `db:"challenge"`
+	Token     string `db:"token"`
+	UserUUID  string `db:"user_uuid"`
+	Created   int64  `db:"created"`
+}
 
 type UserSession struct {
 	db *sqlx.DB
@@ -71,8 +79,17 @@ func (store *UserSession) Activate(session user.UserSession) error {
 
 func (store *UserSession) Get(token string) (user.UserSession, error) {
 	var session user.UserSession
+	var row DatabaseUserSession
 
-	err := store.db.Get(&session, UserSessionSelectByToken, token)
+	err := store.db.Get(&row, UserSessionSelectByToken, token)
+	if err != nil {
+		return session, err
+	}
+
+	session.Challenge = row.Challenge
+	session.Token = row.Token
+	session.UserUUID = row.UserUUID
+	session.Created = time.Unix(row.Created, 0)
 	return session, err
 }
 

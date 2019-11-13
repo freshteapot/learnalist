@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/jmoiron/sqlx"
 
@@ -25,7 +26,19 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		OauthHandlers: *oauthHandlers,
 	}
 
-	authenticate.LookUp = m.Datastore.GetUserByCredentials
+	authenticate.LookupBasic = m.Datastore.GetUserByCredentials
+	authenticate.LookupBearer = func(token string) (*uuid.User, error) {
+		user := &uuid.User{}
+
+		userSession, err := dal.UserSession().Get(token)
+		if err != nil {
+			return user, err
+		}
+
+		user.Uuid = userSession.UserUUID
+		return user, nil
+	}
+
 	v1 := server.Group("/api/v1")
 	if config.CorsAllowOrigins != "" {
 		allowOrigins := strings.Split(config.CorsAllowOrigins, ",")
@@ -36,10 +49,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		}))
 	}
 
-	v1.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
-		Skipper:   authenticate.SkipBasicAuth,
-		Validator: authenticate.ValidateBasicAuth,
-	}))
+	v1.Use(authenticate.Auth)
 
 	v1.GET("/version", m.V1GetVersion)
 

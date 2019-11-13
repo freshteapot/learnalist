@@ -68,7 +68,9 @@ func (store *UserFromIDP) GetByUserUUID(userUUID string) (user.UserInfoFromIDP, 
 	var info user.UserInfoFromIDP
 	var userInfo DatabaseUserFromIDP
 	err := store.db.Get(&userInfo, UserFromIDPSelectByUserUUID, userUUID)
-
+	if err != nil {
+		return info, err
+	}
 	info.UserUUID = userInfo.UserUUID
 	info.IDP = userInfo.IDP
 	info.Identifier = userInfo.Identifier
