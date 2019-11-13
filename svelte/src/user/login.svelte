@@ -49,6 +49,7 @@ let isLoggedIn = loggedIn();
 		<div class="lh-copy mt3">
 			<a href="/forgot-your-password.html" class="f6 link dim black db">Forgot your password?</a>
 			<a href="/register.html" class="f6 link dim black db">Sign up</a>
+			<a href="/api/v1/oauth/google/redirect" class="f6 link dim black db">Login with google</a>
 		</div>
 	</form>
 
