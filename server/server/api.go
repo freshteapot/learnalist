@@ -8,7 +8,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/jmoiron/sqlx"
 
@@ -27,17 +26,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 	}
 
 	authenticate.LookupBasic = m.Datastore.GetUserByCredentials
-	authenticate.LookupBearer = func(token string) (*uuid.User, error) {
-		user := &uuid.User{}
-
-		userSession, err := dal.UserSession().Get(token)
-		if err != nil {
-			return user, err
-		}
-
-		user.Uuid = userSession.UserUUID
-		return user, nil
-	}
+	authenticate.LookupBearer = m.Datastore.UserSession().GetUserUUIDByToken
 
 	v1 := server.Group("/api/v1")
 	if config.CorsAllowOrigins != "" {

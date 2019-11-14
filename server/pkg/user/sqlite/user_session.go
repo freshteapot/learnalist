@@ -44,6 +44,13 @@ FROM
 	user_sessions
 WHERE token = ?`
 
+	UserSessionSelectUserUUIDByToken = `
+SELECT
+	user_uuid
+FROM
+	user_sessions
+WHERE token = ?`
+
 	UserSessionSelectChallengeIsValid = `SELECT 1 FROM user_sessions WHERE challenge=? AND token="none"`
 )
 
@@ -91,6 +98,11 @@ func (store *UserSession) Get(token string) (user.UserSession, error) {
 	session.UserUUID = row.UserUUID
 	session.Created = time.Unix(row.Created, 0)
 	return session, err
+}
+
+func (store *UserSession) GetUserUUIDByToken(token string) (userUUID string, err error) {
+	err = store.db.Get(&userUUID, UserSessionSelectUserUUIDByToken, token)
+	return userUUID, err
 }
 
 func (store *UserSession) IsChallengeValid(challenge string) (bool, error) {

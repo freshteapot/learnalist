@@ -21,7 +21,8 @@ type UserSession struct {
 	Token     string
 	UserUUID  string
 	Challenge string
-	Created   time.Time
+	// TODO I want to know what client it is, web, mobile, chrome-extension, so I can handle different responses.
+	Created time.Time
 }
 
 type Session interface {
@@ -33,6 +34,7 @@ type Session interface {
 	// Get session via token
 	Get(token string) (UserSession, error)
 
+	GetUserUUIDByToken(token string) (userUUID string, err error)
 	IsChallengeValid(challenge string) (bool, error)
 }
 

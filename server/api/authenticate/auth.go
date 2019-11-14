@@ -16,7 +16,7 @@ const (
 )
 
 var LookupBasic func(loginUser LoginUser) (*uuid.User, error)
-var LookupBearer func(token string) (*uuid.User, error)
+var LookupBearer func(token string) (string, error)
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -93,9 +93,13 @@ func skip(c echo.Context) bool {
 }
 
 func validateBearer(c echo.Context, token string) (bool, error) {
-	user, err := LookupBearer(token)
+	userUUID, err := LookupBearer(token)
 	if err != nil {
 		return false, nil
+	}
+
+	user := &uuid.User{
+		Uuid: userUUID,
 	}
 	c.Set("loggedInUser", *user)
 	return true, nil
