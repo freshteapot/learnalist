@@ -27,8 +27,9 @@ var _ = BeforeSuite(func() {
 	acl := aclStorage.NewAcl(db)
 	userSession := userStorage.NewUserSession(db)
 	userFromIDP := userStorage.NewUserFromIDP(db)
+	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
-	dal = models.NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
+	dal = models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 	hugoHelper := new(mocks.HugoSiteBuilder)
 
 	m = api.Manager{

@@ -23,8 +23,10 @@ type UserSession struct {
 
 const (
 	UserSessionInsertEntry              = `INSERT INTO user_sessions (challenge) VALUES (?)`
+	UserSessionInsertFullRecord         = `INSERT INTO user_sessions (challenge, token, user_uuid, created) VALUES (?, ?, ?, ?)`
 	UserSessionUpdateEntry              = `UPDATE user_sessions SET token=?, user_uuid=? WHERE challenge=? AND token="none"`
-	UserSessionDeleteByUserUUID         = `DELETE FROM user_sessions WHERE user_uuid = ?`
+	UserSessionDeleteByUserUUID         = `DELETE FROM user_sessions WHERE user_uuid=?`
+	UserSessionDeleteByUserUUIDAndToken = `DELETE FROM user_sessions WHERE user_uuid=? AND token=?`
 	UserSessionDeleteUnActiveChallenges = `
 DELETE FROM
 	user_sessions
@@ -60,7 +62,21 @@ func NewUserSession(db *sqlx.DB) *UserSession {
 	}
 }
 
-func (store *UserSession) Create() (string, error) {
+func (store *UserSession) NewSession(userUUID string) (session user.UserSession, err error) {
+	token := guuid.New()
+	challenge := guuid.New()
+	when := time.Now().UTC()
+
+	session.UserUUID = userUUID
+	session.Token = token.String()
+	session.Challenge = challenge.String()
+	session.Created = when
+
+	_, err = store.db.Exec(UserSessionInsertFullRecord, session.Challenge, session.Token, session.UserUUID, when.Unix())
+	return session, err
+}
+
+func (store *UserSession) CreateWithChallenge() (string, error) {
 	id := guuid.New()
 	_, err := store.db.Exec(UserSessionInsertEntry, id.String())
 	return id.String(), err
@@ -127,5 +143,10 @@ func (store *UserSession) RemoveSessionsForUser(userUUID string) error {
 
 func (store *UserSession) RemoveExpiredChallenges() error {
 	_, err := store.db.Exec(UserSessionDeleteUnActiveChallenges)
+	return err
+}
+
+func (store *UserSession) RemoveSessionForUser(userUUID string, token string) error {
+	_, err := store.db.Exec(UserSessionDeleteByUserUUIDAndToken, userUUID, token)
 	return err
 }

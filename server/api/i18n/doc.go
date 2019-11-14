@@ -30,6 +30,7 @@ const (
 	PostUserLabelJSONFailure                = "Your input is invalid json."
 	InputAlistJSONFailure                   = "Your input is invalid json."
 	PostShareListJSONFailure                = "Your input is invalid json."
+	InputLogoutJSONFailure                  = "Your input is invalid json."
 	InputMissingListUuid                    = "The uuid is missing."
 	InternalServerErrorDeleteAlist          = "We have failed to remove your list."
 	ApiMethodNotSupported                   = "This method is not supported."
@@ -47,6 +48,7 @@ const (
 	ApiShareListSuccessPrivate              = "List is now private to the owner"
 	ApiShareReadAccessInvalidWithNotShared  = "You cant grant or revoke read access when the list is shared as private"
 	ApiShareNoChange                        = "No change made"
+	ApiUserLogoutError                      = "Please refer to the api documentation regarding /user/logout"
 )
 
 var (

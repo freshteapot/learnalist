@@ -2,6 +2,12 @@ package user
 
 import "time"
 
+type UserInfoFromUsernameAndPassword struct {
+	UserUUID string
+	Username string
+	Hash     string
+}
+
 type UserInfoFromIDP struct {
 	UserUUID   string
 	IDP        string
@@ -26,9 +32,10 @@ type UserSession struct {
 }
 
 type Session interface {
+	NewSession(userUUID string) (session UserSession, err error)
 	// Create create a session with a unique challenge, send the challenge in the oauth2 flow
 	// The string returned is the actual challenge
-	Create() (string, error)
+	CreateWithChallenge() (string, error)
 	// Activate update the challenge with the userUUID and token
 	Activate(session UserSession) error
 	// Get session via token
@@ -36,9 +43,8 @@ type Session interface {
 
 	GetUserUUIDByToken(token string) (userUUID string, err error)
 	IsChallengeValid(challenge string) (bool, error)
-}
 
-type SessionMaintenance interface {
+	RemoveSessionForUser(userUUID string, token string) error
 	// RemoveSessionsForUser remove all sessions for a user
 	RemoveSessionsForUser(userUUID string) error
 	// RemoveExpiredChallenges remove challenges that were never activated
@@ -47,8 +53,7 @@ type SessionMaintenance interface {
 
 // TODO
 type UserWithUsernameAndPassword interface {
-	Register(username string, password string) (userUUID string, err error)
-	// GetUserByCredentials look up the user based on username + password
+	Register(username string, hash string) (info UserInfoFromUsernameAndPassword, err error)
 	Lookup(username string, hash string) (userUUID string, err error)
 }
 

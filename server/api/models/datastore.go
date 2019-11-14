@@ -2,8 +2,6 @@ package models
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api/authenticate"
-	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
@@ -24,6 +22,7 @@ type DatastoreOauth2 interface {
 type DatastoreUser interface {
 	UserSession() user.Session
 	UserFromIDP() user.UserFromIDP
+	UserWithUsernameAndPassword() user.UserWithUsernameAndPassword
 }
 
 type DatastoreLabels interface {
@@ -46,7 +45,5 @@ type DatastoreAlists interface {
 
 type DatastoreUsers interface {
 	// User
-	InsertNewUser(loginUser authenticate.LoginUser) (*uuid.User, error)
-	GetUserByCredentials(loginUser authenticate.LoginUser) (*uuid.User, error)
 	UserExists(userUUID string) bool
 }

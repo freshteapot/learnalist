@@ -9,20 +9,22 @@ import (
 
 // DB allowing us to build an abstraction layer
 type DAL struct {
-	Db           *sqlx.DB
-	Acl          acl.Acl
-	userSession  user.Session
-	userFromIDP  user.UserFromIDP
-	oauthHandler oauth.OAuthReadWriter
+	Db                          *sqlx.DB
+	Acl                         acl.Acl
+	userSession                 user.Session
+	userFromIDP                 user.UserFromIDP
+	userWithUsernameAndPassword user.UserWithUsernameAndPassword
+	oauthHandler                oauth.OAuthReadWriter
 }
 
-func NewDAL(db *sqlx.DB, acl acl.Acl, userSession user.Session, userFromIDP user.UserFromIDP, oauthHandler oauth.OAuthReadWriter) *DAL {
+func NewDAL(db *sqlx.DB, acl acl.Acl, userSession user.Session, userFromIDP user.UserFromIDP, userWithUsernameAndPassword user.UserWithUsernameAndPassword, oauthHandler oauth.OAuthReadWriter) *DAL {
 	dal := &DAL{
-		Db:           db,
-		Acl:          acl,
-		userSession:  userSession,
-		userFromIDP:  userFromIDP,
-		oauthHandler: oauthHandler,
+		Db:                          db,
+		Acl:                         acl,
+		userSession:                 userSession,
+		userFromIDP:                 userFromIDP,
+		userWithUsernameAndPassword: userWithUsernameAndPassword,
+		oauthHandler:                oauthHandler,
 	}
 	return dal
 }

@@ -22,8 +22,9 @@ func (suite *ModelSuite) SetupSuite() {
 	acl := aclStorage.NewAcl(db)
 	userSession := userStorage.NewUserSession(db)
 	userFromIDP := userStorage.NewUserFromIDP(db)
+	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
-	dal = NewDAL(db, acl, userSession, userFromIDP, oauthHandler)
+	dal = NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

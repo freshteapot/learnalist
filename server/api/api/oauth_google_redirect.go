@@ -14,7 +14,7 @@ func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "this website has not configured Google OAuth")
 	}
 
-	challenge, err := m.Datastore.UserSession().Create()
+	challenge, err := m.Datastore.UserSession().CreateWithChallenge()
 	if err != nil {
 		response := HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,

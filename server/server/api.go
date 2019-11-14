@@ -6,9 +6,10 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
-	"github.com/freshteapot/learnalist-api/server/api/authenticate"
+	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
@@ -25,8 +26,9 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		OauthHandlers: *oauthHandlers,
 	}
 
-	authenticate.LookupBasic = m.Datastore.GetUserByCredentials
+	authenticate.LookupBasic = m.Datastore.UserWithUsernameAndPassword().Lookup
 	authenticate.LookupBearer = m.Datastore.UserSession().GetUserUUIDByToken
+	authenticate.SkipAuth = authenticateApi.SkipAuth
 
 	v1 := server.Group("/api/v1")
 	if config.CorsAllowOrigins != "" {
@@ -42,7 +44,9 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 
 	v1.GET("/version", m.V1GetVersion)
 
-	v1.POST("/register", m.V1PostRegister)
+	v1.POST("/user/register", m.V1PostRegister)
+	v1.POST("/user/login", m.V1PostLogin)
+	v1.POST("/user/logout", m.V1PostLogout)
 
 	// Route => handler
 	v1.GET("/", m.V1GetRoot)

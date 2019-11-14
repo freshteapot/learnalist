@@ -11,12 +11,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type HTTPLoginResponse struct {
+	Token    string `json:"token"`
+	UserUUID string `json:"user_uuid"`
+}
+
 /*
-When a user is created it returns a 201.
-When a user is created with the same username and password it returns a 200.
-When a user is created with a username in the system it returns a 400.
+200, 403
 */
-func (m *Manager) V1PostRegister(c echo.Context) error {
+func (m *Manager) V1PostLogin(c echo.Context) error {
 	var input HttpUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -24,9 +27,9 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: i18n.ValidationUserRegister,
+			Message: i18n.AclHttpAccessDeny,
 		}
-		return c.JSON(http.StatusBadRequest, response)
+		return c.JSON(http.StatusForbidden, response)
 	}
 
 	cleanedUser := user.RegisterInput{
@@ -37,24 +40,31 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
 		response := HttpResponseMessage{
-			Message: i18n.ValidationUserRegister,
+			Message: i18n.AclHttpAccessDeny,
 		}
-		return c.JSON(http.StatusBadRequest, response)
+		return c.JSON(http.StatusForbidden, response)
 	}
 
 	hash := authenticate.HashIt(cleanedUser.Username, cleanedUser.Password)
-	aUser, err := m.Datastore.UserWithUsernameAndPassword().Register(cleanedUser.Username, hash)
+
+	userUUID, err := m.Datastore.UserWithUsernameAndPassword().Lookup(cleanedUser.Username, hash)
 	if err != nil {
-		// TODO Log this
+		response := HttpResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	session, err := m.Datastore.UserSession().NewSession(userUUID)
+	if err != nil {
 		response := HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := user.RegisterResponse{
-		Uuid:     aUser.UserUUID,
-		Username: aUser.Username,
-	}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, &HTTPLoginResponse{
+		Token:    session.Token,
+		UserUUID: userUUID,
+	})
 }

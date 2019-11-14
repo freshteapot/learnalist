@@ -39,7 +39,7 @@ var _ = Describe("Testing User", func() {
 					WillReturnError(want)
 
 				repoistory = storage.NewUserSession(dbCon)
-				_, err = repoistory.Create()
+				_, err = repoistory.CreateWithChallenge()
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(sql.ErrNoRows))
 			})
@@ -49,7 +49,7 @@ var _ = Describe("Testing User", func() {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				repoistory = storage.NewUserSession(dbCon)
-				_, err = repoistory.Create()
+				_, err = repoistory.CreateWithChallenge()
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})

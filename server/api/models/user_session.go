@@ -9,3 +9,7 @@ func (dal *DAL) UserSession() user.Session {
 func (dal *DAL) UserFromIDP() user.UserFromIDP {
 	return dal.userFromIDP
 }
+
+func (dal *DAL) UserWithUsernameAndPassword() user.UserWithUsernameAndPassword {
+	return dal.userWithUsernameAndPassword
+}
