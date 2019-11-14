@@ -44,7 +44,8 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 
 	hash := authenticate.HashIt(cleanedUser.Username, cleanedUser.Password)
 
-	userUUID, err := m.Datastore.UserWithUsernameAndPassword().Lookup(cleanedUser.Username, hash)
+	userWithUsernameAndPassword := m.Datastore.UserWithUsernameAndPassword()
+	userUUID, err := userWithUsernameAndPassword.Lookup(cleanedUser.Username, hash)
 	if err == nil {
 		response := user.RegisterResponse{
 			Uuid:     userUUID,
@@ -53,7 +54,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		return c.JSON(http.StatusOK, response)
 	}
 
-	aUser, err := m.Datastore.UserWithUsernameAndPassword().Register(cleanedUser.Username, hash)
+	aUser, err := userWithUsernameAndPassword.Register(cleanedUser.Username, hash)
 	if err != nil {
 		// TODO Log this
 		response := HttpResponseMessage{
