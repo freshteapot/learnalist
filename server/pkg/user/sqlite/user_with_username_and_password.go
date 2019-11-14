@@ -36,12 +36,12 @@ func NewUserWithUsernameAndPassword(db *sqlx.DB) *UserWithUsernameAndPassword {
 	}
 }
 
+// Register a new user with username and hashed password
 func (store *UserWithUsernameAndPassword) Register(username string, hash string) (info user.UserInfoFromUsernameAndPassword, err error) {
 	id := guuid.New()
 	info.Username = username
 	info.Hash = hash
 	info.UserUUID = id.String()
-	// Assume the user doesnt exist and try and insert them.
 
 	_, err = store.db.Exec(UserWithUsernameAndPasswordInsertEntry, info.UserUUID, info.Username, info.Hash)
 	return info, err

@@ -49,7 +49,7 @@ var _ = Describe("Testing User from IDP", func() {
 				Expect(err).To(Equal(want))
 			})
 
-			It("New session made", func() {
+			It("New user registered", func() {
 				mockSql.ExpectExec(storage.UserFromIDPInsertEntry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
