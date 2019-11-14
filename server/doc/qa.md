@@ -18,3 +18,52 @@ Check your data for the following rules
 - When should be YYYY-MM-DD.
 - Per 500 (p500) should not be empty.
 - Per 500 (p500) is not valid format (xx:xx.xx).
+
+## How to link accounts from username and oauth2
+
+- Manually for now, we will assume you want to copy the user uuid from "username and password" to "google".
+
+### Get the current user id (from username and password)
+```
+SELECT
+  uuid
+FROM
+  user
+WHERE
+  username=?
+```
+
+Record it = "XXX"
+
+### Get the new user uuid, after you logged in for the first time.
+```
+SELECT
+  user_uuid
+FROM
+  user_from_idp
+WHERE
+  idp="google"
+AND
+  identifier=?
+```
+
+Record it = "YYY"
+
+
+### Update
+- replace <XXX>
+- replace <YYY>
+
+```
+UPDATE user_from_idp SET user_uuid="<XXX>" WHERE user_uuid="<YYY>";
+```
+
+```
+UPDATE user_sessions SET user_uuid="<XXX>" WHERE user_uuid="<YYY>";
+```
+
+```
+UPDATE oauth2_token_info SET user_uuid="<XXX>" WHERE user_uuid="<YYY>";
+```
+
+All done

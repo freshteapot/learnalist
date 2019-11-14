@@ -10,6 +10,7 @@ server:
     google:
       clientID: "XXX"
       clientSecret: "XXX"
+      server: "http://localhost:1234"
 tools:
   rebuildStaticSite:
     sqlite:
