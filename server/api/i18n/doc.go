@@ -48,6 +48,7 @@ const (
 	ApiShareReadAccessInvalidWithNotShared  = "You cant grant or revoke read access when the list is shared as private"
 	ApiShareNoChange                        = "No change made"
 	ApiUserLogoutError                      = "Please refer to the api documentation regarding /user/logout"
+	ApiUserLoginError                       = "Please refer to the api documentation regarding /user/login"
 )
 
 var (

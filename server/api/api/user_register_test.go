@@ -18,8 +18,11 @@ var _ = Describe("Testing Register user endpoint", func() {
 	AfterEach(emptyDatabase)
 
 	When("/register", func() {
-		var datastore *mockModels.Datastore
-		var userWithUsernameAndPassword *mockUser.UserWithUsernameAndPassword
+		var (
+			datastore                   *mockModels.Datastore
+			userWithUsernameAndPassword *mockUser.UserWithUsernameAndPassword
+			endpoint                    = "/api/v1/user/register"
+		)
 
 		BeforeEach(func() {
 			datastore = &mockModels.Datastore{}
@@ -27,20 +30,20 @@ var _ = Describe("Testing Register user endpoint", func() {
 			m.Datastore = datastore
 		})
 
-		It("POST'ing an invalid input", func() {
-			input := ""
-			req, rec := setupFakeEndpoint(http.MethodGet, "/api/v1/user/register", input)
-			e := echo.New()
-			c := e.NewContext(req, rec)
-			m.V1PostRegister(c)
-			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
-		})
+		Context("POST'ing invalid input", func() {
+			It("Bad JSON", func() {
+				input := ""
+				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
+				e := echo.New()
+				c := e.NewContext(req, rec)
+				m.V1PostRegister(c)
+				Expect(rec.Code).To(Equal(http.StatusBadRequest))
+				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+			})
 
-		Context("POST'ing an invalid input", func() {
 			It("Invalid password", func() {
 				input := `{"username":"iamusera", "password":"test1"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 
@@ -56,7 +59,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 				}
 
 				for _, input := range inputs {
-					req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
+					req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 					e := echo.New()
 					c := e.NewContext(req, rec)
 					m.V1PostRegister(c)
@@ -67,7 +70,10 @@ var _ = Describe("Testing Register user endpoint", func() {
 		})
 
 		Context("Registering a valid user", func() {
-			var userInfo user.UserInfoFromUsernameAndPassword
+			var (
+				userInfo user.UserInfoFromUsernameAndPassword
+				input    = `{"username":"iamusera", "password":"test123"}`
+			)
 			BeforeEach(func() {
 				userInfo = user.UserInfoFromUsernameAndPassword{
 					UserUUID: "fake-123",
@@ -77,8 +83,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 			})
 
 			It("New user", func() {
-				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("UserWithUsernameAndPassword").Return(userWithUsernameAndPassword)
@@ -94,8 +99,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 			})
 
 			It("New user, database issue via saving user", func() {
-				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 
@@ -111,8 +115,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 			})
 
 			It("New user, but already exists", func() {
-				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 

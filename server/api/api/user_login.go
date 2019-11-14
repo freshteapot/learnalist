@@ -25,8 +25,8 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response.Message = i18n.AclHttpAccessDeny
-		return c.JSON(http.StatusForbidden, response)
+		response.Message = i18n.ApiUserLoginError
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	cleanedUser := user.RegisterInput{
@@ -36,8 +36,8 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
-		response.Message = i18n.AclHttpAccessDeny
-		return c.JSON(http.StatusForbidden, response)
+		response.Message = i18n.ApiUserLoginError
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	hash := authenticate.HashIt(cleanedUser.Username, cleanedUser.Password)
