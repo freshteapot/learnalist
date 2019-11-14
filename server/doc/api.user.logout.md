@@ -25,7 +25,8 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/logout' -d'
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/logout' -d'
 {
   "kind": "user",
-  "user_uuid":"731855f2-a70d-52f6-ada0-15a7690da0ea"
+  "user_uuid":"731855f2-a70d-52f6-ada0-15a7690da0ea",
+  "token":"7ab2d253-0c9f-46d6-a539-ca8b913aa480"
 }
 '
 ```

@@ -38,9 +38,6 @@ type Session interface {
 	CreateWithChallenge() (string, error)
 	// Activate update the challenge with the userUUID and token
 	Activate(session UserSession) error
-	// Get session via token
-	Get(token string) (UserSession, error)
-
 	GetUserUUIDByToken(token string) (userUUID string, err error)
 	IsChallengeValid(challenge string) (bool, error)
 
@@ -59,5 +56,4 @@ type UserWithUsernameAndPassword interface {
 type UserFromIDP interface {
 	Register(idp string, identifier string, info []byte) (userUUID string, err error)
 	Lookup(idp string, identifier string) (userUUID string, err error)
-	GetByUserUUID(userUUID string) (UserInfoFromIDP, error)
 }

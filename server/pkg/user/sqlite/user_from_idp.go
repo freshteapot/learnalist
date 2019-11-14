@@ -3,7 +3,6 @@ package sqlite
 import (
 	"time"
 
-	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -61,21 +60,4 @@ func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string
 	var item DatabaseUserFromIDP
 	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
 	return item.UserUUID, err
-}
-
-func (store *UserFromIDP) GetByUserUUID(userUUID string) (user.UserInfoFromIDP, error) {
-	// This is ugly
-	var info user.UserInfoFromIDP
-	var userInfo DatabaseUserFromIDP
-	err := store.db.Get(&userInfo, UserFromIDPSelectByUserUUID, userUUID)
-	if err != nil {
-		return info, err
-	}
-	info.UserUUID = userInfo.UserUUID
-	info.IDP = userInfo.IDP
-	info.Identifier = userInfo.Identifier
-	info.Kind = userInfo.Kind
-	info.Info = userInfo.Info
-	info.Created = userInfo.Created
-	return info, err
 }

@@ -34,8 +34,5 @@ var _ = Describe("Testing Acl", func() {
 		userUUID_2, err := repoistory.Lookup("google", "fake@freshteapot.net")
 		fmt.Println(userUUID_2)
 		fmt.Println(err)
-		userInfo, err := repoistory.GetByUserUUID(userUUID_2)
-		fmt.Println(userInfo)
-		fmt.Println(err)
 	})
 })
