@@ -25,7 +25,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 		It("POST'ing an invalid input", func() {
 			input := ""
-			req, rec := setupFakeEndpoint(http.MethodGet, "/api/v1/register", input)
+			req, rec := setupFakeEndpoint(http.MethodGet, "/api/v1/user/register", input)
 			e := echo.New()
 			c := e.NewContext(req, rec)
 			m.V1PostRegister(c)
@@ -36,7 +36,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 		Context("POST'ing an invalid input", func() {
 			It("Invalid password", func() {
 				input := `{"username":"iamusera", "password":"test1"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("GetUserByCredentials", mock.Anything).Return(&uuid.User{}, errors.New("Fail"))
@@ -53,7 +53,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 				}
 
 				for _, input := range inputs {
-					req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+					req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 					e := echo.New()
 					c := e.NewContext(req, rec)
 					datastore.On("GetUserByCredentials", mock.Anything).Return(&uuid.User{}, errors.New("Fail"))
@@ -71,7 +71,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 					Uuid: "fake-123",
 				}
 				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("InsertNewUser", mock.Anything).Return(user, nil)
@@ -86,7 +86,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 					Uuid: "fake-123",
 				}
 				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("GetUserByCredentials", mock.Anything).Return(user, errors.New(i18n.DatabaseLookupNotFound))
@@ -102,7 +102,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 					Uuid: "fake-123",
 				}
 				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("InsertNewUser", mock.Anything).Return(user, errors.New(i18n.UserInsertUsernameExists))
@@ -118,7 +118,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 					Uuid: "fake-123",
 				}
 				input := `{"username":"iamusera", "password":"test123"}`
-				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+				req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
 				datastore.On("InsertNewUser", mock.Anything).Return(user, errors.New(i18n.UserInsertUsernameExists))

@@ -27,7 +27,7 @@ func createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
 
 func createNewUser(input string) (statusCode int, responseBytes []byte) {
 	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	err := m.V1PostRegister(c)
