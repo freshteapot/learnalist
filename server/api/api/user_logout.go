@@ -16,9 +16,6 @@ type HTTPLogoutRequest struct {
 	Token    string `json:"token"`
 }
 
-/*
-200, 403
-*/
 func (m *Manager) V1PostLogout(c echo.Context) error {
 	var err error
 	var input HTTPLogoutRequest
@@ -36,6 +33,26 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 	response := HttpResponseMessage{}
 	switch input.Kind {
 	case "token":
+		break
+	case "user":
+		break
+	default:
+		response.Message = i18n.ApiUserLogoutError
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	if input.UserUUID == "" {
+		response.Message = i18n.ApiUserLogoutError
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	if input.Token == "" {
+		response.Message = i18n.ApiUserLogoutError
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	switch input.Kind {
+	case "token":
 		fmt.Println("Logout a single token")
 		err = m.Datastore.UserSession().RemoveSessionForUser(input.UserUUID, input.Token)
 		response.Message = fmt.Sprintf("Session %s, is now logged out", input.Token)
@@ -43,11 +60,6 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 		fmt.Println("Logout all sessions for the user")
 		err = m.Datastore.UserSession().RemoveSessionsForUser(input.UserUUID)
 		response.Message = fmt.Sprintf("All sessions have been logged out for user %s", input.UserUUID)
-	default:
-		response := HttpResponseMessage{
-			Message: i18n.ApiUserLogoutError,
-		}
-		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	if err != nil {

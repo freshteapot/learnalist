@@ -16,19 +16,16 @@ type HTTPLoginResponse struct {
 	UserUUID string `json:"user_uuid"`
 }
 
-/*
-200, 403
-*/
 func (m *Manager) V1PostLogin(c echo.Context) error {
 	var input HttpUserRegisterInput
+	response := HttpResponseMessage{}
+
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response := HttpResponseMessage{
-			Message: i18n.AclHttpAccessDeny,
-		}
+		response.Message = i18n.AclHttpAccessDeny
 		return c.JSON(http.StatusForbidden, response)
 	}
 
@@ -39,9 +36,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
-		response := HttpResponseMessage{
-			Message: i18n.AclHttpAccessDeny,
-		}
+		response.Message = i18n.AclHttpAccessDeny
 		return c.JSON(http.StatusForbidden, response)
 	}
 
@@ -49,17 +44,13 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	userUUID, err := m.Datastore.UserWithUsernameAndPassword().Lookup(cleanedUser.Username, hash)
 	if err != nil {
-		response := HttpResponseMessage{
-			Message: i18n.AclHttpAccessDeny,
-		}
+		response.Message = i18n.AclHttpAccessDeny
 		return c.JSON(http.StatusForbidden, response)
 	}
 
 	session, err := m.Datastore.UserSession().NewSession(userUUID)
 	if err != nil {
-		response := HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
+		response.Message = i18n.InternalServerErrorFunny
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
