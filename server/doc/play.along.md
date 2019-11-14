@@ -3,7 +3,7 @@ When the database is created, it is empty.
 
 ## You need a user first.
 ```sh
-curl -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
+curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
     "username":"iamchris",
     "password":"test123"
@@ -152,7 +152,7 @@ type HttpShareListWithUserInput struct {
 
 Create new user
 ```sh
-curl -s -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
+curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
     "username":"iamusera",
     "password":"test123"

@@ -217,7 +217,7 @@ func (store *Sqlite) ListIsSharedWith(alistUUID string) (string, error) {
 	case keys.SharedWithFriends:
 		return keys.SharedWithFriends, nil
 	default:
-		return "", errors.New("Something is saved that is not supported")
+		return "", errors.New("something is saved that is not supported")
 	}
 }
 

@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
-	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,8 +19,12 @@ type ModelSuite struct {
 
 func (suite *ModelSuite) SetupSuite() {
 	db := database.NewTestDB()
-	acl := aclSqlite.NewAcl(db)
-	dal = NewDAL(db, acl)
+	acl := aclStorage.NewAcl(db)
+	userSession := userStorage.NewUserSession(db)
+	userFromIDP := userStorage.NewUserFromIDP(db)
+	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
+	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
+	dal = NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

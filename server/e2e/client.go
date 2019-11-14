@@ -78,7 +78,7 @@ func (c Client) Register(username string, password string) RegisterResponse {
 }
 `, username, password))
 
-	url := fmt.Sprintf("%s/api/v1/register", c.getServerURL())
+	url := fmt.Sprintf("%s/api/v1/user/register", c.getServerURL())
 	req, err := http.NewRequest("POST", url, body)
 	req = req.WithContext(context.Background())
 	if err != nil {

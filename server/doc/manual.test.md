@@ -5,7 +5,7 @@
 
 # Add test user
 ```sh
-curl -s -w "%{http_code}\n" -XPOST 127.0.0.1:1234/api/v1/register -d'
+curl -s -w "%{http_code}\n" -XPOST 127.0.0.1:1234/api/v1/user/register -d'
 {
     "username":"iamchris",
     "password":"test123"

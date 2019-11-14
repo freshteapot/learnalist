@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/labstack/echo/v4"
@@ -27,7 +28,7 @@ func createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
 
 func createNewUser(input string) (statusCode int, responseBytes []byte) {
 	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/register", input)
+	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	err := m.V1PostRegister(c)
@@ -80,4 +81,10 @@ func getValidUserRegisterInput(which string) string {
 
 func cleanEchoJSONResponse(rec *httptest.ResponseRecorder) string {
 	return strings.TrimSuffix(string(rec.Body.Bytes()), "\n")
+}
+
+func CheckMessageResponse(rec *httptest.ResponseRecorder, expect string) {
+	var response api.HttpResponseMessage
+	json.Unmarshal(rec.Body.Bytes(), &response)
+	Expect(response.Message).To(Equal(expect))
 }

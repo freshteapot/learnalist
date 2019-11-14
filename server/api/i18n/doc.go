@@ -1,5 +1,7 @@
 package i18n
 
+import "errors"
+
 const (
 	ValidationErrorList                     = "Failed to pass list info. %s"
 	ValidationErrorListV1                   = "Failed to pass list type v1."
@@ -28,6 +30,7 @@ const (
 	PostUserLabelJSONFailure                = "Your input is invalid json."
 	InputAlistJSONFailure                   = "Your input is invalid json."
 	PostShareListJSONFailure                = "Your input is invalid json."
+	InputLogoutJSONFailure                  = "Your input is invalid json."
 	InputMissingListUuid                    = "The uuid is missing."
 	InternalServerErrorDeleteAlist          = "We have failed to remove your list."
 	ApiMethodNotSupported                   = "This method is not supported."
@@ -36,7 +39,6 @@ const (
 	ApiDeleteUserLabelSuccess               = "Label %s was removed."
 	UserInsertAlreadyExistsPasswordNotMatch = "Failed to save."
 	UserInsertUsernameExists                = "Username already exists."
-	DatabaseLookupNotFound                  = "sql: no rows in result set"
 	AclHttpAccessDeny                       = "Access Denied"
 	ApiShareYouCantShareWithYourself        = "Today, we dont let you share with yourself"
 	ApiShareValidationError                 = "Please refer to the documentation on sharing a list"
@@ -45,4 +47,14 @@ const (
 	ApiShareListSuccessPrivate              = "List is now private to the owner"
 	ApiShareReadAccessInvalidWithNotShared  = "You cant grant or revoke read access when the list is shared as private"
 	ApiShareNoChange                        = "No change made"
+	ApiUserLogoutError                      = "Please refer to the api documentation regarding /user/logout"
+	ApiUserLoginError                       = "Please refer to the api documentation regarding /user/login"
+)
+
+var (
+	ErrorCannotReadResponse             = errors.New("Cannot read response.")
+	ErrorInternal                       = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
+	ErrorUserSessionActivate            = errors.New("challenge doesnt exist or is active")
+	ErrorUserAlreadyExists              = errors.New("user.already.exists")
+	ErrorUserAlreadyExistsWrongPassword = errors.New("user.already.exists.wrong.password")
 )

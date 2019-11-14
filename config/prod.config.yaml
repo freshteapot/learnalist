@@ -6,6 +6,11 @@ server:
     allowedOrigins: "*"
   siteCacheDirectory: "/srv/learnalist/site-cache"
   hugoDirectory: "/srv/learnalist/hugo"
+  loginWith:
+    google:
+      clientID: "XXX"
+      clientSecret: "XXX"
+      server: "https://learnalist.net"
 
 tools:
   rebuildStaticSite:

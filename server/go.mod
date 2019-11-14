@@ -3,8 +3,10 @@ module github.com/freshteapot/learnalist-api/server
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/gookit/validate v1.1.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo/v4 v4.1.5
@@ -25,6 +27,7 @@ require (
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
 	google.golang.org/appengine v1.6.2 // indirect
 )

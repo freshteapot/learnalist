@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/labstack/echo/v4"
 )
 
@@ -42,39 +42,30 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	loginUser := authenticate.LoginUser{
-		Username: cleanedUser.Username,
-		Password: cleanedUser.Password,
-	}
+	hash := authenticate.HashIt(cleanedUser.Username, cleanedUser.Password)
 
-	newUser, err := m.Datastore.InsertNewUser(loginUser)
+	userWithUsernameAndPassword := m.Datastore.UserWithUsernameAndPassword()
+	userUUID, err := userWithUsernameAndPassword.Lookup(cleanedUser.Username, hash)
 	if err == nil {
 		response := user.RegisterResponse{
-			Uuid:     newUser.Uuid,
+			Uuid:     userUUID,
 			Username: cleanedUser.Username,
 		}
-		return c.JSON(http.StatusCreated, response)
+		return c.JSON(http.StatusOK, response)
 	}
 
-	if err.Error() != i18n.UserInsertUsernameExists {
-		response := HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	existingUser, err := m.Datastore.GetUserByCredentials(loginUser)
+	aUser, err := userWithUsernameAndPassword.Register(cleanedUser.Username, hash)
 	if err != nil {
+		// TODO Log this
 		response := HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
-
 	}
 
 	response := user.RegisterResponse{
-		Uuid:     existingUser.Uuid,
-		Username: cleanedUser.Username,
+		Uuid:     aUser.UserUUID,
+		Username: aUser.Username,
 	}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusCreated, response)
 }

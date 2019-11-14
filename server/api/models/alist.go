@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -109,7 +110,7 @@ func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
 	query := "SELECT * FROM alist_kv WHERE uuid = ?"
 	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
-		if err.Error() == i18n.DatabaseLookupNotFound {
+		if err == sql.ErrNoRows {
 			return nil, errors.New(i18n.SuccessAlistNotFound)
 		}
 

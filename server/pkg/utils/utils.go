@@ -20,7 +20,7 @@ func CmdParsePathToFolder(key string, dir string) (string, error) {
 	pathToFolder, _ := filepath.Abs(dir)
 
 	if pathToFolder == "" {
-		return "", fmt.Errorf("You might have forgotten to set the path for: %s", key)
+		return "", fmt.Errorf("you might have forgotten to set the path for: %s", key)
 	}
 
 	if !IsDir(pathToFolder) {

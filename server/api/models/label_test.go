@@ -73,7 +73,7 @@ INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data"
 /*
 For setup data.
 
-curl -s -w "%{http_code}\n" -XPOST 'http://127.0.0.1:1234/api/v1/register' -d'
+curl -s -w "%{http_code}\n" -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
     "username":"iamchris",
     "password":"test123"

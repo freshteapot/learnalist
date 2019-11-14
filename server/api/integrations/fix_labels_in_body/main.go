@@ -7,14 +7,14 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
-	aclSqlite "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 )
 
 var dal *models.DAL
 
 func setUp(databaseName string) *models.DAL {
 	db := database.NewDB(databaseName)
-	acl := aclSqlite.NewAcl(db)
+	acl := aclStorage.NewAcl(db)
 	_dal := models.NewDAL(db, acl)
 	return _dal
 }

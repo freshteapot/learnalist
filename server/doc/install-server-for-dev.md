@@ -32,5 +32,5 @@ cd server/
 ```
 
 ```sh
-go run main.go server --config=dev.config.yaml
+go run main.go server --config=../config/dev.config.yaml
 ```

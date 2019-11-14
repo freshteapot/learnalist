@@ -6,23 +6,30 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
-	"github.com/freshteapot/learnalist-api/server/api/authenticate"
+	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/jmoiron/sqlx"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper) {
+func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper, oauthHandlers *oauth.Handlers) {
+
 	m := api.Manager{
-		Datastore:  dal,
-		Acl:        acl,
-		HugoHelper: *hugoHelper,
+		Datastore:     dal,
+		Acl:           acl,
+		HugoHelper:    *hugoHelper,
+		OauthHandlers: *oauthHandlers,
 	}
 
-	authenticate.LookUp = m.Datastore.GetUserByCredentials
+	authenticate.LookupBasic = m.Datastore.UserWithUsernameAndPassword().Lookup
+	authenticate.LookupBearer = m.Datastore.UserSession().GetUserUUIDByToken
+	authenticate.SkipAuth = authenticateApi.SkipAuth
+
 	v1 := server.Group("/api/v1")
 	if config.CorsAllowOrigins != "" {
 		allowOrigins := strings.Split(config.CorsAllowOrigins, ",")
@@ -33,14 +40,13 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		}))
 	}
 
-	v1.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
-		Skipper:   authenticate.SkipBasicAuth,
-		Validator: authenticate.ValidateBasicAuth,
-	}))
+	v1.Use(authenticate.Auth)
 
 	v1.GET("/version", m.V1GetVersion)
 
-	v1.POST("/register", m.V1PostRegister)
+	v1.POST("/user/register", m.V1PostRegister)
+	v1.POST("/user/login", m.V1PostLogin)
+	v1.POST("/user/logout", m.V1PostLogout)
 
 	// Route => handler
 	v1.GET("/", m.V1GetRoot)
@@ -60,4 +66,8 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 	v1.POST("/labels", m.V1PostUserLabel)
 	v1.GET("/labels/by/me", m.V1GetUserLabels)
 	v1.DELETE("/labels/:label", m.V1RemoveUserLabel)
+
+	// Oauth
+	v1.GET("/oauth/google/redirect", m.V1OauthGoogleRedirect)
+	v1.GET("/oauth/google/callback", m.V1OauthGoogleCallback)
 }
