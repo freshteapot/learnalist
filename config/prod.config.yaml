@@ -10,6 +10,8 @@ server:
     google:
       clientID: "XXX"
       clientSecret: "XXX"
+      server: "https://learnalist.net"
+
 tools:
   rebuildStaticSite:
     sqlite:

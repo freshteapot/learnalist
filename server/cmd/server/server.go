@@ -26,7 +26,7 @@ var ServerCmd = &cobra.Command{
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
 			Secret: viper.GetString("server.loginWith.google.clientSecret"),
-			Server: "http://localhost:1234",
+			Server: viper.GetString("server.loginWith.google.server"),
 		})
 
 		oauthHandlers := &oauth.Handlers{
@@ -83,4 +83,5 @@ var ServerCmd = &cobra.Command{
 func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
+	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
 }
