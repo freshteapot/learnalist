@@ -29,5 +29,5 @@ func Validate(input RegisterInput) (RegisterInput, error) {
 		v.BindSafeData(&cleaned)
 		return cleaned, nil
 	}
-	return cleaned, errors.New("Please refer to the documentation.")
+	return cleaned, errors.New("please refer to the documentation")
 }
