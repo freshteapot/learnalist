@@ -100,22 +100,6 @@ func (store *UserSession) Activate(session user.UserSession) error {
 	return nil
 }
 
-func (store *UserSession) Get(token string) (user.UserSession, error) {
-	var session user.UserSession
-	var row DatabaseUserSession
-
-	err := store.db.Get(&row, UserSessionSelectByToken, token)
-	if err != nil {
-		return session, err
-	}
-
-	session.Challenge = row.Challenge
-	session.Token = row.Token
-	session.UserUUID = row.UserUUID
-	session.Created = time.Unix(row.Created, 0)
-	return session, err
-}
-
 func (store *UserSession) GetUserUUIDByToken(token string) (userUUID string, err error) {
 	err = store.db.Get(&userUUID, UserSessionSelectUserUUIDByToken, token)
 	return userUUID, err
