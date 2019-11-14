@@ -1,19 +1,17 @@
 package sqlite
 
 import (
-	"time"
-
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type DatabaseUserFromIDP struct {
-	UserUUID   string    `db:"user_uuid"`
-	IDP        string    `db:"idp"`
-	Identifier string    `db:"identifier"`
-	Kind       string    `db:"kind"`
-	Info       string    `db:"info"`
-	Created    time.Time `db:"created"`
+	UserUUID   string `db:"user_uuid"`
+	IDP        string `db:"idp"`
+	Identifier string `db:"identifier"`
+	Kind       string `db:"kind"`
+	Info       string `db:"info"`
+	Created    int64  `db:"created"`
 }
 
 type UserFromIDP struct {

@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS user_from_idp (
  identifier TEXT NOT NULL,
  kind TEXT NOT NULL,
  info TEXT NOT NULL DEFAULT '',
- created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+ created integer(4) not null default (strftime('%s','now'))
 );

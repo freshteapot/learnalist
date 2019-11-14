@@ -45,27 +45,6 @@ func (_m *Session) CreateWithChallenge() (string, error) {
 	return r0, r1
 }
 
-// Get provides a mock function with given fields: token
-func (_m *Session) Get(token string) (user.UserSession, error) {
-	ret := _m.Called(token)
-
-	var r0 user.UserSession
-	if rf, ok := ret.Get(0).(func(string) user.UserSession); ok {
-		r0 = rf(token)
-	} else {
-		r0 = ret.Get(0).(user.UserSession)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(token)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // GetUserUUIDByToken provides a mock function with given fields: token
 func (_m *Session) GetUserUUIDByToken(token string) (string, error) {
 	ret := _m.Called(token)

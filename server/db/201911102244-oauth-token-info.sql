@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS oauth2_token_info (
  access_token TEXT NOT NULL,
  token_type TEXT NOT NULL,
  refresh_token TEXT NOT NULL,
- expiry TIMESTAMP NOT NULL
+ expiry integer(4) not null default (strftime('%s','now'))
 );

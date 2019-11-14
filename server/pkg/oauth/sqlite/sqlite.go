@@ -8,11 +8,11 @@ import (
 )
 
 type DatabaseOauth2TokenInfo struct {
-	UserUUID     string    `db:"user_uuid"`
-	AccessToken  string    `db:"access_token"`
-	TokenType    string    `db:"token_type"`
-	RefreshToken string    `db:"refresh_token"`
-	Expiry       time.Time `db:"expiry"`
+	UserUUID     string `db:"user_uuid"`
+	AccessToken  string `db:"access_token"`
+	TokenType    string `db:"token_type"`
+	RefreshToken string `db:"refresh_token"`
+	Expiry       int64  `db:"expiry"`
 }
 
 type Sqlite struct {
@@ -50,7 +50,7 @@ func (store *Sqlite) GetTokenInfo(userUUID string) (*oauth2.Token, error) {
 	token.AccessToken = row.AccessToken
 	token.TokenType = row.TokenType
 	token.RefreshToken = row.RefreshToken
-	token.Expiry = row.Expiry
+	token.Expiry = time.Unix(row.Expiry, 0)
 	return token, nil
 }
 
@@ -60,7 +60,7 @@ func (store *Sqlite) WriteTokenInfo(userUUID string, token *oauth2.Token) error 
 		AccessToken:  token.AccessToken,
 		TokenType:    token.TokenType,
 		RefreshToken: token.RefreshToken,
-		Expiry:       token.Expiry,
+		Expiry:       token.Expiry.UTC().Unix(),
 	}
 
 	tx, err := store.db.Beginx()

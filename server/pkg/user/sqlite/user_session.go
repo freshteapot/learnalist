@@ -10,13 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type DatabaseUserSession struct {
-	Challenge string `db:"challenge"`
-	Token     string `db:"token"`
-	UserUUID  string `db:"user_uuid"`
-	Created   int64  `db:"created"`
-}
-
 type UserSession struct {
 	db *sqlx.DB
 }

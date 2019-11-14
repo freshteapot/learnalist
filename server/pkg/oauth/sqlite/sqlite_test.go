@@ -62,7 +62,7 @@ var _ = Describe("Testing Oauth", func() {
 					"refresh_token",
 					"expiry",
 				}).
-					AddRow(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry)
+					AddRow(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry.UTC().Unix())
 				mockSql.ExpectQuery(oauthStorage.SelectByUserUUID).
 					WithArgs(userUUID).
 					WillReturnRows(rs)
@@ -81,7 +81,7 @@ var _ = Describe("Testing Oauth", func() {
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectExec(oauthStorage.InsertEntry).
-					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry).
+					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry.UTC().Unix()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectCommit()
 
@@ -135,7 +135,7 @@ var _ = Describe("Testing Oauth", func() {
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectExec(oauthStorage.InsertEntry).
-					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry).
+					WithArgs(userUUID, token.AccessToken, token.TokenType, token.RefreshToken, token.Expiry.UTC().Unix()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectCommit().
 					WillReturnError(want)

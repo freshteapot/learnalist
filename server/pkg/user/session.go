@@ -8,15 +8,6 @@ type UserInfoFromUsernameAndPassword struct {
 	Hash     string
 }
 
-type UserInfoFromIDP struct {
-	UserUUID   string
-	IDP        string
-	Identifier string
-	Kind       string
-	Info       string
-	Created    time.Time
-}
-
 type UserInfo struct {
 	UserUUID  string
 	Challenge string
