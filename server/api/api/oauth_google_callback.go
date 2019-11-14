@@ -139,7 +139,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 	vars := make(map[string]interface{})
 	vars["token"] = session.Token
-	vars["refreshRedirectURL"] = "//welcome.html"
+	vars["refreshRedirectURL"] = "/welcome.html"
 	vars["idp"] = "Google"
 
 	var tpl bytes.Buffer
