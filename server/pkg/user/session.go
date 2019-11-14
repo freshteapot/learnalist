@@ -51,7 +51,6 @@ type Session interface {
 	RemoveExpiredChallenges() error
 }
 
-// TODO
 type UserWithUsernameAndPassword interface {
 	Register(username string, hash string) (info UserInfoFromUsernameAndPassword, err error)
 	Lookup(username string, hash string) (userUUID string, err error)
