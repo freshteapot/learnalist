@@ -39,7 +39,6 @@ const (
 	ApiDeleteUserLabelSuccess               = "Label %s was removed."
 	UserInsertAlreadyExistsPasswordNotMatch = "Failed to save."
 	UserInsertUsernameExists                = "Username already exists."
-	DatabaseLookupNotFound                  = "sql: no rows in result set"
 	AclHttpAccessDeny                       = "Access Denied"
 	ApiShareYouCantShareWithYourself        = "Today, we dont let you share with yourself"
 	ApiShareValidationError                 = "Please refer to the documentation on sharing a list"
@@ -52,7 +51,9 @@ const (
 )
 
 var (
-	ErrorCannotReadResponse  = errors.New("Cannot read response.")
-	ErrorInternal            = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
-	ErrorUserSessionActivate = errors.New("challenge doesnt exist or is active")
+	ErrorCannotReadResponse             = errors.New("Cannot read response.")
+	ErrorInternal                       = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
+	ErrorUserSessionActivate            = errors.New("challenge doesnt exist or is active")
+	ErrorUserAlreadyExists              = errors.New("user.already.exists")
+	ErrorUserAlreadyExistsWrongPassword = errors.New("user.already.exists.wrong.password")
 )

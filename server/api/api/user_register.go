@@ -43,6 +43,16 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	}
 
 	hash := authenticate.HashIt(cleanedUser.Username, cleanedUser.Password)
+
+	userUUID, err := m.Datastore.UserWithUsernameAndPassword().Lookup(cleanedUser.Username, hash)
+	if err == nil {
+		response := user.RegisterResponse{
+			Uuid:     userUUID,
+			Username: cleanedUser.Username,
+		}
+		return c.JSON(http.StatusOK, response)
+	}
+
 	aUser, err := m.Datastore.UserWithUsernameAndPassword().Register(cleanedUser.Username, hash)
 	if err != nil {
 		// TODO Log this
@@ -56,5 +66,5 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		Uuid:     aUser.UserUUID,
 		Username: aUser.Username,
 	}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusCreated, response)
 }
