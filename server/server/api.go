@@ -1,9 +1,6 @@
 package server
 
 import (
-	"net/http"
-	"strings"
-
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
@@ -13,8 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper, oauthHandlers *oauth.Handlers) {
@@ -33,14 +28,6 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 	}
 
 	v1 := server.Group("/api/v1")
-	if config.CorsAllowOrigins != "" {
-		allowOrigins := strings.Split(config.CorsAllowOrigins, ",")
-		v1.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: allowOrigins,
-			AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-			AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderOrigin, echo.HeaderContentType},
-		}))
-	}
 
 	v1.Use(authenticate.Auth(authConfig))
 
