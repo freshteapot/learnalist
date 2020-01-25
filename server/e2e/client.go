@@ -467,3 +467,9 @@ func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, us
 	response.Body = data
 	return response, err
 }
+
+func (c Client) RawRequest(request *http.Request) (response *http.Response, err error) {
+	request = request.WithContext(context.Background())
+	response, err = c.httpClient.Do(request)
+	return response, err
+}
