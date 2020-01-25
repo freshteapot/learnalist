@@ -55,7 +55,7 @@ func Auth(config Config) echo.MiddlewareFunc {
 			default:
 				return echo.ErrForbidden
 			}
-
+			// Hmm currently this will never be triggered :(
 			if err != nil {
 				return echo.ErrInternalServerError
 			}
@@ -87,6 +87,7 @@ func (config Config) validateBearer(c echo.Context, token string) (bool, error) 
 
 func (config Config) validateBasic(c echo.Context, basic string) (bool, error) {
 	b, err := base64.StdEncoding.DecodeString(basic)
+	// Not sure how to trigger this path
 	if err != nil {
 		return false, nil
 	}
