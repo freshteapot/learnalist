@@ -14,68 +14,71 @@ const (
 	defaultRealm = "Restricted"
 )
 
-var LookupBasic func(username string, hash string) (string, error)
-var LookupBearer func(token string) (string, error)
-var SkipAuth func(c echo.Context) bool
+type Config struct {
+	Skip         func(c echo.Context) bool
+	LookupBasic  func(username string, hash string) (string, error)
+	LookupBearer func(token string) (string, error)
+}
 
-func Auth(next echo.HandlerFunc) echo.HandlerFunc {
-
-	if SkipAuth == nil {
-		panic("You need to set SkipAuth")
-	}
-
-	if LookupBearer == nil {
+func Auth(config Config) echo.MiddlewareFunc {
+	if config.LookupBearer == nil {
 		panic("You need to set LookupBearer")
 	}
 
-	if LookupBearer == nil {
+	if config.LookupBearer == nil {
 		panic("You need to set LookupBasic")
 	}
 
-	return func(c echo.Context) error {
-		var valid bool
-		var err error
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			var valid bool
+			var err error
+			fmt.Println("hi3")
+			fmt.Println("hi3.")
+			if config.Skip(c) {
+				return next(c)
+			}
+			fmt.Println("hi4")
+			authorization := c.Request().Header.Get("Authorization")
+			fmt.Println("hi")
+			fmt.Println(authorization)
+			parts := strings.SplitN(authorization, " ", 2)
+			fmt.Println(len(parts))
+			if len(parts) != 2 {
+				return echo.ErrForbidden
+			}
 
-		if SkipAuth(c) {
-			return next(c)
+			what := strings.ToLower(parts[0])
+
+			switch what {
+			case "basic":
+				hash := parts[1]
+				valid, err = config.validateBasic(c, hash)
+			case "bearer":
+				token := parts[1]
+				valid, err = config.validateBearer(c, token)
+			default:
+				return echo.ErrForbidden
+			}
+
+			if err != nil {
+				return echo.ErrInternalServerError
+			}
+
+			if valid {
+				return next(c)
+			}
+
+			realm := defaultRealm
+			// Need to return `401` for browsers to pop-up login box.
+			c.Response().Header().Set(echo.HeaderWWWAuthenticate, what+" realm="+realm)
+			return echo.ErrUnauthorized
 		}
-
-		authorization := c.Request().Header.Get("Authorization")
-		parts := strings.SplitN(authorization, " ", 2)
-		if len(parts) != 2 {
-			return echo.ErrForbidden
-		}
-
-		what := strings.ToLower(parts[0])
-
-		switch what {
-		case "basic":
-			hash := parts[1]
-			valid, err = validateBasic(c, hash)
-		case "bearer":
-			token := parts[1]
-			valid, err = validateBearer(c, token)
-		default:
-			return echo.ErrForbidden
-		}
-
-		if err != nil {
-			return echo.ErrInternalServerError
-		}
-
-		if valid {
-			return next(c)
-		}
-
-		realm := defaultRealm
-		// Need to return `401` for browsers to pop-up login box.
-		c.Response().Header().Set(echo.HeaderWWWAuthenticate, what+" realm="+realm)
-		return echo.ErrUnauthorized
 	}
 }
 
-func validateBearer(c echo.Context, token string) (bool, error) {
-	userUUID, err := LookupBearer(token)
+func (config Config) validateBearer(c echo.Context, token string) (bool, error) {
+	userUUID, err := config.LookupBearer(token)
 	if err != nil {
 		return false, nil
 	}
@@ -87,7 +90,7 @@ func validateBearer(c echo.Context, token string) (bool, error) {
 	return true, nil
 }
 
-func validateBasic(c echo.Context, basic string) (bool, error) {
+func (config Config) validateBasic(c echo.Context, basic string) (bool, error) {
 	b, err := base64.StdEncoding.DecodeString(basic)
 	if err != nil {
 		return false, nil
@@ -103,7 +106,7 @@ func validateBasic(c echo.Context, basic string) (bool, error) {
 	hash := HashIt(username, password)
 
 	// TODO this is ugly
-	userUUID, err := LookupBasic(username, hash)
+	userUUID, err := config.LookupBasic(username, hash)
 	if err != nil {
 		return false, nil
 	}

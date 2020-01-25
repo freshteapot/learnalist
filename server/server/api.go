@@ -26,9 +26,11 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		OauthHandlers: *oauthHandlers,
 	}
 
-	authenticate.LookupBasic = m.Datastore.UserWithUsernameAndPassword().Lookup
-	authenticate.LookupBearer = m.Datastore.UserSession().GetUserUUIDByToken
-	authenticate.SkipAuth = authenticateApi.SkipAuth
+	authConfig := authenticate.Config{
+		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,
+		LookupBearer: m.Datastore.UserSession().GetUserUUIDByToken,
+		Skip:         authenticateApi.Skip,
+	}
 
 	v1 := server.Group("/api/v1")
 	if config.CorsAllowOrigins != "" {
@@ -40,7 +42,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHel
 		}))
 	}
 
-	v1.Use(authenticate.Auth)
+	v1.Use(authenticate.Auth(authConfig))
 
 	v1.GET("/version", m.V1GetVersion)
 

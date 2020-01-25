@@ -18,12 +18,14 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 		HugoHelper:      *hugoHelper,
 	}
 
-	authenticate.LookupBasic = m.Datastore.UserWithUsernameAndPassword().Lookup
-	authenticate.LookupBearer = m.Datastore.UserSession().GetUserUUIDByToken
-	authenticate.SkipAuth = authenticateAlists.SkipAuth
+	authConfig := authenticate.Config{
+		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,
+		LookupBearer: m.Datastore.UserSession().GetUserUUIDByToken,
+		Skip:         authenticateAlists.SkipAuth,
+	}
 
 	alists := server.Group("/alists")
-	alists.Use(authenticate.Auth)
+	alists.Use(authenticate.Auth(authConfig))
 
 	alists.GET("/*", m.GetAlist)
 	server.Static("/", config.SiteCacheFolder)
