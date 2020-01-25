@@ -1,7 +1,6 @@
 package authenticate
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -12,7 +11,7 @@ func Skip(c echo.Context) bool {
 	url := c.Request().URL.Path
 	method := c.Request().Method
 	url = strings.TrimPrefix(url, "/api/v1")
-	fmt.Print(url)
+
 	switch method {
 	case http.MethodGet:
 		if url == "/" {

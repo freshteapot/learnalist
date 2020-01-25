@@ -33,23 +33,18 @@ func Auth(config Config) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			var valid bool
 			var err error
-			fmt.Println("hi3")
-			fmt.Println("hi3.")
+
 			if config.Skip(c) {
 				return next(c)
 			}
-			fmt.Println("hi4")
+
 			authorization := c.Request().Header.Get("Authorization")
-			fmt.Println("hi")
-			fmt.Println(authorization)
 			parts := strings.SplitN(authorization, " ", 2)
-			fmt.Println(len(parts))
 			if len(parts) != 2 {
 				return echo.ErrForbidden
 			}
 
 			what := strings.ToLower(parts[0])
-
 			switch what {
 			case "basic":
 				hash := parts[1]
