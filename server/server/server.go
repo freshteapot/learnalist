@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -29,6 +31,15 @@ func Init(_config Config) {
 	server.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 9,
 	}))
+
+	if config.CorsAllowOrigins != "" {
+		allowOrigins := strings.Split(config.CorsAllowOrigins, ",")
+		server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: allowOrigins,
+			AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+			AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderOrigin, echo.HeaderContentType},
+		}))
+	}
 }
 
 func Run() {
