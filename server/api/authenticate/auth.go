@@ -31,6 +31,10 @@ func Skip(c echo.Context) bool {
 		if url == "/user/register" {
 			return true
 		}
+
+		if url == "/user/login" {
+			return true
+		}
 	default:
 		return false
 	}

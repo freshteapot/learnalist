@@ -7,13 +7,6 @@
         {
             "name": "Debug server (dev config)",
             "type": "go",
-            "request": "attach",
-            "mode": "local",
-            "processId": 82586
-        },
-        {
-            "name": "Launch file",
-            "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceRoot}/server/main.go",
@@ -21,6 +14,13 @@
                 "server",
                 "--config=../config/dev.config.yaml"
             ]
+        },
+        {
+            "name": "Debug binary via pid",
+            "type": "go",
+            "request": "attach",
+            "mode": "local",
+            "processId": 82586
         }
     ]
 }
