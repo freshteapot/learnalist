@@ -109,6 +109,26 @@ func (c Client) Register(username string, password string) RegisterResponse {
 	return response
 }
 
+func (c Client) RawLogin(username string, password string) (*http.Response, error) {
+	body := strings.NewReader(fmt.Sprintf(`
+{
+    "username":"%s",
+    "password":"%s"
+}
+`, username, password))
+
+	url := fmt.Sprintf("%s/api/v1/user/login", c.getServerURL())
+	req, err := http.NewRequest("POST", url, body)
+	req = req.WithContext(context.Background())
+	if err != nil {
+		// handle err
+		fmt.Println("Failed NewRequest")
+		panic(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	return c.httpClient.Do(req)
+}
+
 func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Response, error) {
 	var response *http.Response
 	body := strings.NewReader(input)

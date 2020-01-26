@@ -114,7 +114,6 @@ func getInputListWithShare(listType string, sharedWith string) string {
 		panic("List input type not supported")
 	}
 
-	// Set shared
 	with := ""
 	switch sharedWith {
 	case aclKeys.SharedWithPublic:
@@ -137,7 +136,7 @@ func generateUsername() string {
 	for i := 0; i < length; i++ {
 		b.WriteRune(chars[rand.Intn(len(chars))])
 	}
-	str := b.String() // E.g. "Excb
+	str := b.String()
 
 	return usernameOwner + "-" + str
 }
