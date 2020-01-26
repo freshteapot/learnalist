@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SkipAuth(c echo.Context) bool {
+func Skip(c echo.Context) bool {
 	url := c.Request().URL.Path
 	method := c.Request().Method
 	url = strings.TrimPrefix(url, "/api/v1")
@@ -26,8 +26,13 @@ func SkipAuth(c echo.Context) bool {
 			return true
 		}
 	case http.MethodPost:
+		// TODO Add a secret if you want to control who can register
 		// Unfiltered ability to register a user
-		if url == "/register" {
+		if url == "/user/register" {
+			return true
+		}
+
+		if url == "/user/login" {
 			return true
 		}
 	default:
