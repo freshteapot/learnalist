@@ -19,3 +19,6 @@ svelte/node_modules
 svelte/public/*.js
 svelte/public/*.map
 svelte/public/*.css
+
+# js
+js/node_modules

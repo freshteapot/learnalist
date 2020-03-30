@@ -82,9 +82,7 @@ func (writer HugoAlist) toContent(aList alist.Alist) string {
 
 		"js_include": func(info alist.AlistInfo) string {
 			jsInclude := make([]string, 0)
-			if info.Interact.Slideshow == "1" {
-				jsInclude = append(jsInclude, info.ListType)
-			}
+			jsInclude = append(jsInclude, info.ListType)
 			b, _ := json.Marshal(jsInclude)
 			return string(b)
 		},
