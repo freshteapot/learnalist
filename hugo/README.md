@@ -22,3 +22,9 @@ curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' 
 ```sh
 http://localhost:1234/alists/5d4c9869-1d26-567d-82be-497c3521368a.html
 ```
+
+
+docker run --name lal-sample \
+-p 8080:80 \
+-v $PWD/hugo/public-alist:/usr/share/nginx/html:ro \
+-P -d nginx:1.17-alpine

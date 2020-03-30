@@ -7,13 +7,12 @@ server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
 
-# www-ui
-www-ui/node_modules
-
-# alists
-hugo/content/alists/
-hugo/data/lists/
+# hugo
+hugo/content/alist/
+hugo/data/alist/
+hugo/data/alistsbyuser/
 hugo/public-alist/
+hugo/node_modules/
 
 # svelte
 svelte/node_modules

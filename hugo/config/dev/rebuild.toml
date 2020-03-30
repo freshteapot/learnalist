@@ -1,0 +1,4 @@
+baseURL = ""
+
+[build]
+  useResourceCacheWhen = "never"

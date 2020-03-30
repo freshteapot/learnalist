@@ -1,0 +1,4 @@
+baseURL = "https://learnalist.net/"
+
+[build]
+  useResourceCacheWhen = "always"

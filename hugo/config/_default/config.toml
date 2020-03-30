@@ -1,0 +1,19 @@
+baseURL = ""
+languageCode = "en-us"
+title = "Learnalist"
+
+uglyURLs = true
+disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
+
+[taxonomies]
+  label = "labels"
+
+
+[output]
+alist = ["HTML"]
+
+#[build]
+#  useResourceCacheWhen = "always"
+
+[markup.goldmark.renderer]
+  unsafe = true

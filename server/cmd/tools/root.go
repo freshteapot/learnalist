@@ -13,5 +13,6 @@ func init() {
 	RootCmd.AddCommand(rebuildStaticSiteCmd)
 	RootCmd.AddCommand(integrationTestsCmd)
 	RootCmd.AddCommand(stubSQLFileCmd)
-	RootCmd.AddCommand(hugoInputCmd)
+	RootCmd.AddCommand(hugoImportListsCmd)
+	RootCmd.AddCommand(hugoImportListsByUserCmd)
 }

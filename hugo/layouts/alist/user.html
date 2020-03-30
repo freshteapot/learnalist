@@ -1,0 +1,28 @@
+{{- $usersList := getJSON "data/alistsbyuser/" $.Params.Uuid ".json" -}}
+{{- $listPrefix := relURL "alist/" -}}
+
+<!DOCTYPE html>
+<html>
+{{- partial "head.html" $ -}}
+
+<body>
+    {{- partial "header.html" $ -}}
+    <notification-center></notification-center>
+    <main class="w-100 bt b--black-10 bg-white ">
+        <article id="list-info" class="mw9 mw6-ns center pt2">
+            {{range $usersList}}
+            {{- $aList := getJSON "data/alist/" . ".json" -}}
+            {{- $listUrl := (printf "%s%s.html" $listPrefix $aList.uuid) -}}
+            <blockquote class="ml0 mt4 pl3 black-90 bl bw2 b--black">
+                <p class="measure-wide black-60">
+                    {{ $aList.info.title }}
+                </p>
+                <cite class="f5 fs-normal"><a class="black-40 near-black dim"
+                        href="{{ $listUrl }}">{{ $aList.uuid }}</a></cite>
+            </blockquote>
+            {{ end }}
+        </article>
+    </main>
+</body>
+
+</html>

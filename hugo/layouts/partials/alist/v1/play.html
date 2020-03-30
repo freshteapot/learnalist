@@ -1,0 +1,4 @@
+{{- $aList := . -}}
+{{- with .info.interact -}}
+<v1-slideshow listdata={{ $aList | jsonify }}></v1-slideshow>
+{{- end -}}
