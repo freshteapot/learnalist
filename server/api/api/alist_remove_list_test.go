@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 
@@ -35,7 +36,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 	var rec *httptest.ResponseRecorder
 	BeforeEach(func() {
 		testHugoHelper := &mocks.HugoSiteBuilder{}
-		testHugoHelper.On("Write", mock.Anything)
+		testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 		testHugoHelper.On("Remove", mock.Anything)
 		m.HugoHelper = testHugoHelper
 
@@ -85,6 +86,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 		It("Successfully removed a list", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(nil)
+			datastore.On("GetListsByUserWithFilters", user.Uuid, "", "").Return([]alist.Alist{}, nil)
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List fake-list-123 was removed."}`))

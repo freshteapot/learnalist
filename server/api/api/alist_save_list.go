@@ -86,7 +86,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 	// Save to hugo
 	m.HugoHelper.WriteList(aList)
-
+	// TODO this might become a painful bottle neck
 	aLists := m.Datastore.GetListsByUserWithFilters(aList.User.Uuid, "", "")
 	m.HugoHelper.WriteListsByUser(aList.User.Uuid, aLists)
 	statusCode := http.StatusOK

@@ -145,6 +145,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	m.Datastore.SaveAlist(http.MethodPut, aList)
 	// Save to hugo
 	m.HugoHelper.WriteList(aList)
+	// TODO this might become a painful bottle neck
 	aLists := m.Datastore.GetListsByUserWithFilters(aList.User.Uuid, "", "")
 	m.HugoHelper.WriteListsByUser(aList.User.Uuid, aLists)
 
