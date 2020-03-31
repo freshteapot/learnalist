@@ -428,7 +428,7 @@ func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, inpu
 func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (HttpResponse, error) {
 	var response HttpResponse
 	var err error
-	url := fmt.Sprintf("%s/alists/%s.html", c.getServerURL(), uuid)
+	url := fmt.Sprintf("%s/alist/%s.html", c.getServerURL(), uuid)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		// handle err

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
@@ -41,10 +40,7 @@ var rebuildStaticSiteCmd = &cobra.Command{
 		hugoHelper := hugo.NewHugoHelper(hugoFolder, masterCron, siteCacheFolder)
 
 		makeLists(db, hugoHelper)
-		//makeUserLists(db, hugoHelper)
-		fmt.Println("sleeping")
-		time.Sleep(time.Duration(5 * time.Second))
-		fmt.Println("slept")
+		makeUserLists(db, hugoHelper)
 	},
 }
 
@@ -63,44 +59,34 @@ FROM
 		json.Unmarshal([]byte(row.Body), &aList)
 		aList.User.Uuid = row.UserUuid
 
-		helper.WriteList(aList)
+		helper.WriteList(*aList)
 	}
 }
 
 func makeUserLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
-	// This will break one day
-	queryUsers := `
-SELECT
-	uuid, user_uuid
-FROM
-	alist_kv`
+	var users []string
+	err := db.Select(&users, `SELECT DISTINCT(user_uuid) FROM alist_kv`)
+	if err != nil {
+		fmt.Println(err)
+		panic("...")
+	}
 
-	queryListsByUser := `
-SELECT
-	uuid
-FROM
-	alist_kv
-WHERE
-	user_uuid = ?
-`
-
-	rows, _ := db.Queryx(queryUsers)
-
-	for rows.Next() {
-		var row models.AlistKV
-		rows.StructScan(&row)
-
-		userUUID := row.UserUuid
-
-		listRows, _ := db.Queryx(queryListsByUser, userUUID)
-		lists := []string{}
-		for listRows.Next() {
-			var listRow models.AlistKV
-			listRows.StructScan(&listRow)
-			lists = append(lists, listRow.Uuid)
+	for _, userUUID := range users {
+		var lists []string
+		err := db.Select(&lists, `SELECT body FROM alist_kv WHERE user_uuid=?`, userUUID)
+		if err != nil {
+			fmt.Println(err)
+			panic("...")
 		}
-		helper.WriteListsByUser(userUUID, lists)
 
+		aLists := make([]alist.Alist, len(lists))
+		for index, raw := range lists {
+			var aList alist.Alist
+			aList.UnmarshalJSON([]byte(raw))
+			aLists[index] = aList
+		}
+
+		helper.WriteListsByUser(userUUID, aLists)
 	}
 
 }

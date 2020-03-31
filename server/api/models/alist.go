@@ -39,8 +39,8 @@ type GetListsByUserWithFiltersArgs struct {
 // - labels needs can be single or "," separated.
 // - uuid = User.Uuid
 // - listType = one of the types in alist (but if its not there, it will clearly not return anything.)
-func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType string) []*alist.Alist {
-	var items = []*alist.Alist{}
+func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType string) []alist.Alist {
+	var items = []alist.Alist{}
 	var row AlistKV
 	filterQueryWithListTypeLookup := "list_type = :list_type"
 
@@ -105,21 +105,22 @@ func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType s
 }
 
 // GetAlist Get alist
-func (dal *DAL) GetAlist(uuid string) (*alist.Alist, error) {
+func (dal *DAL) GetAlist(uuid string) (alist.Alist, error) {
+	var aList alist.Alist
 	row := AlistKV{}
 	query := "SELECT * FROM alist_kv WHERE uuid = ?"
 	err := dal.Db.Get(&row, query, uuid)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.New(i18n.SuccessAlistNotFound)
+			return aList, errors.New(i18n.SuccessAlistNotFound)
 		}
 
 		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
 		log.Println(err)
-		return nil, err
+		return aList, err
 	}
 
-	aList := convertDbRowToAlist(row)
+	aList = convertDbRowToAlist(row)
 	return aList, nil
 }
 
@@ -161,17 +162,17 @@ If POST, we enforce a new uuid for the list.
 If empty uuid, we reject.
 If PUT, do a lookup to see if the list exists.
 */
-func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error) {
+func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error) {
 	var err error
 	var jsonBytes []byte
-
+	var emptyAlist alist.Alist
 	err = alist.Validate(aList)
 	if err != nil {
-		return nil, err
+		return emptyAlist, err
 	}
 
 	if aList.User.Uuid == "" {
-		return nil, errors.New(i18n.InternalServerErrorMissingUserUuid)
+		return emptyAlist, errors.New(i18n.InternalServerErrorMissingUserUuid)
 	}
 
 	// We set the uuid
@@ -184,7 +185,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	}
 
 	if aList.Uuid == "" {
-		return nil, errors.New(i18n.InternalServerErrorMissingAlistUuid)
+		return emptyAlist, errors.New(i18n.InternalServerErrorMissingAlistUuid)
 	}
 	// This really shouldnt happen, but could do if called directly.
 	jsonBytes, err = json.Marshal(&aList)
@@ -193,20 +194,19 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 
 	if method == http.MethodPut {
 		current, _ := dal.GetAlist(aList.Uuid)
-		if current == nil {
-			return nil, errors.New(i18n.SuccessAlistNotFound)
+		if current.Uuid == "" {
+			return emptyAlist, errors.New(i18n.SuccessAlistNotFound)
 		}
 
-		if current != nil {
-			if current.User.Uuid != aList.User.Uuid {
-				return nil, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
-			}
+		if current.User.Uuid != aList.User.Uuid {
+			return emptyAlist, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
 		}
+
 		// Check if what is about to be written is the same.
 		a, _ := json.Marshal(&aList)
 		b, _ := json.Marshal(current)
 		if string(a) == string(b) {
-			return &aList, nil
+			return aList, nil
 		}
 	}
 
@@ -225,7 +225,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 	}
 
 	if err != nil {
-		return nil, err
+		return emptyAlist, err
 	}
 
 	// Set shared
@@ -240,7 +240,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error
 		dal.Acl.MakeListPrivate(aList.Uuid, aList.User.Uuid)
 	}
 
-	return &aList, nil
+	return aList, nil
 }
 
 // Process the lists labels,
@@ -271,8 +271,8 @@ func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) error {
 // the correct fields attached.
 // The json object saved in the db, should not be
 // relied on 100% for all the fields.
-func convertDbRowToAlist(row AlistKV) *alist.Alist {
-	aList := new(alist.Alist)
+func convertDbRowToAlist(row AlistKV) alist.Alist {
+	var aList alist.Alist
 	json.Unmarshal([]byte(row.Body), &aList)
 	aList.User.Uuid = row.UserUuid
 	return aList

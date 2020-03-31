@@ -3,10 +3,10 @@ package api_test
 import (
 	"testing"
 
-	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -30,7 +30,7 @@ var _ = BeforeSuite(func() {
 	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	dal = models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
-	hugoHelper := new(mocks.HugoSiteBuilder)
+	hugoHelper := &mocks.HugoSiteBuilder{}
 
 	m = api.Manager{
 		Datastore:  dal,

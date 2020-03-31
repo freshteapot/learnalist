@@ -36,7 +36,7 @@ func (h HugoHelper) ProcessContent() {
 	h.inprogress.Lock()
 	now := time.Now()
 	fmt.Printf("Processing content within %s @ %s\n", h.Cwd, now)
-	h.MakeContent()
+
 	h.Build()
 	h.inprogress.Unlock()
 }

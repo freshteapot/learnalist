@@ -1,26 +1,13 @@
 package hugo
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-func (h HugoHelper) WriteList(aList *alist.Alist) {
-	uuid := aList.Uuid
-	content, _ := json.Marshal(aList)
-	path := fmt.Sprintf("%s/%s.json", h.DataDirectory, uuid)
-	err := ioutil.WriteFile(path, content, 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	h.RegisterCronJob()
-}
-
-// Remove delete cached files based on list uuid.
+// TODO will need to handle this
+// Remove delete cached files based on list uui.
 func (h HugoHelper) Remove(uuid string) {
 	h.deleteBuildFiles(uuid)
 
@@ -29,4 +16,17 @@ func (h HugoHelper) Remove(uuid string) {
 		fmt.Sprintf("%s/alist/%s.json", h.SiteCacheFolder, uuid),
 	}
 	h.deleteFiles(files)
+}
+
+func (h HugoHelper) WriteList(aList alist.Alist) {
+	h.AlistWriter.Data(aList)
+	h.AlistWriter.Content(aList)
+	h.RegisterCronJob()
+}
+
+// WriteListsByUser
+func (h HugoHelper) WriteListsByUser(userUUID string, lists []alist.Alist) {
+	h.AlistsByUserWriter.Data(userUUID, lists)
+	h.AlistsByUserWriter.Content(userUUID)
+	h.RegisterCronJob()
 }

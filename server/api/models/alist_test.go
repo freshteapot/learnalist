@@ -28,19 +28,20 @@ func (suite *ModelSuite) TestSaveAlistPost() {
 		}
 		`
 
-	aList := new(alist.Alist)
+	var aList alist.Alist
+
 	aList.UnmarshalJSON([]byte(a))
 	aList.User.Uuid = userUUID
 
 	// TODO move this into own test
-	aList, err := dal.SaveAlist(http.MethodPost, *aList)
+	aList, err := dal.SaveAlist(http.MethodPost, aList)
 	suite.NoError(err)
 
-	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	aList, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.NoError(err)
 
 	aList.Info.Labels = []string{"test1", "test2"}
-	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	aList, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.NoError(err)
 	suite.Equal(2, len(aList.Info.Labels))
 }
@@ -66,20 +67,20 @@ func (suite *ModelSuite) TestSaveAListInternalIssues() {
 		}
 		`
 
-	aList := new(alist.Alist)
+	var aList alist.Alist
 	aList.UnmarshalJSON([]byte(a))
 
 	// Check empty user.uuid
 	aList.User.Uuid = ""
-	_, err = dal.SaveAlist(http.MethodPost, *aList)
+	_, err = dal.SaveAlist(http.MethodPost, aList)
 	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
 
-	_, err = dal.SaveAlist(http.MethodPut, *aList)
+	_, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.Equal(i18n.InternalServerErrorMissingUserUuid, err.Error())
 	// Check empty alist Uuid
 	aList.User.Uuid = userUUID
 	aList.Uuid = ""
-	_, err = dal.SaveAlist(http.MethodPut, *aList)
+	_, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.Equal(i18n.InternalServerErrorMissingAlistUuid, err.Error())
 }
 
@@ -102,16 +103,16 @@ func (suite *ModelSuite) TestSaveAListViaPutWithSameData() {
 		    }
 		}
 		`
-	aList := new(alist.Alist)
+	var aList alist.Alist
 	aList.UnmarshalJSON([]byte(a))
 	aList.User.Uuid = userUUID
-	aList, err := dal.SaveAlist(http.MethodPost, *aList)
+	aList, err := dal.SaveAlist(http.MethodPost, aList)
 	suite.NoError(err)
 	aUUID := aList.Uuid
-	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	aList, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.NoError(err)
 	bUUID := aList.Uuid
-	aList, err = dal.SaveAlist(http.MethodPut, *aList)
+	aList, err = dal.SaveAlist(http.MethodPut, aList)
 	suite.NoError(err)
 	cUUID := aList.Uuid
 	// Make sure the uuid is the same
@@ -140,19 +141,20 @@ func (suite *ModelSuite) TestSaveAListViaPutWithNotFoundUuid() {
 		}
 		`
 
-	aList := new(alist.Alist)
+	var aList alist.Alist
 	aList.UnmarshalJSON([]byte(a))
 	aList.User.Uuid = userUUID
-	aList, err := dal.SaveAlist(http.MethodPut, *aList)
+	aList, err := dal.SaveAlist(http.MethodPut, aList)
 	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
 }
 
 func (suite *ModelSuite) TestSaveAListEmptyList() {
 	userUUID := suite.UserUUID
-	input := new(alist.Alist)
+	var input alist.Alist
 	input.User.Uuid = userUUID
-	aList, err := dal.SaveAlist(http.MethodPost, *input)
-	suite.Nil(aList)
+
+	aList, err := dal.SaveAlist(http.MethodPost, input)
+	suite.Equal(alist.Alist{}, aList)
 	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty.\nInvalid option for info.shared_with"), err.Error())
 }
 

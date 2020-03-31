@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
-	mockUser "github.com/freshteapot/learnalist-api/server/pkg/user/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,14 +19,14 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 	When("/register", func() {
 		var (
-			datastore                   *mockModels.Datastore
-			userWithUsernameAndPassword *mockUser.UserWithUsernameAndPassword
+			datastore                   *mocks.Datastore
+			userWithUsernameAndPassword *mocks.UserWithUsernameAndPassword
 			endpoint                    = "/api/v1/user/register"
 		)
 
 		BeforeEach(func() {
-			datastore = &mockModels.Datastore{}
-			userWithUsernameAndPassword = &mockUser.UserWithUsernameAndPassword{}
+			datastore = &mocks.Datastore{}
+			userWithUsernameAndPassword = &mocks.UserWithUsernameAndPassword{}
 			m.Datastore = datastore
 		})
 

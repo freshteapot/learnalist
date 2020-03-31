@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	mockHugo "github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
-	mockAcl "github.com/freshteapot/learnalist-api/server/pkg/acl/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,8 +18,8 @@ import (
 var _ = Describe("Testing Api endpoints that get lists", func() {
 	AfterEach(emptyDatabase)
 
-	var datastore *mockModels.Datastore
-	var acl *mockAcl.Acl
+	var datastore *mocks.Datastore
+	var acl *mocks.Acl
 	var user *uuid.User
 	var (
 		method    string
@@ -29,13 +28,13 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 		alistUUID string
 	)
 	BeforeEach(func() {
-		testHugoHelper := &mockHugo.HugoSiteBuilder{}
+		testHugoHelper := &mocks.HugoSiteBuilder{}
 		testHugoHelper.On("Write", mock.Anything)
 		testHugoHelper.On("Remove", mock.Anything)
 		m.HugoHelper = testHugoHelper
 
-		datastore = &mockModels.Datastore{}
-		acl = &mockAcl.Acl{}
+		datastore = &mocks.Datastore{}
+		acl = &mocks.Acl{}
 		m.Datastore = datastore
 		m.Acl = acl
 
@@ -50,7 +49,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 	When("Get list by the user logged in", func() {
 		It("No lists found", func() {
 
-			var aLists = []*alist.Alist{}
+			var aLists = []alist.Alist{}
 			uri = "/api/v1/alist/by/me"
 			req, rec := setupFakeEndpoint(method, uri, input)
 			e := echo.New()

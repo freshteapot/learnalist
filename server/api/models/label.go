@@ -112,7 +112,7 @@ WHERE user_uuid=?
 // Pass in the label and the user (uuid) to remove them from the tables
 func (dal *DAL) RemoveUserLabel(label string, user string) error {
 	var err error
-	var aList *alist.Alist
+	var aList alist.Alist
 
 	queryForUuids := `
 SELECT
@@ -141,7 +141,7 @@ AND
 				}
 			}
 			aList.Info.Labels = cleaned
-			dal.SaveAlist(http.MethodPut, *aList)
+			dal.SaveAlist(http.MethodPut, aList)
 		}
 	}
 

@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 
 	"github.com/freshteapot/learnalist-api/server/api/api"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
+
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
-	mockAcl "github.com/freshteapot/learnalist-api/server/pkg/acl/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,16 +22,16 @@ var _ = Describe("Testing Label endpoints", func() {
 
 	When("/labels", func() {
 		Context("Posting", func() {
-			var datastore *mockModels.Datastore
-			var acl *mockAcl.Acl
+			var datastore *mocks.Datastore
+			var acl *mocks.Acl
 			var user *uuid.User
 			var method string
 			var uri string
 			var e *echo.Echo
 
 			BeforeEach(func() {
-				datastore = &mockModels.Datastore{}
-				acl = &mockAcl.Acl{}
+				datastore = &mocks.Datastore{}
+				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
 
@@ -128,8 +129,8 @@ var _ = Describe("Testing Label endpoints", func() {
 		})
 		Context("Get", func() {
 			var (
-				datastore *mockModels.Datastore
-				acl       *mockAcl.Acl
+				datastore *mocks.Datastore
+				acl       *mocks.Acl
 				user      *uuid.User
 				method    string
 				uri       string
@@ -140,8 +141,8 @@ var _ = Describe("Testing Label endpoints", func() {
 			)
 
 			BeforeEach(func() {
-				datastore = &mockModels.Datastore{}
-				acl = &mockAcl.Acl{}
+				datastore = &mocks.Datastore{}
+				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
 
@@ -188,8 +189,8 @@ var _ = Describe("Testing Label endpoints", func() {
 
 		Context("DELETE", func() {
 			var (
-				datastore *mockModels.Datastore
-				acl       *mockAcl.Acl
+				datastore *mocks.Datastore
+				acl       *mocks.Acl
 				user      *uuid.User
 				method    string
 				uri       string
@@ -200,8 +201,8 @@ var _ = Describe("Testing Label endpoints", func() {
 			)
 
 			BeforeEach(func() {
-				datastore = &mockModels.Datastore{}
-				acl = &mockAcl.Acl{}
+				datastore = &mocks.Datastore{}
+				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -30,7 +31,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
-	aList := new(alist.Alist)
+	var aList alist.Alist
 	err := aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
 		response := HttpResponseMessage{
@@ -40,7 +41,8 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	}
 
 	aList.User = user
-
+	fmt.Println(user)
+	fmt.Println(aList)
 	if method == http.MethodPut {
 		inputUuid = c.Param("uuid")
 		if inputUuid == "" {
@@ -61,7 +63,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		aList.Uuid = inputUuid
 	}
 
-	aList, err = m.Datastore.SaveAlist(method, *aList)
+	aList, err = m.Datastore.SaveAlist(method, aList)
 	if err != nil {
 		switch err.Error() {
 		case i18n.SuccessAlistNotFound:
@@ -84,9 +86,12 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 	// Save to hugo
 	m.HugoHelper.WriteList(aList)
+
+	aLists := m.Datastore.GetListsByUserWithFilters(aList.User.Uuid, "", "")
+	m.HugoHelper.WriteListsByUser(aList.User.Uuid, aLists)
 	statusCode := http.StatusOK
 	if method == http.MethodPost {
 		statusCode = http.StatusCreated
 	}
-	return c.JSON(statusCode, *aList)
+	return c.JSON(statusCode, aList)
 }

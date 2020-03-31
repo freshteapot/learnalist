@@ -61,5 +61,5 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 	// TODO http://localhost:1234/lists-by-me.html
 	// TODO block access to the user files (alistsbyuser)
 	server.Static("/", config.SiteCacheFolder)
-	server.HTTPErrorHandler = customHTTPErrorHandler
+	//server.HTTPErrorHandler = customHTTPErrorHandler
 }

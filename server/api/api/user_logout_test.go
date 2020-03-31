@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
-	mockUser "github.com/freshteapot/learnalist-api/server/pkg/user/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,14 +17,14 @@ import (
 var _ = Describe("Testing user logout endpoint", func() {
 	var (
 		endpoint    = "/api/v1/user/logout"
-		datastore   *mockModels.Datastore
-		userSession *mockUser.Session
+		datastore   *mocks.Datastore
+		userSession *mocks.Session
 	)
 	AfterEach(emptyDatabase)
 
 	BeforeEach(func() {
-		datastore = &mockModels.Datastore{}
-		userSession = &mockUser.Session{}
+		datastore = &mocks.Datastore{}
+		userSession = &mocks.Session{}
 		m.Datastore = datastore
 	})
 
@@ -85,8 +85,8 @@ var _ = Describe("Testing user logout endpoint", func() {
 			token    = "fake-token-123"
 		)
 		BeforeEach(func() {
-			datastore = &mockModels.Datastore{}
-			userSession = &mockUser.Session{}
+			datastore = &mocks.Datastore{}
+			userSession = &mocks.Session{}
 			m.Datastore = datastore
 		})
 

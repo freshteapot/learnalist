@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
-	mockUser "github.com/freshteapot/learnalist-api/server/pkg/user/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,16 +17,16 @@ import (
 var _ = Describe("Testing user login endpoint", func() {
 	var (
 		endpoint                    = "/api/v1/user/login"
-		datastore                   *mockModels.Datastore
-		userWithUsernameAndPassword *mockUser.UserWithUsernameAndPassword
-		userSession                 *mockUser.Session
+		datastore                   *mocks.Datastore
+		userWithUsernameAndPassword *mocks.UserWithUsernameAndPassword
+		userSession                 *mocks.Session
 	)
 	AfterEach(emptyDatabase)
 
 	BeforeEach(func() {
-		datastore = &mockModels.Datastore{}
-		userWithUsernameAndPassword = &mockUser.UserWithUsernameAndPassword{}
-		userSession = &mockUser.Session{}
+		datastore = &mocks.Datastore{}
+		userWithUsernameAndPassword = &mocks.UserWithUsernameAndPassword{}
+		userSession = &mocks.Session{}
 		m.Datastore = datastore
 	})
 
@@ -75,9 +75,9 @@ var _ = Describe("Testing user login endpoint", func() {
 			input   = `{"username":"iamusera", "password":"test123"}`
 		)
 		BeforeEach(func() {
-			datastore = &mockModels.Datastore{}
-			userWithUsernameAndPassword = &mockUser.UserWithUsernameAndPassword{}
-			userSession = &mockUser.Session{}
+			datastore = &mocks.Datastore{}
+			userWithUsernameAndPassword = &mocks.UserWithUsernameAndPassword{}
+			userSession = &mocks.Session{}
 			m.Datastore = datastore
 
 			session.Token = "fake-token"

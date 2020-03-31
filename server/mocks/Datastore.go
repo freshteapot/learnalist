@@ -19,16 +19,14 @@ type Datastore struct {
 }
 
 // GetAlist provides a mock function with given fields: uuid
-func (_m *Datastore) GetAlist(uuid string) (*alist.Alist, error) {
+func (_m *Datastore) GetAlist(uuid string) (alist.Alist, error) {
 	ret := _m.Called(uuid)
 
-	var r0 *alist.Alist
-	if rf, ok := ret.Get(0).(func(string) *alist.Alist); ok {
+	var r0 alist.Alist
+	if rf, ok := ret.Get(0).(func(string) alist.Alist); ok {
 		r0 = rf(uuid)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*alist.Alist)
-		}
+		r0 = ret.Get(0).(alist.Alist)
 	}
 
 	var r1 error
@@ -42,15 +40,15 @@ func (_m *Datastore) GetAlist(uuid string) (*alist.Alist, error) {
 }
 
 // GetListsByUserWithFilters provides a mock function with given fields: uuid, labels, listType
-func (_m *Datastore) GetListsByUserWithFilters(uuid string, labels string, listType string) []*alist.Alist {
+func (_m *Datastore) GetListsByUserWithFilters(uuid string, labels string, listType string) []alist.Alist {
 	ret := _m.Called(uuid, labels, listType)
 
-	var r0 []*alist.Alist
-	if rf, ok := ret.Get(0).(func(string, string, string) []*alist.Alist); ok {
+	var r0 []alist.Alist
+	if rf, ok := ret.Get(0).(func(string, string, string) []alist.Alist); ok {
 		r0 = rf(uuid, labels, listType)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*alist.Alist)
+			r0 = ret.Get(0).([]alist.Alist)
 		}
 	}
 
@@ -167,16 +165,14 @@ func (_m *Datastore) RemoveUserLabel(label string, uuid string) error {
 }
 
 // SaveAlist provides a mock function with given fields: method, aList
-func (_m *Datastore) SaveAlist(method string, aList alist.Alist) (*alist.Alist, error) {
+func (_m *Datastore) SaveAlist(method string, aList alist.Alist) (alist.Alist, error) {
 	ret := _m.Called(method, aList)
 
-	var r0 *alist.Alist
-	if rf, ok := ret.Get(0).(func(string, alist.Alist) *alist.Alist); ok {
+	var r0 alist.Alist
+	if rf, ok := ret.Get(0).(func(string, alist.Alist) alist.Alist); ok {
 		r0 = rf(method, aList)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*alist.Alist)
-		}
+		r0 = ret.Get(0).(alist.Alist)
 	}
 
 	var r1 error

@@ -10,14 +10,14 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 )
 
-func NewTypeV3() *Alist {
-	aList := &Alist{}
+func NewTypeV3() Alist {
+	aList := Alist{}
 
 	aList.Info.ListType = Concept2
 	data := make(TypeV3, 0)
 	aList.Data = data
 
-	*aList = enrichTypeV3(*aList)
+	aList = enrichTypeV3(aList)
 	return aList
 }
 

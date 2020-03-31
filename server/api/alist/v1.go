@@ -11,8 +11,8 @@ import (
 // TypeV1 list type v1
 type TypeV1 []string
 
-func NewTypeV1() *Alist {
-	aList := &Alist{}
+func NewTypeV1() Alist {
+	aList := Alist{}
 
 	aList.Info.ListType = SimpleList
 	data := make(TypeV1, 0)

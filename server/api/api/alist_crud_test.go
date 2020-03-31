@@ -3,14 +3,13 @@ package api_test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
-	mockHugo "github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
-	mockAcl "github.com/freshteapot/learnalist-api/server/pkg/acl/mocks"
+	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,26 +21,29 @@ var _ = Describe("Testing Alist endpoints", func() {
 
 	When("Basic crud", func() {
 		var userUUID string
-		var datastore *mockModels.Datastore
-		var acl *mockAcl.Acl
+		var datastore *mocks.Datastore
+
+		var acl *mocks.Acl
 		var user *uuid.User
 		var method string
 		var uri string
 		BeforeEach(func() {
 			method = http.MethodPost
 			uri = "/api/v1/alist"
-			testHugoHelper := &mockHugo.HugoSiteBuilder{}
-			testHugoHelper.On("Write", mock.Anything)
+			testHugoHelper := &mocks.HugoSiteBuilder{}
+			testHugoHelper.On("WriteList", mock.Anything)
+			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 			testHugoHelper.On("Remove", mock.Anything)
 			m.HugoHelper = testHugoHelper
 
-			datastore = &mockModels.Datastore{}
-			acl = &mockAcl.Acl{}
+			datastore = &mocks.Datastore{}
+			acl = &mocks.Acl{}
 			m.Datastore = datastore
 			m.Acl = acl
 
+			userUUID = "fake-123"
 			user = &uuid.User{
-				Uuid: "fake-123",
+				Uuid: userUUID,
 			}
 		})
 		Context("Save a list", func() {
@@ -71,6 +73,8 @@ var _ = Describe("Testing Alist endpoints", func() {
 			It("Post, success", func() {
 				savedList := alist.NewTypeV1()
 				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(savedList, nil)
+				datastore.On("GetListsByUserWithFilters", "", "", "").Return([]alist.Alist{}, nil)
+
 				input := `
       {
       	"data": ["car"],
@@ -83,7 +87,8 @@ var _ = Describe("Testing Alist endpoints", func() {
 				user := &uuid.User{
 					Uuid: userUUID,
 				}
-
+				fmt.Println(user)
+				fmt.Println(userUUID)
 				req, rec := setupFakeEndpoint(method, uri, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
@@ -96,7 +101,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 			})
 
 			It("Post, fail, due to ownership", func() {
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.InputSaveAlistOperationOwnerOnly))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.InputSaveAlistOperationOwnerOnly))
 				input := `
       {
       	"data": ["car"],
@@ -149,7 +154,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 
 			It("PUT, fail, due to list uuid not being found", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
 				input := `
       {
       	"data": ["car"],
@@ -207,7 +212,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 			})
 
 			It("Post, fail, due to internal issues", func() {
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New("Failed"))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New("Failed"))
 				input := `
       {
       	"data": ["car"],

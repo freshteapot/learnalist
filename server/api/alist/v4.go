@@ -8,8 +8,8 @@ import (
 	"github.com/gookit/validate"
 )
 
-func NewTypeV4() *Alist {
-	aList := &Alist{}
+func NewTypeV4() Alist {
+	aList := Alist{}
 
 	aList.Info.ListType = ContentAndUrl
 	data := make(TypeV4, 0)

@@ -91,8 +91,9 @@ func (clientApi *Client) GetVersion() (api.HttpGetVersionResponse, error) {
 	return httpResponse, nil
 }
 
-func (clientApi *Client) GetAlist(uuid string) (int, *alist.Alist, error) {
+func (clientApi *Client) GetAlist(uuid string) (int, alist.Alist, error) {
 	var httpClient = clientApi.getHttpClient()
+	var aList alist.Alist
 	url := fmt.Sprintf("%s/alist/%s", clientApi.getServerPath(), uuid)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -108,10 +109,9 @@ func (clientApi *Client) GetAlist(uuid string) (int, *alist.Alist, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return resp.StatusCode, nil, nil
+		return resp.StatusCode, aList, nil
 	}
 
-	aList := new(alist.Alist)
 	jsonBytes, err := ioutil.ReadAll(resp.Body)
 	err = aList.UnmarshalJSON(jsonBytes)
 	return resp.StatusCode, aList, err
