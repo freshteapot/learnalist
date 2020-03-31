@@ -23,6 +23,8 @@ func (h HugoHelper) Build() {
 	fmt.Println(toPublish)
 	h.buildSite()
 	//uuids := h.getPublishedFiles()
+	// TODO whats the downside of this?
+	// TODO should I have a publish list per type alist, user?
 	uuids := toPublish
 
 	h.copyToSiteCache()

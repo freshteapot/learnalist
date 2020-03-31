@@ -17,7 +17,8 @@ rm -rf ./hugo/public-alist
 
 ```sh
 mkdir -p ./hugo/{public-alist,content/alists,data/lists}
-cp -rf ./hugo/themes/alist/static/ /tmp/learnalist-api/site-cache/
+cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
+cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
 ```
 
 ##  Build the database

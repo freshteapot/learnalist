@@ -31,7 +31,6 @@ func (m *Manager) GetAlist(c echo.Context) error {
 
 	// TODO should we check if it exists?
 	allow, err := m.Acl.HasUserListReadAccess(alistUUID, userUUID)
-	allow = true
 	if err != nil {
 		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/500.html", m.SiteCacheFolder))
 		return c.HTMLBlob(http.StatusInternalServerError, data)
