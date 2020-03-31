@@ -34,9 +34,9 @@ Create the files for hugo
 ```sh
 cd ..
 mkdir -p /srv/learnalist/{bin,site-cache}
-cp -rf ./hugo/themes/alist/static/* /srv/learnalist/site-cache/
+cp -rf ./hugo/static/* /srv/learnalist/site-cache/
 cp -r ./hugo /srv/learnalist
-mkdir -p /srv/learnalist/hugo/{public-alist,content/alists,data/lists}
+mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 ```
 
 Make sure the ownerships is www-data
