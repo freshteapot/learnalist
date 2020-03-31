@@ -65,7 +65,6 @@ FROM
 
 		helper.WriteList(aList)
 	}
-	fmt.Println("HI")
 }
 
 func makeUserLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {

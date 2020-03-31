@@ -51,6 +51,8 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 		Skip:         authenticateAlists.SkipAuth,
 	}
 
+	server.GET("lists-by-me.html", m.GetMyLists, authenticate.Auth(authConfig))
+
 	alists := server.Group("/alist")
 	alists.Use(authenticate.Auth(authConfig))
 

@@ -11,7 +11,6 @@ func Skip(c echo.Context) bool {
 	url := c.Request().URL.Path
 	method := c.Request().Method
 	url = strings.TrimPrefix(url, "/api/v1")
-
 	switch method {
 	case http.MethodGet:
 		if url == "/" {
