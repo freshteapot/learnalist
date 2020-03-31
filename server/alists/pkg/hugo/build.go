@@ -20,8 +20,10 @@ func (h HugoHelper) Build() {
 	}
 
 	fmt.Printf("Build static site for %d lists\n", len(toPublish))
+	fmt.Println(toPublish)
 	h.buildSite()
-	uuids := h.getPublishedFiles()
+	//uuids := h.getPublishedFiles()
+	uuids := toPublish
 
 	h.copyToSiteCache()
 
@@ -33,11 +35,16 @@ func (h HugoHelper) Build() {
 
 func (h HugoHelper) buildSite() {
 	staticSiteFolder := h.Cwd
-	parts := strings.Split("-e alist --config=config/alist/config.toml", " ")
+	// TODO change this to be dynamic via config
+	parts := []string{
+		"-verbose",
+		`--environment=production`,
+	}
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
 	out, err := cmd.Output()
 	if err != nil {
+		fmt.Println(string(out))
 		log.Fatal(err)
 	}
 	fmt.Println(string(out))
@@ -87,6 +94,7 @@ func (h HugoHelper) getFilesToPublish() []string {
 	return uuids
 }
 
+// TODO change this to lists
 func (h HugoHelper) getPublishedFiles() []string {
 	dataDir := h.PublishDirectory
 	var files []string
@@ -112,9 +120,9 @@ func (h HugoHelper) getPublishedFiles() []string {
 
 	for _, file := range files {
 		filename := strings.TrimPrefix(file, dataDir+"/")
-
-		if strings.HasPrefix(filename, "alists/") && strings.HasSuffix(filename, ".html") {
-			uuid := strings.TrimPrefix(filename, "alists/")
+		fmt.Println(file)
+		if strings.HasPrefix(filename, "alist/") && strings.HasSuffix(filename, ".html") {
+			uuid := strings.TrimPrefix(filename, "alist/")
 			uuid = strings.TrimSuffix(uuid, ".html")
 			uuids = append(uuids, uuid)
 		}
@@ -126,8 +134,8 @@ func (h HugoHelper) getBuildFiles(uuid string) []string {
 	files := []string{
 		fmt.Sprintf("%s/%s.md", h.ContentDirectory, uuid),
 		fmt.Sprintf("%s/%s.json", h.DataDirectory, uuid),
-		fmt.Sprintf("%s/alists/%s.json", h.PublishDirectory, uuid),
-		fmt.Sprintf("%s/alists/%s.html", h.PublishDirectory, uuid),
+		fmt.Sprintf("%s/alist/%s.json", h.PublishDirectory, uuid),
+		fmt.Sprintf("%s/alist/%s.html", h.PublishDirectory, uuid),
 	}
 	return files
 }

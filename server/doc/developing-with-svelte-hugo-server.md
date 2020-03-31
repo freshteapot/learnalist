@@ -5,7 +5,7 @@
 # Rebuild from existing database
 
 ```sh
-go run main.go tools rebuild-static-site --config=dev.config.yaml
+go run main.go tools rebuild-static-site --config=../config/dev.config.yaml
 ```
 
 # Svelte

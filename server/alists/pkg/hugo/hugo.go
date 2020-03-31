@@ -14,7 +14,8 @@ type HugoSiteBuilder interface {
 	ProcessContent()
 	MakeContent()
 	Build()
-	Write(aList *alist.Alist)
+	WriteList(aList *alist.Alist)
+	WriteListsByUser(userUUID string, lists []string)
 	// Remove list via uuid
 	Remove(uuid string)
 }
@@ -32,16 +33,16 @@ type HugoHelper struct {
 
 func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
-	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
+	dataDirectory := fmt.Sprintf("%s/data/alist", cwd)
 	if !utils.IsDir(dataDirectory) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", dataDirectory))
 	}
-	contentDirectory := fmt.Sprintf("%s/content/alists", cwd)
+	contentDirectory := fmt.Sprintf("%s/content/alist", cwd)
 	if !utils.IsDir(contentDirectory) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", contentDirectory))
 	}
 
-	publishDirectory := fmt.Sprintf("%s/public-alist", cwd)
+	publishDirectory := fmt.Sprintf("%s/public", cwd)
 	if !utils.IsDir(publishDirectory) {
 		log.Fatal(fmt.Sprintf("%s is not a directory", publishDirectory))
 	}

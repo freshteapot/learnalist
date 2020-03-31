@@ -22,7 +22,7 @@ type Manager struct {
 }
 
 func GetAlistUUIDFromURL(input string) (string, string, error) {
-	input = strings.TrimPrefix(input, "/alists/")
+	input = strings.TrimPrefix(input, "/alist/")
 	if strings.Contains(input, "/") {
 		return "", "", errors.New("Invalid uri")
 	}

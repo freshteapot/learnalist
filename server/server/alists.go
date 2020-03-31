@@ -24,7 +24,7 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 		Skip:         authenticateAlists.SkipAuth,
 	}
 
-	alists := server.Group("/alists")
+	alists := server.Group("/alist")
 	alists.Use(authenticate.Auth(authConfig))
 
 	alists.GET("/*", m.GetAlist)

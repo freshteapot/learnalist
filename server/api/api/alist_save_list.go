@@ -83,7 +83,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	}
 
 	// Save to hugo
-	m.HugoHelper.Write(aList)
+	m.HugoHelper.WriteList(aList)
 	statusCode := http.StatusOK
 	if method == http.MethodPost {
 		statusCode = http.StatusCreated

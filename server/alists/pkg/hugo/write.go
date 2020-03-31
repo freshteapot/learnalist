@@ -8,7 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-func (h HugoHelper) Write(aList *alist.Alist) {
+func (h HugoHelper) WriteList(aList *alist.Alist) {
 	uuid := aList.Uuid
 	content, _ := json.Marshal(aList)
 	path := fmt.Sprintf("%s/%s.json", h.DataDirectory, uuid)
@@ -25,8 +25,8 @@ func (h HugoHelper) Remove(uuid string) {
 	h.deleteBuildFiles(uuid)
 
 	files := []string{
-		fmt.Sprintf("%s/alists/%s.html", h.SiteCacheFolder, uuid),
-		fmt.Sprintf("%s/alists/%s.json", h.SiteCacheFolder, uuid),
+		fmt.Sprintf("%s/alist/%s.html", h.SiteCacheFolder, uuid),
+		fmt.Sprintf("%s/alist/%s.json", h.SiteCacheFolder, uuid),
 	}
 	h.deleteFiles(files)
 }

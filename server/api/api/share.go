@@ -144,7 +144,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	aList.Info.SharedWith = input.Action
 	m.Datastore.SaveAlist(http.MethodPut, *aList)
 	// Save to hugo
-	m.HugoHelper.Write(aList)
+	m.HugoHelper.WriteList(aList)
 
 	message := ""
 	switch input.Action {
