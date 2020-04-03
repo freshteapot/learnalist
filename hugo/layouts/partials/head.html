@@ -15,6 +15,7 @@
 
 
 {{ $shareJS := relURL $manifest.shared }}
+{{ $editorJS := relURL $manifest.editor }}
 
 <head>
     <meta charset="utf-8" />
@@ -28,4 +29,5 @@
     <script type="module" src="{{ relURL $name }}"></script>
     {{end}}
     {{end}}
+    <script defer type="module" src="{{ $editorJS }}"></script>
 </head>

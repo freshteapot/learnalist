@@ -1,8 +1,7 @@
 ---
 type: alist
 layout: editor
-url: /editor.html
-js_include: ["editor"]
+url: /editor2.html
 ---
 # Todo
 - Can I resue the extension?

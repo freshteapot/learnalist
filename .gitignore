@@ -11,7 +11,7 @@ server/profile.cov
 hugo/content/alist/
 hugo/data/alist/
 hugo/data/alistsbyuser/
-hugo/public-alist/
+hugo/public/
 hugo/node_modules/
 
 # svelte
