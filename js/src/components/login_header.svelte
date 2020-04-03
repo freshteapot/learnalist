@@ -12,8 +12,8 @@
 <div class="fr mt0">
   {#if loggedIn()}
     <a
-      title="Create"
-      href="/create.html"
+      title="create, edit, share"
+      href="/editor.html"
       class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
       Create
     </a>

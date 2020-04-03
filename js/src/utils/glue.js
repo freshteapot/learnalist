@@ -2,22 +2,28 @@ const fs = require('fs-extra')
 
 // TODO this might break
 const pathToManifestFile = "../hugo/data/manifest.json";
-const pathToStaticJSDirectory = "../hugo/static/js";
+const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
+const pathToStaticJSDirectory = "../hugo/static";
 
 const getComponentInfo = (componentKey) => {
     const chunkhash = Date.now();
     const filename = `${componentKey}.${chunkhash}.js`;
-    const outputPath = `${pathToStaticJSDirectory}/${filename}`;
+    const filenameCSS = `${componentKey}.${chunkhash}.css`;
+    const outputPath = `${pathToStaticJSDirectory}/js/${filename}`;
+    const outputPathCSS = `${pathToStaticJSDirectory}/css/${filenameCSS}`;
     const rollupDeleteTargets = [
-        `${pathToStaticJSDirectory}/${componentKey}.*.js`,
-        `${pathToStaticJSDirectory}/${componentKey}.*.js.map`
+        `${pathToStaticJSDirectory}/js/${componentKey}.*.js`,
+        `${pathToStaticJSDirectory}/js/${componentKey}.*.js.map`,
+        `${pathToStaticJSDirectory}/css/${componentKey}.*.css`,
     ];
 
     return {
         componentKey: componentKey,
         chunkhash: chunkhash,
         filename: filename,
+        filenameCSS: filenameCSS,
         outputPath: outputPath,
+        outputPathCSS: outputPathCSS,
         rollupDeleteTargets,
     }
 }
@@ -54,6 +60,7 @@ const write = async (manifestFile, key, value) => {
 const syncManifest = async (componentInfo) => {
     try {
         await write(pathToManifestFile, componentInfo.componentKey, `/js/${componentInfo.filename}`);
+        await write(pathToManifestFileCSS, componentInfo.componentKey, `/css/${componentInfo.filenameCSS}`);
     } catch (e) {
         // Deal with the fact the chain failed
         console.log(e)

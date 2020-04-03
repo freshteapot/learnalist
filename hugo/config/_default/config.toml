@@ -5,9 +5,12 @@ title = "Learnalist"
 uglyURLs = true
 disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
 
+[params]
+  #ApiServer = "http://localhost:1234"
+  ApiServer = "https://learnalist.net"
+
 [taxonomies]
   label = "labels"
-
 
 [output]
 alist = ["HTML"]

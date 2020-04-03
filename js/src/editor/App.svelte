@@ -49,18 +49,9 @@
 </style>
 
 <TopMenu />
-<main class="w-100 bt b--black-10 bg-white">
-  <!-- <Menu /> -->
-  <Router
-    {routes}
-    on:conditionsFailed={conditionsFailed}
-    on:routeLoaded={routeLoaded} />
-</main>
 
-<Footer />
-<main class="w-100 bt b--black-10 bg-white">
-
-  <!-- Used for testing
-<p id="logbox">{logbox}</p>
- -->
-</main>
+<!-- <Menu /> -->
+<Router
+  {routes}
+  on:conditionsFailed={conditionsFailed}
+  on:routeLoaded={routeLoaded} />

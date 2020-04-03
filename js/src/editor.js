@@ -30,7 +30,7 @@ if (window.location.protocol !== 'chrome-extension:') {
 
 
 var app = new App({
-    target: document.body
+    target: document.querySelector("#list-info")
 });
 
 export default app;

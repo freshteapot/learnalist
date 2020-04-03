@@ -2,7 +2,7 @@ const keys = {
   'lists.by.me': 'my.lists',
   'my.edited.lists': 'my.edited.lists',
   'last.screen': 'last.screen',
-  'authentication.bearer': 'auth.bearer',
+  'authentication.bearer': 'settings.authentication',
   'user.uuid': 'user.uuid',
   'settings.server': 'settings.server',
   'settings.install.defaults': 'settings.install.defaults',
@@ -27,7 +27,12 @@ function rm(key) {
 function clear() {
   localStorage.clear();
   save(keys['settings.install.defaults'], true);
-  save(keys['settings.server'], 'https://learnalist.net');
+  const apiServer = document.querySelector('meta[name="api.server"]');
+  if (apiServer) {
+    save(keys['settings.server'], apiServer.content);
+  } else {
+    save(keys['settings.server'], 'https://learnalist.net');
+  }
   // TODO why is this not showing up?
   save(keys['my.edited.lists'], []);
   save(keys['lists.by.me'], []);

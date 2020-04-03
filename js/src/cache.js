@@ -3,7 +3,8 @@ const KeySettingsInstallDefaults = "settings.install.defaults";
 const KeyAuthentication = "settings.authentication";
 const KeyUserUuid = "app.user.uuid";
 const KeyNotifications = "app.notifications";
-
+const KeyEditorMyEditedLists = "my.edited.lists";
+const KeyEditorMyLists = "my.lists";
 
 function get(key, defaultResult) {
   if (!localStorage.hasOwnProperty(key)) {
@@ -24,7 +25,15 @@ function rm(key) {
 function clear() {
   localStorage.clear();
   save(KeySettingsInstallDefaults, true);
-  save(KeySettingsServer, "https://learnalist.net");
+  const apiServer = document.querySelector('meta[name="api.server"]');
+  if (apiServer) {
+    save(KeySettingsServer, apiServer.content);
+  } else {
+    save(KeySettingsServer, "https://learnalist.net");
+  }
+
+  save(KeyEditorMyEditedLists, []);
+  save(KeyEditorMyLists, []);
 }
 
 export default {

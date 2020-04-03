@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
@@ -32,7 +31,11 @@ export default {
       dev: !IS_PROD,
       preprocess: autoPreprocess({
         postcss: true
-      })
+      }),
+      css: css => {
+        // TODO how to have this cache friendly?
+        css.write(componentInfo.outputPathCSS);
+      }
     }),
 
     resolve({
