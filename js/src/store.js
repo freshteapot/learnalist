@@ -23,7 +23,9 @@ const loggedIn = () => {
 
 const logout = (redirect) => {
     console.log("I want to be logged out.")
-    Cookies.remove(ID_LOGGED_IN_KEY);
+    // TODO how to make this work when I dont know the domain :(
+    const apiServer = document.querySelector('meta[name="api.server"]');
+    Cookies.remove(ID_LOGGED_IN_KEY, { path: '/', domain: `.${apiServer}` });
     localStorage.clear();
     if (redirect === "#") {
         return;
