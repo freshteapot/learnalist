@@ -140,6 +140,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 	vars := make(map[string]interface{})
 	vars["token"] = session.Token
+	vars["userUUID"] = userUUID
 	vars["refreshRedirectURL"] = "/welcome.html"
 	vars["idp"] = "Google"
 
@@ -148,6 +149,8 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
+	// TODO add no caching
+	// TODO make this a lot better
 	return c.HTMLBlob(http.StatusOK, tpl.Bytes())
 }
 
@@ -157,10 +160,17 @@ var oauthGoogleCallbackHtml200 = template.Must(template.New("").Parse(`
 <head
 	data-redirectUri="{{.refreshRedirectURL}}"
 	data-token="{{.token}}"
+	data-user-uuid="{{.userUUID}}"
 >
 <meta http-equiv="refresh" content="2;url={{.refreshRedirectURL}}" />
 
 <meta charset="utf-8" />
+<script>
+const token = document.querySelector("head").getAttribute('data-token').toString();
+const userUUID = document.querySelector("head").getAttribute('data-user-uuid').toString();
+localStorage.setItem("settings.authentication", JSON.stringify(token))
+localStorage.setItem("app.user.uuid", JSON.stringify(userUUID))
+</script>
 </head>
 <body>
 <h1>You have succesfully logged in via {{.idp}}</h1>
