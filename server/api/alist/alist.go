@@ -22,6 +22,11 @@ var allowedListTypes = []string{
 	ContentAndUrl,
 }
 
+type ShortInfo struct {
+	UUID  string `db:"uuid" json:"uuid"`
+	Title string `db:"title" json:"title"`
+}
+
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
 	Title      string    `json:"title"`

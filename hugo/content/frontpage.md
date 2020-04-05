@@ -1,6 +1,8 @@
 ---
 title: "Landing page"
 url: /
+type: alist
+layout: frontpage
 js_include: ["main"]
 ---
 # Welcome

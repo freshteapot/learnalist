@@ -25,8 +25,14 @@ func (h HugoHelper) WriteList(aList alist.Alist) {
 }
 
 // WriteListsByUser
-func (h HugoHelper) WriteListsByUser(userUUID string, lists []alist.Alist) {
+func (h HugoHelper) WriteListsByUser(userUUID string, lists []alist.ShortInfo) {
 	h.AlistsByUserWriter.Data(userUUID, lists)
 	h.AlistsByUserWriter.Content(userUUID)
+	h.RegisterCronJob()
+}
+
+func (h HugoHelper) WritePublicLists(lists []alist.ShortInfo) {
+	fmt.Println("WritePublicLists")
+	h.PublicListsWriter.Data(lists)
 	h.RegisterCronJob()
 }

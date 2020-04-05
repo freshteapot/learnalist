@@ -146,8 +146,8 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	// Save to hugo
 	m.HugoHelper.WriteList(aList)
 	// TODO this might become a painful bottle neck
-	aLists := m.Datastore.GetListsByUserWithFilters(aList.User.Uuid, "", "")
-	m.HugoHelper.WriteListsByUser(aList.User.Uuid, aLists)
+	m.HugoHelper.WriteListsByUser(aList.User.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
+	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	message := ""
 	switch input.Action {

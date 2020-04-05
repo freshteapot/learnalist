@@ -29,6 +29,49 @@ type GetListsByUserWithFiltersArgs struct {
 	ListType string   `db:"list_type"`
 }
 
+func (dal *DAL) GetPublicLists() []alist.ShortInfo {
+	query := `
+	SELECT
+		uuid,
+		title
+	FROM (
+	SELECT
+		json_extract(body, '$.info.title') AS title,
+		IFNULL(json_extract(body, '$.info.shared_with'), "private") AS shared_with,
+		uuid
+	FROM
+		alist_kv
+	) as temp
+	WHERE shared_with="public";
+	`
+	var lists []alist.ShortInfo
+	err := dal.Db.Select(&lists, query)
+	if err != nil {
+		fmt.Println(err)
+		panic("Failed to make public lists")
+	}
+	return lists
+}
+
+func (dal *DAL) GetAllListsByUser(userUUID string) []alist.ShortInfo {
+	var lists []alist.ShortInfo
+	query := `
+SELECT
+	json_extract(body, '$.info.title') AS title,
+	uuid
+FROM
+	alist_kv
+WHERE
+	user_uuid=?`
+
+	err := dal.Db.Select(&lists, query, userUUID)
+	if err != nil {
+		fmt.Println(err)
+		panic("...")
+	}
+	return lists
+}
+
 // GetListsByUserWithFilters Filter a list and return an array of lists.
 // Filter by:
 // - userUUID

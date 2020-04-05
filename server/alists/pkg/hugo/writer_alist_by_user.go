@@ -55,7 +55,7 @@ js_include: ["main"]
 
 }
 
-func (w HugoAListUserWriter) Data(userUUID string, lists []alist.Alist) {
+func (w HugoAListUserWriter) Data(userUUID string, lists []alist.ShortInfo) {
 	content, _ := json.Marshal(lists)
 	path := fmt.Sprintf("%s/%s.json", w.dataDirectory, userUUID)
 	err := ioutil.WriteFile(path, content, 0644)

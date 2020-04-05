@@ -1,4 +1,4 @@
-{{- $usersLists := getJSON "data/alistsbyuser/" $.Params.Uuid ".json" -}}
+{{- $publicLists := getJSON "data/public_lists.json" -}}
 {{- $listPrefix := relURL "alist/" -}}
 
 <!DOCTYPE html>
@@ -9,8 +9,13 @@
     {{- partial "header.html" $ -}}
     <notification-center></notification-center>
     <main class="w-100 bt b--black-10 bg-white ">
+        <article class="mw9 mw6-ns center pt2">
+            {{.Content}}
+        </article>
+
         <article id="list-info" class="mw9 mw6-ns center pt2">
-            {{range $usersLists}}
+            <h1>Public Lists</h1>
+            {{range $publicLists}}
             {{- $aList :=  . -}}
             {{- $listUrl := (printf "%s%s.html" $listPrefix $aList.uuid) -}}
             <blockquote class="ml0 mt4 pl3 black-90 bl bw2 b--black">

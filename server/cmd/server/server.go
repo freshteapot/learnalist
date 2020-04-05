@@ -38,11 +38,18 @@ var ServerCmd = &cobra.Command{
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
 
 		// "path to static site builder
-		hugoFolder, err := utils.CmdParsePathToFolder("server.hugoDirectory", viper.GetString("server.hugoDirectory"))
+		hugoFolder, err := utils.CmdParsePathToFolder("server.hugo.directory", viper.GetString("server.hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
+
+		hugoEnvironment := viper.GetString("server.hugo.environment")
+		if hugoEnvironment == "" {
+			fmt.Println("server.hugo.environment is missing")
+			os.Exit(1)
+		}
+
 		// "path to site cache"
 		siteCacheFolder, err := utils.CmdParsePathToFolder("server.siteCacheDirectory", viper.GetString("server.siteCacheDirectory"))
 		if err != nil {
@@ -62,7 +69,7 @@ var ServerCmd = &cobra.Command{
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, masterCron, serverConfig.SiteCacheFolder)
+		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, masterCron, serverConfig.SiteCacheFolder)
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.

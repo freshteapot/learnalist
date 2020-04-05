@@ -14,13 +14,15 @@ type HugoSiteBuilder interface {
 	ProcessContent()
 	Build()
 	WriteList(aList alist.Alist)
-	WriteListsByUser(userUUID string, lists []alist.Alist)
+	WriteListsByUser(userUUID string, lists []alist.ShortInfo)
+	WritePublicLists(lists []alist.ShortInfo)
 	// Remove list via uuid
 	Remove(uuid string)
 }
 
 type HugoHelper struct {
 	Cwd                string
+	Environment        string
 	DataDirectory      string
 	ContentDirectory   string
 	SiteCacheFolder    string
@@ -30,9 +32,11 @@ type HugoHelper struct {
 	inprogress         *sync.Mutex
 	AlistWriter        HugoAListWriter
 	AlistsByUserWriter HugoAListUserWriter
+	PublicListsWriter  HugoPublicListsWriter
 }
 
 const (
+	RealtivePathData                = "%s/data"
 	RealtivePathContentAlist        = "%s/content/alist"
 	RealtivePathDataAlist           = "%s/data/alist"
 	RealtivePathContentAlistsByUser = "%s/content/alistsbyuser"
@@ -40,7 +44,7 @@ const (
 	RealtivePathPublic              = "%s/public"
 )
 
-func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
+func NewHugoHelper(cwd string, environment string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
 	check := []string{
 		RealtivePathContentAlist,
@@ -65,6 +69,7 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
 	return &HugoHelper{
 		Cwd:              cwd,
+		Environment:      environment,
 		PublishDirectory: publishDirectory,
 		SiteCacheFolder:  siteCacheFolder,
 		cronEntryID:      &empty,
@@ -78,5 +83,6 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 			fmt.Sprintf(RealtivePathContentAlistsByUser, cwd),
 			fmt.Sprintf(RealtivePathDataAlistsByUser, cwd),
 			publishDirectory),
+		PublicListsWriter: NewHugoPublicListsWriter(fmt.Sprintf(RealtivePathData, cwd)),
 	}
 }

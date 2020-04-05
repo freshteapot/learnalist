@@ -33,8 +33,8 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	// Remove from cache
 	m.HugoHelper.Remove(alistUUID)
 	// TODO this might become a painful bottle neck
-	aLists := m.Datastore.GetListsByUserWithFilters(user.Uuid, "", "")
-	m.HugoHelper.WriteListsByUser(user.Uuid, aLists)
+	m.HugoHelper.WriteListsByUser(user.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
+	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	response.Message = fmt.Sprintf(i18n.ApiDeleteAlistSuccess, alistUUID)
 	return c.JSON(http.StatusOK, response)

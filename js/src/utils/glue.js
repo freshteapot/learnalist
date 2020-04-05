@@ -15,6 +15,7 @@ const getComponentInfo = (componentKey) => {
         `${pathToStaticJSDirectory}/js/${componentKey}.*.js`,
         `${pathToStaticJSDirectory}/js/${componentKey}.*.js.map`,
         `${pathToStaticJSDirectory}/css/${componentKey}.*.css`,
+        `${pathToStaticJSDirectory}/css/${componentKey}.*.css.map`,
     ];
 
     return {

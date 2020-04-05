@@ -5,6 +5,7 @@
   "description": "Svelte Rollup template with static asset hashing and minification",
   "author": "freshteapot (https://github.com/freshteapot)",
   "scripts": {
+    "dev:api-server": "cd ../ && make run-api-server",
     "dev:hugo": "cd ../hugo && hugo server --disableFastRender --renderToDisk",
     "dev:js:shared": "rollup -c rollup.config.store.js -w",
     "dev:js:user": "rollup -c rollup.config.server.js -w",
@@ -14,7 +15,7 @@
     "dev:js:alist:v4": "rollup -c rollup.config.alist.v4.js -w",
     "dev:js:alist:editor": "rollup -c rollup.config.alist.editor.js -w",
     "dev:js:components": "concurrently \"npm run dev:js:user\" \"npm run dev:js:shared\" \"npm run dev:js:alist:v1\" \"npm run dev:js:alist:v2\" \"npm run dev:js:alist:v3\" \"npm run dev:js:alist:v4\" \"npm run dev:js:alist:editor\"",
-    "dev": "concurrently \"npm run dev:hugo\" \"npm run dev:js:components\"",
+    "dev": "concurrently \"npm run dev:hugo\" \"npm run dev:js:components\" \"npm run dev:api-server\"",
     "build:hugo": "cd ../hugo && hugo",
     "build:js:shared": "rollup -c rollup.config.store.js",
     "build:js:user": "rollup -c rollup.config.server.js",

@@ -23,6 +23,18 @@
     <meta name="api.server" content="{{.Site.Params.ApiServer}}">
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <link rel="stylesheet" href="{{ $cssBundle.Permalink }}">
+    <script>
+        function measureCRP() {
+            var t = window.performance.timing,
+                interactive = t.domInteractive - t.domLoading,
+                dcl = t.domContentLoadedEventStart - t.domLoading,
+                complete = t.domComplete - t.domLoading;
+            var stats = document.createElement('p');
+            stats.textContent = 'interactive: ' + interactive + 'ms, ' +
+                'dcl: ' + dcl + 'ms, complete: ' + complete + 'ms';
+            console.log(stats);
+        }
+    </script>
     {{ with .Params.css_include}}
     {{- range . -}}
     {{ $name := index $manifestCSS .}}

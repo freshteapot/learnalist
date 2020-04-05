@@ -64,6 +64,11 @@ Check the logs
 supervisorctl tail -f  learnalist
 ```
 
+Rebuild the site, if you know javascript, templates changed
+```
+/srv/learnalist/bin/learnalist-cli tools rebuild-static-site --config=/srv/learnalist/prod.config.yaml
+```
+
 
 ## Change golang
 ```sh

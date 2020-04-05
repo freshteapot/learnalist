@@ -46,8 +46,9 @@ func (h HugoHelper) buildSite() {
 	// TODO change this to be dynamic via config
 	parts := []string{
 		"-verbose",
-		`--environment=production`,
+		fmt.Sprintf(`--environment=%s`, h.Environment),
 	}
+
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
 	out, err := cmd.Output()
@@ -60,11 +61,14 @@ func (h HugoHelper) buildSite() {
 
 // Copy each file over, including non alist files and directories
 func (h HugoHelper) copyToSiteCache() {
+	fmt.Println("Copy site")
 	siteCacheDir := h.SiteCacheFolder
 	destinationDir := h.PublishDirectory
 
 	err := copy.Copy(destinationDir, siteCacheDir)
 	fmt.Println(err)
+	fmt.Println(destinationDir)
+	fmt.Println(siteCacheDir)
 }
 
 // deleteBuildFiles

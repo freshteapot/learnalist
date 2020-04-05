@@ -5,7 +5,9 @@ server:
   cors:
     allowedOrigins: "*"
   siteCacheDirectory: "/srv/learnalist/site-cache"
-  hugoDirectory: "/srv/learnalist/hugo"
+  hugo:
+    directory: "/srv/learnalist/hugo"
+    environment: "production"
   loginWith:
     google:
       clientID: "XXX"
@@ -17,7 +19,9 @@ tools:
     sqlite:
       database: "/srv/learnalist/api.db"
     siteCacheDirectory: "/srv/learnalist/site-cache"
-    hugoDirectory: "/srv/learnalist/hugo"
+    hugo:
+      directory: "/srv/learnalist/hugo"
+      environment: "production"
   integrationTests:
     username: ""
     password: ""
