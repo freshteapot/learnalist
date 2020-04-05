@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -145,6 +146,8 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	var tpl bytes.Buffer
 	oauthGoogleCallbackHtml200.Execute(&tpl, vars)
 
+	cookie := authenticate.NewLoginCookie(session.Token)
+	c.SetCookie(cookie)
 	return c.HTMLBlob(http.StatusOK, tpl.Bytes())
 }
 
@@ -155,6 +158,8 @@ var oauthGoogleCallbackHtml200 = template.Must(template.New("").Parse(`
 	data-redirectUri="{{.refreshRedirectURL}}"
 	data-token="{{.token}}"
 >
+<meta http-equiv="refresh" content="2;url={{.refreshRedirectURL}}" />
+
 <meta charset="utf-8" />
 </head>
 <body>

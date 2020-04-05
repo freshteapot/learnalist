@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
@@ -64,6 +65,13 @@ var ServerCmd = &cobra.Command{
 			SiteCacheFolder:  siteCacheFolder,
 		}
 		server.Init(serverConfig)
+
+		// A hack would be to access it via
+		loginCookie := authenticate.CookieConfig{
+			Domain: viper.GetString("server.cookie.domain"),
+			Secure: viper.GetBool("server.cookie.secure"),
+		}
+		authenticate.SetLoginCookieConfig(loginCookie)
 
 		masterCron := cron.NewCron()
 

@@ -13,7 +13,6 @@ import (
 )
 
 func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper, oauthHandlers *oauth.Handlers) {
-
 	m := api.Manager{
 		Datastore:     dal,
 		Acl:           acl,

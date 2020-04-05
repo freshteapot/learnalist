@@ -34,8 +34,7 @@ const logout = (redirect) => {
     window.location = redirect;
 }
 
-const login = (token, redirect) => {
-    Cookies.set(ID_LOGGED_IN_KEY, token);
+const login = (redirect) => {
     if (!redirect) {
         redirect = '/welcome.html';
     }

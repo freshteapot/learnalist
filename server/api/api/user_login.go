@@ -54,6 +54,9 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	cookie := authenticate.NewLoginCookie(session.Token)
+	c.SetCookie(cookie)
+
 	return c.JSON(http.StatusOK, &HTTPLoginResponse{
 		Token:    session.Token,
 		UserUUID: userUUID,

@@ -33,15 +33,10 @@ GO111MODULE=on sh build.sh
 Create the files for hugo
 ```sh
 cd ..
-mkdir -p /srv/learnalist/{bin,site-cache}
-cp -rf ./hugo/static/* /srv/learnalist/site-cache/
-cp -r ./hugo /srv/learnalist
-mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
-```
-
-Make sure the ownerships is www-data
-```sh
-chown -R www-data:www-data /srv/learnalist/
+sudo -u www-data -g www-data mkdir -p /srv/learnalist/{bin,site-cache}
+sudo -u www-data -g www-data cp -rf ./hugo/static/* /srv/learnalist/site-cache/
+sudo -u www-data -g www-data cp -r ./hugo /srv/learnalist
+sudo -u www-data -g www-data mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 ```
 
 Make a backup of the one running
@@ -52,7 +47,7 @@ cp /srv/learnalist/bin/learnalist-cli /srv/learnalist/learnalist-cli.last.workin
 
 Move it to where supervisor will find it.
 ```sh
-cp server/learnalist-cli /srv/learnalist/bin/learnalist-cli
+cp -f server/learnalist-cli /srv/learnalist/bin/learnalist-cli
 ```
 When ready, reload
 ```sh

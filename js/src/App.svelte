@@ -5,7 +5,7 @@
   }
 
   function handleLogin() {
-    login("chris", "/sample.html");
+    login("/sample.html");
     notify("info", "welcome");
   }
 </script>

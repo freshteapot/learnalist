@@ -33,6 +33,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 			testHugoHelper := &mocks.HugoSiteBuilder{}
 			testHugoHelper.On("WriteList", mock.Anything)
 			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
+			testHugoHelper.On("WritePublicLists", mock.Anything)
 			testHugoHelper.On("Remove", mock.Anything)
 			m.HugoHelper = testHugoHelper
 
@@ -73,7 +74,8 @@ var _ = Describe("Testing Alist endpoints", func() {
 			It("Post, success", func() {
 				savedList := alist.NewTypeV1()
 				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(savedList, nil)
-				datastore.On("GetListsByUserWithFilters", "", "", "").Return([]alist.Alist{}, nil)
+				datastore.On("GetAllListsByUser", user.Uuid).Return([]alist.ShortInfo{}, nil)
+				datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 
 				input := `
       {

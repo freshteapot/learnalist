@@ -4,6 +4,9 @@ server:
   port: "9090"
   cors:
     allowedOrigins: "*"
+  cookie:
+    domain: "learnalist.net"
+    secure: true
   siteCacheDirectory: "/srv/learnalist/site-cache"
   hugo:
     directory: "/srv/learnalist/hugo"

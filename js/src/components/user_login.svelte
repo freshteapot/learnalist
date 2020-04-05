@@ -18,14 +18,12 @@
     let response = await postLogin(username, password);
     if (response.status != 200) {
       notify("error", "Please try again");
-      console.log(response);
       return;
     }
-    console.log("TODO, log them in");
+
     cache.save(cache.KeyUserUuid, response.body.user_uuid);
     cache.save(cache.KeyAuthentication, response.body.token);
-    console.log(response);
-    login(response.body.token, "/");
+    login("/");
     return;
   }
 </script>

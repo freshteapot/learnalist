@@ -34,6 +34,11 @@ func (_m *HugoSiteBuilder) WriteList(aList alist.Alist) {
 }
 
 // WriteListsByUser provides a mock function with given fields: userUUID, lists
-func (_m *HugoSiteBuilder) WriteListsByUser(userUUID string, lists []alist.Alist) {
+func (_m *HugoSiteBuilder) WriteListsByUser(userUUID string, lists []alist.ShortInfo) {
 	_m.Called(userUUID, lists)
+}
+
+// WritePublicLists provides a mock function with given fields: lists
+func (_m *HugoSiteBuilder) WritePublicLists(lists []alist.ShortInfo) {
+	_m.Called(lists)
 }

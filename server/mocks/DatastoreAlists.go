@@ -33,6 +33,22 @@ func (_m *DatastoreAlists) GetAlist(uuid string) (alist.Alist, error) {
 	return r0, r1
 }
 
+// GetAllListsByUser provides a mock function with given fields: userUUID
+func (_m *DatastoreAlists) GetAllListsByUser(userUUID string) []alist.ShortInfo {
+	ret := _m.Called(userUUID)
+
+	var r0 []alist.ShortInfo
+	if rf, ok := ret.Get(0).(func(string) []alist.ShortInfo); ok {
+		r0 = rf(userUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]alist.ShortInfo)
+		}
+	}
+
+	return r0
+}
+
 // GetListsByUserWithFilters provides a mock function with given fields: uuid, labels, listType
 func (_m *DatastoreAlists) GetListsByUserWithFilters(uuid string, labels string, listType string) []alist.Alist {
 	ret := _m.Called(uuid, labels, listType)
@@ -43,6 +59,22 @@ func (_m *DatastoreAlists) GetListsByUserWithFilters(uuid string, labels string,
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]alist.Alist)
+		}
+	}
+
+	return r0
+}
+
+// GetPublicLists provides a mock function with given fields:
+func (_m *DatastoreAlists) GetPublicLists() []alist.ShortInfo {
+	ret := _m.Called()
+
+	var r0 []alist.ShortInfo
+	if rf, ok := ret.Get(0).(func() []alist.ShortInfo); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]alist.ShortInfo)
 		}
 	}
 

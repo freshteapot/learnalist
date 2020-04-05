@@ -4,10 +4,13 @@ server:
   port: "1234"
   cors:
     allowedOrigins: "*"
+  cookie:
+    domain: "localhost"
+    secure: false
   siteCacheDirectory: /tmp/learnalist-api/site-cache
   hugo:
     directory: "./../hugo"
-    environment: "production"
+    environment: "dev"
 
   loginWith:
     google:
