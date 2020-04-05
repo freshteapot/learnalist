@@ -23,7 +23,7 @@ func NewLoginCookie(token string) *http.Cookie {
 		Value:    token,
 		Path:     "/",
 		Domain:   fmt.Sprintf(".%s", config.Domain),
-		HttpOnly: true,
+		HttpOnly: false,
 		Secure:   config.Secure,
 		Expires:  time.Now().UTC().Add(30 * (time.Hour * 24)),
 	}
