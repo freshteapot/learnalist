@@ -9,7 +9,7 @@ import (
 // TODO will need to handle this
 // Remove delete cached files based on list uui.
 func (h HugoHelper) Remove(uuid string) {
-	h.deleteBuildFiles(uuid)
+	//h.deleteBuildFiles(uuid)
 
 	files := []string{
 		fmt.Sprintf("%s/alist/%s.html", h.SiteCacheFolder, uuid),

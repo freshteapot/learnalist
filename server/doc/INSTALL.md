@@ -37,6 +37,7 @@ sudo -u www-data -g www-data mkdir -p /srv/learnalist/{bin,site-cache}
 sudo -u www-data -g www-data cp -rf ./hugo/static/* /srv/learnalist/site-cache/
 sudo -u www-data -g www-data cp -r ./hugo /srv/learnalist
 sudo -u www-data -g www-data mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
+chown -R www-data:www-data /srv/learnalist/
 ```
 
 Make a backup of the one running
