@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,11 +18,14 @@ func (m *Manager) Logout(c echo.Context) error {
 		}
 	}
 
-	session := m.Datastore.UserSession()
 	token := loginCookie.Value
-	loginCookie.Value = ""
-	loginCookie.MaxAge = -1
-	c.SetCookie(loginCookie)
+	cookie := authenticate.NewLoginCookie(token)
+	cookie.Expires = time.Now().Add(-100 * time.Hour)
+	cookie.MaxAge = -1
+	cookie.Value = ""
+	session := m.Datastore.UserSession()
+
+	c.SetCookie(cookie)
 
 	userUUID, err := session.GetUserUUIDByToken(token)
 	if err != nil {
