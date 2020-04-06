@@ -1,6 +1,10 @@
 <script>
   import { login, notify } from "../store.js";
-  import cache from "../cache.js";
+  import {
+    save as cacheSave,
+    KeyUserUuid,
+    KeyUserAuthentication
+  } from "../cache.js";
   import { postLogin } from "../api.js";
 
   let isLoggedIn = false;
@@ -21,9 +25,9 @@
       return;
     }
 
-    cache.save(cache.KeyUserUuid, response.body.user_uuid);
-    cache.save(cache.KeyAuthentication, response.body.token);
-    login("/");
+    cacheSave(KeyUserUuid, response.body.user_uuid);
+    cacheSave(KeyUserAuthentication, response.body.token);
+    login("/welcome.html");
     return;
   }
 </script>

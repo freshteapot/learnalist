@@ -7,7 +7,8 @@ server:
   cookie:
     domain: "localhost"
     secure: false
-  siteCacheDirectory: /tmp/learnalist-api/site-cache
+  #siteCacheDirectory: /tmp/learnalist-api/site-cache
+  siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
   hugo:
     directory: "./../hugo"
     environment: "dev"
@@ -21,7 +22,7 @@ tools:
   rebuildStaticSite:
     sqlite:
       database: /tmp/learnalist-api/server.db
-    siteCacheDirectory: /tmp/learnalist-api/site-cache
+    siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
     hugo:
       directory: "./../hugo"
       environment: "dev"

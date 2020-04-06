@@ -1,7 +1,7 @@
 const KeySettingsServer = "settings.server";
 const KeySettingsInstallDefaults = "settings.install.defaults";
-const KeyAuthentication = "settings.authentication";
 const KeyUserUuid = "app.user.uuid";
+const KeyUserAuthentication = "app.user.authentication"
 const KeyNotifications = "app.notifications";
 const KeyEditorMyEditedLists = "my.edited.lists";
 const KeyEditorMyLists = "my.lists";
@@ -36,15 +36,14 @@ function clear() {
   save(KeyEditorMyLists, []);
 }
 
-export default {
-  KeyAuthentication,
+export {
   KeySettingsServer,
   KeySettingsInstallDefaults,
   KeyUserUuid,
+  KeyUserAuthentication,
   KeyNotifications,
   get,
   save,
-
   rm,
   clear
 };

@@ -1,6 +1,11 @@
 <script>
   import { loggedIn } from "../store.js";
   export let loginurl = "/login.html";
+
+  function preLogout() {
+    localStorage.clear();
+    console.log("It should still click");
+  }
 </script>
 
 <style>
@@ -26,6 +31,7 @@
     <a
       title="Logout"
       href="/logout.html"
+      on:click={preLogout}
       class="f6 fw6 hover-blue link black-70 di ml3">
       Logout
     </a>

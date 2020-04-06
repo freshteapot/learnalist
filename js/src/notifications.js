@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import cache from './cache.js';
+import { rm as rmCache, save as saveCache, get as cacheGet, KeyNotifications } from './cache.js';
 
 const data = {
     level: "",
@@ -10,7 +10,7 @@ const emptyData = JSON.parse(JSON.stringify(data));
 let liveData = JSON.parse(JSON.stringify(data));
 
 
-const storedData = cache.get(cache.KeyNotifications, null);
+const storedData = cacheGet(KeyNotifications, null);
 
 if (storedData !== null) {
     liveData = storedData;
@@ -26,13 +26,13 @@ function wrapper() {
             update(notification => {
                 notification.level = level;
                 notification.message = message;
-                cache.save(cache.KeyNotifications, notification)
+                saveCache(KeyNotifications, notification)
                 return notification;
             });
         },
 
         clear: () => {
-            cache.rm(cache.KeyNotifications);
+            rmCache(KeyNotifications);
             set(emptyData);
         }
     };

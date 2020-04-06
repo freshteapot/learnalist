@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store';
-import { getListsByMe } from '../lib/api.js';
+import { getListsByMe } from "../../api.js";
 import cache from '../lib/cache.js';
 
 const current = cache.get(cache.keys["lists.by.me"]);

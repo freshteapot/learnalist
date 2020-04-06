@@ -1,6 +1,6 @@
 <script>
   import goto from "../lib/goto.js";
-  import cache from "../lib/cache.js";
+  import { getServer } from "../../api.js";
   import listsEdits from "../store/lists_edits.js";
   import ItemV1 from "./list.view.data.item.v1.svelte";
   import ItemV2 from "./list.view.data.item.v2.svelte";
@@ -37,10 +37,8 @@
   }
 
   function view() {
-    window.open(
-      "https://learnalist.net/alists/" + aList.uuid + ".html",
-      "_blank"
-    );
+    const server = getServer();
+    window.open(`${server}/alist/${aList.uuid}.html`, "_blank");
   }
 </script>
 
@@ -48,8 +46,8 @@
   <div class="pl0 measure center">
 
     <div>
-      <button on:click="{edit}">Edit list</button>
-      <button on:click="{view}">View ({aList.info.shared_with})</button>
+      <button on:click={edit}>Edit list</button>
+      <button on:click={view}>View ({aList.info.shared_with})</button>
     </div>
 
     <div>
@@ -66,8 +64,7 @@
             <li class="dib mr1 mb2 pl0">
               <span
                 href="#"
-                class="f6 f5-ns b db pa2 link dark-gray ba b--black-20"
-              >
+                class="f6 f5-ns b db pa2 link dark-gray ba b--black-20">
                 {item}
               </span>
             </li>
@@ -79,7 +76,7 @@
     {#if data.length > 0}
       <div class="nicebox">
         {#each data as item}
-          <svelte:component this="{renderItem}" bind:item />
+          <svelte:component this={renderItem} bind:item />
         {/each}
       </div>
     {/if}

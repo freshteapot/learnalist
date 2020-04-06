@@ -15,6 +15,7 @@
     ...new Set($ListsByMeStore.map(item => item.info.type))
   ];
 
+  alert("HI");
   const defaultListTypes = [
     {
       key: "all",
@@ -116,31 +117,31 @@
           </div>
 
           <div class="flex items-center mb2">
-            <select bind:value="{find}">
+            <select bind:value={find}>
               {#each listTypes as listType}
-                <option value="{listType.key}">{listType.description}</option>
+                <option value={listType.key}>{listType.description}</option>
               {/each}
             </select>
           </div>
 
           {#if hasLabels(listLabels)}
             <div class="flex items-center mb2">
-              <select bind:value="{filterByLabel}">
+              <select bind:value={filterByLabel}>
                 {#each listLabels as label}
-                  <option value="{label}">{label}</option>
+                  <option value={label}>{label}</option>
                 {/each}
               </select>
             </div>
           {/if}
 
           <div class="flex items-center mb2">
-            <button on:click="{reset}">reset</button>
+            <button on:click={reset}>reset</button>
           </div>
         </fieldset>
       </div>
       <ul class="list pl0 measure center">
         {#each filterLists as aList}
-          <ListItem title="{aList.info.title}" uuid="{aList.uuid}" />
+          <ListItem title={aList.info.title} uuid={aList.uuid} />
         {/each}
       </ul>
     {/if}

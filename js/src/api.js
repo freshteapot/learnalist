@@ -1,7 +1,7 @@
-import cache from './cache.js';
+import { get as cacheGet, KeyUserAuthentication, KeySettingsServer } from './cache.js';
 
 function getAuth() {
-  const token = cache.get(cache.KeyAuthentication, null)
+  const token = cacheGet(KeyUserAuthentication, null)
   if (token === null) {
     throw new Error('login.required');
   }
@@ -9,7 +9,7 @@ function getAuth() {
 }
 
 function getServer() {
-  const server = cache.get(cache.KeySettingsServer, null)
+  const server = cacheGet(KeySettingsServer, null)
   if (server === null) {
     throw new Error('settings.server.missing');
   }
@@ -161,6 +161,7 @@ async function deleteList(uuid) {
 }
 
 export {
+  getServer,
   getListsByMe,
   getVersion,
   postLogin,

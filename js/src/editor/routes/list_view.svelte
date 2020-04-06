@@ -6,6 +6,7 @@
 
   const aList = myLists.find(params.uuid);
   console.log(aList);
+
   $: show = aList && aList.info && aList.data;
 </script>
 

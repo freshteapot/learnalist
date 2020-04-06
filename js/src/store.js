@@ -1,10 +1,5 @@
-import Cookies from './js.cookie.js'
-import { writable } from 'svelte/store';
 import { notifications } from './notifications.js';
-
-const ID_LOGGED_IN_KEY = 'x-authentication-bearer';
-
-const count = writable(0);
+import { KeyUserAuthentication } from './cache.js';
 
 // Link any component to be able to notify the banner component
 const notify = (level, message) => {
@@ -12,19 +7,14 @@ const notify = (level, message) => {
 }
 
 const loggedIn = () => {
-    console.log("am I logged in");
-    console.log("Should I check local storage");
-    let item = Cookies.get(ID_LOGGED_IN_KEY);
-    if (!item) {
-        return false;
-    }
-    return true;
+    return localStorage.hasOwnProperty(KeyUserAuthentication);
 }
-
+/*
 const logout = (redirect) => {
     console.log("I want to be logged out.")
-    // TODO how to make this work when I dont know the domain :(
+    // TODO how to make this work when I dont know the domain.
     const apiServer = document.querySelector('meta[name="api.server"]');
+    // TODO this will need to know if its secure.
     Cookies.remove(ID_LOGGED_IN_KEY, { path: '/', domain: `.${apiServer}` });
     localStorage.clear();
     if (redirect === "#") {
@@ -35,6 +25,7 @@ const logout = (redirect) => {
     }
     window.location = redirect;
 }
+*/
 
 const login = (redirect) => {
     if (!redirect) {
@@ -44,10 +35,8 @@ const login = (redirect) => {
 }
 
 export {
-    count,
-    loggedIn,
-    logout,
     login,
+    loggedIn,
     notify,
     notifications,
 }

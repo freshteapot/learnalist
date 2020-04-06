@@ -33,6 +33,11 @@ func (h HugoHelper) Build() {
 	// Why copy?
 	h.copyToSiteCache()
 
+	if h.SiteCacheFolder == h.PublishDirectory {
+		h.StopCronJob()
+		return
+	}
+
 	// Only remove what we processed, that way any that get added will not be lost (hopefully)
 	removeA := h.AlistWriter.GetFilesToClean()
 	removeB := h.AlistsByUserWriter.GetFilesToClean()

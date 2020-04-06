@@ -1,7 +1,7 @@
 <script>
   import { replace } from "svelte-spa-router";
   import cache from "../lib/cache.js";
-  import { putList, deleteList } from "../lib/api.js";
+  import { putList, deleteList } from "../../api.js";
   import goto from "../lib/goto.js";
   import myLists from "../store/lists_by_me";
   import listsEdits from "../store/lists_edits.js";
@@ -79,19 +79,19 @@
 </script>
 
 <Box>
-  <ListEditTitle bind:title="{aList.info.title}" />
+  <ListEditTitle bind:title={aList.info.title} />
 </Box>
 
 <Box>
-  <ListEditLabels bind:labels="{aList.info.labels}" />
+  <ListEditLabels bind:labels={aList.info.labels} />
 </Box>
 
 <Box>
-  <svelte:component this="{renderItem}" bind:listData="{aList.data}" />
+  <svelte:component this={renderItem} bind:listData={aList.data} />
 </Box>
 <Box>
-  <button on:click="{save}">Save</button>
-  <button on:click="{cancel}">Cancel</button>
+  <button on:click={save}>Save</button>
+  <button on:click={cancel}>Cancel</button>
 </Box>
 
 <Box>
@@ -99,27 +99,15 @@
   <Box>
     <h2>Share</h2>
     <label>
-      <input
-        type="radio"
-        bind:group="{aList.info.shared_with}"
-        value="private"
-      />
+      <input type="radio" bind:group={aList.info.shared_with} value="private" />
       Private
     </label>
     <label>
-      <input
-        type="radio"
-        bind:group="{aList.info.shared_with}"
-        value="public"
-      />
+      <input type="radio" bind:group={aList.info.shared_with} value="public" />
       Public
     </label>
     <label>
-      <input
-        type="radio"
-        bind:group="{aList.info.shared_with}"
-        value="friends"
-      />
+      <input type="radio" bind:group={aList.info.shared_with} value="friends" />
       Friends
     </label>
   </Box>
@@ -132,18 +120,16 @@
         <label>
           <input
             type="radio"
-            bind:group="{aList.info.interact.slideshow}"
-            value="0"
-          />
+            bind:group={aList.info.interact.slideshow}
+            value="0" />
           Disable
         </label>
 
         <label>
           <input
             type="radio"
-            bind:group="{aList.info.interact.slideshow}"
-            value="1"
-          />
+            bind:group={aList.info.interact.slideshow}
+            value="1" />
           Enable
         </label>
       </Box>
@@ -153,7 +139,7 @@
   <Box>
     <h1>Danger</h1>
     <Box>
-      <button on:click="{remove}">Delete this list forever</button>
+      <button on:click={remove}>Delete this list forever</button>
     </Box>
   </Box>
 </Box>

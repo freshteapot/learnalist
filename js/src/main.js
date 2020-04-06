@@ -1,11 +1,11 @@
-import cache from './cache.js';
+import { KeySettingsInstallDefaults, get as cacheGet, clear as clearCache } from './cache.js';
 import Banner from './components/banner/banner.svelte';
 import LoginHeader from './components/login_header.svelte';
 import UserLogin from './components/user_login.svelte';
 
-const installed = cache.get(cache.KeySettingsInstallDefaults, null)
+const installed = cacheGet(KeySettingsInstallDefaults, null)
 if (installed === null) {
-    cache.clear();
+    clearCache();
 }
 
 // TODO setup

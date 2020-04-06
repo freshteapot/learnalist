@@ -168,7 +168,7 @@ var oauthGoogleCallbackHtml200 = template.Must(template.New("").Parse(`
 <script>
 const token = document.querySelector("head").getAttribute('data-token').toString();
 const userUUID = document.querySelector("head").getAttribute('data-user-uuid').toString();
-localStorage.setItem("settings.authentication", JSON.stringify(token))
+localStorage.setItem("app.user.authentication", JSON.stringify(token))
 localStorage.setItem("app.user.uuid", JSON.stringify(userUUID))
 </script>
 </head>

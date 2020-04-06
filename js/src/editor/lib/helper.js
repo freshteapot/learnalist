@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import cache from './cache.js';
+import { save as saveCache, get as cacheGet, KeyUserAuthentication } from '../../cache.js';
 
 function copyObject(item) {
 	return JSON.parse(JSON.stringify(item))
@@ -28,7 +28,7 @@ function loginHelperSingleton() {
 	let obj = {
 		redirectURL: defaultRedirectURL,
 		loggedIn: (() => {
-			const auth = cache.get(cache.keys['authentication.bearer']);
+			const auth = cacheGet(KeyUserAuthentication);
 			return auth ? true : false;
 		})()
 	}
@@ -39,7 +39,7 @@ function loginHelperSingleton() {
 		subscribe,
 
 		login: ((session) => {
-			cache.save(cache.keys['authentication.bearer'], session.token);
+			saveCache(KeyUserAuthentication, session.token);
 			update(n => {
 				n.loggedIn = true;
 				return n;
