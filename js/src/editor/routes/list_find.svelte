@@ -15,7 +15,6 @@
     ...new Set($ListsByMeStore.map(item => item.info.type))
   ];
 
-  alert("HI");
   const defaultListTypes = [
     {
       key: "all",

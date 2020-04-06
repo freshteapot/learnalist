@@ -23,6 +23,6 @@
     </a>
   </li>
   <li>
-    <a class="f5 link black" href="#" on:click="{() => reset()}">Clear cache</a>
+    <a class="f5 link black" href="#" on:click={() => reset()}>Clear cache</a>
   </li>
 </ul>

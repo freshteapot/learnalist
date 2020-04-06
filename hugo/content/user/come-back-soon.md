@@ -6,5 +6,4 @@ js_include: ["main"]
 ---
 <script>
 superstore.notify("info", "Good bye, come back soon")
-superstore.logout("#");
 </script>

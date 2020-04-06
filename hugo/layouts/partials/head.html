@@ -1,4 +1,4 @@
-{{- $cssAll := "0" -}}
+{{- $cssAll := "1" -}}
 
 {{- $cssBundle := "" -}}
 {{- $baseCSS := resources.Get "css/base-v1.css" -}}
@@ -22,7 +22,7 @@
     <title>{{.Title}}</title>
     <meta name="api.server" content="{{.Site.Params.ApiServer}}">
     <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <link rel="stylesheet" href="{{ $cssBundle.Permalink }}">
+    <link rel="stylesheet" href="{{ relURL $cssBundle.RelPermalink }}">
     <script>
         function measureCRP() {
             var t = window.performance.timing,

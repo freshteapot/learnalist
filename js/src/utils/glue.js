@@ -4,6 +4,7 @@ const fs = require('fs-extra')
 const pathToManifestFile = "../hugo/data/manifest.json";
 const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
 const pathToStaticJSDirectory = "../hugo/static";
+const pathToPublicDirectory = "../hugo/public";
 
 const getComponentInfo = (componentKey) => {
     const chunkhash = Date.now();
@@ -16,6 +17,11 @@ const getComponentInfo = (componentKey) => {
         `${pathToStaticJSDirectory}/js/${componentKey}.*.js.map`,
         `${pathToStaticJSDirectory}/css/${componentKey}.*.css`,
         `${pathToStaticJSDirectory}/css/${componentKey}.*.css.map`,
+
+        `${pathToPublicDirectory}/js/${componentKey}.*.js`,
+        `${pathToPublicDirectory}/js/${componentKey}.*.js.map`,
+        `${pathToPublicDirectory}/css/${componentKey}.*.css`,
+        `${pathToPublicDirectory}/css/${componentKey}.*.css.map`,
     ];
 
     return {

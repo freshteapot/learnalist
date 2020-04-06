@@ -9,6 +9,7 @@ server/profile.cov
 
 # hugo
 hugo/content/alist/
+hugo/content/alistsbyuser/
 hugo/data/alist/
 hugo/data/alistsbyuser/
 hugo/public/

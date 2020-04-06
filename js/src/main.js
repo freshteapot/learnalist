@@ -12,4 +12,3 @@ if (installed === null) {
 customElements.define('login-header', LoginHeader);
 customElements.define('user-login', UserLogin);
 customElements.define('notification-center', Banner);
-

@@ -9,6 +9,7 @@ const notify = (level, message) => {
 const loggedIn = () => {
     return localStorage.hasOwnProperty(KeyUserAuthentication);
 }
+
 /*
 const logout = (redirect) => {
     console.log("I want to be logged out.")
