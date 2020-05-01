@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -13,6 +14,7 @@ import (
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -24,11 +26,14 @@ var ServerCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
+		logger := logging.GetLogger()
+		// I changed somehting
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
 			Secret: viper.GetString("server.loginWith.google.clientSecret"),
 			Server: viper.GetString("server.loginWith.google.server"),
 		})
+		viper.Set("server.loginWith.google.clientSecret", "***")
 
 		oauthHandlers := &oauth.Handlers{
 			Google: googleOauthConfig,
@@ -58,6 +63,16 @@ var ServerCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// A hack would be to access it via
+		loginCookie := authenticate.CookieConfig{
+			Domain: viper.GetString("server.cookie.domain"),
+			Secure: viper.GetBool("server.cookie.secure"),
+		}
+
+		logger.WithFields(logrus.Fields{
+			"settings": viper.AllSettings(),
+		}).Info("server startup")
+
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
@@ -66,11 +81,6 @@ var ServerCmd = &cobra.Command{
 		}
 		server.Init(serverConfig)
 
-		// A hack would be to access it via
-		loginCookie := authenticate.CookieConfig{
-			Domain: viper.GetString("server.cookie.domain"),
-			Secure: viper.GetBool("server.cookie.secure"),
-		}
 		authenticate.SetLoginCookieConfig(loginCookie)
 
 		masterCron := cron.NewCron()
@@ -91,6 +101,7 @@ var ServerCmd = &cobra.Command{
 		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)
 		server.InitAlists(acl, dal, hugoHelper)
 
+		logger.Info("Hello Chris")
 		server.Run()
 	},
 }

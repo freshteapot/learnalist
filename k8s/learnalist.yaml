@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learnalist
+  labels:
+    app: learnalist
+spec:
+  selector:
+    matchLabels:
+      app: learnalist
+  template:
+    metadata:
+      labels:
+        app: learnalist
+    spec:
+      containers:
+        - name: learnalist
+          image: registry.devbox/learnalist:latest
+          args: ["server", "--config=/etc/learnalist/config.yaml"]
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
+
+            - name: srv-learnalist-volume
+              mountPath: "/srv/learnalist/"
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learnalist-config
+
+        - name: srv-learnalist-volume
+          persistentVolumeClaim:
+            claimName: srv-learnalist
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learnalist
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 1234
+  selector:
+    app: learnalist
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: learnalist
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+    - secretName: tls
+      hosts:
+        - lal01.learnalist.net
+        - learnalist.net
+
+  rules:
+    - host: lal01.learnalist.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: learnalist
+              servicePort: 80
+    - host: learnalist.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: learnalist
+              servicePort: 80

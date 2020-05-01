@@ -16,7 +16,7 @@ rm -rf ./hugo/public-alist
 ## Make required folders and copy static files to the site-cache
 
 ```sh
-mkdir -p ./hugo/{public-alist,content/alists,data/lists}
+mkdir -p ./hugo/{public,content/alist,content/alistsbyuser,data/alist,data/alistsbyuser}
 cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
 cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
 ```

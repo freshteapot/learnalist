@@ -9,6 +9,7 @@ import (
 )
 
 func (suite *ModelSuite) TestSaveAlistPost() {
+	//
 	userUUID := suite.UserUUID
 	a := `
 		{

@@ -1,0 +1,7 @@
+node_modules/
+content/alist/
+content/alistsbyuser/
+data/alist/
+data/alistsbyuser/
+data/public_lists.json
+public/

@@ -1,0 +1,9 @@
+FROM alpine:3.11
+ENV LC_ALL=en_US.UTF-8
+ENV LC_LANG=en_US.UTF-8
+ENV LC_LANGUAGE=en_US.UTF-8
+RUN apk update && \
+    apk add --no-cache \
+    tzdata \
+    sqlite \
+    hugo
