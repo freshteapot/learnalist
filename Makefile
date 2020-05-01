@@ -15,3 +15,7 @@ run-api-server:
 rebuild-static-site:
 	cd server && \
 	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
+
+develop:
+	cd js && \
+	npm run dev

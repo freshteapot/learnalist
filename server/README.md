@@ -43,15 +43,6 @@ Build the database
 make rebuild-db
 ```
 
-Now we can run the app
-```sh
-go run commands/api/main.go \
---port=1234 \
---database=/tmp/learnalist/server.db \
---hugo-dir="/tmp/learnalist/hugo" \
---site-cache-dir="/tmp/learnalist/site-cache"
-```
-
 Your server should now be running on port 1234 with the database created at /tmp/api.db
 
 

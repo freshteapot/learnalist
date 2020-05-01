@@ -1,7 +1,6 @@
 # Technical Debt
 Known technical debt
 
-
 ## Saving a list
 - Triggers a rebuild of all the users lists
 

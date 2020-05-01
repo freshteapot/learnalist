@@ -5,8 +5,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	alists "github.com/freshteapot/learnalist-api/server/alists/server"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
@@ -37,5 +35,5 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 	// TODO http://localhost:1234/lists-by-me.html
 	// TODO block access to the user files (alistsbyuser)
 
-	server.Static("/", config.SiteCacheFolder)customHTTPErrorHandler
+	server.Static("/", config.SiteCacheFolder)
 }

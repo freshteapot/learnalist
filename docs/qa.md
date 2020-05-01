@@ -67,3 +67,12 @@ UPDATE oauth2_token_info SET user_uuid="<XXX>" WHERE user_uuid="<YYY>";
 ```
 
 All done
+
+
+# Testdata
+```sh
+cd ../hugo/
+cp testdata/5d4c9869-1d26-567d-82be-497c3521368a.json data/lists/
+cp testdata/5d4c9869-1d26-567d-82be-497c3521368a.md content/alists/
+cd -
+```

@@ -77,7 +77,7 @@ async function putList(aList) {
 }
 
 
-// Look at https://github.com/freshteapot/learnalist-api/blob/master/server/doc/api.user.login.md
+// Look at https://github.com/freshteapot/learnalist-api/blob/master/docs/api.user.login.md
 async function postLogin(username, password) {
   const response = {
     status: 400,
