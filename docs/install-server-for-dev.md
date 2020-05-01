@@ -3,8 +3,8 @@
 ## Setup folder structure
 
 ```sh
-rm -rf /tmp/learnalist-api
-mkdir -p /tmp/learnalist-api/site-cache
+rm -rf /tmp/learnalist
+mkdir -p /tmp/learnalist/site-cache
 ```
 
 ## Empty the public directory
@@ -17,21 +17,17 @@ rm -rf ./hugo/public-alist
 
 ```sh
 mkdir -p ./hugo/{public,content/alist,content/alistsbyuser,data/alist,data/alistsbyuser}
-cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
-cp -rf ./hugo/static/ /tmp/learnalist-api/site-cache/
+cp -rf ./hugo/static/ /tmp/learnalist/site-cache/
+cp -rf ./hugo/static/ /tmp/learnalist/site-cache/
 ```
 
 ##  Build the database
 ```sh
-ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
+make rebuild-db
 ```
 
 
 ##  Run the server
 ```sh
-cd server/
-```
-
-```sh
-go run main.go server --config=../config/dev.config.yaml
+make run-api-server
 ```

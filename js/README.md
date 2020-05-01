@@ -57,8 +57,8 @@ docker container rm --force svelte-shared-store
 cat ~/git/learn-hugo/hugo/list.json | \
 jq -c '.[]| .' | go run main.go tools hugo-import-lists \
 --config=../config/dev.config.yaml \
---content-dir="/Users/tinkerbell/git/learnalist-api/hugo/content" \
---data-dir="/Users/tinkerbell/git/learnalist-api/hugo/data"
+--content-dir="/Users/tinkerbell/git/learnalist/hugo/content" \
+--data-dir="/Users/tinkerbell/git/learnalist/hugo/data"
 ```
 
 
@@ -67,7 +67,7 @@ cat ~/git/learn-hugo/hugo/list.json | \
 jq -c '.[]| .' \
 | go run main.go tools hugo-import-lists-by-user \
 --config=../config/dev.config.yaml \
---content-dir="/Users/tinkerbell/git/learnalist-api/hugo/content" \
---data-dir="/Users/tinkerbell/git/learnalist-api/hugo/data" \
+--content-dir="/Users/tinkerbell/git/learnalist/hugo/content" \
+--data-dir="/Users/tinkerbell/git/learnalist/hugo/data" \
 --user-uuid="fc7f0e39-aa15-52d4-b590-e3a2bf9ee86d"
 ```

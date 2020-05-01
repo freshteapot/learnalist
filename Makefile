@@ -1,8 +1,8 @@
 
 rebuild-db:
-	mkdir -p /tmp/learnalist-api/
-	rm -f /tmp/learnalist-api/server.db
-	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
+	mkdir -p /tmp/learnalist/
+	rm -f /tmp/learnalist/server.db
+	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
 tests:
 	cd server && \

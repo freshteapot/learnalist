@@ -32,24 +32,24 @@ GO111MODULE=on go mod vendor
 
 Setup folder structure
 ```sh
-rm -rf /tmp/learnalist-api
-mkdir -p /tmp/learnalist-api/site-cache
-cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
-mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}
+rm -rf /tmp/learnalist
+mkdir -p /tmp/learnalist/site-cache
+cp -r $(pwd)/alists/hugo /tmp/learnalist/hugo
+mkdir -p /tmp/learnalist/hugo/{public-alist,content/alists,data/lists}
 ```
 
 Build the database
 ```sh
-ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
+make rebuild-db
 ```
 
 Now we can run the app
 ```sh
 go run commands/api/main.go \
 --port=1234 \
---database=/tmp/learnalist-api/server.db \
---hugo-dir="/tmp/learnalist-api/hugo" \
---site-cache-dir="/tmp/learnalist-api/site-cache"
+--database=/tmp/learnalist/server.db \
+--hugo-dir="/tmp/learnalist/hugo" \
+--site-cache-dir="/tmp/learnalist/site-cache"
 ```
 
 Your server should now be running on port 1234 with the database created at /tmp/api.db

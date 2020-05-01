@@ -1,3 +1,4 @@
+# TODO REVIEW THIS AND DELETE IT
 # Manually Install on the server
 
 ## Setup

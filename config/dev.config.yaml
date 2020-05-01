@@ -1,14 +1,14 @@
 server:
   sqlite:
-    database: /tmp/learnalist-api/server.db
+    database: /tmp/learnalist/server.db
   port: "1234"
   cors:
     allowedOrigins: "*"
   cookie:
     domain: "localhost"
     secure: false
-  #siteCacheDirectory: /tmp/learnalist-api/site-cache
-  siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
+  #siteCacheDirectory: /tmp/learnalist/site-cache
+  siteCacheDirectory: /Users/tinkerbell/git/learnalist/hugo/public
   hugo:
     directory: "./../hugo"
     environment: "dev"
@@ -21,8 +21,8 @@ server:
 tools:
   rebuildStaticSite:
     sqlite:
-      database: /tmp/learnalist-api/server.db
-    siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
+      database: /tmp/learnalist/server.db
+    siteCacheDirectory: /Users/tinkerbell/git/learnalist/hugo/public
     hugo:
       directory: "./../hugo"
       environment: "dev"

@@ -18,7 +18,7 @@ curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' 
 }'
 ```
 
-# View in learnalist-api server
+# View via the server
 ```sh
 http://localhost:1234/alist/5d4c9869-1d26-567d-82be-497c3521368a.html
 ```
