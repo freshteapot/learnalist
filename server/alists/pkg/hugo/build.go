@@ -31,7 +31,8 @@ func (h HugoHelper) Build() {
 	// TODO should I have a publish list per type alist, user?
 
 	// Why copy?
-	h.copyToSiteCache()
+	// Maybe skip if paths are the same
+	//h.copyToSiteCache()
 
 	if h.SiteCacheFolder == h.PublishDirectory {
 		h.StopCronJob()
@@ -42,7 +43,8 @@ func (h HugoHelper) Build() {
 	removeA := h.AlistWriter.GetFilesToClean()
 	removeB := h.AlistsByUserWriter.GetFilesToClean()
 	toDelete := append(removeA, removeB...)
-	h.deleteFiles(toDelete)
+	fmt.Println("toDelete", toDelete)
+	//h.deleteFiles(toDelete)
 
 }
 

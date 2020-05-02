@@ -22,6 +22,7 @@ var rebuildStaticSiteCmd = &cobra.Command{
 	Use:   "rebuild-static-site",
 	Short: "Rebuild the static site based on all lists in the database",
 	Run: func(cmd *cobra.Command, args []string) {
+		skipPublishing, _ := cmd.Flags().GetBool("skip-publishing")
 		databaseName := viper.GetString("tools.rebuildStaticSite.sqlite.database")
 		// "path to static site builder
 		hugoFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.hugo.directory", viper.GetString("tools.rebuildStaticSite.hugo.directory"))
@@ -36,6 +37,12 @@ var rebuildStaticSiteCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		hugoExternal := viper.GetBool("server.hugo.external")
+		if hugoEnvironment == "" {
+			fmt.Println("server.hugo.external is missing")
+			os.Exit(1)
+		}
+
 		// "path to site cache"
 		siteCacheFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.siteCacheDirectory", viper.GetString("tools.rebuildStaticSite.siteCacheDirectory"))
 		if err != nil {
@@ -45,7 +52,10 @@ var rebuildStaticSiteCmd = &cobra.Command{
 
 		db := database.NewDB(databaseName)
 		masterCron := cron.NewCron()
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, masterCron, siteCacheFolder)
+		if skipPublishing {
+			masterCron.Stop()
+		}
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, siteCacheFolder)
 
 		makeLists(db, hugoHelper)
 		makeUserLists(db, hugoHelper)
@@ -53,6 +63,10 @@ var rebuildStaticSiteCmd = &cobra.Command{
 
 		time.Sleep(5 * time.Second)
 	},
+}
+
+func init() {
+	rebuildStaticSiteCmd.Flags().Bool("skip-publishing", false, "Skip the actual building of the pages")
 }
 
 func makeLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {

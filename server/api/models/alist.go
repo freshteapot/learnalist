@@ -44,7 +44,7 @@ func (dal *DAL) GetPublicLists() []alist.ShortInfo {
 	) as temp
 	WHERE shared_with="public";
 	`
-	var lists []alist.ShortInfo
+	lists := make([]alist.ShortInfo, 0)
 	err := dal.Db.Select(&lists, query)
 	if err != nil {
 		fmt.Println(err)

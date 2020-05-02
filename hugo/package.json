@@ -2,12 +2,11 @@
     "name": "learn-hugo",
     "version": "1.0.0",
     "devDependencies": {
-        "@fullhuman/postcss-purgecss": "^2.1.0",
-        "autoprefixer": "^9.7.4",
+        "@fullhuman/postcss-purgecss": "^2.1.2",
+        "autoprefixer": "^9.7.6",
         "postcss": "^7.0.27",
-        "postcss-cli": "^7.1.0",
-        "postcss-import": "^12.0.1",
-        "tachyons": "^4.11.1"
+        "postcss-cli": "^7.1.1",
+        "tachyons": "^4.12.0"
     },
     "dependencies": {}
 }

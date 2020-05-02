@@ -1,12 +1,14 @@
-const purgecss = require('@fullhuman/postcss-purgecss')
+const purgecss = require('@fullhuman/postcss-purgecss')({
+    content: ['./hugo_stats.json'],
+    defaultExtractor: (content) => {
+        let els = JSON.parse(content).htmlElements;
+        return els.tags.concat(els.classes, els.ids);
+    }
+});
 
 module.exports = {
     plugins: [
-        require("postcss-import")(),
         require("autoprefixer"),
-        // Only purge css on production
-        purgecss({
-            content: ['./**/*.html']
-        })
+        purgecss,
     ]
 };

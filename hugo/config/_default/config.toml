@@ -1,4 +1,4 @@
-baseURL = ""
+baseURL = "http://localhost:1313"
 languageCode = "en-us"
 title = "Learnalist"
 
@@ -6,6 +6,8 @@ uglyURLs = true
 disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
 
 [params]
+  BuildCss = true
+  BuildCssProduction = false
   ApiServer = "http://localhost:1234"
   #ApiServer = "https://learnalist.net"
 
@@ -15,8 +17,8 @@ disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
 [output]
 alist = ["HTML"]
 
-#[build]
-#  useResourceCacheWhen = "always"
+[build]
+  writeStats = true
 
 [markup.goldmark.renderer]
   unsafe = true

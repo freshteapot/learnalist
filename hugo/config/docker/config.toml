@@ -2,6 +2,4 @@ baseURL = "http://localhost:8080/"
 
 [params]
   ApiServer = "http://localhost:8080"
-
-[build]
-  useResourceCacheWhen = "always"
+  BuildCss = false

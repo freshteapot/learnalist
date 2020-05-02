@@ -1,6 +1,0 @@
-baseURL = ""
-
-watch = true
-
-[build]
-  useResourceCacheWhen = "never"

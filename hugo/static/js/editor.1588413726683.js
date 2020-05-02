@@ -13199,4 +13199,4 @@ var app = new App({
 });
 
 export default app;
-//# sourceMappingURL=editor.1588330601721.js.map
+//# sourceMappingURL=editor.1588413726683.js.map

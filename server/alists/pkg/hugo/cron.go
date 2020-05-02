@@ -14,6 +14,12 @@ func (d Job) Run() {
 }
 
 func (h HugoHelper) RegisterCronJob() {
+	if h.externalHugo {
+		fmt.Println("Will not process request as external hugo enabled")
+		return
+	}
+
+	// Have a way to skip if hugoRunning as its own process / service
 	if *h.cronEntryID != 0 {
 		return
 	}

@@ -40,7 +40,7 @@ a
 # View via docker
 ## Run
 ```sh
-docker run --name svelte-shared-store \
+docker run --name learnalist-static-dev \
 -p 8080:80 \
 -v $PWD/hugo/public/:/usr/share/nginx/html:ro \
 -v $PWD/nginx.conf:/etc/nginx/nginx.conf:ro \
@@ -49,7 +49,7 @@ docker run --name svelte-shared-store \
 
 ## Delete
 ```sh
-docker container rm --force svelte-shared-store
+docker container rm --force learnalist-static-dev
 ```
 
 
@@ -70,4 +70,42 @@ jq -c '.[]| .' \
 --content-dir="/Users/tinkerbell/git/learnalist/hugo/content" \
 --data-dir="/Users/tinkerbell/git/learnalist/hugo/data" \
 --user-uuid="fc7f0e39-aa15-52d4-b590-e3a2bf9ee86d"
+```
+
+
+1) Build normal
+
+```sh
+hugo server  --environment=dev --config=config/  -v -w --disableFastRender --renderToDisk
+```
+
+2) Build and postcss
+
+```sh
+cd hugo && HUGO_BUILD_WRITESTATS=true HUGO_PARAMS_BUILDCSS=true HUGO_PARAMS_BUILDCSSPRODUCTION=true hugo --environment=lal01
+```
+
+3) build with the manifest css
+
+```sh
+cd js && node watch.js
+```
+
+
+```sh
+rm -rf ./hugo/public/*
+cd hugo && HUGO_PARAMS_BUILDCSS=false hugo --environment=lal01
+```
+
+
+Need test data, to cover all paths thru the templates...
+
+save to static
+rsync static
+rebuild
+
+
+
+```sh
+make sync-site-to-k8s
 ```

@@ -812,4 +812,4 @@
     customElements.define('notification-center', Banner);
 
 }(superstore));
-//# sourceMappingURL=v4.1588330601709.js.map
+//# sourceMappingURL=v3.1588413726677.js.map

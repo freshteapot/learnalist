@@ -6,7 +6,7 @@
   "author": "freshteapot (https://github.com/freshteapot)",
   "scripts": {
     "dev:api-server": "cd ../ && make run-api-server",
-    "dev:hugo": "cd ../hugo && hugo server --disableFastRender --renderToDisk",
+    "dev:hugo": "cd ../hugo && rm -rf ./public/* && hugo server -w --disableFastRender  --forceSyncStatic --renderToDisk",
     "dev:js:shared": "rollup -c rollup.config.store.js -w",
     "dev:js:user": "rollup -c rollup.config.server.js -w",
     "dev:js:alist:v1": "rollup -c rollup.config.alist.v1.js -w",
@@ -14,7 +14,7 @@
     "dev:js:alist:v3": "rollup -c rollup.config.alist.v3.js -w",
     "dev:js:alist:v4": "rollup -c rollup.config.alist.v4.js -w",
     "dev:js:alist:editor": "rollup -c rollup.config.alist.editor.js -w",
-    "dev:js:components": "concurrently \"npm run dev:js:user\" \"npm run dev:js:shared\" \"npm run dev:js:alist:v1\" \"npm run dev:js:alist:v2\" \"npm run dev:js:alist:v3\" \"npm run dev:js:alist:v4\" \"npm run dev:js:alist:editor\"",
+    "dev:js:components": "concurrently 'npm run dev:js:shared' 'npm run dev:js:user' 'npm run dev:js:alist:v1' 'npm run dev:js:alist:v2' 'npm run dev:js:alist:v3' 'npm run dev:js:alist:v4' 'npm run dev:js:alist:editor'",
     "dev": "concurrently \"npm run dev:hugo\" \"npm run dev:js:components\" \"npm run dev:api-server\"",
     "build:hugo": "cd ../hugo && hugo",
     "build:js:shared": "rollup -c rollup.config.store.js",
@@ -46,7 +46,7 @@
     "rollup-plugin-delete": "^1.2.0",
     "rollup-plugin-livereload": "^1.3.0",
     "rollup-plugin-output-manifest": "^1.0.2",
-    "rollup-plugin-postcss": "^2.9.0",
+    "rollup-plugin-postcss": "^3.1.1",
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-svelte": "^5.2.1",
     "rollup-plugin-terser": "^5.3.0",
@@ -54,5 +54,8 @@
     "svelte-preprocess": "^3.7.4",
     "svelte-spa-router": "^2.1.0",
     "tachyons": "^4.12.0"
+  },
+  "dependencies": {
+    "del": "^5.1.0"
   }
 }

@@ -11,6 +11,7 @@ server:
   hugo:
     directory: "/srv/learnalist/hugo"
     environment: "lal01"
+    external: "false"
 
   loginWith:
     google:
@@ -25,6 +26,7 @@ tools:
     hugo:
       directory: "/srv/learnalist/hugo"
       environment: "lal01"
+      external: "false"
   integrationTests:
     username: ""
     password: ""

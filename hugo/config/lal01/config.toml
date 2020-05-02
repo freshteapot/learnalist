@@ -2,6 +2,7 @@ baseURL = "https://learnalist.net/"
 
 [params]
   ApiServer = "https://learnalist.net"
+  BuildCss = false
 
 [build]
-  useResourceCacheWhen = "always"
+  writeStats = false

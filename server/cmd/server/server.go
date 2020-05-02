@@ -56,6 +56,12 @@ var ServerCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		hugoExternal := viper.GetBool("server.hugo.external")
+		if hugoEnvironment == "" {
+			fmt.Println("server.hugo.external is missing")
+			os.Exit(1)
+		}
+
 		// "path to site cache"
 		siteCacheFolder, err := utils.CmdParsePathToFolder("server.siteCacheDirectory", viper.GetString("server.siteCacheDirectory"))
 		if err != nil {
@@ -87,7 +93,7 @@ var ServerCmd = &cobra.Command{
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, masterCron, serverConfig.SiteCacheFolder)
+		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, hugoExternal, masterCron, serverConfig.SiteCacheFolder)
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.
@@ -110,4 +116,5 @@ func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
+	viper.BindEnv("server.hugo.external", "HUGO_EXTERNAL")
 }

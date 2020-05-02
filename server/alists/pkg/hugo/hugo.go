@@ -27,6 +27,7 @@ type HugoHelper struct {
 	ContentDirectory   string
 	SiteCacheFolder    string
 	PublishDirectory   string
+	externalHugo       bool
 	cronEntryID        *cron.EntryID
 	cron               *cron.Cron
 	inprogress         *sync.Mutex
@@ -44,7 +45,7 @@ const (
 	RealtivePathPublic              = "%s/public"
 )
 
-func NewHugoHelper(cwd string, environment string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
+func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
 	check := []string{
 		RealtivePathContentAlist,
@@ -72,6 +73,7 @@ func NewHugoHelper(cwd string, environment string, _cron *cron.Cron, siteCacheFo
 		Environment:      environment,
 		PublishDirectory: publishDirectory,
 		SiteCacheFolder:  siteCacheFolder,
+		externalHugo:     isExternal,
 		cronEntryID:      &empty,
 		cron:             _cron,
 		inprogress:       &sync.Mutex{},

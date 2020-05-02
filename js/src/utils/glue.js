@@ -1,22 +1,22 @@
 const fs = require('fs-extra')
+const del = require('del');
 
-// TODO this might break
 const pathToManifestFile = "../hugo/data/manifest.json";
 const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
-const pathToStaticJSDirectory = "../hugo/static";
+const pathToStaticDirectory = "../hugo/static";
 const pathToPublicDirectory = "../hugo/public";
 
 const getComponentInfo = (componentKey) => {
     const chunkhash = Date.now();
     const filename = `${componentKey}.${chunkhash}.js`;
     const filenameCSS = `${componentKey}.${chunkhash}.css`;
-    const outputPath = `${pathToStaticJSDirectory}/js/${filename}`;
-    const outputPathCSS = `${pathToStaticJSDirectory}/css/${filenameCSS}`;
+    const outputPath = `${pathToStaticDirectory}/js/${filename}`;
+    const outputPathCSS = `${pathToStaticDirectory}/css/${filenameCSS}`;
     const rollupDeleteTargets = [
-        `${pathToStaticJSDirectory}/js/${componentKey}.*.js`,
-        `${pathToStaticJSDirectory}/js/${componentKey}.*.js.map`,
-        `${pathToStaticJSDirectory}/css/${componentKey}.*.css`,
-        `${pathToStaticJSDirectory}/css/${componentKey}.*.css.map`,
+        `${pathToStaticDirectory}/js/${componentKey}.*.js`,
+        `${pathToStaticDirectory}/js/${componentKey}.*.js.map`,
+        `${pathToStaticDirectory}/css/${componentKey}.*.css`,
+        `${pathToStaticDirectory}/css/${componentKey}.*.css.map`,
 
         `${pathToPublicDirectory}/js/${componentKey}.*.js`,
         `${pathToPublicDirectory}/js/${componentKey}.*.js.map`,
@@ -90,8 +90,29 @@ const rollupPluginManifestSync = (componentInfo) => {
     }
 }
 
+const syncManifestCSSBase = async () => {
+    const chunkhash = Date.now();
+    const componentKey = "base";
+    const filenameCSS = `${componentKey}.${chunkhash}.css`;
+    const outputPathCSS = `${pathToStaticDirectory}/css/${filenameCSS}`;
+
+    const path = '../hugo/public/css/base.min.css';
+
+    try {
+        write(pathToManifestFileCSS, componentKey, `/css/${filenameCSS}`);
+
+        const find = `${pathToStaticDirectory}/css/base.*.css`;
+        const deletedPaths = await del([find], { dryRun: false, verbose: true, force: true });
+        console.log('Files and directories that would be deleted:\n', deletedPaths.join('\n'));
+        fs.copySync(path, outputPathCSS);
+    } catch (e) {
+        // Deal with the fact the chain failed
+        console.log(e)
+    }
+}
 
 module.exports = {
     getComponentInfo,
     rollupPluginManifestSync,
+    syncManifestCSSBase,
 }

@@ -1,7 +1,0 @@
-baseURL = "https://learnalist.net/"
-
-[params]
-  ApiServer = "https://learnalist.net"
-
-[build]
-  useResourceCacheWhen = "fallback"
