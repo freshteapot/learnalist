@@ -1,4 +1,9 @@
 
+clear-site:
+	rm -rf ./hugo/public/*
+	rm -f ./hugo/content/alist/*
+	rm -f ./hugo/content/alistsbyuser/*
+
 rebuild-db:
 	mkdir -p /tmp/learnalist/
 	rm -f /tmp/learnalist/server.db

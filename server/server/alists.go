@@ -26,14 +26,12 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) 
 
 	server.GET("/logout.html", m.Logout)
 	server.GET("/lists-by-me.html", m.GetMyLists, authenticate.Auth(authConfig))
+	server.GET("/alistsbyuser/:uuid.html", m.GetMyListsByURI, authenticate.Auth(authConfig))
 
 	alists := server.Group("/alist")
 	alists.Use(authenticate.Auth(authConfig))
 
 	alists.GET("/*", m.GetAlist)
-
-	// TODO http://localhost:1234/lists-by-me.html
-	// TODO block access to the user files (alistsbyuser)
 
 	server.Static("/", config.SiteCacheFolder)
 }

@@ -41,7 +41,7 @@ HUGO_EXTERNAL=false make run-api-server
 - hugo on port 1313
 - server on port 1234
 ```sh
-make develops
+make develop
 ```
 
 ## Run the js + hugo + server

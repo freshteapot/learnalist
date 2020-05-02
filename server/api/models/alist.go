@@ -54,7 +54,7 @@ func (dal *DAL) GetPublicLists() []alist.ShortInfo {
 }
 
 func (dal *DAL) GetAllListsByUser(userUUID string) []alist.ShortInfo {
-	var lists []alist.ShortInfo
+	lists := make([]alist.ShortInfo, 0)
 	query := `
 SELECT
 	json_extract(body, '$.info.title') AS title,

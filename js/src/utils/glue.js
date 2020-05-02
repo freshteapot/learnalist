@@ -56,7 +56,7 @@ const write = async (manifestFile, key, value) => {
     }
 
     try {
-        await fs.writeJson(manifestFile, newManifest)
+        await fs.writeJson(manifestFile, newManifest, { spaces: ' ' })
         console.log('success!')
     } catch (err) {
         console.log('failed to update manifest!')
