@@ -1,8 +1,12 @@
 
 clear-site:
+	mkdir -p ./hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 	rm -rf ./hugo/public/*
 	rm -f ./hugo/content/alist/*
 	rm -f ./hugo/content/alistsbyuser/*
+	rm -f ./hugo/data/alist/*
+	rm -f ./hugo/data/alistsbyuser/*
+	echo "[]" > ./hugo/data/public_lists.json
 
 rebuild-db:
 	mkdir -p /tmp/learnalist/

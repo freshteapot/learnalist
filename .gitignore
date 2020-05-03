@@ -1,15 +1,18 @@
 # Ignore all databases
 *.db
 *.DS_Store
+
 # GO: Ignore all files in vendor
 server/vendor/
 server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
+server/c.out
 
 # hugo
 hugo/content/alist/
 hugo/content/alistsbyuser/
+hugo/data/public_lists.json
 hugo/data/alist/
 hugo/data/alistsbyuser/
 hugo/public/

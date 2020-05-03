@@ -20,6 +20,7 @@ nmap XXX.XXX.XXX.XXX
 
 ## Install k3s
 - dont install traefik, we are going to use nginx-ingress
+
 ```sh
 curl -sLS https://get.k3s.io | INSTALL_K3S_EXEC='server --tls-san 127.0.0.1 --no-deploy servicelb --no-deploy traefik' sh -
 ```
@@ -72,3 +73,13 @@ kubectl apply -f output/docker-registry/templates/
 ```
 
 
+# Setup insecure local registry
+- We do this so to skip setting up https on docker registry (not ideal, but its a fact)
+
+```sh
+rsync -avzP --rsync-path="sudo rsync" ./k3s/registries.yaml $SSH_SERVER:/etc/rancher/k3s/registries.yaml
+```
+
+```sh
+sudo systemctl restart k3s
+```

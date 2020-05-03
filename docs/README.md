@@ -4,6 +4,7 @@
 * [Api Overview](./api.md)
 * [List types overview](./list.types.md)
 * [Question and Answers](./qa.md)
+* [Technical Debt](./technical-debt.md)
 * [Manual install instructions for me](./INSTALL.md)
 * [Client commands](./client.md)
 * [Golang tips](./tips.md)
