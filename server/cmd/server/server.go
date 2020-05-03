@@ -106,8 +106,6 @@ var ServerCmd = &cobra.Command{
 
 		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)
 		server.InitAlists(acl, dal, hugoHelper)
-
-		logger.Info("Hello Chris")
 		server.Run()
 	},
 }
