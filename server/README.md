@@ -32,24 +32,15 @@ GO111MODULE=on go mod vendor
 
 Setup folder structure
 ```sh
-rm -rf /tmp/learnalist-api
-mkdir -p /tmp/learnalist-api/site-cache
-cp -r $(pwd)/alists/hugo /tmp/learnalist-api/hugo
-mkdir -p /tmp/learnalist-api/hugo/{public-alist,content/alists,data/lists}
+rm -rf /tmp/learnalist
+mkdir -p /tmp/learnalist/site-cache
+cp -r $(pwd)/alists/hugo /tmp/learnalist/hugo
+mkdir -p /tmp/learnalist/hugo/{public-alist,content/alists,data/lists}
 ```
 
 Build the database
 ```sh
-ls db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist-api/server.db
-```
-
-Now we can run the app
-```sh
-go run commands/api/main.go \
---port=1234 \
---database=/tmp/learnalist-api/server.db \
---hugo-dir="/tmp/learnalist-api/hugo" \
---site-cache-dir="/tmp/learnalist-api/site-cache"
+make rebuild-db
 ```
 
 Your server should now be running on port 1234 with the database created at /tmp/api.db
@@ -107,3 +98,52 @@ go install
 ```
 
 Thanks to http://stackoverflow.com/a/38296407.
+
+
+
+rm -rf /tmp/learnalist/
+mkdir -p /tmp/learnalist/{bin,site-cache}
+cp -rf ./hugo/static/* /tmp/learnalist/site-cache/
+cp -r ./hugo /tmp/learnalist
+mkdir -p /tmp/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
+ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
+
+
+docker  run
+
+docker run --name lal-sample \
+-v /tmp/learnalist:/srv/learnalist \
+-v $PWD/config/docker.config.yaml:/docker.config.yaml \
+-p 8080:1234 \
+-P -d learnalist:latest \
+server --config=/docker.config.yaml
+
+
+docker container rm --force lal-sample
+
+
+Build a base to hopefully not have to keep building hugo and sending 50mb :(
+```
+docker build -f Dockerfile_prod_base  . -t learnalist-prod-base:latest
+docker tag learnalist-prod-base:latest registry.devbox:5000/learnalist-prod-base:latest
+docker push registry.devbox:5000/learnalist-prod-base:latest
+```
+
+```
+docker build . -t learnalist:latest
+docker tag learnalist:latest registry.devbox:5000/learnalist:latest
+docker push registry.devbox:5000/learnalist:latest
+```
+
+
+
+
+mkdir -p /srv/learnalist/{bin,site-cache}
+cp -rf ./hugo/static/* /srv/learnalist/site-cache/
+cp -r ./hugo /srv/learnalist
+mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
+ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
+
+
+
+docker cp  ./hugo/static/* k3d-k3s-default-server:/srv/learnalist/site-cache/

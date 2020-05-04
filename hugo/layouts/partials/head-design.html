@@ -1,0 +1,22 @@
+{{- $cssBundle := "" -}}
+{{- $baseCss := resources.Get "css/base-v1.css" -}}
+{{- $css := resources.Get "css/tachyons.css" -}}
+{{ $cssBundle = slice $css $baseCss  | resources.Concat "/css/bundle.css" }}
+{{- $manifest := .Site.Data.manifest_js -}}
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>{{ block "title" . }}{{ .Site.Title }} {{ with .Params.Title }} | {{ . }}{{ end }}{{ end }}</title>
+    <link rel="stylesheet" href="{{ $cssBundle.Permalink }}">
+    <script type="module" src="{{ relURL (printf "%s%s" "js/" $manifest.login_header) }}"></script>
+    <script type="module" src="{{ relURL (printf "%s%s" "js/" $manifest.user) }}"></script>
+    <script type="module" src="{{ relURL (printf "%s%s" "js/" $manifest.banner) }}"></script>
+    {{ with .Params.js_include}}
+    {{- range . -}}
+    {{ $name := index $manifest .}}
+    <script type="module" src="{{ relURL (printf "%s%s" "js/" $name) }}"></script>
+
+    {{end}}
+    {{end}}
+</head>

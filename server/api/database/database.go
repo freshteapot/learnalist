@@ -60,15 +60,16 @@ func NewTestDB() *sqlx.DB {
 func NewDB(dataSourceName string) *sqlx.DB {
 	//	dataSourceName = dataSourceName + "?cache=shared&_busy_timeout=5000&_journal_mode=WAL"
 	db, err := sqlx.Connect("sqlite3", dataSourceName)
-	db.SetMaxOpenConns(1)
 	// Very aggressive, but clearly a problem if I cant access the database.
 	checkErr(err)
+	db.SetMaxOpenConns(1)
 
 	err = db.Ping()
 	checkErr(err)
 	return db
 }
 
+// EmptyDatabase
 func EmptyDatabase(db *sqlx.DB) {
 	tables := GetTables()
 	for _, table := range tables {

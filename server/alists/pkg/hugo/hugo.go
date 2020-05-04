@@ -12,38 +12,53 @@ import (
 
 type HugoSiteBuilder interface {
 	ProcessContent()
-	MakeContent()
 	Build()
-	Write(aList *alist.Alist)
+	WriteList(aList alist.Alist)
+	WriteListsByUser(userUUID string, lists []alist.ShortInfo)
+	WritePublicLists(lists []alist.ShortInfo)
 	// Remove list via uuid
 	Remove(uuid string)
 }
 
 type HugoHelper struct {
-	Cwd              string
-	DataDirectory    string
-	ContentDirectory string
-	SiteCacheFolder  string
-	PublishDirectory string
-	cronEntryID      *cron.EntryID
-	cron             *cron.Cron
-	inprogress       *sync.Mutex
+	Cwd                string
+	Environment        string
+	DataDirectory      string
+	ContentDirectory   string
+	SiteCacheFolder    string
+	PublishDirectory   string
+	externalHugo       bool
+	cronEntryID        *cron.EntryID
+	cron               *cron.Cron
+	inprogress         *sync.Mutex
+	AlistWriter        HugoAListWriter
+	AlistsByUserWriter HugoAListUserWriter
+	PublicListsWriter  HugoPublicListsWriter
 }
 
-func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
+const (
+	RealtivePathData                = "%s/data"
+	RealtivePathContentAlist        = "%s/content/alist"
+	RealtivePathDataAlist           = "%s/data/alist"
+	RealtivePathContentAlistsByUser = "%s/content/alistsbyuser"
+	RealtivePathDataAlistsByUser    = "%s/data/alistsbyuser"
+	RealtivePathPublic              = "%s/public"
+)
+
+func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
-	dataDirectory := fmt.Sprintf("%s/data/lists", cwd)
-	if !utils.IsDir(dataDirectory) {
-		log.Fatal(fmt.Sprintf("%s is not a directory", dataDirectory))
-	}
-	contentDirectory := fmt.Sprintf("%s/content/alists", cwd)
-	if !utils.IsDir(contentDirectory) {
-		log.Fatal(fmt.Sprintf("%s is not a directory", contentDirectory))
+	check := []string{
+		RealtivePathContentAlist,
+		RealtivePathDataAlist,
+		RealtivePathContentAlistsByUser,
+		RealtivePathDataAlistsByUser,
 	}
 
-	publishDirectory := fmt.Sprintf("%s/public-alist", cwd)
-	if !utils.IsDir(publishDirectory) {
-		log.Fatal(fmt.Sprintf("%s is not a directory", publishDirectory))
+	for _, template := range check {
+		directory := fmt.Sprintf(template, cwd)
+		if !utils.IsDir(directory) {
+			log.Fatal(fmt.Sprintf("%s is not a directory", directory))
+		}
 	}
 
 	if !utils.IsDir(siteCacheFolder) {
@@ -52,15 +67,24 @@ func NewHugoHelper(cwd string, _cron *cron.Cron, siteCacheFolder string) *HugoHe
 	// This is required to keep track of the memory, I think.
 	var empty cron.EntryID
 	empty = 0
-
+	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
 	return &HugoHelper{
 		Cwd:              cwd,
-		DataDirectory:    dataDirectory,
-		ContentDirectory: contentDirectory,
-		SiteCacheFolder:  siteCacheFolder,
+		Environment:      environment,
 		PublishDirectory: publishDirectory,
+		SiteCacheFolder:  siteCacheFolder,
+		externalHugo:     isExternal,
 		cronEntryID:      &empty,
 		cron:             _cron,
 		inprogress:       &sync.Mutex{},
+		AlistWriter: NewHugoAListWriter(
+			fmt.Sprintf(RealtivePathContentAlist, cwd),
+			fmt.Sprintf(RealtivePathDataAlist, cwd),
+			publishDirectory),
+		AlistsByUserWriter: NewHugoAListByUserWriter(
+			fmt.Sprintf(RealtivePathContentAlistsByUser, cwd),
+			fmt.Sprintf(RealtivePathDataAlistsByUser, cwd),
+			publishDirectory),
+		PublicListsWriter: NewHugoPublicListsWriter(fmt.Sprintf(RealtivePathData, cwd)),
 	}
 }

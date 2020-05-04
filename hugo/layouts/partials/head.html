@@ -1,0 +1,63 @@
+{{- $cssBundlePath := "" -}}
+
+{{- $cssBundle := "" -}}
+{{- if eq .Site.Params.BuildCss true -}}
+{{- $baseCSS := resources.Get "css/base-v1.css" -}}
+{{- $tachyonsCSS := resources.Get "css/tachyons.css" -}}
+
+
+{{- if eq .Site.Params.BuildCssProduction true -}}
+{{- $basePostCSS := $baseCSS | resources.PostCSS -}}
+{{- $tachyonsPostCSS := $tachyonsCSS | resources.PostCSS -}}
+{{- $cssBundle = slice $basePostCSS $tachyonsPostCSS | resources.Concat "/css/base.css" | minify | resources.PostProcess -}}
+{{- else -}}
+{{- $cssBundle = slice $baseCSS $tachyonsCSS | resources.Concat "/css/base.css" -}}
+{{- end -}}
+
+{{- $cssBundlePath = $cssBundle.RelPermalink -}}
+{{- end -}}
+
+
+{{- $manifest := .Site.Data.manifest_js -}}
+{{- $manifestCSS := .Site.Data.manifest_css -}}
+
+{{- if eq .Site.Params.BuildCss false -}}
+{{- $cssBundlePath = index $manifestCSS "base" -}}
+{{- end -}}
+
+{{- $shareJS := relURL $manifest.shared -}}
+{{- $editorJS := relURL $manifest.editor -}}
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{.Title}}</title>
+    <meta name="api.server" content="{{.Site.Params.ApiServer}}">
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <link rel="stylesheet" href="{{ $cssBundlePath }}">
+    <script>
+        function measureCRP() {
+            var t = window.performance.timing,
+                interactive = t.domInteractive - t.domLoading,
+                dcl = t.domContentLoadedEventStart - t.domLoading,
+                complete = t.domComplete - t.domLoading;
+            var stats = document.createElement('p');
+            stats.textContent = 'interactive: ' + interactive + 'ms, ' +
+                'dcl: ' + dcl + 'ms, complete: ' + complete + 'ms';
+            console.log(stats);
+        }
+    </script>
+    {{- with .Params.css_include -}}
+    {{- range . -}}
+    {{- $name := index $manifestCSS . -}}
+    <link rel="stylesheet" href="{{ relURL $name }}">
+    {{- end -}}
+    {{- end -}}
+
+    <script src="{{ $shareJS }}"></script>
+    {{- with .Params.js_include -}}
+    {{- range . -}}
+    {{- $name := index $manifest . -}}
+    <script type="module" src="{{ relURL $name }}"></script>
+    {{- end -}}
+    {{- end -}}
+</head>

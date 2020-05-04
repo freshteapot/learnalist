@@ -16,8 +16,8 @@ type TypeV2Item struct {
 
 type TypeV2 []TypeV2Item
 
-func NewTypeV2() *Alist {
-	aList := &Alist{}
+func NewTypeV2() Alist {
+	aList := Alist{}
 
 	aList.Info.ListType = FromToList
 	data := make(TypeV2, 0)

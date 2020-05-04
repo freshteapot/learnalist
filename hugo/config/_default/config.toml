@@ -1,0 +1,24 @@
+baseURL = "http://localhost:1313"
+languageCode = "en-us"
+title = "Learnalist"
+
+uglyURLs = true
+disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS"]
+
+[params]
+  BuildCss = true
+  BuildCssProduction = false
+  ApiServer = "http://localhost:1234"
+  #ApiServer = "https://learnalist.net"
+
+[taxonomies]
+  label = "labels"
+
+[output]
+alist = ["HTML"]
+
+[build]
+  writeStats = true
+
+[markup.goldmark.renderer]
+  unsafe = true

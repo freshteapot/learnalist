@@ -15,7 +15,7 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 # Getting Started
 
 ## Server
-* look at [Readme](server/README.md).
+* look at [Readme](docs/README.md).
 
 ## Chrome Extension
 * [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
@@ -29,3 +29,4 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 ## iOS Bacis app
 * look at [Readme](https://github.com/freshteapot/learnalist-ios/blob/master/README.md).
+

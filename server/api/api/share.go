@@ -121,7 +121,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	}
 
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
-	if aList == nil {
+	if aList.Uuid == "" {
 		response := HttpResponseMessage{
 			Message: i18n.SuccessAlistNotFound,
 		}
@@ -142,9 +142,12 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	}
 
 	aList.Info.SharedWith = input.Action
-	m.Datastore.SaveAlist(http.MethodPut, *aList)
+	m.Datastore.SaveAlist(http.MethodPut, aList)
 	// Save to hugo
-	m.HugoHelper.Write(aList)
+	m.HugoHelper.WriteList(aList)
+	// TODO this might become a painful bottle neck
+	m.HugoHelper.WriteListsByUser(aList.User.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
+	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	message := ""
 	switch input.Action {

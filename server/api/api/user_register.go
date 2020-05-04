@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
@@ -67,5 +68,8 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		Uuid:     aUser.UserUUID,
 		Username: aUser.Username,
 	}
+
+	lists := make([]alist.ShortInfo, 0)
+	m.HugoHelper.WriteListsByUser(aUser.UserUUID, lists)
 	return c.JSON(http.StatusCreated, response)
 }

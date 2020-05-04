@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func checkTypeV3Info(aList *alist.Alist) {
+func checkTypeV3Info(aList alist.Alist) {
 	Expect(aList.Info.ListType).To(Equal(alist.Concept2))
 	Expect(reflect.TypeOf(aList.Data).Name()).To(Equal("TypeV3"))
 
@@ -51,7 +51,7 @@ var _ = Describe("Testing List type V3", func() {
 		}
 		`
 			jsonBytes := []byte(input)
-			aList := new(alist.Alist)
+			var aList alist.Alist
 			err := aList.UnmarshalJSON(jsonBytes)
 			Expect(err).ShouldNot(HaveOccurred())
 			checkTypeV3Info(aList)

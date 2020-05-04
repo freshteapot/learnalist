@@ -1,6 +1,0 @@
-{{ $aList := getJSON "data/lists/" .Params.Uuid ".json" }}
-
-{
-  "hello": "world",
-  "info": {{- $aList.info | jsonify -}}
-}

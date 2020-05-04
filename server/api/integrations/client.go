@@ -26,7 +26,7 @@ func (integrations *Client) runV1Tests() {
 	integrations.getAlistV1(aList.Uuid)
 	integrations.deleteAlist(aList.Uuid)
 	shouldNotFindIt := integrations.getAlistV1(aList.Uuid)
-	if shouldNotFindIt != nil {
+	if shouldNotFindIt.Uuid != "" {
 		log.Fatalln("The delete api might be broken.")
 	}
 
@@ -90,7 +90,7 @@ func (integrations *Client) updateAlistV1WithData(aList alist.Alist) *alist.Alis
 	return aListB
 }
 
-func (integrations *Client) getAlistV1(uuid string) *alist.Alist {
+func (integrations *Client) getAlistV1(uuid string) alist.Alist {
 	fmt.Println("integrations.getAlistV1 start")
 	_, aList, _ := integrations.ApiClient.GetAlist(uuid)
 	fmt.Println("integrations.getAlistV1 success")

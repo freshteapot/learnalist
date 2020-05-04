@@ -23,6 +23,6 @@ var _ = Describe("Testing with Ginkgo", func() {
 		listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 		messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "public")
 		assert.Equal(messageResponse.Message, "List is now public")
-		fmt.Println(fmt.Sprintf("http://localhost:1234/alists/%s.html", listInfo.Uuid))
+		fmt.Println(fmt.Sprintf("http://localhost:1234/alist/%s.html", listInfo.Uuid))
 	})
 })

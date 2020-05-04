@@ -10,7 +10,7 @@ var _ = Describe("Testing server that handles static and html etc", func() {
 
 	When("Requesting a list", func() {
 		It("Valid html request", func() {
-			input := "/alists/b453a069-24e4-5b52-8de5-23ac05c753ef.html"
+			input := "/alist/b453a069-24e4-5b52-8de5-23ac05c753ef.html"
 			alistUUID, isA, err := server.GetAlistUUIDFromURL(input)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(alistUUID).To(Equal("b453a069-24e4-5b52-8de5-23ac05c753ef"))
@@ -18,7 +18,7 @@ var _ = Describe("Testing server that handles static and html etc", func() {
 		})
 
 		It("Valid json request", func() {
-			input := "/alists/b453a069-24e4-5b52-8de5-23ac05c753ef.json"
+			input := "/alist/b453a069-24e4-5b52-8de5-23ac05c753ef.json"
 			alistUUID, isA, err := server.GetAlistUUIDFromURL(input)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(alistUUID).To(Equal("b453a069-24e4-5b52-8de5-23ac05c753ef"))
@@ -26,14 +26,14 @@ var _ = Describe("Testing server that handles static and html etc", func() {
 		})
 
 		It("The uri has an extra / in it, making it invalid", func() {
-			input := "/alists/b453a069-24e4-5b52-8de5-23ac05c753ef/a.json"
+			input := "/alist/b453a069-24e4-5b52-8de5-23ac05c753ef/a.json"
 			_, _, err := server.GetAlistUUIDFromURL(input)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(Equal("Invalid uri"))
 		})
 
 		It("The uri has an extra / in it, making it invalid", func() {
-			input := "/alists/b453a069-24e4-5b52-8de5-23ac05c753efa.txt"
+			input := "/alist/b453a069-24e4-5b52-8de5-23ac05c753efa.txt"
 			_, _, err := server.GetAlistUUIDFromURL(input)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(Equal("Unsupported format"))

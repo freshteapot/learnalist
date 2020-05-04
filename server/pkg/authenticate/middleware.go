@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,6 +19,7 @@ type Config struct {
 	Skip         func(c echo.Context) bool
 	LookupBasic  func(username string, hash string) (string, error)
 	LookupBearer func(token string) (string, error)
+	// TODO maybe we should actually lookup via cookie
 }
 
 func Auth(config Config) echo.MiddlewareFunc {
@@ -41,7 +43,18 @@ func Auth(config Config) echo.MiddlewareFunc {
 			authorization := c.Request().Header.Get("Authorization")
 			parts := strings.SplitN(authorization, " ", 2)
 			if len(parts) != 2 {
-				return echo.ErrForbidden
+				// TODO check cookie
+				cookie, err := utils.GetCookieByName(c.Request().Cookies(), "x-authentication-bearer")
+				if err != nil {
+					return echo.ErrForbidden
+				}
+
+				// TODO how to handle non json response
+				// TODO maybe use lookupCookie
+				parts = []string{
+					"bearer",
+					cookie.Value,
+				}
 			}
 
 			what := strings.ToLower(parts[0])
@@ -55,6 +68,7 @@ func Auth(config Config) echo.MiddlewareFunc {
 			default:
 				return echo.ErrForbidden
 			}
+
 			// Hmm currently this will never be triggered :(
 			if err != nil {
 				return echo.ErrInternalServerError

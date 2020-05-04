@@ -1,11 +1,19 @@
 server:
   sqlite:
-    database: /tmp/learnalist-api/server.db
+    database: /tmp/learnalist/server.db
   port: "1234"
   cors:
     allowedOrigins: "*"
-  siteCacheDirectory: /tmp/learnalist-api/site-cache
-  hugoDirectory: "./../hugo"
+  cookie:
+    domain: "localhost"
+    secure: false
+  #siteCacheDirectory: /tmp/learnalist/site-cache
+  siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
+  hugo:
+    directory: "/Users/tinkerbell/git/learnalist-api/hugo"
+    environment: "dev"
+    external: "true"
+
   loginWith:
     google:
       clientID: "XXX"
@@ -14,9 +22,13 @@ server:
 tools:
   rebuildStaticSite:
     sqlite:
-      database: /tmp/learnalist-api/server.db
-    siteCacheDirectory: /tmp/learnalist-api/site-cache
-    hugoDirectory: "./../hugo"
+      database: /tmp/learnalist/server.db
+    #siteCacheDirectory: /tmp/learnalist/site-cache
+    siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
+    hugo:
+      directory: "./../hugo"
+      environment: "dev"
+      external: "true"
   integrationTests:
     username: ""
     password: ""

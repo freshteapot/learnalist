@@ -1,0 +1,4 @@
+mirrors:
+  registry.devbox:
+    endpoint:
+      - "http://registry.devbox"

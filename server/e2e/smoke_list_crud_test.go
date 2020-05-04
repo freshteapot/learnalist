@@ -280,6 +280,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		assert.NoError(err)
 		assert.Equal(0, len(aLists))
 	})
+
 	It("method not supported for saving list", func() {
 
 		assert := assert.New(GinkgoT())
@@ -293,6 +294,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		assert.NoError(err)
 		assert.Equal(resp.StatusCode, http.StatusMethodNotAllowed)
 	})
+
 	It("delete alist not found", func() {
 
 		var raw map[string]interface{}

@@ -1,0 +1,12 @@
+# Docs
+* [Setup for development](./setup-server-for-development.md)
+* [Run some end-to-end tests](./end-to-end-testing.md)
+* [Api Overview](./api.md)
+* [List types overview](./list.types.md)
+* [Question and Answers](./qa.md)
+* [Technical Debt](./technical-debt.md)
+* [Manual install instructions for me](./INSTALL.md)
+* [Client commands](./client.md)
+* [Golang tips](./tips.md)
+* [Try curl requests](./play.along.md)
+* [Manual testing of endpoints](./manual.test.md)

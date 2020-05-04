@@ -14,6 +14,12 @@ func (d Job) Run() {
 }
 
 func (h HugoHelper) RegisterCronJob() {
+	if h.externalHugo {
+		fmt.Println("Will not process request as external hugo enabled")
+		return
+	}
+
+	// Have a way to skip if hugoRunning as its own process / service
 	if *h.cronEntryID != 0 {
 		return
 	}
@@ -36,7 +42,7 @@ func (h HugoHelper) ProcessContent() {
 	h.inprogress.Lock()
 	now := time.Now()
 	fmt.Printf("Processing content within %s @ %s\n", h.Cwd, now)
-	h.MakeContent()
+
 	h.Build()
 	h.inprogress.Unlock()
 }

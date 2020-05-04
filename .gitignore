@@ -1,22 +1,25 @@
 # Ignore all databases
 *.db
 *.DS_Store
+
 # GO: Ignore all files in vendor
 server/vendor/
 server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
+server/c.out
 
-# www-ui
-www-ui/node_modules
+# hugo
+hugo/content/alist/
+hugo/content/alistsbyuser/
+hugo/data/public_lists.json
+hugo/data/alist/
+hugo/data/alistsbyuser/
+hugo/public/
+hugo/node_modules/
+# Postcss specific
+hugo/hugo_stats.json
+hugo/resources/
 
-# alists
-hugo/content/alists/
-hugo/data/lists/
-hugo/public-alist/
-
-# svelte
-svelte/node_modules
-svelte/public/*.js
-svelte/public/*.map
-svelte/public/*.css
+# js
+js/node_modules

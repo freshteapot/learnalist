@@ -1,0 +1,31 @@
+server:
+  sqlite:
+    database: /srv/learnalist/server.db
+  port: "1234"
+  cors:
+    allowedOrigins: "*"
+  cookie:
+    domain: "localhost"
+    secure: false
+  siteCacheDirectory: /srv/learnalist/site-cache
+  hugo:
+    directory: "/srv/learnalist/hugo"
+    environment: "docker"
+
+  loginWith:
+    google:
+      clientID: "XXX"
+      clientSecret: "XXX"
+      server: "http://localhost:1234"
+tools:
+  rebuildStaticSite:
+    sqlite:
+      database: /srv/learnalist/server.db
+    siteCacheDirectory: /srv/learnalist/site-cache
+    hugo:
+      directory: "/srv/learnalist/hugo"
+      environment: "docker"
+  integrationTests:
+    username: ""
+    password: ""
+    server: ""

@@ -1,0 +1,37 @@
+<html lang="en">
+{{- $aList := getJSON "data/alist/" $.Params.Uuid ".json" -}}
+{{- $allowed := slice "v1" "v2" "v4" -}}
+{{- $interactAllowed := slice "v1" -}}
+{{- partial "head.html" $ -}}
+
+<body onload="measureCRP()">
+
+    {{- partial "header.html" $ -}}
+    <notification-center></notification-center>
+    <main class="w-100 bt b--black-10 bg-white">
+        <header>
+            <h1 class="tc">{{- $aList.info.title -}}</h1>
+        </header>
+        <article id="list-info" class="mw9 mw6-ns center pt2">
+            {{- with $aList.info.interact -}}
+            {{- if in $interactAllowed $aList.info.type -}}
+            {{- partial (printf "alist/%s/menu.html" $aList.info.type) $aList -}}
+            {{- end -}}
+            {{- end -}}
+            {{- if in $allowed $aList.info.type -}}
+            <h2>Data</h2>
+            {{- $name := printf "alist/%s/data.html" $aList.info.type -}}
+            {{ partial $name $aList }}
+            {{- end -}}
+        </article>
+        {{- with $aList.info.interact -}}
+        {{- if in $interactAllowed $aList.info.type -}}
+        <div id="play" class="measure center" style="display:none">
+            {{- partial (printf "alist/%s/play.html" $aList.info.type) $aList -}}
+        </div>
+        {{- end -}}
+        {{- end -}}
+    </main>
+</body>
+
+</html>

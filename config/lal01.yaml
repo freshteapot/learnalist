@@ -1,0 +1,33 @@
+server:
+  sqlite:
+    database: /srv/learnalist/server.db
+  port: "1234"
+  cors:
+    allowedOrigins: "*"
+  cookie:
+    domain: "learnalist.net"
+    secure: true
+  siteCacheDirectory: /srv/learnalist/hugo/public
+  hugo:
+    directory: "/srv/learnalist/hugo"
+    environment: "lal01"
+    external: "false"
+
+  loginWith:
+    google:
+      clientID: "XXX"
+      clientSecret: "XXX"
+      server: "https://learnalist.net"
+tools:
+  rebuildStaticSite:
+    sqlite:
+      database: /srv/learnalist/server.db
+    siteCacheDirectory: /srv/learnalist/hugo/public
+    hugo:
+      directory: "/srv/learnalist/hugo"
+      environment: "lal01"
+      external: "false"
+  integrationTests:
+    username: ""
+    password: ""
+    server: ""

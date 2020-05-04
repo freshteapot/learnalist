@@ -5,14 +5,13 @@ import (
 	"errors"
 	"net/http"
 
-	mockHugo "github.com/freshteapot/learnalist-api/server/alists/pkg/hugo/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	mockModels "github.com/freshteapot/learnalist-api/server/api/models/mocks"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
-	mockAcl "github.com/freshteapot/learnalist-api/server/pkg/acl/mocks"
+
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,8 +22,8 @@ var _ = Describe("Testing Sharing endpoints", func() {
 	AfterEach(emptyDatabase)
 
 	When("/share/readaccess", func() {
-		var datastore *mockModels.Datastore
-		var acl *mockAcl.Acl
+		var datastore *mocks.Datastore
+		var acl *mocks.Acl
 		var userA *uuid.User
 		var userB *uuid.User
 		var method string
@@ -32,13 +31,15 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		var e *echo.Echo
 
 		BeforeEach(func() {
-			datastore = &mockModels.Datastore{}
-			acl = &mockAcl.Acl{}
+			datastore = &mocks.Datastore{}
+			acl = &mocks.Acl{}
 			m.Datastore = datastore
 			m.Acl = acl
 
-			testHugoHelper := &mockHugo.HugoSiteBuilder{}
-			testHugoHelper.On("Write", mock.Anything)
+			testHugoHelper := &mocks.HugoSiteBuilder{}
+			testHugoHelper.On("WriteList", mock.Anything)
+			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
+			testHugoHelper.On("WritePublicLists", mock.Anything)
 			testHugoHelper.On("Remove", mock.Anything)
 			m.HugoHelper = testHugoHelper
 
@@ -95,7 +96,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(nil, errors.New("Fail"))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New("Fail"))
 
 			m.V1ShareListReadAccess(c)
 
@@ -116,7 +117,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
 
 			m.V1ShareListReadAccess(c)
 
@@ -247,8 +248,8 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 	})
 	When("/share", func() {
-		var datastore *mockModels.Datastore
-		var acl *mockAcl.Acl
+		var datastore *mocks.Datastore
+		var acl *mocks.Acl
 		var userA *uuid.User
 		var userB *uuid.User
 		var method string
@@ -256,13 +257,15 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		var e *echo.Echo
 
 		BeforeEach(func() {
-			datastore = &mockModels.Datastore{}
-			acl = &mockAcl.Acl{}
+			datastore = &mocks.Datastore{}
+			acl = &mocks.Acl{}
 			m.Datastore = datastore
 			m.Acl = acl
 
-			testHugoHelper := &mockHugo.HugoSiteBuilder{}
-			testHugoHelper.On("Write", mock.Anything)
+			testHugoHelper := &mocks.HugoSiteBuilder{}
+			testHugoHelper.On("WriteList", mock.Anything)
+			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
+			testHugoHelper.On("WritePublicLists", mock.Anything)
 			testHugoHelper.On("Remove", mock.Anything)
 			m.HugoHelper = testHugoHelper
 
@@ -316,7 +319,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
 
 			m.V1ShareAlist(c)
 
@@ -336,6 +339,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c.Set("loggedInUser", *userA)
 
 			aList := alist.NewTypeV1()
+			aList.Uuid = "fake-123"
 			aList.User.Uuid = userB.Uuid
 			datastore.On("GetAlist", mock.Anything).Return(aList, nil)
 
@@ -369,7 +373,9 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				returnAlist.Info.SharedWith = aclKeys.SharedWithPublic
 
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+				datastore.On("SaveAlist", http.MethodPut, returnAlist).Return(returnAlist, nil)
+				datastore.On("GetAllListsByUser", userA.Uuid).Return([]alist.ShortInfo{}, nil)
+				datastore.On("GetPublicLists").Return([]alist.ShortInfo{})
 
 				m.V1ShareAlist(c)
 
@@ -400,7 +406,9 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				returnAlist.Info.SharedWith = aclKeys.NotShared
 
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+				datastore.On("SaveAlist", http.MethodPut, returnAlist).Return(returnAlist, nil)
+				datastore.On("GetAllListsByUser", userA.Uuid).Return([]alist.ShortInfo{}, nil)
+				datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
@@ -430,7 +438,9 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				returnAlist.Info.SharedWith = aclKeys.SharedWithFriends
 
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+				datastore.On("SaveAlist", http.MethodPut, returnAlist).Return(returnAlist, nil)
+				datastore.On("GetAllListsByUser", userA.Uuid).Return([]alist.ShortInfo{}, nil)
+				datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
@@ -460,7 +470,9 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				returnAlist.Info.SharedWith = aclKeys.SharedWithFriends
 
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("SaveAlist", http.MethodPut, *returnAlist).Return(returnAlist, nil)
+				datastore.On("SaveAlist", http.MethodPut, returnAlist).Return(returnAlist, nil)
+				datastore.On("GetAllListsByUser", userA.Uuid).Return([]alist.ShortInfo{}, nil)
+				datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
