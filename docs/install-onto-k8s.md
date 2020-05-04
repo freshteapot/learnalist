@@ -7,6 +7,14 @@ export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 ```
 
+- remove what is currently set
+- set to default based on KUBECONFIG (above)
+
+```sh
+kubectl config unset current-context
+kubectl config use-context default
+```
+
 ```
 127.0.0.1 registry.devbox
 ```
@@ -36,6 +44,19 @@ docker push registry.devbox:5000/learnalist:latest
 ```
 
 
+```sh
+kubectl scale deployment/container-registry  --replicas=1
+```
+
+
+```sh
+PATCH=$(cat <<_EOF_
+  {"spec":{"template":{"metadata":{"creationTimestamp":"$(date -u '+%FT%TZ')"}}}}
+  _EOF_
+)
+kubectl patch deployment learnalist -p "${PATCH}"
+```
+
 ## Turn off
 ```
 ssh $SSH_SERVER
@@ -54,5 +75,20 @@ kill -9 $(lsof -ti tcp:6443)
 
 ```sh
 kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -- sh
-/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+HUGO_EXTERNAL=false  /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+```
+
+
+
+
+
+kubectl create configmap learnalist-config --from-file=config.yaml=config/lal01.yaml -o yaml --dry-run | kubectl replace -f -
+
+
+
+
+```sh
+rsync -avzP \
+--rsync-path="sudo rsync" \
+${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 ```

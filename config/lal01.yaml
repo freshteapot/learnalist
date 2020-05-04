@@ -7,7 +7,7 @@ server:
   cookie:
     domain: "learnalist.net"
     secure: true
-  siteCacheDirectory: /srv/learnalist/site-cache
+  siteCacheDirectory: /srv/learnalist/hugo/public
   hugo:
     directory: "/srv/learnalist/hugo"
     environment: "lal01"
@@ -22,7 +22,7 @@ tools:
   rebuildStaticSite:
     sqlite:
       database: /srv/learnalist/server.db
-    siteCacheDirectory: /srv/learnalist/site-cache
+    siteCacheDirectory: /srv/learnalist/hugo/public
     hugo:
       directory: "/srv/learnalist/hugo"
       environment: "lal01"

@@ -13,7 +13,7 @@ rebuild-db:
 	rm -f /tmp/learnalist/server.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
-tests:
+test:
 	cd server && \
 	./cover.sh
 
@@ -37,3 +37,12 @@ sync-site-assets:
 develop:
 	cd js && \
 	npm run dev
+
+build-image:
+	cd server && \
+	docker build . -t learnalist:latest
+
+push-image:
+	cd server && \
+	docker tag learnalist:latest registry.devbox:5000/learnalist:latest
+	docker push registry.devbox:5000/learnalist:latest

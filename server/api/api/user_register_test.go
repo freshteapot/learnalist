@@ -86,7 +86,11 @@ var _ = Describe("Testing Register user endpoint", func() {
 				req, rec := setupFakeEndpoint(http.MethodPost, endpoint, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
+				testHugoHelper := &mocks.HugoSiteBuilder{}
+				testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
+				m.HugoHelper = testHugoHelper
 				datastore.On("UserWithUsernameAndPassword").Return(userWithUsernameAndPassword)
+
 				userWithUsernameAndPassword.On("Lookup", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 					Return("", sql.ErrNoRows)
 
@@ -96,6 +100,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusCreated))
 				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
+				testHugoHelper.AssertExpectations(GinkgoT())
 			})
 
 			It("New user, database issue via saving user", func() {
