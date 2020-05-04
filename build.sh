@@ -21,12 +21,14 @@ build_assets() {
     hugo --environment=lal01
 
     ls -lah public/css/base*
+    cd "$ORIGPWD"
 }
 
 build_js() {
     cd "$ORIGPWD"
     cd js
     npm run build:js:components
+    cd "$ORIGPWD"
 }
 
 build() {
@@ -44,6 +46,7 @@ build() {
     hugo --environment=lal01
 
     find static
+    cd "$ORIGPWD"
 }
 
 build_js
@@ -53,3 +56,5 @@ build
 
 # Add static file
 git add hugo/static/
+git add hugo/data/manifest_css.json
+git add hugo/data/manifest_js.json
