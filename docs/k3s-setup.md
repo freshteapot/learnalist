@@ -72,6 +72,15 @@ helm template docker-registry  -f custom/docker-registry.yaml --output-dir ./out
 kubectl apply -f output/docker-registry/templates/
 ```
 
+- Change the ownership to the user at id=1000
+- Docker securitycontext locks it down to that user
+```sh
+ssh $SSH_SERVER
+sudo su -
+mkdir -p /srv/container-registry
+chown -R USER:USER /srv/container-registry
+```
+
 
 # Setup insecure local registry
 - We do this so to skip setting up https on docker registry (not ideal, but its a fact)

@@ -1,5 +1,9 @@
 fullnameOverride: container-registry
 
+persistence:
+  enabled: true
+  existingClaim: srv-container-registry
+
 ingress:
   enabled: true
   hosts:
