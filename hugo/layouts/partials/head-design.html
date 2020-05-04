@@ -2,7 +2,7 @@
 {{- $baseCss := resources.Get "css/base-v1.css" -}}
 {{- $css := resources.Get "css/tachyons.css" -}}
 {{ $cssBundle = slice $css $baseCss  | resources.Concat "/css/bundle.css" }}
-{{- $manifest := .Site.Data.manifest -}}
+{{- $manifest := .Site.Data.manifest_js -}}
 
 <head>
     <meta charset='utf-8'>

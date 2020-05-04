@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const del = require('del');
 
-const pathToManifestFile = "../hugo/data/manifest.json";
+const pathToManifestFile = "../hugo/data/manifest_js.json";
 const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
 const pathToStaticDirectory = "../hugo/static";
 const pathToPublicDirectory = "../hugo/public";
