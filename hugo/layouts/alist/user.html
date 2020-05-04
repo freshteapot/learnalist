@@ -1,8 +1,6 @@
+<html lang="en">
 {{- $usersLists := getJSON "data/alistsbyuser/" $.Params.Uuid ".json" -}}
 {{- $listPrefix := relURL "alist/" -}}
-
-<!DOCTYPE html>
-<html>
 {{- partial "head.html" $ -}}
 
 <body>
