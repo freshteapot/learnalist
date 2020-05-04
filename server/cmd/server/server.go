@@ -27,7 +27,6 @@ var ServerCmd = &cobra.Command{
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		// I changed somehting
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
 			Secret: viper.GetString("server.loginWith.google.clientSecret"),
