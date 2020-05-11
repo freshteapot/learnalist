@@ -43,9 +43,17 @@ func (w HugoAListWriter) Content(aList alist.Alist) {
 		},
 
 		"js_include": func(info alist.AlistInfo) string {
-			jsInclude := make([]string, 0)
-			jsInclude = append(jsInclude, info.ListType)
-			b, _ := json.Marshal(jsInclude)
+			include := make([]string, 0)
+			include = append(include, "main")
+			include = append(include, info.ListType)
+			b, _ := json.Marshal(include)
+			return string(b)
+		},
+
+		"css_include": func(info alist.AlistInfo) string {
+			include := make([]string, 0)
+			include = append(include, info.ListType)
+			b, _ := json.Marshal(include)
 			return string(b)
 		},
 	}
@@ -57,6 +65,7 @@ title: {{.Info.Title}}
 labels: {{stringify_string_array .Info.Labels}}
 interact: {{can_interact .Info.Interact}}
 js_include: {{js_include .Info}}
+css_include: {{css_include .Info}}
 ---
 `))
 	var tpl bytes.Buffer

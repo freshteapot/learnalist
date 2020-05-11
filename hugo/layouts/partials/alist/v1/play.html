@@ -1,4 +1,5 @@
 {{- $aList := . -}}
 {{- with .info.interact -}}
-<v1-slideshow listdata={{ $aList | jsonify }}></v1-slideshow>
+<script id="play-data" type="application/json">{{ $aList | jsonify | safeJS }}</script>
+<div id="play-screen"></div>
 {{- end -}}
