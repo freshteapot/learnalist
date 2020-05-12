@@ -38,7 +38,8 @@ type AlistInfo struct {
 }
 
 type Interact struct {
-	Slideshow string `json:"slideshow"`
+	Slideshow   string `json:"slideshow"`
+	TotalRecall string `json:"totalrecall"`
 }
 
 type InputAlist struct {
