@@ -1,5 +1,7 @@
 {{- $aList := . -}}
 {{- with .info.interact -}}
+{{- if eq info.interact.slideshow "1" -}}
 <script id="play-data" type="application/json">{{ $aList | jsonify | safeJS }}</script>
 <div id="play-screen"></div>
+{{- end -}}
 {{- end -}}
