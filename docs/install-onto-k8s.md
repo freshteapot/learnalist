@@ -130,4 +130,6 @@ unset KUBECONFIG
 ssh $SSH_SERVER
 sudo su -
 kill -9 $(lsof -ti tcp:5000)
+
+unset SSH_SERVER
 ```

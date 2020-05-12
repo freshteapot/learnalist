@@ -1,5 +1,5 @@
-{{- if eq info.interact.slideshow "1" -}}
+{{- with .info.interact -}}
 <div id="menu-v1">
-  <v1-menu slideshow="{{ .info.interact.slideshow }}" totalrecall="1">
+  <v1-menu slideshow="{{ .slideshow }}" totalrecall="{{ .totalrecall }}">
 </div>
 {{- end -}}
