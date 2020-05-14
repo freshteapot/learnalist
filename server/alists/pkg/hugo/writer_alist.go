@@ -36,7 +36,10 @@ func (w HugoAListWriter) Content(aList alist.Alist) {
 		},
 
 		"can_interact": func(interact *alist.Interact) bool {
-			if interact.Slideshow == "1" {
+			if interact.Slideshow == 1 {
+				return true
+			}
+			if interact.TotalRecall == 1 {
 				return true
 			}
 			return false

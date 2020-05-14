@@ -1,6 +1,6 @@
 <script>
-  export let slideshow = "1";
-  export let totalrecall = "1";
+  export let slideshow = "0";
+  export let totalrecall = "0";
 
   function showSlideshow(event) {
     window.location.hash = "#/play/slideshow";

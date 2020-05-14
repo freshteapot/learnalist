@@ -5,15 +5,20 @@ import (
 	"errors"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 )
 
 const (
-	SimpleList    = "v1"
-	FromToList    = "v2"
-	Concept2      = "v3"
-	ContentAndUrl = "v4"
+	SimpleList       = "v1"
+	FromToList       = "v2"
+	Concept2         = "v3"
+	ContentAndUrl    = "v4"
+	InteractEnabled  = 1
+	InteractDisabled = 0
 )
+
+var ValidInteract = []int{InteractEnabled, InteractDisabled}
 
 var allowedListTypes = []string{
 	SimpleList,
@@ -38,8 +43,8 @@ type AlistInfo struct {
 }
 
 type Interact struct {
-	Slideshow   string `json:"slideshow"`
-	TotalRecall string `json:"totalrecall"`
+	Slideshow   int `json:"slideshow"`
+	TotalRecall int `json:"totalrecall"`
 }
 
 type InputAlist struct {
@@ -91,6 +96,26 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	if !utils.StringArrayContains(allowedListTypes, aList.Info.ListType) {
+		err = errors.New("Unsupported list type.")
+		return err
+	}
+
+	switch aList.Info.ListType {
+	case SimpleList:
+		aList.Info, err = parseInfoV1(aList.Info)
+		if err != nil {
+			err = errors.New(i18n.ValidationErrorListV1)
+			return err
+		}
+	case FromToList:
+		break
+	case Concept2:
+		break
+	case ContentAndUrl:
+		break
+	}
+
 	if raw["data"] == nil {
 		err = errors.New("Failed to pass list. Data is missing.")
 		return err
@@ -124,9 +149,6 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			err = errors.New(i18n.ValidationErrorListV4)
 			return err
 		}
-	default:
-		err = errors.New("Unsupported list type.")
-		return err
 	}
 	return nil
 }

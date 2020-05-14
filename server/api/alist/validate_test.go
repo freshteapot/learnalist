@@ -112,6 +112,10 @@ func TestValidateAlist(t *testing.T) {
 		Title:      "I am a title",
 		ListType:   "v1",
 		SharedWith: aclKeys.NotShared,
+		Interact: &Interact{
+			Slideshow:   InteractDisabled,
+			TotalRecall: InteractDisabled,
+		},
 	}
 	aList.Data = TypeV1{""}
 	err = Validate(*aList)
