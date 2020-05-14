@@ -9,7 +9,7 @@ import autoPreprocess from 'svelte-preprocess'
 const IS_PROD = !process.env.ROLLUP_WATCH;
 const { getComponentInfo, rollupPluginManifestSync } = require("./src/utils/glue.js");
 const componentKey = "editor";
-const componentInfo = getComponentInfo(componentKey);
+const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 
 // External and replacement needs to be the full path :(
 export default {
