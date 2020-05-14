@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/gookit/validate"
 )
 
@@ -21,6 +22,7 @@ func NewTypeV1() Alist {
 				Slideshow:   InteractDisabled,
 				TotalRecall: InteractDisabled,
 			},
+			SharedWith: aclKeys.NotShared,
 		},
 	}
 

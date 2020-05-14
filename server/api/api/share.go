@@ -54,17 +54,17 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	if aList.Info.SharedWith == aclKeys.NotShared {
-		return c.JSON(http.StatusBadRequest, HttpResponseMessage{
-			Message: i18n.ApiShareReadAccessInvalidWithNotShared,
-		})
-	}
-
 	if aList.User.Uuid != user.Uuid {
 		response := HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
+	}
+
+	if aList.Info.SharedWith == aclKeys.NotShared {
+		return c.JSON(http.StatusBadRequest, HttpResponseMessage{
+			Message: i18n.ApiShareReadAccessInvalidWithNotShared,
+		})
 	}
 
 	if input.UserUUID == user.Uuid {

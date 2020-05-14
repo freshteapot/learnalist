@@ -163,6 +163,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 			aList := alist.NewTypeV1()
 			aList.User.Uuid = userA.Uuid
+			aList.Info.SharedWith = aclKeys.SharedWithPublic
 			datastore.On("GetAlist", mock.Anything).Return(aList, nil)
 
 			m.V1ShareListReadAccess(c)
@@ -186,6 +187,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 			aList := alist.NewTypeV1()
 			aList.User.Uuid = userA.Uuid
+			aList.Info.SharedWith = aclKeys.SharedWithPublic
 			datastore.On("GetAlist", mock.Anything).Return(aList, nil)
 			datastore.On("UserExists", userB.Uuid).Return(false)
 
@@ -211,6 +213,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 				aList := alist.NewTypeV1()
 				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.SharedWithPublic
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
 				datastore.On("UserExists", userB.Uuid).Return(true)
 				acl.On("GrantUserListReadAccess", inputGrant.AlistUUID, inputGrant.UserUUID).Return(nil)
@@ -236,6 +239,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 				aList := alist.NewTypeV1()
 				aList.User.Uuid = userA.Uuid
+				aList.Info.SharedWith = aclKeys.SharedWithPublic
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
 				datastore.On("UserExists", userB.Uuid).Return(true)
 				acl.On("RevokeUserListReadAccess", inputRevoke.AlistUUID, inputRevoke.UserUUID).Return(nil)
