@@ -9,11 +9,19 @@ import (
 )
 
 type interactV1 struct {
-	db *sqlx.DB
+	db  *sqlx.DB
+	key string
 }
 
 func NewInteractV1(db *sqlx.DB) interactV1 {
-	return interactV1{db: db}
+	return interactV1{
+		key: "fix-interact-v1",
+		db:  db,
+	}
+}
+
+func (f interactV1) Key() string {
+	return f.key
 }
 
 func (f interactV1) GetListsToChange() []string {
