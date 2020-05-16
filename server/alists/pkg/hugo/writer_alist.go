@@ -36,12 +36,19 @@ func (w HugoAListWriter) Content(aList alist.Alist) {
 		},
 
 		"can_interact": func(interact *alist.Interact) bool {
+			// Handle when it has not been set
+			// Not all lists support interact
+			if interact == nil {
+				return false
+			}
+
 			if interact.Slideshow == 1 {
 				return true
 			}
 			if interact.TotalRecall == 1 {
 				return true
 			}
+
 			return false
 		},
 
