@@ -11,11 +11,14 @@ const getComponentInfo = (componentKey, dev) => {
     if (dev) {
         chunkhash = "dev";
     }
+
     const filename = `${componentKey}.${chunkhash}.js`;
     const filenameCSS = `${componentKey}.${chunkhash}.css`;
     const outputPath = `${pathToStaticDirectory}/js/${filename}`;
     const outputPathCSS = `${pathToStaticDirectory}/css/${filenameCSS}`;
 
+    // Should we only delete dev? and then leave it as a manual step to remove production?
+    // Or try and include in rollupdelete?
     const rollupDeleteTargets = [
         `${pathToStaticDirectory}/js/${componentKey}.*.js`,
         `${pathToStaticDirectory}/js/${componentKey}.*.js.map`,
