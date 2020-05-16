@@ -11196,7 +11196,7 @@ class List_edit_labels extends SvelteComponentDev {
 const { Object: Object_1$1, console: console_1$5 } = globals;
 const file$u = "src/editor/components/list_edit.svelte";
 
-// (81:0) <Box>
+// (82:0) <Box>
 function create_default_slot_10(ctx) {
 	let updating_title;
 	let current;
@@ -11255,14 +11255,14 @@ function create_default_slot_10(ctx) {
 		block,
 		id: create_default_slot_10.name,
 		type: "slot",
-		source: "(81:0) <Box>",
+		source: "(82:0) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (85:0) <Box>
+// (86:0) <Box>
 function create_default_slot_9(ctx) {
 	let updating_labels;
 	let current;
@@ -11321,14 +11321,14 @@ function create_default_slot_9(ctx) {
 		block,
 		id: create_default_slot_9.name,
 		type: "slot",
-		source: "(85:0) <Box>",
+		source: "(86:0) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (89:0) <Box>
+// (90:0) <Box>
 function create_default_slot_8(ctx) {
 	let updating_listData;
 	let switch_instance_anchor;
@@ -11424,14 +11424,14 @@ function create_default_slot_8(ctx) {
 		block,
 		id: create_default_slot_8.name,
 		type: "slot",
-		source: "(89:0) <Box>",
+		source: "(90:0) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (92:0) <Box>
+// (93:0) <Box>
 function create_default_slot_7(ctx) {
 	let button0;
 	let t1;
@@ -11445,8 +11445,8 @@ function create_default_slot_7(ctx) {
 			t1 = space();
 			button1 = element("button");
 			button1.textContent = "Cancel";
-			add_location(button0, file$u, 92, 2, 2413);
-			add_location(button1, file$u, 93, 2, 2453);
+			add_location(button0, file$u, 93, 2, 2473);
+			add_location(button1, file$u, 94, 2, 2513);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, button0, anchor);
@@ -11472,14 +11472,14 @@ function create_default_slot_7(ctx) {
 		block,
 		id: create_default_slot_7.name,
 		type: "slot",
-		source: "(92:0) <Box>",
+		source: "(93:0) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (99:2) <Box>
+// (100:2) <Box>
 function create_default_slot_6(ctx) {
 	let h2;
 	let t1;
@@ -11512,25 +11512,25 @@ function create_default_slot_6(ctx) {
 			label2 = element("label");
 			input2 = element("input");
 			t6 = text("\n      Friends");
-			add_location(h2, file$u, 99, 4, 2541);
+			add_location(h2, file$u, 100, 4, 2601);
 			attr_dev(input0, "type", "radio");
 			input0.__value = "private";
 			input0.value = input0.__value;
 			/*$$binding_groups*/ ctx[11][2].push(input0);
-			add_location(input0, file$u, 101, 6, 2574);
-			add_location(label0, file$u, 100, 4, 2560);
+			add_location(input0, file$u, 102, 6, 2634);
+			add_location(label0, file$u, 101, 4, 2620);
 			attr_dev(input1, "type", "radio");
 			input1.__value = "public";
 			input1.value = input1.__value;
 			/*$$binding_groups*/ ctx[11][2].push(input1);
-			add_location(input1, file$u, 105, 6, 2694);
-			add_location(label1, file$u, 104, 4, 2680);
+			add_location(input1, file$u, 106, 6, 2754);
+			add_location(label1, file$u, 105, 4, 2740);
 			attr_dev(input2, "type", "radio");
 			input2.__value = "friends";
 			input2.value = input2.__value;
 			/*$$binding_groups*/ ctx[11][2].push(input2);
-			add_location(input2, file$u, 109, 6, 2812);
-			add_location(label2, file$u, 108, 4, 2798);
+			add_location(input2, file$u, 110, 6, 2872);
+			add_location(label2, file$u, 109, 4, 2858);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, h2, anchor);
@@ -11589,14 +11589,14 @@ function create_default_slot_6(ctx) {
 		block,
 		id: create_default_slot_6.name,
 		type: "slot",
-		source: "(99:2) <Box>",
+		source: "(100:2) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (115:2) {#if canInteract}
+// (116:2) {#if canInteract}
 function create_if_block$g(ctx) {
 	let current;
 
@@ -11643,23 +11643,25 @@ function create_if_block$g(ctx) {
 		block,
 		id: create_if_block$g.name,
 		type: "if",
-		source: "(115:2) {#if canInteract}",
+		source: "(116:2) {#if canInteract}",
 		ctx
 	});
 
 	return block;
 }
 
-// (118:6) <Box>
+// (119:6) <Box>
 function create_default_slot_5(ctx) {
 	let h3;
 	let t1;
 	let label0;
 	let input0;
+	let input0_value_value;
 	let t2;
 	let t3;
 	let label1;
 	let input1;
+	let input1_value_value;
 	let t4;
 	let dispose;
 
@@ -11675,19 +11677,19 @@ function create_default_slot_5(ctx) {
 			label1 = element("label");
 			input1 = element("input");
 			t4 = text("\n          Enable");
-			add_location(h3, file$u, 118, 8, 2998);
+			add_location(h3, file$u, 119, 8, 3058);
 			attr_dev(input0, "type", "radio");
-			input0.__value = "0";
+			input0.__value = input0_value_value = 0;
 			input0.value = input0.__value;
 			/*$$binding_groups*/ ctx[11][1].push(input0);
-			add_location(input0, file$u, 120, 10, 3043);
-			add_location(label0, file$u, 119, 8, 3025);
+			add_location(input0, file$u, 121, 10, 3103);
+			add_location(label0, file$u, 120, 8, 3085);
 			attr_dev(input1, "type", "radio");
-			input1.__value = "1";
+			input1.__value = input1_value_value = 1;
 			input1.value = input1.__value;
 			/*$$binding_groups*/ ctx[11][1].push(input1);
-			add_location(input1, file$u, 128, 10, 3217);
-			add_location(label1, file$u, 127, 8, 3199);
+			add_location(input1, file$u, 129, 10, 3277);
+			add_location(label1, file$u, 128, 8, 3259);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, h3, anchor);
@@ -11733,23 +11735,25 @@ function create_default_slot_5(ctx) {
 		block,
 		id: create_default_slot_5.name,
 		type: "slot",
-		source: "(118:6) <Box>",
+		source: "(119:6) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (136:6) <Box>
+// (137:6) <Box>
 function create_default_slot_4(ctx) {
 	let h3;
 	let t1;
 	let label0;
 	let input0;
+	let input0_value_value;
 	let t2;
 	let t3;
 	let label1;
 	let input1;
+	let input1_value_value;
 	let t4;
 	let dispose;
 
@@ -11765,19 +11769,19 @@ function create_default_slot_4(ctx) {
 			label1 = element("label");
 			input1 = element("input");
 			t4 = text("\n          Enable");
-			add_location(h3, file$u, 136, 8, 3396);
+			add_location(h3, file$u, 137, 8, 3456);
 			attr_dev(input0, "type", "radio");
-			input0.__value = "0";
+			input0.__value = input0_value_value = 0;
 			input0.value = input0.__value;
 			/*$$binding_groups*/ ctx[11][0].push(input0);
-			add_location(input0, file$u, 138, 10, 3444);
-			add_location(label0, file$u, 137, 8, 3426);
+			add_location(input0, file$u, 139, 10, 3504);
+			add_location(label0, file$u, 138, 8, 3486);
 			attr_dev(input1, "type", "radio");
-			input1.__value = "1";
+			input1.__value = input1_value_value = 1;
 			input1.value = input1.__value;
 			/*$$binding_groups*/ ctx[11][0].push(input1);
-			add_location(input1, file$u, 146, 10, 3620);
-			add_location(label1, file$u, 145, 8, 3602);
+			add_location(input1, file$u, 147, 10, 3680);
+			add_location(label1, file$u, 146, 8, 3662);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, h3, anchor);
@@ -11823,14 +11827,14 @@ function create_default_slot_4(ctx) {
 		block,
 		id: create_default_slot_4.name,
 		type: "slot",
-		source: "(136:6) <Box>",
+		source: "(137:6) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (116:4) <Box>
+// (117:4) <Box>
 function create_default_slot_3(ctx) {
 	let h2;
 	let t1;
@@ -11861,7 +11865,7 @@ function create_default_slot_3(ctx) {
 			create_component(box0.$$.fragment);
 			t2 = space();
 			create_component(box1.$$.fragment);
-			add_location(h2, file$u, 116, 6, 2960);
+			add_location(h2, file$u, 117, 6, 3020);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, h2, anchor);
@@ -11911,14 +11915,14 @@ function create_default_slot_3(ctx) {
 		block,
 		id: create_default_slot_3.name,
 		type: "slot",
-		source: "(116:4) <Box>",
+		source: "(117:4) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (160:4) <Box>
+// (161:4) <Box>
 function create_default_slot_2(ctx) {
 	let button;
 	let dispose;
@@ -11927,7 +11931,7 @@ function create_default_slot_2(ctx) {
 		c: function create() {
 			button = element("button");
 			button.textContent = "Delete this list forever";
-			add_location(button, file$u, 160, 6, 3846);
+			add_location(button, file$u, 161, 6, 3906);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, button, anchor);
@@ -11945,14 +11949,14 @@ function create_default_slot_2(ctx) {
 		block,
 		id: create_default_slot_2.name,
 		type: "slot",
-		source: "(160:4) <Box>",
+		source: "(161:4) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (158:2) <Box>
+// (159:2) <Box>
 function create_default_slot_1(ctx) {
 	let h1;
 	let t1;
@@ -11972,7 +11976,7 @@ function create_default_slot_1(ctx) {
 			h1.textContent = "Danger";
 			t1 = space();
 			create_component(box.$$.fragment);
-			add_location(h1, file$u, 158, 4, 3814);
+			add_location(h1, file$u, 159, 4, 3874);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, h1, anchor);
@@ -12009,14 +12013,14 @@ function create_default_slot_1(ctx) {
 		block,
 		id: create_default_slot_1.name,
 		type: "slot",
-		source: "(158:2) <Box>",
+		source: "(159:2) <Box>",
 		ctx
 	});
 
 	return block;
 }
 
-// (97:0) <Box>
+// (98:0) <Box>
 function create_default_slot(ctx) {
 	let h1;
 	let t1;
@@ -12052,7 +12056,7 @@ function create_default_slot(ctx) {
 			if (if_block) if_block.c();
 			t3 = space();
 			create_component(box1.$$.fragment);
-			add_location(h1, file$u, 97, 2, 2511);
+			add_location(h1, file$u, 98, 2, 2571);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, h1, anchor);
@@ -12132,7 +12136,7 @@ function create_default_slot(ctx) {
 		block,
 		id: create_default_slot.name,
 		type: "slot",
-		source: "(97:0) <Box>",
+		source: "(98:0) <Box>",
 		ctx
 	});
 
@@ -12309,7 +12313,8 @@ function instance$v($$self, $$props, $$invalidate) {
 	);
 
 	if (!aList.info.hasOwnProperty("interact") || !aList.info.interact.hasOwnProperty("slideshow")) {
-		aList.info.interact = { slideshow: "0" };
+		// TODO how to make this work per version
+		aList.info.interact = { slideshow: 0, totalrecall: 1 };
 	}
 
 	function cancel() {

@@ -33,7 +33,8 @@
     !aList.info.hasOwnProperty("interact") ||
     !aList.info.interact.hasOwnProperty("slideshow")
   ) {
-    aList.info.interact = { slideshow: "0" };
+    // TODO how to make this work per version
+    aList.info.interact = { slideshow: 0, totalrecall: 1 };
   }
 
   $: canInteract = aList && aList.info.type === "v1";
@@ -121,7 +122,7 @@
           <input
             type="radio"
             bind:group={aList.info.interact.slideshow}
-            value="0" />
+            value={0} />
           Disable
         </label>
 
@@ -129,7 +130,7 @@
           <input
             type="radio"
             bind:group={aList.info.interact.slideshow}
-            value="1" />
+            value={1} />
           Enable
         </label>
       </Box>
@@ -139,7 +140,7 @@
           <input
             type="radio"
             bind:group={aList.info.interact.totalrecall}
-            value="0" />
+            value={0} />
           Disable
         </label>
 
@@ -147,7 +148,7 @@
           <input
             type="radio"
             bind:group={aList.info.interact.totalrecall}
-            value="1" />
+            value={1} />
           Enable
         </label>
       </Box>
