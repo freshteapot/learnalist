@@ -17,9 +17,12 @@ hugo/data/alist/
 hugo/data/alistsbyuser/
 hugo/public/
 hugo/node_modules/
+
 # Postcss specific
 hugo/hugo_stats.json
 hugo/resources/
 
 # js
 js/node_modules
+hugo/static/css/*.dev.*
+hugo/static/js/*.dev.*
