@@ -1,4 +1,3 @@
-
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
@@ -27,8 +26,6 @@ export default {
       extract: true,
     }),
 
-    // TODO Css is not coming thru when customelement includes non-custom element
-    // Possible tip https://github.com/sveltejs/svelte/issues/4274.
     svelte({
       dev: !IS_PROD,
       customElement: false,
@@ -42,6 +39,8 @@ export default {
       }
     }),
 
+    // TODO Css is not coming thru when customelement includes non-custom element
+    // Possible tip https://github.com/sveltejs/svelte/issues/4274.
     svelte({
       dev: !IS_PROD,
       customElement: true,
