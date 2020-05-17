@@ -26,7 +26,7 @@
   ];
   */
   export let data = [];
-  export let gameSize = 7;
+  export let gameSize = 3;
   export let speed = 1;
 
   playElement.style.display = "";
