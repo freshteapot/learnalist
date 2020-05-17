@@ -30,6 +30,7 @@ hugo/static/css/editor.*
 hugo/static/css/v1.*
 hugo/static/js/main.*
 hugo/static/js/editor.*
+hugo/static/js/shared.*
 hugo/static/js/v1.*
 hugo/static/js/v2.*
 hugo/static/js/v3.*

@@ -55,6 +55,5 @@ build
 
 
 # Add static file
-git add hugo/static/
 git add hugo/data/manifest_css.json
 git add hugo/data/manifest_js.json
