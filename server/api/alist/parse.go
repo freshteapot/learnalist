@@ -12,11 +12,10 @@ func parseAlistInfo(jsonBytes []byte) (AlistInfo, error) {
 	if listInfo.Labels == nil {
 		listInfo.Labels = []string{}
 	}
+
 	if listInfo.SharedWith == "" {
 		listInfo.SharedWith = aclKeys.NotShared
 	}
-	if listInfo.Interact == nil {
-		listInfo.Interact = &Interact{Slideshow: "0"}
-	}
+
 	return *listInfo, err
 }

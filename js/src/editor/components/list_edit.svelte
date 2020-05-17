@@ -29,13 +29,6 @@
       return listTypes[key];
     }, ListEditDataTodo);
 
-  if (
-    !aList.info.hasOwnProperty("interact") ||
-    !aList.info.interact.hasOwnProperty("slideshow")
-  ) {
-    aList.info.interact = { slideshow: "0" };
-  }
-
   $: canInteract = aList && aList.info.type === "v1";
 
   function cancel() {
@@ -121,7 +114,7 @@
           <input
             type="radio"
             bind:group={aList.info.interact.slideshow}
-            value="0" />
+            value={0} />
           Disable
         </label>
 
@@ -129,10 +122,29 @@
           <input
             type="radio"
             bind:group={aList.info.interact.slideshow}
-            value="1" />
+            value={1} />
           Enable
         </label>
       </Box>
+      <Box>
+        <h3>Total Recall</h3>
+        <label>
+          <input
+            type="radio"
+            bind:group={aList.info.interact.totalrecall}
+            value={0} />
+          Disable
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            bind:group={aList.info.interact.totalrecall}
+            value={1} />
+          Enable
+        </label>
+      </Box>
+
     </Box>
   {/if}
 

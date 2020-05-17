@@ -92,3 +92,44 @@ rsync -avzP \
 --rsync-path="sudo rsync" \
 ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 ```
+
+
+# Install
+```sh
+export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export SSH_SERVER="lal01.learnalist.net"
+kubectl config unset current-context
+kubectl config use-context default
+kill -9 $(lsof -ti tcp:6443)
+kill -9 $(lsof -ti tcp:5000)
+ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
+ssh $SSH_SERVER -L 5000:127.0.0.1:5000 -N &
+```
+```sh
+ssh $SSH_SERVER
+sudo su -
+kill -9 $(lsof -ti tcp:5000)
+```
+
+```sh
+kubectl scale deployment/container-registry  --replicas=1
+ssh $SSH_SERVER sudo kubectl port-forward deployment/container-registry 5000:5000 &
+```
+
+```sh
+kubectl apply -f k8s/learnalist.yaml
+```
+
+```sh
+kubectl scale deployment/container-registry  --replicas=0
+kill -9 $(lsof -ti tcp:6443)
+kill -9 $(lsof -ti tcp:5000)
+kubectl config unset current-context
+unset KUBECONFIG
+
+ssh $SSH_SERVER
+sudo su -
+kill -9 $(lsof -ti tcp:5000)
+
+unset SSH_SERVER
+```

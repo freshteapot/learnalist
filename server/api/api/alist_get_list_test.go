@@ -154,7 +154,8 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetAlist", alistUUID).Return(aList, nil)
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"shared_with":""},"uuid":"fake-list-123"}`))
+			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
+
 		})
 	})
 })

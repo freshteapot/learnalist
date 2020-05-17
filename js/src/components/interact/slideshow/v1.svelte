@@ -1,19 +1,15 @@
 <script>
-  import { tick } from "svelte";
-  import { onMount } from "svelte";
-
+  import { push } from "svelte-spa-router";
   // {DomElement}
-  let listElement;
+  export let listElement;
   // {DomElement}
-  let playElement;
+  export let playElement;
   // learnalist aList object
-  export let listdata;
+  // This is horrible, as it works on aList not alist
+  export let aList;
 
-  let aList = {};
-  onMount(async () => {
-    await tick();
-    aList = JSON.parse(listdata);
-  });
+  playElement.style.display = "";
+  listElement.style.display = "none";
 
   let loops = 0;
   let index = -1;
@@ -21,24 +17,6 @@
     "Welcome, to beginning, click next, or use the right arrow key..";
   let show = firstTime;
   let nextTimeIsLoop = 0;
-
-  /**
-   * Start / prepare the slideshow for first usage.
-   * @param {DomElement} _listView
-   * @param {DomElement} _playView
-   */
-  export function start(_listElement, _playElement) {
-    show = firstTime;
-    loops = 0;
-    index = -1;
-    nextTimeIsLoop = 0;
-
-    playElement = _playElement;
-    listElement = _listElement;
-    playElement.style.display = "";
-    listElement.style.display = "none";
-    window.addEventListener("keydown", handleKeydown);
-  }
 
   function forward(event) {
     index += 1;
@@ -67,9 +45,9 @@
   }
 
   function handleClose(event) {
-    window.removeEventListener("keydown", handleKeydown);
     playElement.style.display = "none";
     listElement.style.display = "";
+    push("/");
   }
 
   function handleKeydown(event) {
@@ -79,7 +57,6 @@
         break;
       case "Space":
       case "ArrowRight":
-        console.log("right");
         forward(event);
         break;
       default:
@@ -94,6 +71,7 @@
   @import "tachyons";
 </style>
 
+<svelte:window on:keydown={handleKeydown} />
 <svelte:options tag={null} accessors={true} />
 <article>
   <header>
@@ -102,7 +80,7 @@
     <button class="br3" on:click={handleClose}>Close</button>
   </header>
   <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-    <p class="f5 f4-m f3-l lh-copy measure mt0">{show}</p>
+    <p class="f3 lh-copy">{show}</p>
     {#if loops > 0}
       <cite class="f6 ttu tracked fs-normal">
         - {loops} (Looped over the list)

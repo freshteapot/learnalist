@@ -39,7 +39,7 @@ var _ = Describe("Testing alist.Alist", func() {
 			})
 
 			It("When data is missing", func() {
-				input := `{"info": {"title": "I am a title"}}`
+				input := `{"info": {"title": "I am a title", "type": "v1"}}`
 
 				err := aList.UnmarshalJSON([]byte(input))
 				Expect(err).Should(HaveOccurred())

@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
@@ -10,43 +9,50 @@ import autoPreprocess from 'svelte-preprocess'
 const IS_PROD = !process.env.ROLLUP_WATCH;
 const { getComponentInfo, rollupPluginManifestSync } = require("./src/utils/glue.js");
 const componentKey = "v1";
-const componentInfo = getComponentInfo(componentKey);
+const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 
 // External and replacement needs to be the full path :(
 export default {
-  external: ['superstore'],
   input: 'src/v1.js',
   output: {
-    globals: {
-      'superstore': 'superstore',
-    },
     sourcemap: !IS_PROD,
-    format: 'iife',
+    format: 'esm',
     name: componentInfo.componentKey,
     file: componentInfo.outputPath
   },
   plugins: [
-    alias({
-      entries: [
-        { find: './store.js', replacement: 'superstore' },
-        { find: '../store.js', replacement: 'superstore' },
-        { find: '../../store.js', replacement: 'superstore' },
-      ]
-    }),
     del({ targets: componentInfo.rollupDeleteTargets, verbose: true, force: true }),
     postcss({
       extract: true,
     }),
+
+    svelte({
+      dev: !IS_PROD,
+      customElement: false,
+      exclude: /\.wc\.svelte$/,
+      preprocess: autoPreprocess({
+        postcss: true
+      }),
+      css: css => {
+        // TODO how to have this cache friendly?
+        css.write(componentInfo.outputPathCSS);
+      }
+    }),
+
+    // TODO Css is not coming thru when customelement includes non-custom element
+    // Possible tip https://github.com/sveltejs/svelte/issues/4274.
     svelte({
       dev: !IS_PROD,
       customElement: true,
+      include: /\.wc\.svelte$/,
       preprocess: autoPreprocess({
         postcss: true
-      })
+      }),
+      css: true, // I Wonder if I actually need this.
     }),
 
     resolve({
-      browser: true,
+      browser: true
     }),
     commonjs(),
 

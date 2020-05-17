@@ -17,9 +17,21 @@ hugo/data/alist/
 hugo/data/alistsbyuser/
 hugo/public/
 hugo/node_modules/
+
 # Postcss specific
 hugo/hugo_stats.json
 hugo/resources/
 
 # js
 js/node_modules
+# Removing dev assets
+hugo/static/css/base.*
+hugo/static/css/editor.*
+hugo/static/css/v1.*
+hugo/static/js/main.*
+hugo/static/js/editor.*
+hugo/static/js/shared.*
+hugo/static/js/v1.*
+hugo/static/js/v2.*
+hugo/static/js/v3.*
+hugo/static/js/v4.*

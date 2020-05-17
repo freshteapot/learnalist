@@ -1,5 +1,17 @@
-import LoginHeader from './components/login_header.svelte';
-import Banner from './components/banner/banner.svelte';
 
-customElements.define('login-header', LoginHeader);
-customElements.define('notification-center', Banner);
+import Menu from './components/interact/menu.wc.svelte';
+import Interact from "./components/interact/interact.svelte";
+
+// Webcomponent
+customElements.define('interact-menu', Menu);
+
+// Actual app to handle the interactions
+let app;
+const el = document.querySelector("#play-screen")
+if (el) {
+    app = new Interact({
+        target: el,
+    });
+}
+
+export default app;
