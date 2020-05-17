@@ -29,14 +29,6 @@
       return listTypes[key];
     }, ListEditDataTodo);
 
-  if (
-    !aList.info.hasOwnProperty("interact") ||
-    !aList.info.interact.hasOwnProperty("slideshow")
-  ) {
-    // TODO how to make this work per version
-    aList.info.interact = { slideshow: 0, totalrecall: 1 };
-  }
-
   $: canInteract = aList && aList.info.type === "v1";
 
   function cancel() {

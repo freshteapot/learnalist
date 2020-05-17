@@ -34,6 +34,13 @@ sync-site-assets:
 	--exclude-from="exclude-srv-learnalist.txt" \
 	./hugo ${SSH_SERVER}:/srv/learnalist
 
+
+sync-db-files:
+	rsync -avzP \
+	--rsync-path="sudo rsync" \
+	./server/db ${SSH_SERVER}:/srv/learnalist
+
+
 develop:
 	cd js && \
 	npm run dev
