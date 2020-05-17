@@ -31,5 +31,5 @@
 </style>
 
 <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-  <p class="dark-pink f3 lh-copy">{show}</p>
+  <p class="f3 lh-copy">{show}</p>
 </blockquote>
