@@ -27,6 +27,7 @@
   }
 </script>
 
+<svelte:options tag={null} />
 <Router
   {routes}
   on:conditionsFailed={conditionsFailed}

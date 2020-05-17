@@ -1,9 +1,9 @@
 {
- "v2": "/js/v2.1589754550730.js",
- "v3": "/js/v3.1589754553521.js",
- "main": "/js/main.1589754545209.js",
- "v1": "/js/v1.1589754548049.js",
- "editor": "/js/editor.1589754556837.js",
- "shared": "/js/shared.1589754547203.js",
- "v4": "/js/v4.1589754555193.js"
+ "v2": "/js/v2.dev.js",
+ "v3": "/js/v3.dev.js",
+ "main": "/js/main.dev.js",
+ "v1": "/js/v1.dev.js",
+ "editor": "/js/editor.dev.js",
+ "shared": "/js/shared.dev.js",
+ "v4": "/js/v4.dev.js"
 }
