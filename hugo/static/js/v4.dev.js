@@ -366,7 +366,7 @@
     			attr_dev(a, "title", "Click to login");
     			attr_dev(a, "href", /*loginurl*/ ctx[0]);
     			attr_dev(a, "class", "f6 fw6 hover-red link black-70 mr2 mr3-m mr4-l dib");
-    			add_location(a, file, 189, 4, 109451);
+    			add_location(a, file, 189, 4, 109400);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -415,15 +415,15 @@
     			attr_dev(a0, "title", "create, edit, share");
     			attr_dev(a0, "href", "/editor.html");
     			attr_dev(a0, "class", "f6 fw6 hover-blue link black-70 ml0 mr2-l di");
-    			add_location(a0, file, 169, 4, 108948);
+    			add_location(a0, file, 169, 4, 108897);
     			attr_dev(a1, "title", "Lists created by you");
     			attr_dev(a1, "href", "/lists-by-me.html");
     			attr_dev(a1, "class", "f6 fw6 hover-blue link black-70 di");
-    			add_location(a1, file, 175, 4, 109097);
+    			add_location(a1, file, 175, 4, 109046);
     			attr_dev(a2, "title", "Logout");
     			attr_dev(a2, "href", "/logout.html");
     			attr_dev(a2, "class", "f6 fw6 hover-blue link black-70 di ml3");
-    			add_location(a2, file, 181, 4, 109244);
+    			add_location(a2, file, 181, 4, 109193);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, a0, anchor);
@@ -475,7 +475,7 @@
     			if (if_block) if_block.c();
     			this.c = noop;
     			attr_dev(div, "class", "fr mt0");
-    			add_location(div, file, 167, 0, 108904);
+    			add_location(div, file, 167, 0, 108853);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -610,22 +610,22 @@
     			t1 = space();
     			span = element("span");
     			t2 = text(/*message*/ ctx[2]);
-    			add_location(title, file$1, 197, 6, 110031);
+    			add_location(title, file$1, 197, 6, 109980);
     			attr_dev(path, "d", path_d_value = /*getIcon*/ ctx[5](/*$notifications*/ ctx[1].level));
-    			add_location(path, file$1, 198, 6, 110062);
+    			add_location(path, file$1, 198, 6, 110011);
     			attr_dev(svg, "class", "w1");
     			attr_dev(svg, "data-icon", "info");
     			attr_dev(svg, "viewBox", "0 0 24 24");
     			set_style(svg, "fill", "currentcolor");
     			set_style(svg, "width", "2em");
     			set_style(svg, "height", "2em");
-    			add_location(svg, file$1, 192, 4, 109900);
+    			add_location(svg, file$1, 192, 4, 109849);
     			attr_dev(span, "class", "lh-title ml3");
-    			add_location(span, file$1, 200, 4, 110120);
+    			add_location(span, file$1, 200, 4, 110069);
     			attr_dev(div, "class", "flex items-center justify-center pa3 navy");
     			toggle_class(div, "info", /*level*/ ctx[0] === "info");
     			toggle_class(div, "error", /*level*/ ctx[0] === "error");
-    			add_location(div, file$1, 187, 2, 109743);
+    			add_location(div, file$1, 187, 2, 109692);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, div, anchor);

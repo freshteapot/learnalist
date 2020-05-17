@@ -15,7 +15,6 @@ var fixInteractV1Cmd = &cobra.Command{
 		dsn, _ := cmd.Flags().GetString("dsn")
 		// 1) Find lists that have interact object
 		// 2) Update lists of type v1 with slideshow and totalrecall
-		// 3) trigger rebuild of sites?
 		db := database.NewDB(dsn)
 		history := fix.NewHistory(db)
 		fixup := fix.NewInteractV1(db)

@@ -12,6 +12,7 @@
 </script>
 
 <style>
+  @import "../../../../hugo/assets/css/base-v1.css";
   @import "tachyons";
 </style>
 

@@ -432,7 +432,7 @@ var v2 = (function () {
 
     const file = "src/components/interact/menu.wc.svelte";
 
-    // (170:0) {#if slideshow == '1'}
+    // (353:0) {#if slideshow == '1'}
     function create_if_block_1(ctx) {
     	let button;
     	let dispose;
@@ -442,7 +442,7 @@ var v2 = (function () {
     			button = element("button");
     			button.textContent = "Slideshow";
     			attr_dev(button, "class", "br3");
-    			add_location(button, file, 170, 2, 108992);
+    			add_location(button, file, 353, 2, 111118);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, button, anchor);
@@ -460,14 +460,14 @@ var v2 = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(170:0) {#if slideshow == '1'}",
+    		source: "(353:0) {#if slideshow == '1'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (174:0) {#if totalrecall == '1'}
+    // (357:0) {#if totalrecall == '1'}
     function create_if_block(ctx) {
     	let button;
     	let dispose;
@@ -477,7 +477,7 @@ var v2 = (function () {
     			button = element("button");
     			button.textContent = "Total Recall";
     			attr_dev(button, "class", "br3");
-    			add_location(button, file, 174, 2, 109090);
+    			add_location(button, file, 357, 2, 111216);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, button, anchor);
@@ -495,7 +495,7 @@ var v2 = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(174:0) {#if totalrecall == '1'}",
+    		source: "(357:0) {#if totalrecall == '1'}",
     		ctx
     	});
 
@@ -620,7 +620,7 @@ var v2 = (function () {
     class Menu_wc extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}.br3{border-radius:.5rem}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
+    		this.shadowRoot.innerHTML = `<style>button{font-family:inherit;font-size:inherit;padding:0.4em;margin:0 0 0.5em 0;box-sizing:border-box;border:1px solid #ccc;border-radius:2px}button{color:#333;background-color:#f4f4f4;outline:none}button:active{background-color:#ddd}button:focus{border-color:#666}button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}.br3{border-radius:.5rem}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
     		init(this, { target: this.shadowRoot }, instance, create_fragment, safe_not_equal, { slideshow: 0, totalrecall: 1 });
 
     		if (options) {
@@ -1519,18 +1519,19 @@ var v2 = (function () {
     }
 
     // (271:0) {#if state === 'playing'}
-    function create_if_block_3(ctx) {
+    function create_if_block_4(ctx) {
+    	let p;
     	let t0;
+    	let t1;
+    	let t2;
     	let div;
     	let button0;
-    	let t2;
-    	let button1;
     	let t4;
-    	let button2;
+    	let button1;
     	let t6;
-    	let p;
-    	let t7;
+    	let button2;
     	let dispose;
+    	let if_block = /*hasChecked*/ ctx[3] && create_if_block_5(ctx);
     	let each_value_2 = /*playData*/ ctx[1];
     	validate_each_argument(each_value_2);
     	let each_blocks = [];
@@ -1539,50 +1540,54 @@ var v2 = (function () {
     		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
     	}
 
-    	let if_block = /*hasChecked*/ ctx[3] && create_if_block_4(ctx);
-
     	const block = {
     		c: function create() {
+    			p = element("p");
+    			t0 = text("How many do you remember?\n    ");
+    			if (if_block) if_block.c();
+    			t1 = space();
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			t0 = space();
+    			t2 = space();
     			div = element("div");
     			button0 = element("button");
     			button0.textContent = "check";
-    			t2 = space();
+    			t4 = space();
     			button1 = element("button");
     			button1.textContent = "I give up, show me";
-    			t4 = space();
+    			t6 = space();
     			button2 = element("button");
     			button2.textContent = "restart";
-    			t6 = space();
-    			p = element("p");
-    			t7 = text("How many do you remember?\n    ");
-    			if (if_block) if_block.c();
-    			add_location(button0, file$1, 282, 4, 111676);
-    			add_location(button1, file$1, 283, 4, 111720);
-    			add_location(button2, file$1, 284, 4, 111778);
-    			add_location(div, file$1, 281, 2, 111666);
-    			add_location(p, file$1, 286, 2, 111833);
+    			add_location(p, file$1, 271, 2, 111328);
+    			attr_dev(button0, "class", "br3");
+    			add_location(button0, file$1, 287, 4, 111696);
+    			attr_dev(button1, "class", "br3");
+    			add_location(button1, file$1, 288, 4, 111752);
+    			attr_dev(button2, "class", "br3");
+    			add_location(button2, file$1, 289, 4, 111822);
+    			attr_dev(div, "class", "pv1");
+    			add_location(div, file$1, 286, 2, 111674);
     		},
     		m: function mount(target, anchor, remount) {
+    			insert_dev(target, p, anchor);
+    			append_dev(p, t0);
+    			if (if_block) if_block.m(p, null);
+    			insert_dev(target, t1, anchor);
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].m(target, anchor);
     			}
 
-    			insert_dev(target, t0, anchor);
+    			insert_dev(target, t2, anchor);
     			insert_dev(target, div, anchor);
     			append_dev(div, button0);
-    			append_dev(div, t2);
-    			append_dev(div, button1);
     			append_dev(div, t4);
+    			append_dev(div, button1);
+    			append_dev(div, t6);
     			append_dev(div, button2);
-    			insert_dev(target, t6, anchor);
-    			insert_dev(target, p, anchor);
-    			append_dev(p, t7);
-    			if (if_block) if_block.m(p, null);
     			if (remount) run_all(dispose);
 
     			dispose = [
@@ -1592,6 +1597,19 @@ var v2 = (function () {
     			];
     		},
     		p: function update(ctx, dirty) {
+    			if (/*hasChecked*/ ctx[3]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    				} else {
+    					if_block = create_if_block_5(ctx);
+    					if_block.c();
+    					if_block.m(p, null);
+    				}
+    			} else if (if_block) {
+    				if_block.d(1);
+    				if_block = null;
+    			}
+
     			if (dirty & /*feedback, guesses, playData*/ 70) {
     				each_value_2 = /*playData*/ ctx[1];
     				validate_each_argument(each_value_2);
@@ -1605,7 +1623,7 @@ var v2 = (function () {
     					} else {
     						each_blocks[i] = create_each_block_2(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(t0.parentNode, t0);
+    						each_blocks[i].m(t2.parentNode, t2);
     					}
     				}
 
@@ -1615,34 +1633,21 @@ var v2 = (function () {
 
     				each_blocks.length = each_value_2.length;
     			}
-
-    			if (/*hasChecked*/ ctx[3]) {
-    				if (if_block) {
-    					if_block.p(ctx, dirty);
-    				} else {
-    					if_block = create_if_block_4(ctx);
-    					if_block.c();
-    					if_block.m(p, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
     		},
     		d: function destroy(detaching) {
-    			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(t0);
-    			if (detaching) detach_dev(div);
-    			if (detaching) detach_dev(t6);
     			if (detaching) detach_dev(p);
     			if (if_block) if_block.d();
+    			if (detaching) detach_dev(t1);
+    			destroy_each(each_blocks, detaching);
+    			if (detaching) detach_dev(t2);
+    			if (detaching) detach_dev(div);
     			run_all(dispose);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3.name,
+    		id: create_if_block_4.name,
     		type: "if",
     		source: "(271:0) {#if state === 'playing'}",
     		ctx
@@ -1651,70 +1656,8 @@ var v2 = (function () {
     	return block;
     }
 
-    // (272:2) {#each playData as item, index}
-    function create_each_block_2(ctx) {
-    	let div;
-    	let input;
-    	let input_class_value;
-    	let input_disabled_value;
-    	let dispose;
-
-    	function input_input_handler() {
-    		/*input_input_handler*/ ctx[17].call(input, /*index*/ ctx[21]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			input = element("input");
-    			attr_dev(input, "class", input_class_value = /*feedback*/ ctx[6][/*index*/ ctx[21]]);
-    			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
-    			attr_dev(input, "type", "text");
-    			attr_dev(input, "placeholder", "");
-    			add_location(input, file$1, 273, 6, 111475);
-    			add_location(div, file$1, 272, 4, 111463);
-    		},
-    		m: function mount(target, anchor, remount) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, input);
-    			set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
-    			if (remount) dispose();
-    			dispose = listen_dev(input, "input", input_input_handler);
-    		},
-    		p: function update(new_ctx, dirty) {
-    			ctx = new_ctx;
-
-    			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = /*feedback*/ ctx[6][/*index*/ ctx[21]])) {
-    				attr_dev(input, "class", input_class_value);
-    			}
-
-    			if (dirty & /*feedback*/ 64 && input_disabled_value !== (input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found")) {
-    				prop_dev(input, "disabled", input_disabled_value);
-    			}
-
-    			if (dirty & /*guesses*/ 4 && input.value !== /*guesses*/ ctx[2][/*index*/ ctx[21]]) {
-    				set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block_2.name,
-    		type: "each",
-    		source: "(272:2) {#each playData as item, index}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (289:4) {#if hasChecked}
-    function create_if_block_4(ctx) {
+    // (274:4) {#if hasChecked}
+    function create_if_block_5(ctx) {
     	let t0;
     	let t1;
 
@@ -1738,19 +1681,82 @@ var v2 = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_4.name,
+    		id: create_if_block_5.name,
     		type: "if",
-    		source: "(289:4) {#if hasChecked}",
+    		source: "(274:4) {#if hasChecked}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (293:0) {#if state === 'finished'}
-    function create_if_block_1$1(ctx) {
-    	let t0;
+    // (277:2) {#each playData as item, index}
+    function create_each_block_2(ctx) {
+    	let div;
+    	let input;
+    	let input_class_value;
+    	let input_disabled_value;
+    	let dispose;
+
+    	function input_input_handler() {
+    		/*input_input_handler*/ ctx[17].call(input, /*index*/ ctx[21]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			div = element("div");
+    			input = element("input");
+    			attr_dev(input, "class", input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]]);
+    			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
+    			attr_dev(input, "type", "text");
+    			attr_dev(input, "placeholder", "");
+    			add_location(input, file$1, 278, 6, 111475);
+    			attr_dev(div, "class", "pv1");
+    			add_location(div, file$1, 277, 4, 111451);
+    		},
+    		m: function mount(target, anchor, remount) {
+    			insert_dev(target, div, anchor);
+    			append_dev(div, input);
+    			set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
+    			if (remount) dispose();
+    			dispose = listen_dev(input, "input", input_input_handler);
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+
+    			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]])) {
+    				attr_dev(input, "class", input_class_value);
+    			}
+
+    			if (dirty & /*feedback*/ 64 && input_disabled_value !== (input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found")) {
+    				prop_dev(input, "disabled", input_disabled_value);
+    			}
+
+    			if (dirty & /*guesses*/ 4 && input.value !== /*guesses*/ ctx[2][/*index*/ ctx[21]]) {
+    				set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block_2.name,
+    		type: "each",
+    		source: "(277:2) {#each playData as item, index}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (294:0) {#if state === 'finished'}
+    function create_if_block_2(ctx) {
     	let p0;
+    	let t1;
     	let t2;
     	let t3;
     	let p1;
@@ -1771,17 +1777,18 @@ var v2 = (function () {
     		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
     	}
 
-    	let if_block = /*perfect*/ ctx[5] && create_if_block_2(ctx);
+    	let if_block = /*perfect*/ ctx[5] && create_if_block_3(ctx);
 
     	const block = {
     		c: function create() {
+    			p0 = element("p");
+    			p0.textContent = "Well done! You did it.";
+    			t1 = space();
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			t0 = space();
-    			p0 = element("p");
-    			p0.textContent = "Well done!";
     			t2 = space();
     			if (if_block) if_block.c();
     			t3 = space();
@@ -1796,19 +1803,23 @@ var v2 = (function () {
     			t9 = space();
     			button1 = element("button");
     			button1.textContent = "restart";
-    			add_location(p0, file$1, 303, 2, 112192);
-    			add_location(p1, file$1, 307, 2, 112263);
-    			add_location(button0, file$1, 310, 4, 112314);
-    			add_location(button1, file$1, 311, 4, 112367);
-    			add_location(div, file$1, 309, 2, 112304);
+    			add_location(p0, file$1, 294, 2, 111923);
+    			add_location(p1, file$1, 310, 2, 112267);
+    			attr_dev(button0, "class", "br3");
+    			add_location(button0, file$1, 313, 4, 112330);
+    			attr_dev(button1, "class", "br3");
+    			add_location(button1, file$1, 314, 4, 112395);
+    			attr_dev(div, "class", "pv1");
+    			add_location(div, file$1, 312, 2, 112308);
     		},
     		m: function mount(target, anchor, remount) {
+    			insert_dev(target, p0, anchor);
+    			insert_dev(target, t1, anchor);
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].m(target, anchor);
     			}
 
-    			insert_dev(target, t0, anchor);
-    			insert_dev(target, p0, anchor);
     			insert_dev(target, t2, anchor);
     			if (if_block) if_block.m(target, anchor);
     			insert_dev(target, t3, anchor);
@@ -1842,7 +1853,7 @@ var v2 = (function () {
     					} else {
     						each_blocks[i] = create_each_block_1(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(t0.parentNode, t0);
+    						each_blocks[i].m(t2.parentNode, t2);
     					}
     				}
 
@@ -1855,7 +1866,7 @@ var v2 = (function () {
 
     			if (/*perfect*/ ctx[5]) {
     				if (if_block) ; else {
-    					if_block = create_if_block_2(ctx);
+    					if_block = create_if_block_3(ctx);
     					if_block.c();
     					if_block.m(t3.parentNode, t3);
     				}
@@ -1867,9 +1878,9 @@ var v2 = (function () {
     			if (dirty & /*attempts*/ 128) set_data_dev(t5, /*attempts*/ ctx[7]);
     		},
     		d: function destroy(detaching) {
-    			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(t0);
     			if (detaching) detach_dev(p0);
+    			if (detaching) detach_dev(t1);
+    			destroy_each(each_blocks, detaching);
     			if (detaching) detach_dev(t2);
     			if (if_block) if_block.d(detaching);
     			if (detaching) detach_dev(t3);
@@ -1882,16 +1893,16 @@ var v2 = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$1.name,
+    		id: create_if_block_2.name,
     		type: "if",
-    		source: "(293:0) {#if state === 'finished'}",
+    		source: "(294:0) {#if state === 'finished'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (294:2) {#each playData as item, index}
+    // (297:2) {#each playData as item, index}
     function create_each_block_1(ctx) {
     	let div;
     	let input;
@@ -1907,12 +1918,13 @@ var v2 = (function () {
     		c: function create() {
     			div = element("div");
     			input = element("input");
-    			attr_dev(input, "class", input_class_value = /*feedback*/ ctx[6][/*index*/ ctx[21]]);
+    			attr_dev(input, "class", input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]]);
     			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
     			attr_dev(input, "type", "text");
     			attr_dev(input, "placeholder", "");
-    			add_location(input, file$1, 295, 6, 112001);
-    			add_location(div, file$1, 294, 4, 111989);
+    			add_location(input, file$1, 298, 6, 112016);
+    			attr_dev(div, "class", "pv1");
+    			add_location(div, file$1, 297, 4, 111992);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, div, anchor);
@@ -1924,7 +1936,7 @@ var v2 = (function () {
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
 
-    			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = /*feedback*/ ctx[6][/*index*/ ctx[21]])) {
+    			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]])) {
     				attr_dev(input, "class", input_class_value);
     			}
 
@@ -1946,22 +1958,22 @@ var v2 = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(294:2) {#each playData as item, index}",
+    		source: "(297:2) {#each playData as item, index}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (305:2) {#if perfect}
-    function create_if_block_2(ctx) {
+    // (308:2) {#if perfect}
+    function create_if_block_3(ctx) {
     	let p;
 
     	const block = {
     		c: function create() {
     			p = element("p");
     			p.textContent = "Perfect recall!";
-    			add_location(p, file$1, 305, 4, 112230);
+    			add_location(p, file$1, 308, 4, 112234);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p, anchor);
@@ -1973,23 +1985,27 @@ var v2 = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2.name,
+    		id: create_if_block_3.name,
     		type: "if",
-    		source: "(305:2) {#if perfect}",
+    		source: "(308:2) {#if perfect}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (316:0) {#if state === 'show-me'}
+    // (319:0) {#if state === 'show-me'}
     function create_if_block$2(ctx) {
+    	let p;
     	let t0;
+    	let t1;
+    	let t2;
     	let div;
     	let button0;
-    	let t2;
+    	let t4;
     	let button1;
     	let dispose;
+    	let if_block = /*hasChecked*/ ctx[3] && create_if_block_1$1(ctx);
     	let each_value = /*playData*/ ctx[1];
     	validate_each_argument(each_value);
     	let each_blocks = [];
@@ -2000,30 +2016,44 @@ var v2 = (function () {
 
     	const block = {
     		c: function create() {
+    			p = element("p");
+    			t0 = text("How many do you remember?\n    ");
+    			if (if_block) if_block.c();
+    			t1 = space();
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			t0 = space();
+    			t2 = space();
     			div = element("div");
     			button0 = element("button");
     			button0.textContent = "play again";
-    			t2 = space();
+    			t4 = space();
     			button1 = element("button");
     			button1.textContent = "restart";
-    			add_location(button0, file$1, 327, 4, 112656);
-    			add_location(button1, file$1, 328, 4, 112709);
-    			add_location(div, file$1, 326, 2, 112646);
+    			add_location(p, file$1, 319, 2, 112495);
+    			attr_dev(button0, "class", "br3");
+    			add_location(button0, file$1, 336, 4, 112814);
+    			attr_dev(button1, "class", "br3");
+    			add_location(button1, file$1, 337, 4, 112879);
+    			attr_dev(div, "class", "pv2");
+    			add_location(div, file$1, 335, 2, 112792);
     		},
     		m: function mount(target, anchor, remount) {
+    			insert_dev(target, p, anchor);
+    			append_dev(p, t0);
+    			if (if_block) if_block.m(p, null);
+    			insert_dev(target, t1, anchor);
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].m(target, anchor);
     			}
 
-    			insert_dev(target, t0, anchor);
+    			insert_dev(target, t2, anchor);
     			insert_dev(target, div, anchor);
     			append_dev(div, button0);
-    			append_dev(div, t2);
+    			append_dev(div, t4);
     			append_dev(div, button1);
     			if (remount) run_all(dispose);
 
@@ -2033,6 +2063,19 @@ var v2 = (function () {
     			];
     		},
     		p: function update(ctx, dirty) {
+    			if (/*hasChecked*/ ctx[3]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    				} else {
+    					if_block = create_if_block_1$1(ctx);
+    					if_block.c();
+    					if_block.m(p, null);
+    				}
+    			} else if (if_block) {
+    				if_block.d(1);
+    				if_block = null;
+    			}
+
     			if (dirty & /*playData*/ 2) {
     				each_value = /*playData*/ ctx[1];
     				validate_each_argument(each_value);
@@ -2046,7 +2089,7 @@ var v2 = (function () {
     					} else {
     						each_blocks[i] = create_each_block(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(t0.parentNode, t0);
+    						each_blocks[i].m(t2.parentNode, t2);
     					}
     				}
 
@@ -2058,8 +2101,11 @@ var v2 = (function () {
     			}
     		},
     		d: function destroy(detaching) {
+    			if (detaching) detach_dev(p);
+    			if (if_block) if_block.d();
+    			if (detaching) detach_dev(t1);
     			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(t0);
+    			if (detaching) detach_dev(t2);
     			if (detaching) detach_dev(div);
     			run_all(dispose);
     		}
@@ -2069,14 +2115,48 @@ var v2 = (function () {
     		block,
     		id: create_if_block$2.name,
     		type: "if",
-    		source: "(316:0) {#if state === 'show-me'}",
+    		source: "(319:0) {#if state === 'show-me'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (317:2) {#each playData as item, index}
+    // (322:4) {#if hasChecked}
+    function create_if_block_1$1(ctx) {
+    	let t0;
+    	let t1;
+
+    	const block = {
+    		c: function create() {
+    			t0 = text(/*leftToFind*/ ctx[4]);
+    			t1 = text(" left");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, t0, anchor);
+    			insert_dev(target, t1, anchor);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*leftToFind*/ 16) set_data_dev(t0, /*leftToFind*/ ctx[4]);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(t0);
+    			if (detaching) detach_dev(t1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block_1$1.name,
+    		type: "if",
+    		source: "(322:4) {#if hasChecked}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (325:2) {#each playData as item, index}
     function create_each_block(ctx) {
     	let div;
     	let input;
@@ -2086,13 +2166,14 @@ var v2 = (function () {
     		c: function create() {
     			div = element("div");
     			input = element("input");
-    			attr_dev(input, "class", "found");
+    			attr_dev(input, "class", "w-100 found");
     			input.disabled = "true";
     			attr_dev(input, "type", "text");
     			attr_dev(input, "placeholder", "");
     			input.value = input_value_value = /*item*/ ctx[19];
-    			add_location(input, file$1, 318, 6, 112503);
-    			add_location(div, file$1, 317, 4, 112491);
+    			add_location(input, file$1, 326, 6, 112642);
+    			attr_dev(div, "class", "pv1");
+    			add_location(div, file$1, 325, 4, 112618);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2112,7 +2193,7 @@ var v2 = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(317:2) {#each playData as item, index}",
+    		source: "(325:2) {#each playData as item, index}",
     		ctx
     	});
 
@@ -2123,8 +2204,8 @@ var v2 = (function () {
     	let t0;
     	let t1;
     	let if_block2_anchor;
-    	let if_block0 = /*state*/ ctx[0] === "playing" && create_if_block_3(ctx);
-    	let if_block1 = /*state*/ ctx[0] === "finished" && create_if_block_1$1(ctx);
+    	let if_block0 = /*state*/ ctx[0] === "playing" && create_if_block_4(ctx);
+    	let if_block1 = /*state*/ ctx[0] === "finished" && create_if_block_2(ctx);
     	let if_block2 = /*state*/ ctx[0] === "show-me" && create_if_block$2(ctx);
 
     	const block = {
@@ -2153,7 +2234,7 @@ var v2 = (function () {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
     				} else {
-    					if_block0 = create_if_block_3(ctx);
+    					if_block0 = create_if_block_4(ctx);
     					if_block0.c();
     					if_block0.m(t0.parentNode, t0);
     				}
@@ -2166,7 +2247,7 @@ var v2 = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block_1$1(ctx);
+    					if_block1 = create_if_block_2(ctx);
     					if_block1.c();
     					if_block1.m(t1.parentNode, t1);
     				}
@@ -2402,7 +2483,7 @@ var v2 = (function () {
     class Recall extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>button,input{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}div,p{box-sizing:border-box}.ba{border-style:solid;border-width:1px}.bt{border-top-style:solid;border-top-width:1px}.br{border-right-style:solid;border-right-width:1px}.bb{border-bottom-style:solid;border-bottom-width:1px}.bl{border-left-style:solid;border-left-width:1px}.bn{border-style:none;border-width:0}.b--black{border-color:#000}.b--moon-gray{border-color:#ccc}.b--black-30{border-color:rgba(0,0,0,.3)}.b--black-20{border-color:rgba(0,0,0,.2)}.b--black-10{border-color:rgba(0,0,0,.1)}.b--black-05{border-color:rgba(0,0,0,.05)}.b--red{border-color:#ff4136}.b--yellow{border-color:gold}.b--washed-yellow{border-color:#fffceb}.b--transparent{border-color:transparent}.br1{border-radius:.125rem}.br2{border-radius:.25rem}.br3{border-radius:.5rem}.b--dotted{border-style:dotted}.bw1{border-width:.125rem}.bw2{border-width:.25rem}.bw3{border-width:.5rem}.bt-0{border-top-width:0}.br-0{border-right-width:0}.bl-0{border-left-width:0}.pre{overflow-x:auto;overflow-y:hidden;overflow:scroll}.di{display:inline}.db{display:block}.dib{display:inline-block}.dt{display:table}.dtc{display:table-cell}.flex{display:flex}.flex-column{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.fl{float:left}.fl,.fr{_display:inline}.fr{float:right}.athelas{font-family:athelas,georgia,serif}.fs-normal{font-style:normal}.b{font-weight:700}.fw3{font-weight:300}.fw4{font-weight:400}.fw5{font-weight:500}.fw6{font-weight:600}.input-reset{-webkit-appearance:none;-moz-appearance:none}.input-reset::-moz-focus-inner{border:0;padding:0}.h1{height:1rem}.h2{height:2rem}.h3{height:4rem}.tracked{letter-spacing:.1em}.lh-title{line-height:1.25}.lh-copy{line-height:1.5}.link{text-decoration:none}.link,.link:active,.link:focus,.link:hover,.link:link,.link:visited{transition:color .15s ease-in}.link:focus{outline:1px dotted currentColor}.list{list-style-type:none}.mw-100{max-width:100%}.w1{width:1rem}.w-25{width:25%}.w-75{width:75%}.w-100{width:100%}.black-90{color:rgba(0,0,0,.9)}.black-80{color:rgba(0,0,0,.8)}.black-70{color:rgba(0,0,0,.7)}.black-60{color:rgba(0,0,0,.6)}.black-40{color:rgba(0,0,0,.4)}.black{color:#000}.dark-gray{color:#333}.white{color:#fff}.dark-pink{color:#d5008f}.navy{color:#001b44}.bg-white{background-color:#fff}.bg-transparent{background-color:transparent}.bg-light-red{background-color:#ff725c}.bg-washed-yellow{background-color:#fffceb}.bg-washed-red{background-color:#ffdfdf}.hover-red:focus,.hover-red:hover{color:#ff4136}.hover-blue:focus,.hover-blue:hover{color:#357edd}.pa0{padding:0}.pa1{padding:.25rem}.pa2{padding:.5rem}.pa3{padding:1rem}.pa4{padding:2rem}.pl0{padding-left:0}.pl4{padding-left:2rem}.pb2{padding-bottom:.5rem}.pt2{padding-top:.5rem}.pt5{padding-top:4rem}.pv0{padding-top:0;padding-bottom:0}.pv1{padding-top:.25rem;padding-bottom:.25rem}.pv2{padding-top:.5rem;padding-bottom:.5rem}.pv3{padding-top:1rem;padding-bottom:1rem}.pv5{padding-top:4rem;padding-bottom:4rem}.ph0{padding-left:0;padding-right:0}.ph1{padding-left:.25rem;padding-right:.25rem}.ph3{padding-left:1rem;padding-right:1rem}.ph4{padding-left:2rem;padding-right:2rem}.ml0{margin-left:0}.ml3{margin-left:1rem}.mr1{margin-right:.25rem}.mr2{margin-right:.5rem}.mb0{margin-bottom:0}.mb2{margin-bottom:.5rem}.mb3{margin-bottom:1rem}.mb5{margin-bottom:4rem}.mt0{margin-top:0}.mt2{margin-top:.5rem}.mt3{margin-top:1rem}.mt4{margin-top:2rem}.mv0{margin-top:0;margin-bottom:0}.mv2{margin-top:.5rem;margin-bottom:.5rem}.mv3{margin-top:1rem;margin-bottom:1rem}.mh0{margin-left:0;margin-right:0}.mh1{margin-left:.25rem;margin-right:.25rem}.underline{text-decoration:underline}.tc{text-align:center}.ttu{text-transform:uppercase}.f2{font-size:2.25rem}.f3{font-size:1.5rem}.f4{font-size:1.25rem}.f5{font-size:1rem}.f6{font-size:.875rem}.measure{max-width:30em}.center{margin-left:auto}.center{margin-right:auto}.pre{white-space:pre}.v-mid{vertical-align:middle}.dim{opacity:1}.dim,.dim:focus,.dim:hover{transition:opacity .15s ease-in}.dim:focus,.dim:hover{opacity:.5}.dim:active{opacity:.8;transition:opacity .15s ease-out}@media screen and (min-width:30em){.pa2-ns{padding:.5rem}.pa5-ns{padding:4rem}.ph1-ns{padding-left:.25rem;padding-right:.25rem}.ph5-ns{padding-left:4rem;padding-right:4rem}.mr6-ns{margin-right:8rem}.f2-ns{font-size:2.25rem}.f5-ns{font-size:1rem}}@media screen and (min-width:30em) and (max-width:60em){.mr3-m{margin-right:1rem}.f4-m{font-size:1.25rem}}@media screen and (min-width:60em){.ph4-l{padding-left:2rem;padding-right:2rem}.mr2-l{margin-right:.5rem}.mr4-l{margin-right:2rem}.mr5-l{margin-right:4rem}.f3-l{font-size:1.5rem}}.found{border:4px solid #19a974;border-radius:2px}</style>`;
+    		this.shadowRoot.innerHTML = `<style>button,input{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}div,p{box-sizing:border-box}.ba{border-style:solid;border-width:1px}.bt{border-top-style:solid;border-top-width:1px}.br{border-right-style:solid;border-right-width:1px}.bb{border-bottom-style:solid;border-bottom-width:1px}.bl{border-left-style:solid;border-left-width:1px}.bn{border-style:none;border-width:0}.b--black{border-color:#000}.b--moon-gray{border-color:#ccc}.b--black-30{border-color:rgba(0,0,0,.3)}.b--black-20{border-color:rgba(0,0,0,.2)}.b--black-10{border-color:rgba(0,0,0,.1)}.b--black-05{border-color:rgba(0,0,0,.05)}.b--red{border-color:#ff4136}.b--yellow{border-color:gold}.b--washed-yellow{border-color:#fffceb}.b--transparent{border-color:transparent}.br1{border-radius:.125rem}.br2{border-radius:.25rem}.br3{border-radius:.5rem}.b--dotted{border-style:dotted}.bw1{border-width:.125rem}.bw2{border-width:.25rem}.bw3{border-width:.5rem}.bt-0{border-top-width:0}.br-0{border-right-width:0}.bl-0{border-left-width:0}.pre{overflow-x:auto;overflow-y:hidden;overflow:scroll}.di{display:inline}.db{display:block}.dib{display:inline-block}.dt{display:table}.dtc{display:table-cell}.flex{display:flex}.flex-column{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.fl{float:left}.fl,.fr{_display:inline}.fr{float:right}.athelas{font-family:athelas,georgia,serif}.fs-normal{font-style:normal}.b{font-weight:700}.fw3{font-weight:300}.fw4{font-weight:400}.fw5{font-weight:500}.fw6{font-weight:600}.input-reset{-webkit-appearance:none;-moz-appearance:none}.input-reset::-moz-focus-inner{border:0;padding:0}.h1{height:1rem}.h2{height:2rem}.h3{height:4rem}.tracked{letter-spacing:.1em}.lh-title{line-height:1.25}.lh-copy{line-height:1.5}.link{text-decoration:none}.link,.link:active,.link:focus,.link:hover,.link:link,.link:visited{transition:color .15s ease-in}.link:focus{outline:1px dotted currentColor}.list{list-style-type:none}.mw-100{max-width:100%}.w1{width:1rem}.w-25{width:25%}.w-75{width:75%}.w-100{width:100%}.black-90{color:rgba(0,0,0,.9)}.black-80{color:rgba(0,0,0,.8)}.black-70{color:rgba(0,0,0,.7)}.black-60{color:rgba(0,0,0,.6)}.black-40{color:rgba(0,0,0,.4)}.black{color:#000}.dark-gray{color:#333}.white{color:#fff}.dark-pink{color:#d5008f}.navy{color:#001b44}.bg-white{background-color:#fff}.bg-transparent{background-color:transparent}.bg-light-red{background-color:#ff725c}.bg-washed-yellow{background-color:#fffceb}.bg-washed-red{background-color:#ffdfdf}.hover-red:focus,.hover-red:hover{color:#ff4136}.hover-blue:focus,.hover-blue:hover{color:#357edd}.pa0{padding:0}.pa1{padding:.25rem}.pa2{padding:.5rem}.pa3{padding:1rem}.pa4{padding:2rem}.pl0{padding-left:0}.pl4{padding-left:2rem}.pb2{padding-bottom:.5rem}.pt2{padding-top:.5rem}.pt5{padding-top:4rem}.pv0{padding-top:0;padding-bottom:0}.pv1{padding-top:.25rem;padding-bottom:.25rem}.pv2{padding-top:.5rem;padding-bottom:.5rem}.pv3{padding-top:1rem;padding-bottom:1rem}.pv5{padding-top:4rem;padding-bottom:4rem}.ph0{padding-left:0;padding-right:0}.ph1{padding-left:.25rem;padding-right:.25rem}.ph3{padding-left:1rem;padding-right:1rem}.ph4{padding-left:2rem;padding-right:2rem}.ml0{margin-left:0}.ml3{margin-left:1rem}.mr1{margin-right:.25rem}.mr2{margin-right:.5rem}.mb0{margin-bottom:0}.mb2{margin-bottom:.5rem}.mb3{margin-bottom:1rem}.mb5{margin-bottom:4rem}.mt0{margin-top:0}.mt2{margin-top:.5rem}.mt3{margin-top:1rem}.mt4{margin-top:2rem}.mv0{margin-top:0;margin-bottom:0}.mv2{margin-top:.5rem;margin-bottom:.5rem}.mv3{margin-top:1rem;margin-bottom:1rem}.mh0{margin-left:0;margin-right:0}.mh1{margin-left:.25rem;margin-right:.25rem}.underline{text-decoration:underline}.tc{text-align:center}.ttu{text-transform:uppercase}.f2{font-size:2.25rem}.f3{font-size:1.5rem}.f4{font-size:1.25rem}.f5{font-size:1rem}.f6{font-size:.875rem}.measure{max-width:30em}.center{margin-left:auto}.center{margin-right:auto}.pre{white-space:pre}.v-mid{vertical-align:middle}.dim{opacity:1}.dim,.dim:focus,.dim:hover{transition:opacity .15s ease-in}.dim:focus,.dim:hover{opacity:.5}.dim:active{opacity:.8;transition:opacity .15s ease-out}@media screen and (min-width:30em){.pa2-ns{padding:.5rem}.pa5-ns{padding:4rem}.ph1-ns{padding-left:.25rem;padding-right:.25rem}.ph5-ns{padding-left:4rem;padding-right:4rem}.mr6-ns{margin-right:8rem}.f2-ns{font-size:2.25rem}.f5-ns{font-size:1rem}}@media screen and (min-width:30em) and (max-width:60em){.mr3-m{margin-right:1rem}}@media screen and (min-width:60em){.ph4-l{padding-left:2rem;padding-right:2rem}.mr2-l{margin-right:.5rem}.mr4-l{margin-right:2rem}.mr5-l{margin-right:4rem}}.found{border:4px solid #19a974;border-radius:2px}</style>`;
     		init(this, { target: this.shadowRoot }, instance$2, create_fragment$2, safe_not_equal, { data: 12 });
 
     		if (options) {
@@ -2445,10 +2526,10 @@ var v2 = (function () {
     			p = element("p");
     			t = text(/*show*/ ctx[0]);
     			this.c = noop;
-    			attr_dev(p, "class", "dark-pink f5 f4-m f3-l lh-copy measure mt0");
-    			add_location(p, file$2, 184, 2, 109264);
+    			attr_dev(p, "class", "dark-pink f3 lh-copy");
+    			add_location(p, file$2, 184, 2, 109169);
     			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black");
-    			add_location(blockquote, file$2, 183, 0, 109196);
+    			add_location(blockquote, file$2, 183, 0, 109101);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2556,7 +2637,7 @@ var v2 = (function () {
     class View extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>blockquote,p{box-sizing:border-box}.bl{border-left-style:solid;border-left-width:1px}.b--black{border-color:#000}.bw2{border-width:.25rem}.athelas{font-family:athelas,georgia,serif}.lh-copy{line-height:1.5}.black-90{color:rgba(0,0,0,.9)}.dark-pink{color:#d5008f}.pl4{padding-left:2rem}.ml0{margin-left:0}.mt0{margin-top:0}.mt4{margin-top:2rem}.f5{font-size:1rem}.measure{max-width:30em}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){.f4-m{font-size:1.25rem}}@media screen and (min-width:60em){.f3-l{font-size:1.5rem}}</style>`;
+    		this.shadowRoot.innerHTML = `<style>blockquote,p{box-sizing:border-box}.bl{border-left-style:solid;border-left-width:1px}.b--black{border-color:#000}.bw2{border-width:.25rem}.athelas{font-family:athelas,georgia,serif}.lh-copy{line-height:1.5}.black-90{color:rgba(0,0,0,.9)}.dark-pink{color:#d5008f}.pl4{padding-left:2rem}.ml0{margin-left:0}.mt4{margin-top:2rem}.f3{font-size:1.5rem}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
     		init(this, { target: this.shadowRoot }, instance$3, create_fragment$3, safe_not_equal, { data: 1, speed: 2 });
 
     		if (options) {
@@ -2597,7 +2678,7 @@ var v2 = (function () {
     /* src/components/interact/total_recall/v1.svelte generated by Svelte v3.22.2 */
     const file$3 = "src/components/interact/total_recall/v1.svelte";
 
-    // (240:4) {#if state === 'not-playing'}
+    // (239:4) {#if state === 'not-playing'}
     function create_if_block_2$1(ctx) {
     	let h1;
     	let t1;
@@ -2649,24 +2730,24 @@ var v2 = (function () {
     			t13 = space();
     			button = element("button");
     			button.textContent = "Are you ready to play?";
-    			add_location(h1, file$3, 240, 6, 110253);
-    			add_location(p0, file$3, 241, 6, 110274);
-    			add_location(p1, file$3, 242, 6, 110319);
-    			add_location(p2, file$3, 243, 6, 110379);
-    			add_location(span0, file$3, 246, 8, 110442);
+    			add_location(h1, file$3, 239, 6, 110213);
+    			add_location(p0, file$3, 240, 6, 110234);
+    			add_location(p1, file$3, 241, 6, 110279);
+    			add_location(p2, file$3, 242, 6, 110339);
+    			add_location(span0, file$3, 245, 8, 110402);
     			attr_dev(input0, "type", "number");
     			attr_dev(input0, "max", /*maxSize*/ ctx[4]);
     			attr_dev(input0, "min", "1");
-    			add_location(input0, file$3, 247, 8, 110483);
-    			add_location(p3, file$3, 245, 6, 110430);
-    			add_location(span1, file$3, 251, 8, 110581);
+    			add_location(input0, file$3, 246, 8, 110443);
+    			add_location(p3, file$3, 244, 6, 110390);
+    			add_location(span1, file$3, 250, 8, 110541);
     			attr_dev(input1, "type", "number");
     			attr_dev(input1, "max", input1_max_value = 5);
     			attr_dev(input1, "min", "1");
-    			add_location(input1, file$3, 252, 8, 110622);
-    			add_location(p4, file$3, 250, 6, 110569);
+    			add_location(input1, file$3, 251, 8, 110582);
+    			add_location(p4, file$3, 249, 6, 110529);
     			attr_dev(button, "class", "br3");
-    			add_location(button, file$3, 254, 6, 110698);
+    			add_location(button, file$3, 253, 6, 110658);
     		},
     		m: function mount(target, anchor, remount) {
     			insert_dev(target, h1, anchor);
@@ -2733,14 +2814,14 @@ var v2 = (function () {
     		block,
     		id: create_if_block_2$1.name,
     		type: "if",
-    		source: "(240:4) {#if state === 'not-playing'}",
+    		source: "(239:4) {#if state === 'not-playing'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (258:4) {#if state === 'playing'}
+    // (257:4) {#if state === 'playing'}
     function create_if_block_1$2(ctx) {
     	let current;
 
@@ -2786,14 +2867,14 @@ var v2 = (function () {
     		block,
     		id: create_if_block_1$2.name,
     		type: "if",
-    		source: "(258:4) {#if state === 'playing'}",
+    		source: "(257:4) {#if state === 'playing'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (262:4) {#if state === 'recall'}
+    // (261:4) {#if state === 'recall'}
     function create_if_block$3(ctx) {
     	let current;
 
@@ -2835,7 +2916,7 @@ var v2 = (function () {
     		block,
     		id: create_if_block$3.name,
     		type: "if",
-    		source: "(262:4) {#if state === 'recall'}",
+    		source: "(261:4) {#if state === 'recall'}",
     		ctx
     	});
 
@@ -2876,12 +2957,13 @@ var v2 = (function () {
     			if (if_block2) if_block2.c();
     			this.c = noop;
     			attr_dev(h1, "class", "f2 measure");
-    			add_location(h1, file$3, 233, 4, 110088);
+    			add_location(h1, file$3, 233, 4, 110037);
     			attr_dev(button, "class", "br3");
-    			add_location(button, file$3, 234, 4, 110133);
-    			add_location(header, file$3, 232, 2, 110075);
-    			add_location(div, file$3, 237, 2, 110206);
-    			add_location(article, file$3, 231, 0, 110063);
+    			add_location(button, file$3, 234, 4, 110082);
+    			add_location(header, file$3, 232, 2, 110024);
+    			attr_dev(div, "class", "pv2");
+    			add_location(div, file$3, 237, 2, 110155);
+    			add_location(article, file$3, 231, 0, 110012);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3129,7 +3211,7 @@ var v2 = (function () {
     class V1 extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>h1{font-size:2em;margin:.67em 0}button,input{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}article,div,h1,header,p{box-sizing:border-box}.br3{border-radius:.5rem}.f2{font-size:2.25rem}.measure{max-width:30em}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
+    		this.shadowRoot.innerHTML = `<style>h1{font-size:2em;margin:.67em 0}button,input{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}article,div,h1,header,p{box-sizing:border-box}.br3{border-radius:.5rem}.pv2{padding-top:.5rem;padding-bottom:.5rem}.f2{font-size:2.25rem}.measure{max-width:30em}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
 
     		init(this, { target: this.shadowRoot }, instance$4, create_fragment$4, safe_not_equal, {
     			listElement: 9,
@@ -3329,7 +3411,7 @@ var v2 = (function () {
     			t1 = text(/*loops*/ ctx[0]);
     			t2 = text(" (Looped over the list)");
     			attr_dev(cite, "class", "f6 ttu tracked fs-normal");
-    			add_location(cite, file$4, 235, 6, 110493);
+    			add_location(cite, file$4, 235, 6, 110420);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, cite, anchor);
@@ -3392,17 +3474,17 @@ var v2 = (function () {
     			if (if_block) if_block.c();
     			this.c = noop;
     			attr_dev(h1, "class", "f2 measure");
-    			add_location(h1, file$4, 228, 4, 110161);
+    			add_location(h1, file$4, 228, 4, 110110);
     			attr_dev(button0, "class", "br3");
-    			add_location(button0, file$4, 229, 4, 110203);
+    			add_location(button0, file$4, 229, 4, 110152);
     			attr_dev(button1, "class", "br3");
-    			add_location(button1, file$4, 230, 4, 110260);
-    			add_location(header, file$4, 227, 2, 110148);
-    			attr_dev(p, "class", "dark-pink f5 f4-m f3-l lh-copy measure mt0");
-    			add_location(p, file$4, 233, 4, 110402);
+    			add_location(button1, file$4, 230, 4, 110209);
+    			add_location(header, file$4, 227, 2, 110097);
+    			attr_dev(p, "class", "dark-pink f3 lh-copy");
+    			add_location(p, file$4, 233, 4, 110351);
     			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black");
-    			add_location(blockquote, file$4, 232, 2, 110332);
-    			add_location(article, file$4, 226, 0, 110136);
+    			add_location(blockquote, file$4, 232, 2, 110281);
+    			add_location(article, file$4, 226, 0, 110085);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3587,7 +3669,7 @@ var v2 = (function () {
     class V1$1 extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>h1{font-size:2em;margin:.67em 0}button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}article,blockquote,h1,header,p{box-sizing:border-box}.bl{border-left-style:solid;border-left-width:1px}.b--black{border-color:#000}.br3{border-radius:.5rem}.bw2{border-width:.25rem}.athelas{font-family:athelas,georgia,serif}.fs-normal{font-style:normal}.tracked{letter-spacing:.1em}.lh-copy{line-height:1.5}.black-90{color:rgba(0,0,0,.9)}.dark-pink{color:#d5008f}.pl4{padding-left:2rem}.ml0{margin-left:0}.mt0{margin-top:0}.mt4{margin-top:2rem}.ttu{text-transform:uppercase}.f2{font-size:2.25rem}.f5{font-size:1rem}.f6{font-size:.875rem}.measure{max-width:30em}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){.f4-m{font-size:1.25rem}}@media screen and (min-width:60em){.f3-l{font-size:1.5rem}}</style>`;
+    		this.shadowRoot.innerHTML = `<style>h1{font-size:2em;margin:.67em 0}button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}article,blockquote,h1,header,p{box-sizing:border-box}.bl{border-left-style:solid;border-left-width:1px}.b--black{border-color:#000}.br3{border-radius:.5rem}.bw2{border-width:.25rem}.athelas{font-family:athelas,georgia,serif}.fs-normal{font-style:normal}.tracked{letter-spacing:.1em}.lh-copy{line-height:1.5}.black-90{color:rgba(0,0,0,.9)}.dark-pink{color:#d5008f}.pl4{padding-left:2rem}.ml0{margin-left:0}.mt4{margin-top:2rem}.ttu{text-transform:uppercase}.f2{font-size:2.25rem}.f3{font-size:1.5rem}.f6{font-size:.875rem}.measure{max-width:30em}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
     		init(this, { target: this.shadowRoot }, instance$6, create_fragment$6, safe_not_equal, { listElement: 5, playElement: 6, aList: 7 });
     		const { ctx } = this.$$;
     		const props = this.attributes;

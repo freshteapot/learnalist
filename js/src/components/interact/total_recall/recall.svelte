@@ -123,63 +123,72 @@
 </style>
 
 {#if state === 'playing'}
-  {#each playData as item, index}
-    <div>
-      <input
-        class={feedback[index]}
-        disabled={feedback[index] === 'found'}
-        type="text"
-        placeholder=""
-        bind:value={guesses[index]} />
-    </div>
-  {/each}
-  <div>
-    <button on:click={check}>check</button>
-    <button on:click={showMe}>I give up, show me</button>
-    <button on:click={restart}>restart</button>
-  </div>
   <p>
     How many do you remember?
     {#if hasChecked}{leftToFind} left{/if}
   </p>
-{/if}
 
-{#if state === 'finished'}
   {#each playData as item, index}
-    <div>
+    <div class="pv1">
       <input
-        class={feedback[index]}
+        class="w-100 {feedback[index]}"
         disabled={feedback[index] === 'found'}
         type="text"
         placeholder=""
         bind:value={guesses[index]} />
     </div>
   {/each}
-  <p>Well done!</p>
+  <div class="pv1">
+    <button class="br3" on:click={check}>check</button>
+    <button class="br3" on:click={showMe}>I give up, show me</button>
+    <button class="br3" on:click={restart}>restart</button>
+  </div>
+{/if}
+
+{#if state === 'finished'}
+  <p>Well done! You did it.</p>
+
+  {#each playData as item, index}
+    <div class="pv1">
+      <input
+        class="w-100 {feedback[index]}"
+        disabled={feedback[index] === 'found'}
+        type="text"
+        placeholder=""
+        bind:value={guesses[index]} />
+    </div>
+  {/each}
+
   {#if perfect}
     <p>Perfect recall!</p>
   {/if}
   <p>You took {attempts} attempt(s)</p>
 
-  <div>
-    <button on:click={playAgain}>play again</button>
-    <button on:click={restart}>restart</button>
+  <div class="pv1">
+    <button class="br3" on:click={playAgain}>play again</button>
+    <button class="br3" on:click={restart}>restart</button>
   </div>
 {/if}
 
 {#if state === 'show-me'}
+  <p>
+    How many do you remember?
+    {#if hasChecked}{leftToFind} left{/if}
+  </p>
+
   {#each playData as item, index}
-    <div>
+    <div class="pv1">
       <input
-        class="found"
+        class="w-100 found"
         disabled="true"
         type="text"
         placeholder=""
         value={item} />
     </div>
   {/each}
-  <div>
-    <button on:click={playAgain}>play again</button>
-    <button on:click={restart}>restart</button>
+
+  <div class="pv2">
+    <button class="br3" on:click={playAgain}>play again</button>
+    <button class="br3" on:click={restart}>restart</button>
   </div>
 {/if}

@@ -33,6 +33,7 @@
 </script>
 
 <style>
+  @import "../../../hugo/assets/css/base-v1.css";
   @import "tachyons";
 </style>
 
@@ -66,7 +67,7 @@
       <div class="w-100 items-end">
         <div class="fr">
           <div class="flex items-center mb2">
-            <button class="db w-100" type="submit">Login</button>
+            <button class="br3 db w-100" type="submit">Login</button>
           </div>
           <div class="flex items-center mb2">
             <span class="f6 link dib black">

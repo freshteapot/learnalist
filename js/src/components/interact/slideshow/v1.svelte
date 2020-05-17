@@ -80,7 +80,7 @@
     <button class="br3" on:click={handleClose}>Close</button>
   </header>
   <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-    <p class="dark-pink f5 f4-m f3-l lh-copy measure mt0">{show}</p>
+    <p class="dark-pink f3 lh-copy">{show}</p>
     {#if loops > 0}
       <cite class="f6 ttu tracked fs-normal">
         - {loops} (Looped over the list)

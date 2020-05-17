@@ -34,9 +34,6 @@ function subscribe(store, ...callbacks) {
 function component_subscribe(component, store, callback) {
     component.$$.on_destroy.push(subscribe(store, callback));
 }
-function null_to_empty(value) {
-    return value == null ? '' : value;
-}
 
 function append(target, node) {
     target.appendChild(node);
@@ -466,7 +463,7 @@ class SvelteComponentDev extends SvelteComponent {
 
 const file = "src/components/interact/menu.wc.svelte";
 
-// (170:0) {#if slideshow == '1'}
+// (353:0) {#if slideshow == '1'}
 function create_if_block_1(ctx) {
 	let button;
 	let dispose;
@@ -476,7 +473,7 @@ function create_if_block_1(ctx) {
 			button = element("button");
 			button.textContent = "Slideshow";
 			attr_dev(button, "class", "br3");
-			add_location(button, file, 170, 2, 108992);
+			add_location(button, file, 353, 2, 111118);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, button, anchor);
@@ -494,14 +491,14 @@ function create_if_block_1(ctx) {
 		block,
 		id: create_if_block_1.name,
 		type: "if",
-		source: "(170:0) {#if slideshow == '1'}",
+		source: "(353:0) {#if slideshow == '1'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (174:0) {#if totalrecall == '1'}
+// (357:0) {#if totalrecall == '1'}
 function create_if_block(ctx) {
 	let button;
 	let dispose;
@@ -511,7 +508,7 @@ function create_if_block(ctx) {
 			button = element("button");
 			button.textContent = "Total Recall";
 			attr_dev(button, "class", "br3");
-			add_location(button, file, 174, 2, 109090);
+			add_location(button, file, 357, 2, 111216);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, button, anchor);
@@ -529,7 +526,7 @@ function create_if_block(ctx) {
 		block,
 		id: create_if_block.name,
 		type: "if",
-		source: "(174:0) {#if totalrecall == '1'}",
+		source: "(357:0) {#if totalrecall == '1'}",
 		ctx
 	});
 
@@ -654,7 +651,7 @@ function instance($$self, $$props, $$invalidate) {
 class Menu_wc extends SvelteElement {
 	constructor(options) {
 		super();
-		this.shadowRoot.innerHTML = `<style>button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}.br3{border-radius:.5rem}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
+		this.shadowRoot.innerHTML = `<style>button{font-family:inherit;font-size:inherit;padding:0.4em;margin:0 0 0.5em 0;box-sizing:border-box;border:1px solid #ccc;border-radius:2px}button{color:#333;background-color:#f4f4f4;outline:none}button:active{background-color:#ddd}button:focus{border-color:#666}button{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button{overflow:visible}button{text-transform:none}button{-webkit-appearance:button}button::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring{outline:1px dotted ButtonText}.br3{border-radius:.5rem}@media screen and (min-width:30em){}@media screen and (min-width:30em) and (max-width:60em){}@media screen and (min-width:60em){}</style>`;
 		init(this, { target: this.shadowRoot }, instance, create_fragment, safe_not_equal, { slideshow: 0, totalrecall: 1 });
 
 		if (options) {
@@ -1542,18 +1539,19 @@ function get_each_context_2(ctx, list, i) {
 }
 
 // (271:0) {#if state === 'playing'}
-function create_if_block_3(ctx) {
+function create_if_block_4(ctx) {
+	let p;
 	let t0;
+	let t1;
+	let t2;
 	let div;
 	let button0;
-	let t2;
-	let button1;
 	let t4;
-	let button2;
+	let button1;
 	let t6;
-	let p;
-	let t7;
+	let button2;
 	let dispose;
+	let if_block = /*hasChecked*/ ctx[3] && create_if_block_5(ctx);
 	let each_value_2 = /*playData*/ ctx[1];
 	validate_each_argument(each_value_2);
 	let each_blocks = [];
@@ -1562,55 +1560,55 @@ function create_if_block_3(ctx) {
 		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
 	}
 
-	let if_block = /*hasChecked*/ ctx[3] && create_if_block_4(ctx);
-
 	const block = {
 		c: function create() {
+			p = element("p");
+			t0 = text("How many do you remember?\n    ");
+			if (if_block) if_block.c();
+			t1 = space();
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t0 = space();
+			t2 = space();
 			div = element("div");
 			button0 = element("button");
 			button0.textContent = "check";
-			t2 = space();
+			t4 = space();
 			button1 = element("button");
 			button1.textContent = "I give up, show me";
-			t4 = space();
+			t6 = space();
 			button2 = element("button");
 			button2.textContent = "restart";
-			t6 = space();
-			p = element("p");
-			t7 = text("How many do you remember?\n    ");
-			if (if_block) if_block.c();
-			attr_dev(button0, "class", "svelte-gql8pf");
-			add_location(button0, file$1, 282, 4, 111676);
-			attr_dev(button1, "class", "svelte-gql8pf");
-			add_location(button1, file$1, 283, 4, 111720);
-			attr_dev(button2, "class", "svelte-gql8pf");
-			add_location(button2, file$1, 284, 4, 111778);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 281, 2, 111666);
-			attr_dev(p, "class", "svelte-gql8pf");
-			add_location(p, file$1, 286, 2, 111833);
+			attr_dev(p, "class", "svelte-i3yryg");
+			add_location(p, file$1, 271, 2, 111328);
+			attr_dev(button0, "class", "br3 svelte-i3yryg");
+			add_location(button0, file$1, 287, 4, 111696);
+			attr_dev(button1, "class", "br3 svelte-i3yryg");
+			add_location(button1, file$1, 288, 4, 111752);
+			attr_dev(button2, "class", "br3 svelte-i3yryg");
+			add_location(button2, file$1, 289, 4, 111822);
+			attr_dev(div, "class", "pv1 svelte-i3yryg");
+			add_location(div, file$1, 286, 2, 111674);
 		},
 		m: function mount(target, anchor, remount) {
+			insert_dev(target, p, anchor);
+			append_dev(p, t0);
+			if (if_block) if_block.m(p, null);
+			insert_dev(target, t1, anchor);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(target, anchor);
 			}
 
-			insert_dev(target, t0, anchor);
+			insert_dev(target, t2, anchor);
 			insert_dev(target, div, anchor);
 			append_dev(div, button0);
-			append_dev(div, t2);
-			append_dev(div, button1);
 			append_dev(div, t4);
+			append_dev(div, button1);
+			append_dev(div, t6);
 			append_dev(div, button2);
-			insert_dev(target, t6, anchor);
-			insert_dev(target, p, anchor);
-			append_dev(p, t7);
-			if (if_block) if_block.m(p, null);
 			if (remount) run_all(dispose);
 
 			dispose = [
@@ -1620,6 +1618,19 @@ function create_if_block_3(ctx) {
 			];
 		},
 		p: function update(ctx, dirty) {
+			if (/*hasChecked*/ ctx[3]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+				} else {
+					if_block = create_if_block_5(ctx);
+					if_block.c();
+					if_block.m(p, null);
+				}
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
+			}
+
 			if (dirty & /*feedback, guesses, playData*/ 70) {
 				each_value_2 = /*playData*/ ctx[1];
 				validate_each_argument(each_value_2);
@@ -1633,7 +1644,7 @@ function create_if_block_3(ctx) {
 					} else {
 						each_blocks[i] = create_each_block_2(child_ctx);
 						each_blocks[i].c();
-						each_blocks[i].m(t0.parentNode, t0);
+						each_blocks[i].m(t2.parentNode, t2);
 					}
 				}
 
@@ -1643,34 +1654,21 @@ function create_if_block_3(ctx) {
 
 				each_blocks.length = each_value_2.length;
 			}
-
-			if (/*hasChecked*/ ctx[3]) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
-				} else {
-					if_block = create_if_block_4(ctx);
-					if_block.c();
-					if_block.m(p, null);
-				}
-			} else if (if_block) {
-				if_block.d(1);
-				if_block = null;
-			}
 		},
 		d: function destroy(detaching) {
-			destroy_each(each_blocks, detaching);
-			if (detaching) detach_dev(t0);
-			if (detaching) detach_dev(div);
-			if (detaching) detach_dev(t6);
 			if (detaching) detach_dev(p);
 			if (if_block) if_block.d();
+			if (detaching) detach_dev(t1);
+			destroy_each(each_blocks, detaching);
+			if (detaching) detach_dev(t2);
+			if (detaching) detach_dev(div);
 			run_all(dispose);
 		}
 	};
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_3.name,
+		id: create_if_block_4.name,
 		type: "if",
 		source: "(271:0) {#if state === 'playing'}",
 		ctx
@@ -1679,71 +1677,8 @@ function create_if_block_3(ctx) {
 	return block;
 }
 
-// (272:2) {#each playData as item, index}
-function create_each_block_2(ctx) {
-	let div;
-	let input;
-	let input_class_value;
-	let input_disabled_value;
-	let dispose;
-
-	function input_input_handler() {
-		/*input_input_handler*/ ctx[17].call(input, /*index*/ ctx[21]);
-	}
-
-	const block = {
-		c: function create() {
-			div = element("div");
-			input = element("input");
-			attr_dev(input, "class", input_class_value = "" + (null_to_empty(/*feedback*/ ctx[6][/*index*/ ctx[21]]) + " svelte-gql8pf"));
-			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
-			attr_dev(input, "type", "text");
-			attr_dev(input, "placeholder", "");
-			add_location(input, file$1, 273, 6, 111475);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 272, 4, 111463);
-		},
-		m: function mount(target, anchor, remount) {
-			insert_dev(target, div, anchor);
-			append_dev(div, input);
-			set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
-			if (remount) dispose();
-			dispose = listen_dev(input, "input", input_input_handler);
-		},
-		p: function update(new_ctx, dirty) {
-			ctx = new_ctx;
-
-			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "" + (null_to_empty(/*feedback*/ ctx[6][/*index*/ ctx[21]]) + " svelte-gql8pf"))) {
-				attr_dev(input, "class", input_class_value);
-			}
-
-			if (dirty & /*feedback*/ 64 && input_disabled_value !== (input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found")) {
-				prop_dev(input, "disabled", input_disabled_value);
-			}
-
-			if (dirty & /*guesses*/ 4 && input.value !== /*guesses*/ ctx[2][/*index*/ ctx[21]]) {
-				set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
-			}
-		},
-		d: function destroy(detaching) {
-			if (detaching) detach_dev(div);
-			dispose();
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_each_block_2.name,
-		type: "each",
-		source: "(272:2) {#each playData as item, index}",
-		ctx
-	});
-
-	return block;
-}
-
-// (289:4) {#if hasChecked}
-function create_if_block_4(ctx) {
+// (274:4) {#if hasChecked}
+function create_if_block_5(ctx) {
 	let t0;
 	let t1;
 
@@ -1767,19 +1702,82 @@ function create_if_block_4(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_4.name,
+		id: create_if_block_5.name,
 		type: "if",
-		source: "(289:4) {#if hasChecked}",
+		source: "(274:4) {#if hasChecked}",
 		ctx
 	});
 
 	return block;
 }
 
-// (293:0) {#if state === 'finished'}
-function create_if_block_1$1(ctx) {
-	let t0;
+// (277:2) {#each playData as item, index}
+function create_each_block_2(ctx) {
+	let div;
+	let input;
+	let input_class_value;
+	let input_disabled_value;
+	let dispose;
+
+	function input_input_handler() {
+		/*input_input_handler*/ ctx[17].call(input, /*index*/ ctx[21]);
+	}
+
+	const block = {
+		c: function create() {
+			div = element("div");
+			input = element("input");
+			attr_dev(input, "class", input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]] + " svelte-i3yryg");
+			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
+			attr_dev(input, "type", "text");
+			attr_dev(input, "placeholder", "");
+			add_location(input, file$1, 278, 6, 111475);
+			attr_dev(div, "class", "pv1 svelte-i3yryg");
+			add_location(div, file$1, 277, 4, 111451);
+		},
+		m: function mount(target, anchor, remount) {
+			insert_dev(target, div, anchor);
+			append_dev(div, input);
+			set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
+			if (remount) dispose();
+			dispose = listen_dev(input, "input", input_input_handler);
+		},
+		p: function update(new_ctx, dirty) {
+			ctx = new_ctx;
+
+			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]] + " svelte-i3yryg")) {
+				attr_dev(input, "class", input_class_value);
+			}
+
+			if (dirty & /*feedback*/ 64 && input_disabled_value !== (input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found")) {
+				prop_dev(input, "disabled", input_disabled_value);
+			}
+
+			if (dirty & /*guesses*/ 4 && input.value !== /*guesses*/ ctx[2][/*index*/ ctx[21]]) {
+				set_input_value(input, /*guesses*/ ctx[2][/*index*/ ctx[21]]);
+			}
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(div);
+			dispose();
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_each_block_2.name,
+		type: "each",
+		source: "(277:2) {#each playData as item, index}",
+		ctx
+	});
+
+	return block;
+}
+
+// (294:0) {#if state === 'finished'}
+function create_if_block_2(ctx) {
 	let p0;
+	let t1;
 	let t2;
 	let t3;
 	let p1;
@@ -1800,17 +1798,18 @@ function create_if_block_1$1(ctx) {
 		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
 	}
 
-	let if_block = /*perfect*/ ctx[5] && create_if_block_2(ctx);
+	let if_block = /*perfect*/ ctx[5] && create_if_block_3(ctx);
 
 	const block = {
 		c: function create() {
+			p0 = element("p");
+			p0.textContent = "Well done! You did it.";
+			t1 = space();
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t0 = space();
-			p0 = element("p");
-			p0.textContent = "Well done!";
 			t2 = space();
 			if (if_block) if_block.c();
 			t3 = space();
@@ -1825,24 +1824,25 @@ function create_if_block_1$1(ctx) {
 			t9 = space();
 			button1 = element("button");
 			button1.textContent = "restart";
-			attr_dev(p0, "class", "svelte-gql8pf");
-			add_location(p0, file$1, 303, 2, 112192);
-			attr_dev(p1, "class", "svelte-gql8pf");
-			add_location(p1, file$1, 307, 2, 112263);
-			attr_dev(button0, "class", "svelte-gql8pf");
-			add_location(button0, file$1, 310, 4, 112314);
-			attr_dev(button1, "class", "svelte-gql8pf");
-			add_location(button1, file$1, 311, 4, 112367);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 309, 2, 112304);
+			attr_dev(p0, "class", "svelte-i3yryg");
+			add_location(p0, file$1, 294, 2, 111923);
+			attr_dev(p1, "class", "svelte-i3yryg");
+			add_location(p1, file$1, 310, 2, 112267);
+			attr_dev(button0, "class", "br3 svelte-i3yryg");
+			add_location(button0, file$1, 313, 4, 112330);
+			attr_dev(button1, "class", "br3 svelte-i3yryg");
+			add_location(button1, file$1, 314, 4, 112395);
+			attr_dev(div, "class", "pv1 svelte-i3yryg");
+			add_location(div, file$1, 312, 2, 112308);
 		},
 		m: function mount(target, anchor, remount) {
+			insert_dev(target, p0, anchor);
+			insert_dev(target, t1, anchor);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(target, anchor);
 			}
 
-			insert_dev(target, t0, anchor);
-			insert_dev(target, p0, anchor);
 			insert_dev(target, t2, anchor);
 			if (if_block) if_block.m(target, anchor);
 			insert_dev(target, t3, anchor);
@@ -1876,7 +1876,7 @@ function create_if_block_1$1(ctx) {
 					} else {
 						each_blocks[i] = create_each_block_1(child_ctx);
 						each_blocks[i].c();
-						each_blocks[i].m(t0.parentNode, t0);
+						each_blocks[i].m(t2.parentNode, t2);
 					}
 				}
 
@@ -1889,7 +1889,7 @@ function create_if_block_1$1(ctx) {
 
 			if (/*perfect*/ ctx[5]) {
 				if (if_block) ; else {
-					if_block = create_if_block_2(ctx);
+					if_block = create_if_block_3(ctx);
 					if_block.c();
 					if_block.m(t3.parentNode, t3);
 				}
@@ -1901,9 +1901,9 @@ function create_if_block_1$1(ctx) {
 			if (dirty & /*attempts*/ 128) set_data_dev(t5, /*attempts*/ ctx[7]);
 		},
 		d: function destroy(detaching) {
-			destroy_each(each_blocks, detaching);
-			if (detaching) detach_dev(t0);
 			if (detaching) detach_dev(p0);
+			if (detaching) detach_dev(t1);
+			destroy_each(each_blocks, detaching);
 			if (detaching) detach_dev(t2);
 			if (if_block) if_block.d(detaching);
 			if (detaching) detach_dev(t3);
@@ -1916,16 +1916,16 @@ function create_if_block_1$1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_1$1.name,
+		id: create_if_block_2.name,
 		type: "if",
-		source: "(293:0) {#if state === 'finished'}",
+		source: "(294:0) {#if state === 'finished'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (294:2) {#each playData as item, index}
+// (297:2) {#each playData as item, index}
 function create_each_block_1(ctx) {
 	let div;
 	let input;
@@ -1941,13 +1941,13 @@ function create_each_block_1(ctx) {
 		c: function create() {
 			div = element("div");
 			input = element("input");
-			attr_dev(input, "class", input_class_value = "" + (null_to_empty(/*feedback*/ ctx[6][/*index*/ ctx[21]]) + " svelte-gql8pf"));
+			attr_dev(input, "class", input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]] + " svelte-i3yryg");
 			input.disabled = input_disabled_value = /*feedback*/ ctx[6][/*index*/ ctx[21]] === "found";
 			attr_dev(input, "type", "text");
 			attr_dev(input, "placeholder", "");
-			add_location(input, file$1, 295, 6, 112001);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 294, 4, 111989);
+			add_location(input, file$1, 298, 6, 112016);
+			attr_dev(div, "class", "pv1 svelte-i3yryg");
+			add_location(div, file$1, 297, 4, 111992);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, div, anchor);
@@ -1959,7 +1959,7 @@ function create_each_block_1(ctx) {
 		p: function update(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "" + (null_to_empty(/*feedback*/ ctx[6][/*index*/ ctx[21]]) + " svelte-gql8pf"))) {
+			if (dirty & /*feedback*/ 64 && input_class_value !== (input_class_value = "w-100 " + /*feedback*/ ctx[6][/*index*/ ctx[21]] + " svelte-i3yryg")) {
 				attr_dev(input, "class", input_class_value);
 			}
 
@@ -1981,23 +1981,23 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(294:2) {#each playData as item, index}",
+		source: "(297:2) {#each playData as item, index}",
 		ctx
 	});
 
 	return block;
 }
 
-// (305:2) {#if perfect}
-function create_if_block_2(ctx) {
+// (308:2) {#if perfect}
+function create_if_block_3(ctx) {
 	let p;
 
 	const block = {
 		c: function create() {
 			p = element("p");
 			p.textContent = "Perfect recall!";
-			attr_dev(p, "class", "svelte-gql8pf");
-			add_location(p, file$1, 305, 4, 112230);
+			attr_dev(p, "class", "svelte-i3yryg");
+			add_location(p, file$1, 308, 4, 112234);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, p, anchor);
@@ -2009,23 +2009,27 @@ function create_if_block_2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2.name,
+		id: create_if_block_3.name,
 		type: "if",
-		source: "(305:2) {#if perfect}",
+		source: "(308:2) {#if perfect}",
 		ctx
 	});
 
 	return block;
 }
 
-// (316:0) {#if state === 'show-me'}
+// (319:0) {#if state === 'show-me'}
 function create_if_block$2(ctx) {
+	let p;
 	let t0;
+	let t1;
+	let t2;
 	let div;
 	let button0;
-	let t2;
+	let t4;
 	let button1;
 	let dispose;
+	let if_block = /*hasChecked*/ ctx[3] && create_if_block_1$1(ctx);
 	let each_value = /*playData*/ ctx[1];
 	validate_each_argument(each_value);
 	let each_blocks = [];
@@ -2036,33 +2040,45 @@ function create_if_block$2(ctx) {
 
 	const block = {
 		c: function create() {
+			p = element("p");
+			t0 = text("How many do you remember?\n    ");
+			if (if_block) if_block.c();
+			t1 = space();
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t0 = space();
+			t2 = space();
 			div = element("div");
 			button0 = element("button");
 			button0.textContent = "play again";
-			t2 = space();
+			t4 = space();
 			button1 = element("button");
 			button1.textContent = "restart";
-			attr_dev(button0, "class", "svelte-gql8pf");
-			add_location(button0, file$1, 327, 4, 112656);
-			attr_dev(button1, "class", "svelte-gql8pf");
-			add_location(button1, file$1, 328, 4, 112709);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 326, 2, 112646);
+			attr_dev(p, "class", "svelte-i3yryg");
+			add_location(p, file$1, 319, 2, 112495);
+			attr_dev(button0, "class", "br3 svelte-i3yryg");
+			add_location(button0, file$1, 336, 4, 112814);
+			attr_dev(button1, "class", "br3 svelte-i3yryg");
+			add_location(button1, file$1, 337, 4, 112879);
+			attr_dev(div, "class", "pv2 svelte-i3yryg");
+			add_location(div, file$1, 335, 2, 112792);
 		},
 		m: function mount(target, anchor, remount) {
+			insert_dev(target, p, anchor);
+			append_dev(p, t0);
+			if (if_block) if_block.m(p, null);
+			insert_dev(target, t1, anchor);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(target, anchor);
 			}
 
-			insert_dev(target, t0, anchor);
+			insert_dev(target, t2, anchor);
 			insert_dev(target, div, anchor);
 			append_dev(div, button0);
-			append_dev(div, t2);
+			append_dev(div, t4);
 			append_dev(div, button1);
 			if (remount) run_all(dispose);
 
@@ -2072,6 +2088,19 @@ function create_if_block$2(ctx) {
 			];
 		},
 		p: function update(ctx, dirty) {
+			if (/*hasChecked*/ ctx[3]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+				} else {
+					if_block = create_if_block_1$1(ctx);
+					if_block.c();
+					if_block.m(p, null);
+				}
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
+			}
+
 			if (dirty & /*playData*/ 2) {
 				each_value = /*playData*/ ctx[1];
 				validate_each_argument(each_value);
@@ -2085,7 +2114,7 @@ function create_if_block$2(ctx) {
 					} else {
 						each_blocks[i] = create_each_block(child_ctx);
 						each_blocks[i].c();
-						each_blocks[i].m(t0.parentNode, t0);
+						each_blocks[i].m(t2.parentNode, t2);
 					}
 				}
 
@@ -2097,8 +2126,11 @@ function create_if_block$2(ctx) {
 			}
 		},
 		d: function destroy(detaching) {
+			if (detaching) detach_dev(p);
+			if (if_block) if_block.d();
+			if (detaching) detach_dev(t1);
 			destroy_each(each_blocks, detaching);
-			if (detaching) detach_dev(t0);
+			if (detaching) detach_dev(t2);
 			if (detaching) detach_dev(div);
 			run_all(dispose);
 		}
@@ -2108,14 +2140,48 @@ function create_if_block$2(ctx) {
 		block,
 		id: create_if_block$2.name,
 		type: "if",
-		source: "(316:0) {#if state === 'show-me'}",
+		source: "(319:0) {#if state === 'show-me'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (317:2) {#each playData as item, index}
+// (322:4) {#if hasChecked}
+function create_if_block_1$1(ctx) {
+	let t0;
+	let t1;
+
+	const block = {
+		c: function create() {
+			t0 = text(/*leftToFind*/ ctx[4]);
+			t1 = text(" left");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t0, anchor);
+			insert_dev(target, t1, anchor);
+		},
+		p: function update(ctx, dirty) {
+			if (dirty & /*leftToFind*/ 16) set_data_dev(t0, /*leftToFind*/ ctx[4]);
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(t0);
+			if (detaching) detach_dev(t1);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_1$1.name,
+		type: "if",
+		source: "(322:4) {#if hasChecked}",
+		ctx
+	});
+
+	return block;
+}
+
+// (325:2) {#each playData as item, index}
 function create_each_block(ctx) {
 	let div;
 	let input;
@@ -2125,14 +2191,14 @@ function create_each_block(ctx) {
 		c: function create() {
 			div = element("div");
 			input = element("input");
-			attr_dev(input, "class", "found svelte-gql8pf");
+			attr_dev(input, "class", "w-100 found svelte-i3yryg");
 			input.disabled = "true";
 			attr_dev(input, "type", "text");
 			attr_dev(input, "placeholder", "");
 			input.value = input_value_value = /*item*/ ctx[19];
-			add_location(input, file$1, 318, 6, 112503);
-			attr_dev(div, "class", "svelte-gql8pf");
-			add_location(div, file$1, 317, 4, 112491);
+			add_location(input, file$1, 326, 6, 112642);
+			attr_dev(div, "class", "pv1 svelte-i3yryg");
+			add_location(div, file$1, 325, 4, 112618);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -2152,7 +2218,7 @@ function create_each_block(ctx) {
 		block,
 		id: create_each_block.name,
 		type: "each",
-		source: "(317:2) {#each playData as item, index}",
+		source: "(325:2) {#each playData as item, index}",
 		ctx
 	});
 
@@ -2163,8 +2229,8 @@ function create_fragment$2(ctx) {
 	let t0;
 	let t1;
 	let if_block2_anchor;
-	let if_block0 = /*state*/ ctx[0] === "playing" && create_if_block_3(ctx);
-	let if_block1 = /*state*/ ctx[0] === "finished" && create_if_block_1$1(ctx);
+	let if_block0 = /*state*/ ctx[0] === "playing" && create_if_block_4(ctx);
+	let if_block1 = /*state*/ ctx[0] === "finished" && create_if_block_2(ctx);
 	let if_block2 = /*state*/ ctx[0] === "show-me" && create_if_block$2(ctx);
 
 	const block = {
@@ -2192,7 +2258,7 @@ function create_fragment$2(ctx) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_3(ctx);
+					if_block0 = create_if_block_4(ctx);
 					if_block0.c();
 					if_block0.m(t0.parentNode, t0);
 				}
@@ -2205,7 +2271,7 @@ function create_fragment$2(ctx) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_1$1(ctx);
+					if_block1 = create_if_block_2(ctx);
 					if_block1.c();
 					if_block1.m(t1.parentNode, t1);
 				}
@@ -2473,10 +2539,10 @@ function create_fragment$3(ctx) {
 			blockquote = element("blockquote");
 			p = element("p");
 			t = text(/*show*/ ctx[0]);
-			attr_dev(p, "class", "dark-pink f5 f4-m f3-l lh-copy measure mt0 svelte-b3bhnf");
-			add_location(p, file$2, 184, 2, 109264);
-			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black svelte-b3bhnf");
-			add_location(blockquote, file$2, 183, 0, 109196);
+			attr_dev(p, "class", "dark-pink f3 lh-copy svelte-ya3ns9");
+			add_location(p, file$2, 184, 2, 109169);
+			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black svelte-ya3ns9");
+			add_location(blockquote, file$2, 183, 0, 109101);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2614,7 +2680,7 @@ class View extends SvelteComponentDev {
 /* src/components/interact/total_recall/v1.svelte generated by Svelte v3.22.2 */
 const file$3 = "src/components/interact/total_recall/v1.svelte";
 
-// (240:4) {#if state === 'not-playing'}
+// (239:4) {#if state === 'not-playing'}
 function create_if_block_2$1(ctx) {
 	let h1;
 	let t1;
@@ -2666,32 +2732,32 @@ function create_if_block_2$1(ctx) {
 			t13 = space();
 			button = element("button");
 			button.textContent = "Are you ready to play?";
-			attr_dev(h1, "class", "svelte-1ry748z");
-			add_location(h1, file$3, 240, 6, 110253);
-			attr_dev(p0, "class", "svelte-1ry748z");
-			add_location(p0, file$3, 241, 6, 110274);
-			attr_dev(p1, "class", "svelte-1ry748z");
-			add_location(p1, file$3, 242, 6, 110319);
-			attr_dev(p2, "class", "svelte-1ry748z");
-			add_location(p2, file$3, 243, 6, 110379);
-			add_location(span0, file$3, 246, 8, 110442);
+			attr_dev(h1, "class", "svelte-1e5ctcy");
+			add_location(h1, file$3, 239, 6, 110213);
+			attr_dev(p0, "class", "svelte-1e5ctcy");
+			add_location(p0, file$3, 240, 6, 110234);
+			attr_dev(p1, "class", "svelte-1e5ctcy");
+			add_location(p1, file$3, 241, 6, 110279);
+			attr_dev(p2, "class", "svelte-1e5ctcy");
+			add_location(p2, file$3, 242, 6, 110339);
+			add_location(span0, file$3, 245, 8, 110402);
 			attr_dev(input0, "type", "number");
 			attr_dev(input0, "max", /*maxSize*/ ctx[4]);
 			attr_dev(input0, "min", "1");
-			attr_dev(input0, "class", "svelte-1ry748z");
-			add_location(input0, file$3, 247, 8, 110483);
-			attr_dev(p3, "class", "svelte-1ry748z");
-			add_location(p3, file$3, 245, 6, 110430);
-			add_location(span1, file$3, 251, 8, 110581);
+			attr_dev(input0, "class", "svelte-1e5ctcy");
+			add_location(input0, file$3, 246, 8, 110443);
+			attr_dev(p3, "class", "svelte-1e5ctcy");
+			add_location(p3, file$3, 244, 6, 110390);
+			add_location(span1, file$3, 250, 8, 110541);
 			attr_dev(input1, "type", "number");
 			attr_dev(input1, "max", input1_max_value = 5);
 			attr_dev(input1, "min", "1");
-			attr_dev(input1, "class", "svelte-1ry748z");
-			add_location(input1, file$3, 252, 8, 110622);
-			attr_dev(p4, "class", "svelte-1ry748z");
-			add_location(p4, file$3, 250, 6, 110569);
-			attr_dev(button, "class", "br3 svelte-1ry748z");
-			add_location(button, file$3, 254, 6, 110698);
+			attr_dev(input1, "class", "svelte-1e5ctcy");
+			add_location(input1, file$3, 251, 8, 110582);
+			attr_dev(p4, "class", "svelte-1e5ctcy");
+			add_location(p4, file$3, 249, 6, 110529);
+			attr_dev(button, "class", "br3 svelte-1e5ctcy");
+			add_location(button, file$3, 253, 6, 110658);
 		},
 		m: function mount(target, anchor, remount) {
 			insert_dev(target, h1, anchor);
@@ -2758,14 +2824,14 @@ function create_if_block_2$1(ctx) {
 		block,
 		id: create_if_block_2$1.name,
 		type: "if",
-		source: "(240:4) {#if state === 'not-playing'}",
+		source: "(239:4) {#if state === 'not-playing'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (258:4) {#if state === 'playing'}
+// (257:4) {#if state === 'playing'}
 function create_if_block_1$2(ctx) {
 	let current;
 
@@ -2811,14 +2877,14 @@ function create_if_block_1$2(ctx) {
 		block,
 		id: create_if_block_1$2.name,
 		type: "if",
-		source: "(258:4) {#if state === 'playing'}",
+		source: "(257:4) {#if state === 'playing'}",
 		ctx
 	});
 
 	return block;
 }
 
-// (262:4) {#if state === 'recall'}
+// (261:4) {#if state === 'recall'}
 function create_if_block$3(ctx) {
 	let current;
 
@@ -2860,7 +2926,7 @@ function create_if_block$3(ctx) {
 		block,
 		id: create_if_block$3.name,
 		type: "if",
-		source: "(262:4) {#if state === 'recall'}",
+		source: "(261:4) {#if state === 'recall'}",
 		ctx
 	});
 
@@ -2899,16 +2965,16 @@ function create_fragment$4(ctx) {
 			if (if_block1) if_block1.c();
 			t5 = space();
 			if (if_block2) if_block2.c();
-			attr_dev(h1, "class", "f2 measure svelte-1ry748z");
-			add_location(h1, file$3, 233, 4, 110088);
-			attr_dev(button, "class", "br3 svelte-1ry748z");
-			add_location(button, file$3, 234, 4, 110133);
-			attr_dev(header, "class", "svelte-1ry748z");
-			add_location(header, file$3, 232, 2, 110075);
-			attr_dev(div, "class", "svelte-1ry748z");
-			add_location(div, file$3, 237, 2, 110206);
-			attr_dev(article, "class", "svelte-1ry748z");
-			add_location(article, file$3, 231, 0, 110063);
+			attr_dev(h1, "class", "f2 measure svelte-1e5ctcy");
+			add_location(h1, file$3, 233, 4, 110037);
+			attr_dev(button, "class", "br3 svelte-1e5ctcy");
+			add_location(button, file$3, 234, 4, 110082);
+			attr_dev(header, "class", "svelte-1e5ctcy");
+			add_location(header, file$3, 232, 2, 110024);
+			attr_dev(div, "class", "pv2 svelte-1e5ctcy");
+			add_location(div, file$3, 237, 2, 110155);
+			attr_dev(article, "class", "svelte-1e5ctcy");
+			add_location(article, file$3, 231, 0, 110012);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3346,8 +3412,8 @@ function create_if_block$4(ctx) {
 			t0 = text("- ");
 			t1 = text(/*loops*/ ctx[0]);
 			t2 = text(" (Looped over the list)");
-			attr_dev(cite, "class", "f6 ttu tracked fs-normal svelte-1psrbas");
-			add_location(cite, file$4, 235, 6, 110493);
+			attr_dev(cite, "class", "f6 ttu tracked fs-normal svelte-1ypy7vl");
+			add_location(cite, file$4, 235, 6, 110420);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, cite, anchor);
@@ -3408,20 +3474,20 @@ function create_fragment$6(ctx) {
 			t6 = text(/*show*/ ctx[1]);
 			t7 = space();
 			if (if_block) if_block.c();
-			attr_dev(h1, "class", "f2 measure svelte-1psrbas");
-			add_location(h1, file$4, 228, 4, 110161);
-			attr_dev(button0, "class", "br3 svelte-1psrbas");
-			add_location(button0, file$4, 229, 4, 110203);
-			attr_dev(button1, "class", "br3 svelte-1psrbas");
-			add_location(button1, file$4, 230, 4, 110260);
-			attr_dev(header, "class", "svelte-1psrbas");
-			add_location(header, file$4, 227, 2, 110148);
-			attr_dev(p, "class", "dark-pink f5 f4-m f3-l lh-copy measure mt0 svelte-1psrbas");
-			add_location(p, file$4, 233, 4, 110402);
-			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black svelte-1psrbas");
-			add_location(blockquote, file$4, 232, 2, 110332);
-			attr_dev(article, "class", "svelte-1psrbas");
-			add_location(article, file$4, 226, 0, 110136);
+			attr_dev(h1, "class", "f2 measure svelte-1ypy7vl");
+			add_location(h1, file$4, 228, 4, 110110);
+			attr_dev(button0, "class", "br3 svelte-1ypy7vl");
+			add_location(button0, file$4, 229, 4, 110152);
+			attr_dev(button1, "class", "br3 svelte-1ypy7vl");
+			add_location(button1, file$4, 230, 4, 110209);
+			attr_dev(header, "class", "svelte-1ypy7vl");
+			add_location(header, file$4, 227, 2, 110097);
+			attr_dev(p, "class", "dark-pink f3 lh-copy svelte-1ypy7vl");
+			add_location(p, file$4, 233, 4, 110351);
+			attr_dev(blockquote, "class", "athelas ml0 mt4 pl4 black-90 bl bw2 b--black svelte-1ypy7vl");
+			add_location(blockquote, file$4, 232, 2, 110281);
+			attr_dev(article, "class", "svelte-1ypy7vl");
+			add_location(article, file$4, 226, 0, 110085);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");

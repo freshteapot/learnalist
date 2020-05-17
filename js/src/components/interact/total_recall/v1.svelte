@@ -84,8 +84,7 @@
     <button class="br3" on:click={handleClose}>Close</button>
   </header>
 
-  <div>
-
+  <div class="pv2">
     {#if state === 'not-playing'}
       <h1>Rules</h1>
       <p>Can you remember all the words?</p>
