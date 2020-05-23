@@ -18,10 +18,6 @@ type OAuth2ConfigInterface interface {
 	Client(ctx context.Context, t *oauth2.Token) *http.Client
 }
 
-type OAuth2Info interface {
-	GetUserInfo(code string) ([]byte, error)
-}
-
 type OAuthReadWriter interface {
 	GetTokenInfo(userUUID string) (*oauth2.Token, error)
 	WriteTokenInfo(userUUID string, token *oauth2.Token) error

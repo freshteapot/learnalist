@@ -37,6 +37,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
+
 		response := HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}

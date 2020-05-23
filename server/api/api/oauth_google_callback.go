@@ -59,8 +59,6 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		return c.String(http.StatusBadRequest, response)
 	}
 
-	// Could turn this whole section into GetUserInfo
-	// Lookup the user info
 	ctx := context.Background()
 	client := googleConfig.Client(ctx, token)
 

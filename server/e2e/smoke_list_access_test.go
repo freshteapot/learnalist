@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Testing with Ginkgo", func() {
+var _ = Describe("Smoke list access", func() {
 	It("list access", func() {
 
 		var httpResponse e2e.HttpResponse
@@ -48,6 +48,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
 		assert.NoError(err)
 		assert.Equal(httpResponse.StatusCode, http.StatusOK)
+
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>Days of the Week</title>"))
 
 		fmt.Println("> Share the list with friends only")
