@@ -6,6 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type Management interface {
+	FindUserUUID(search string) ([]string, error)
+	DeleteUserFromDB(userUUID string) error
+}
 type management struct {
 	db *sqlx.DB
 }

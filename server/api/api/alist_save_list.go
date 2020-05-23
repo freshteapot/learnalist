@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -41,8 +40,6 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	}
 
 	aList.User = user
-	fmt.Println(user)
-	fmt.Println(aList)
 	if method == http.MethodPut {
 		inputUuid = c.Param("uuid")
 		if inputUuid == "" {
