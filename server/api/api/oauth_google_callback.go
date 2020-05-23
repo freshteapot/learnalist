@@ -120,9 +120,6 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
-	// TODO save token info,
-	// if RefreshToken == "" insert
-	// if not
 	if token.RefreshToken == "" {
 		storedToken, err := oauthHandler.GetTokenInfo(string(userUUID))
 		if err == nil {
