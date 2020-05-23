@@ -20,6 +20,6 @@ var _ = Describe("Testing Root endpoint", func() {
 
 		m.V1GetRoot(c)
 		Expect(rec.Code).To(Equal(http.StatusOK))
-		Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"1, 2, 3. Lets go!"}`))
+		Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"1, 2, 3. Lets go!"}`))
 	})
 })

@@ -68,21 +68,21 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New(i18n.SuccessAlistNotFound))
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
 		})
 
 		It("Only the owner of the list can remove it", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New(i18n.InputDeleteAlistOperationOwnerOnly))
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Only the owner of the list can remove it."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Only the owner of the list can remove it."}`))
 		})
 
 		It("An error occurred whilst trying to remove the list", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New("Fail"))
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"We have failed to remove your list."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"We have failed to remove your list."}`))
 		})
 
 		It("Successfully removed a list", func() {
@@ -91,7 +91,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List fake-list-123 was removed."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List fake-list-123 was removed."}`))
 		})
 	})
 })

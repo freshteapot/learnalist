@@ -8,17 +8,13 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 )
 
-func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper *hugo.HugoHelper, oauthHandlers *oauth.Handlers) {
-	m := api.Manager{
-		Datastore:     dal,
-		Acl:           acl,
-		HugoHelper:    *hugoHelper,
-		OauthHandlers: *oauthHandlers,
-	}
+func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers oauth.Handlers, logger *logrus.Logger) {
+	m := api.NewManager(dal, acl, "", hugoHelper, oauthHandlers, logger)
 
 	authConfig := authenticate.Config{
 		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,

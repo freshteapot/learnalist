@@ -3,6 +3,7 @@ package sqlite
 import (
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/oauth2"
 )
@@ -33,7 +34,7 @@ FROM
 WHERE user_uuid = ?`
 )
 
-func NewOAuthReadWriter(db *sqlx.DB) *Sqlite {
+func NewOAuthReadWriter(db *sqlx.DB) oauth.OAuthReadWriter {
 	return &Sqlite{
 		db: db,
 	}

@@ -148,7 +148,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		defer resp.Body.Close()
 		data, err := ioutil.ReadAll(resp.Body)
 		assert.NoError(err)
-		assert.Equal(cleanEchoJSONResponse(data), `[]`)
+		assert.Equal(cleanEchoResponse(data), `[]`)
 	})
 	It("user has two list v1 and v2", func() {
 

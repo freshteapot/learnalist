@@ -52,7 +52,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
 			})
 
 			It("Valid json, invalid input", func() {
@@ -69,7 +69,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on label(s)"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on label(s)"}`))
 			})
 
 			It("Valid input, failed to save", func() {
@@ -86,7 +86,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
 			})
 
 			Context("Success, label saved", func() {
@@ -105,7 +105,7 @@ var _ = Describe("Testing Label endpoints", func() {
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusCreated))
-					Expect(cleanEchoJSONResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
 				})
 
 				It("Its already in the system", func() {
@@ -123,7 +123,7 @@ var _ = Describe("Testing Label endpoints", func() {
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusOK))
-					Expect(cleanEchoJSONResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
 				})
 			})
 		})
@@ -163,7 +163,7 @@ var _ = Describe("Testing Label endpoints", func() {
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`[]`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`[]`))
 			})
 
 			It("User with labels", func() {
@@ -176,14 +176,14 @@ var _ = Describe("Testing Label endpoints", func() {
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`["wind","water","fire","earth"]`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`["wind","water","fire","earth"]`))
 			})
 
 			It("Something went wrong getting the data from the storage", func() {
 				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
 			})
 		})
 
@@ -227,7 +227,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(errors.New("Failed"))
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
 			})
 
 			It("Successfully removed a label", func() {
@@ -244,7 +244,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(nil)
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Label test was removed."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Label test was removed."}`))
 			})
 		})
 	})

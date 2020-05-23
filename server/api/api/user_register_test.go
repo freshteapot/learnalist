@@ -38,7 +38,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 				c := e.NewContext(req, rec)
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
 			})
 
 			It("Invalid password", func() {
@@ -49,7 +49,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
 			})
 
 			It("Invalid username", func() {
@@ -64,7 +64,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 					c := e.NewContext(req, rec)
 					m.V1PostRegister(c)
 					Expect(rec.Code).To(Equal(http.StatusBadRequest))
-					Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
+					Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on user registration"}`))
 				}
 			})
 		})
@@ -99,7 +99,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusCreated))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
 				testHugoHelper.AssertExpectations(GinkgoT())
 			})
 
@@ -116,7 +116,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
 			})
 
 			It("New user, but already exists", func() {
@@ -130,7 +130,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"uuid":"fake-123","username":"iamusera"}`))
 			})
 		})
 	})

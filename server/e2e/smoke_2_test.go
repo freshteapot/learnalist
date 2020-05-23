@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Testing with Ginkgo", func() {
+var _ = Describe("Testing Smoke test 2", func() {
 	It("share public2", func() {
 
 		var messageResponse e2e.MessageResponse

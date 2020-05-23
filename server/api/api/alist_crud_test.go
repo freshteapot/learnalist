@@ -57,7 +57,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"This method is not supported."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"This method is not supported."}`))
 			})
 
 			It("Get, is not accepted", func() {
@@ -68,7 +68,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
 			})
 
 			It("Post, success", func() {
@@ -99,7 +99,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				Expect(rec.Code).To(Equal(http.StatusCreated))
 				b, _ := json.Marshal(savedList)
 
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(string(b)))
+				Expect(cleanEchoResponse(rec)).To(Equal(string(b)))
 			})
 
 			It("Post, fail, due to ownership", func() {
@@ -123,7 +123,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusForbidden))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Only the owner of the list can modify it."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Only the owner of the list can modify it."}`))
 			})
 
 			It("PUT, fail, due to list uuid not being found", func() {
@@ -151,7 +151,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on lists"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on lists"}`))
 			})
 
 			It("PUT, fail, due to list uuid not being found", func() {
@@ -180,7 +180,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusNotFound))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List not found."}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
 			})
 
 			It("PUT, fail, due to uuid in uri not matching in the list", func() {
@@ -210,7 +210,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"The list uuid in the uri doesnt match that in the payload"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"The list uuid in the uri doesnt match that in the payload"}`))
 			})
 
 			It("Post, fail, due to internal issues", func() {
@@ -234,7 +234,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Failed"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Failed"}`))
 			})
 		})
 

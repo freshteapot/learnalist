@@ -63,7 +63,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
 		})
 
 		It("Valid json input, invalid action", func() {
@@ -80,7 +80,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
 		})
 
 		It("Server error: failed to store in storage", func() {
@@ -101,7 +101,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
 		})
 
 		It("List not found", func() {
@@ -122,7 +122,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
@@ -145,7 +145,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
 		})
 
 		It("List found, you cant share with yourself", func() {
@@ -169,7 +169,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Today, we dont let you share with yourself"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Today, we dont let you share with yourself"}`))
 		})
 
 		It("List found, the user you want to share with doesnt exist", func() {
@@ -194,7 +194,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"User not found."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"User not found."}`))
 		})
 
 		Context("Success, we will share", func() {
@@ -221,7 +221,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareListReadAccess(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"grant"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"grant"}`))
 			})
 
 			It("Revoke user read access", func() {
@@ -247,7 +247,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareListReadAccess(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
 			})
 		})
 	})
@@ -293,7 +293,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
 		})
 
 		It("Valid json input, invalid action", func() {
@@ -309,7 +309,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
 		})
 
 		It("List not found", func() {
@@ -328,7 +328,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
@@ -350,7 +350,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
 		})
 
 		Context("Success, we will share the list", func() {
@@ -384,7 +384,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List is now public"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now public"}`))
 			})
 
 			It("Privately", func() {
@@ -416,7 +416,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List is now private to the owner"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now private to the owner"}`))
 			})
 
 			It("With friends", func() {
@@ -448,7 +448,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"List is now private to the owner and those granted access"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now private to the owner and those granted access"}`))
 			})
 
 			It("With friends when already set", func() {
@@ -480,7 +480,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"No change made"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"No change made"}`))
 			})
 		})
 		/*
@@ -507,7 +507,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
+				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
 			})
 		*/
 	})

@@ -5,6 +5,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/sirupsen/logrus"
 )
 
 // m exposing the data abstraction layer
@@ -14,8 +15,27 @@ type Manager struct {
 	DatabaseName  string
 	HugoHelper    hugo.HugoSiteBuilder
 	OauthHandlers oauth.Handlers
+	logger        *logrus.Logger
 }
 
 type HttpResponseMessage struct {
 	Message string `json:"message"`
+}
+
+func NewManager(
+	datastore models.Datastore,
+	acl acl.Acl,
+	databaseName string,
+	hugoHelper hugo.HugoSiteBuilder,
+	oauthHandlers oauth.Handlers,
+	logger *logrus.Logger,
+) *Manager {
+	return &Manager{
+		Datastore:     datastore,
+		Acl:           acl,
+		DatabaseName:  databaseName,
+		HugoHelper:    hugoHelper,
+		OauthHandlers: oauthHandlers,
+		logger:        logger,
+	}
 }

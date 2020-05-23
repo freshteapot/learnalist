@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Testing with Ginkgo", func() {
+var _ = Describe("Smoke list access", func() {
 	It("list access", func() {
 
 		var httpResponse e2e.HttpResponse
@@ -48,6 +48,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
 		assert.NoError(err)
 		assert.Equal(httpResponse.StatusCode, http.StatusOK)
+
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>Days of the Week</title>"))
 
 		fmt.Println("> Share the list with friends only")
@@ -61,7 +62,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>A list: access denied for this list</title>"))
 		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, aList.Uuid)
 		assert.Equal(httpResponse.StatusCode, http.StatusForbidden)
-		assert.Equal(cleanEchoJSONResponse(httpResponse.Body), `{"message":"Access Denied"}`)
+		assert.Equal(cleanEchoResponse(httpResponse.Body), `{"message":"Access Denied"}`)
 
 		fmt.Println("> Set the other user to be able to read the list")
 		httpResponse, err = learnalistClient.ShareReadAcessV1(userInfoOwner, aList.Uuid, userInfoReader.Uuid, aclKeys.ActionGrant)

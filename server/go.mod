@@ -3,31 +3,39 @@ module github.com/freshteapot/learnalist-api/server
 go 1.12
 
 require (
+	cloud.google.com/go v0.57.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.3.3
-	github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92
+	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
+	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/uuid v1.1.1
-	github.com/gookit/validate v1.1.0
+	github.com/gookit/goutil v0.2.7 // indirect
+	github.com/gookit/validate v1.2.0
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/labstack/echo/v4 v4.1.5
-	github.com/labstack/gommon v0.2.8
+	github.com/labstack/echo/v4 v4.1.16
 	github.com/lib/pq v1.2.0 // indirect
-	github.com/mattn/go-sqlite3 v1.11.0
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/onsi/ginkgo v1.10.2
 	github.com/onsi/gomega v1.7.0
-	github.com/otiai10/copy v1.0.1
-	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
+	github.com/otiai10/copy v1.1.1
+	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
-	github.com/robfig/cron/v3 v3.0.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.4.1
-	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.5.0
+	github.com/sirupsen/logrus v1.6.0
+	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/cobra v1.0.0
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.7.0
 	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.3.0
-	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739 // indirect
-	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
-	google.golang.org/appengine v1.6.2 // indirect
+	github.com/stretchr/testify v1.4.0
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
+	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
+	gopkg.in/ini.v1 v1.56.0 // indirect
 )

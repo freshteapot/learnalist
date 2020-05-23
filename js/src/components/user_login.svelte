@@ -74,7 +74,7 @@
               or with
               <a
                 target="_blank"
-                href="https://learnalist.net/api/v1/oauth/google/redirect"
+                href="/api/v1/oauth/google/redirect"
                 class="f6 link underline dib black">
                 google
               </a>
