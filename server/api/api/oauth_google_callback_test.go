@@ -44,6 +44,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		logger, hook = test.NewNullLogger()
 		datastore = &mocks.Datastore{}
 		userFromIDP = &mocks.UserFromIDP{}
+		userManagement := &mocks.Management{}
 		userSession = &mocks.Session{}
 		oauthReadWriter = &mocks.OAuthReadWriter{}
 		oauth2Config = &mocks.OAuth2ConfigInterface{}
@@ -58,7 +59,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		datastore.On("UserFromIDP").Return(userFromIDP)
 		datastore.On("OAuthHandler").Return(oauthReadWriter)
 
-		manager = api.NewManager(datastore, acl, "", testHugoHelper, oauthHandlers, logger)
+		manager = api.NewManager(datastore, userManagement, acl, "", testHugoHelper, oauthHandlers, logger)
 
 		method = http.MethodGet
 		uriPrefix = "/api/v1/oauth/google/callback"
