@@ -60,7 +60,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 			m.V1GetListsByMe(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`[]`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`[]`))
 		})
 	})
 
@@ -79,7 +79,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"The uuid is missing."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"The uuid is missing."}`))
 		})
 
 		It("Failed to lookup user access to the list, due to issues within", func() {
@@ -97,7 +97,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			acl.On("HasUserListReadAccess", alistUUID, user.Uuid).Return(false, errors.New("Error"))
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Issue with talking to the database whilst doing acl lookup"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Issue with talking to the database whilst doing acl lookup"}`))
 		})
 
 		It("You do not have access to the list", func() {
@@ -115,7 +115,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			acl.On("HasUserListReadAccess", alistUUID, user.Uuid).Return(false, nil)
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
 		})
 
 		// With the look up of access before, this one doesnt fully make sense anymore.
@@ -135,7 +135,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetAlist", alistUUID).Return(aList, errors.New("Trigger"))
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Failed to find alist with uuid: fake-list-123"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Failed to find alist with uuid: fake-list-123"}`))
 		})
 
 		It("Success", func() {
@@ -154,7 +154,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetAlist", alistUUID).Return(aList, nil)
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
 
 		})
 	})

@@ -141,6 +141,6 @@ func generateUsername() string {
 	return usernameOwner + "-" + str
 }
 
-func cleanEchoJSONResponse(data []byte) string {
+func cleanEchoResponse(data []byte) string {
 	return strings.TrimSuffix(string(data), "\n")
 }

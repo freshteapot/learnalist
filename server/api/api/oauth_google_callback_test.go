@@ -79,7 +79,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 			manager.V1OauthGoogleCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`Sadly, our service has taken a nap.`))
 		})
 
 		It("Challenge is not valid", func() {
@@ -93,7 +93,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 			manager.V1OauthGoogleCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"message":"Invalid code / challenge, please try to login again"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`Invalid code / challenge, please try to login again`))
 		})
 	})
 
@@ -106,7 +106,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		c := e.NewContext(req, rec)
 		manager.V1OauthGoogleCallback(c)
 		Expect(rec.Code).To(Equal(http.StatusBadRequest))
-		Expect(cleanEchoJSONResponse(rec)).To(Equal(`Exhange of code to token failed`))
+		Expect(cleanEchoResponse(rec)).To(Equal(`Exhange of code to token failed`))
 		Expect(hook.LastEntry().Data["error"]).To(Equal(want))
 		Expect(hook.LastEntry().Level).To(Equal(logrus.ErrorLevel))
 	})
@@ -148,7 +148,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 			c := e.NewContext(req, rec)
 			manager.V1OauthGoogleCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal("no email address returned by Google"))
+			Expect(cleanEchoResponse(rec)).To(Equal("no email address returned by Google"))
 		})
 	})
 

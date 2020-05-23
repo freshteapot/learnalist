@@ -99,7 +99,7 @@ var _ = Describe("Testing user login endpoint", func() {
 
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoJSONResponse(rec)).To(Equal(`{"token":"fake-token","user_uuid":"fake-123"}`))
+			Expect(cleanEchoResponse(rec)).To(Equal(`{"token":"fake-token","user_uuid":"fake-123"}`))
 		})
 
 		It("Wrong credentials", func() {

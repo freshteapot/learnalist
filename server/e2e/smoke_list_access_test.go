@@ -62,7 +62,7 @@ var _ = Describe("Smoke list access", func() {
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>A list: access denied for this list</title>"))
 		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, aList.Uuid)
 		assert.Equal(httpResponse.StatusCode, http.StatusForbidden)
-		assert.Equal(cleanEchoJSONResponse(httpResponse.Body), `{"message":"Access Denied"}`)
+		assert.Equal(cleanEchoResponse(httpResponse.Body), `{"message":"Access Denied"}`)
 
 		fmt.Println("> Set the other user to be able to read the list")
 		httpResponse, err = learnalistClient.ShareReadAcessV1(userInfoOwner, aList.Uuid, userInfoReader.Uuid, aclKeys.ActionGrant)
