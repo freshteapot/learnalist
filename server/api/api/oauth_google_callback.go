@@ -3,14 +3,12 @@ package api
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
-	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	guuid "github.com/google/uuid"
@@ -19,12 +17,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// TODO fix mixing json and html and string
 func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
-	logger := logging.GetLogger()
+	logger := m.logger
 	googleConfig := m.OauthHandlers.Google
 	oauthHandler := m.Datastore.OAuthHandler()
 	userSession := m.Datastore.UserSession()
 	userFromIDP := m.Datastore.UserFromIDP()
+
 	r := c.Request()
 	challenge := r.FormValue("state")
 	code := r.FormValue("code")
@@ -46,32 +46,39 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
+
 	// Exchange the code for the token
 	token, err := googleConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		return c.String(http.StatusBadRequest, fmt.Sprintf("Error: %s", err.Error()))
-	}
-	// Lookup the user info
-	ctx := context.Background()
-	client := oauth2.NewClient(ctx, googleConfig.TokenSource(ctx, token))
-
-	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-	if err != nil {
+		// Log
+		response := "Exhange of code to token failed"
 		logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Talking to google failed")
-		return c.String(http.StatusInternalServerError, i18n.ErrorInternal.Error())
+		}).Error(response)
+
+		return c.String(http.StatusBadRequest, response)
 	}
 
+	// Could turn this whole section into GetUserInfo
+	// Lookup the user info
+	ctx := context.Background()
+	client := googleConfig.Client(ctx, token)
+
+	// Have read the code, its very unlikely this would throw err (famous last words)
+	req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
 	resp, err := client.Do(req)
 	if err != nil {
-		return c.String(http.StatusBadRequest, i18n.ErrorCannotReadResponse.Error())
+		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
 	}
+
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	}
 
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return c.String(http.StatusBadRequest, i18n.ErrorCannotReadResponse.Error())
+		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
 	}
 
 	userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
@@ -83,10 +90,19 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	// Look up the user based on their email and association with google.
 	userUUID, err := userFromIDP.Lookup("google", userInfo.Email)
 	if err != nil {
+		if err != user.NotFound {
+			logger.WithFields(logrus.Fields{
+				"event": "idp-lookup-user-info",
+				"error": err,
+			}).Error("Issue in google callback")
+			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+		}
+
 		// Create a user
 		userUUID, err = userFromIDP.Register("google", userInfo.Email, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
+				"event": "idp-register-user",
 				"error": err,
 			}).Error("Failed to register new user via idp")
 			response := HttpResponseMessage{
@@ -94,7 +110,11 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			}
 			return c.JSON(http.StatusInternalServerError, response)
 		}
+
+		// Write an empty list
+		m.HugoHelper.WriteListsByUser(userUUID, m.Datastore.GetAllListsByUser(userUUID))
 	}
+
 	// Create a session for the user
 	userSessionToken := guuid.New()
 	session := user.UserSession{
@@ -106,6 +126,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	err = userSession.Activate(session)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
+			"event": "idp-session-activate",
 			"error": err,
 		}).Error("Failed to activate session")
 		response := HttpResponseMessage{
@@ -124,19 +145,17 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		}
 	}
 
-	// TODO save token info
-	oauthHandler.WriteTokenInfo(string(userUUID), token)
-
-	/*
-		b, _ := json.Marshal(token)
-		fmt.Println(string(b))
-		fmt.Println(token.AccessToken)
-		rawIDToken := token.Extra("id_token").(string)
-		fmt.Println(rawIDToken)
-	*/
-	// One way would be to post a cookie
-	// Pass back a header
-	// Have it in the payload, or in the actual html page for javascript to pick up and handle
+	err = oauthHandler.WriteTokenInfo(string(userUUID), token)
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"event": "idp-session-activate",
+			"error": err,
+		}).Error("Failed to save token info")
+		response := HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
 	vars := make(map[string]interface{})
 	vars["token"] = session.Token
@@ -149,8 +168,6 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
-	// TODO add no caching
-	// TODO make this a lot better
 	return c.HTMLBlob(http.StatusOK, tpl.Bytes())
 }
 

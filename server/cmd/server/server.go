@@ -100,10 +100,11 @@ var ServerCmd = &cobra.Command{
 		userSession := userStorage.NewUserSession(db)
 		userFromIDP := userStorage.NewUserFromIDP(db)
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
+		// TODO change to return an interface
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		dal := models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
-		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers)
+		server.InitApi(db, acl, dal, *hugoHelper, *oauthHandlers, logger)
 		server.InitAlists(acl, dal, hugoHelper)
 		server.Run()
 	},

@@ -1,0 +1,13 @@
+{
+    "id": "fake-123",
+    "email": "fake@learnalist.net",
+    "verified_email": true,
+    "name": "Simon Smith",
+    "given_name": "Simon",
+    "family_name": "Smith",
+    "link": "https://plus.google.com/fake-123",
+    "picture": "https://lh3.googleusercontent.com/a-/fake-123",
+    "gender": "male",
+    "locale": "en-GB",
+    "hd": "learnalist.net"
+}

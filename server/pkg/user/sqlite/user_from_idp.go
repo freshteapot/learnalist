@@ -1,6 +1,9 @@
 package sqlite
 
 import (
+	"database/sql"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -57,5 +60,8 @@ func (store *UserFromIDP) Register(idp string, identifier string, info []byte) (
 func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string, err error) {
 	var item DatabaseUserFromIDP
 	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
+	if err == sql.ErrNoRows {
+		err = user.NotFound
+	}
 	return item.UserUUID, err
 }

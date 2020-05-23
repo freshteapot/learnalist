@@ -1,7 +1,6 @@
 package sqlite_test
 
 import (
-	"database/sql"
 	"errors"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -72,7 +71,7 @@ var _ = Describe("Testing User from IDP", func() {
 			})
 
 			It("Nothing found", func() {
-				want := sql.ErrNoRows
+				want := user.NotFound
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
 					WillReturnError(want)
 

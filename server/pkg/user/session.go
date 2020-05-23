@@ -1,6 +1,9 @@
 package user
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type UserInfoFromUsernameAndPassword struct {
 	UserUUID string
@@ -21,6 +24,8 @@ type UserSession struct {
 	// TODO I want to know what client it is, web, mobile, chrome-extension, so I can handle different responses.
 	Created time.Time
 }
+
+var NotFound = errors.New("user-not-found")
 
 type Session interface {
 	NewSession(userUUID string) (session UserSession, err error)

@@ -1,4 +1,7 @@
-
+###############################################################################
+#
+# Development commands
+#
 clear-site:
 	mkdir -p ./hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 	rm -rf ./hugo/public/*
@@ -21,6 +24,17 @@ run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
+develop:
+	cd js && \
+	npm run dev
+
+build-mocks:
+	cd server && mockery -all -recursive
+
+###############################################################################
+#
+# More production than development
+#
 rebuild-static-site:
 	cd server && \
 	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
@@ -34,16 +48,10 @@ sync-site-assets:
 	--exclude-from="exclude-srv-learnalist.txt" \
 	./hugo ${SSH_SERVER}:/srv/learnalist
 
-
 sync-db-files:
 	rsync -avzP \
 	--rsync-path="sudo rsync" \
 	./server/db ${SSH_SERVER}:/srv/learnalist
-
-
-develop:
-	cd js && \
-	npm run dev
 
 build-image:
 	cd server && \
