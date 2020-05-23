@@ -120,6 +120,8 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
+	// If refreshToken is empty, we look it up in the db
+	// before we write it back to the db.
 	if token.RefreshToken == "" {
 		storedToken, err := oauthHandler.GetTokenInfo(string(userUUID))
 		if err == nil {
