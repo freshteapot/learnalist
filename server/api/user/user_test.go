@@ -1,46 +1,67 @@
-package user
+package user_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/suite"
+	"github.com/freshteapot/learnalist-api/server/api/user"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-type UserSuite struct {
-	suite.Suite
-}
+var _ = Describe("Testing user login endpoint", func() {
+	var (
+		err         error
+		cleanedUser user.RegisterInput
+		input       user.RegisterInput
+	)
 
-func (suite *UserSuite) SetupSuite() {
+	It("Test cases", func() {
+		tests := []struct {
+			Username    string
+			Password    string
+			Description string
+			ExpectError bool
+		}{
+			{
+				Username:    "",
+				Password:    "",
+				Description: "Fail because empty",
+			},
+			{
+				Username:    "abc",
+				Password:    "",
+				Description: "Fail because username is too short and password is empty",
+			},
+			{
+				Username:    "iamusera",
+				Password:    "",
+				Description: "Fail because password is empty",
+			},
+			{
+				Username:    "iamusera",
+				Password:    "test12",
+				Description: "Fail because password is not long enough",
+			},
+			{
+				Username:    "iamusera?",
+				Password:    "test1234",
+				Description: "Fail because username is not valid",
+			},
+		}
 
-}
+		for _, test := range tests {
+			input = user.RegisterInput{
+				Username: test.Username,
+				Password: test.Password,
+			}
+		}
+		_, err = user.Validate(input)
+		Expect(err).NotTo(BeNil())
+	})
 
-func (suite *UserSuite) SetupTest() {
-
-}
-
-func (suite *UserSuite) TearDownTest() {
-
-}
-
-func TestRunSuite(t *testing.T) {
-	suite.Run(t, new(UserSuite))
-}
-
-func (suite *UserSuite) TestRegisterValidation() {
-	var err error
-	var cleanedUser RegisterInput
-	input := &RegisterInput{
-		Username: "",
-		Password: "",
-	}
-	_, err = Validate(*input)
-	suite.NotNil(err)
-	input.Username = "abc"
-	_, err = Validate(*input)
-	suite.NotNil(err)
-	input.Username = "iamauserA"
-	input.Password = "_i_am_a_test_"
-	cleanedUser, err = Validate(*input)
-	suite.Nil(err)
-	suite.Equal("iamausera", cleanedUser.Username)
-}
+	It("Confirm filtering of username to lowercase", func() {
+		input.Username = "iamauserA"
+		input.Password = "_i_am_a_test_"
+		cleanedUser, err = user.Validate(input)
+		Expect(cleanedUser.Username).To(Equal("iamausera"))
+		Expect(err).To(BeNil())
+	})
+})
