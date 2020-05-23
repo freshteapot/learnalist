@@ -100,7 +100,6 @@ var ServerCmd = &cobra.Command{
 		userSession := userStorage.NewUserSession(db)
 		userFromIDP := userStorage.NewUserFromIDP(db)
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
-		// TODO change to return an interface
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		dal := models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 

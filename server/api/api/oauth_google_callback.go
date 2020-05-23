@@ -17,7 +17,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// TODO fix mixing json and html and string
 func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	logger := m.logger
 	googleConfig := m.OauthHandlers.Google
@@ -34,17 +33,11 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("Invalid challenge")
-		response := HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
 	if !has {
-		response := HttpResponseMessage{
-			Message: "Invalid code / challenge, please try to login again",
-		}
-		return c.JSON(http.StatusBadRequest, response)
+		return c.String(http.StatusBadRequest, "Invalid code / challenge, please try to login again")
 	}
 
 	// Exchange the code for the token
@@ -103,10 +96,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 				"event": "idp-register-user",
 				"error": err,
 			}).Error("Failed to register new user via idp")
-			response := HttpResponseMessage{
-				Message: i18n.InternalServerErrorFunny,
-			}
-			return c.JSON(http.StatusInternalServerError, response)
+			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
 
 		// Write an empty list
@@ -127,10 +117,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			"event": "idp-session-activate",
 			"error": err,
 		}).Error("Failed to activate session")
-		response := HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
 	// TODO save token info,
@@ -149,10 +136,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			"event": "idp-session-activate",
 			"error": err,
 		}).Error("Failed to save token info")
-		response := HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
 	vars := make(map[string]interface{})
