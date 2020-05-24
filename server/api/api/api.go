@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
+	"github.com/freshteapot/learnalist-api/server/api/event"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
@@ -18,6 +19,7 @@ type Manager struct {
 	HugoHelper     hugo.HugoSiteBuilder
 	OauthHandlers  oauth.Handlers
 	logger         *logrus.Logger
+	insights       event.Insights
 }
 
 type HttpResponseMessage struct {
@@ -41,5 +43,6 @@ func NewManager(
 		HugoHelper:     hugoHelper,
 		OauthHandlers:  oauthHandlers,
 		logger:         logger,
+		insights:       event.NewInsights(logger),
 	}
 }
