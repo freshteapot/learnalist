@@ -41,7 +41,6 @@ var _ = Describe("Testing user delete endpoint", func() {
 
 	BeforeEach(func() {
 		logger, hook = test.NewNullLogger()
-		fmt.Println(hook)
 		datastore = &mocks.Datastore{}
 		userManagement = &mocks.Management{}
 		acl := &mocks.Acl{}
