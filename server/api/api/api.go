@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
-	"github.com/freshteapot/learnalist-api/server/api/event"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/sirupsen/logrus"

@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/event"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )

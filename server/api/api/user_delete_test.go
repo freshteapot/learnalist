@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 
 	"github.com/freshteapot/learnalist-api/server/api/api"
-	"github.com/freshteapot/learnalist-api/server/api/event"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
