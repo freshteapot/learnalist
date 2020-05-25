@@ -15,8 +15,9 @@ type HttpResponseMessage struct {
 }
 
 type Manager struct {
-	Acl             acl.Acl
-	Datastore       models.Datastore
+	Acl       acl.Acl
+	Datastore models.Datastore
+	// Todo do I need this?
 	SiteCacheFolder string
 	HugoHelper      hugo.HugoHelper
 }

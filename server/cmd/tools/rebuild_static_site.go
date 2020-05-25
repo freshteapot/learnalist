@@ -15,6 +15,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
@@ -22,6 +23,7 @@ var rebuildStaticSiteCmd = &cobra.Command{
 	Use:   "rebuild-static-site",
 	Short: "Rebuild the static site based on all lists in the database",
 	Run: func(cmd *cobra.Command, args []string) {
+		logger := logging.GetLogger()
 		skipPublishing, _ := cmd.Flags().GetBool("skip-publishing")
 		databaseName := viper.GetString("tools.rebuildStaticSite.sqlite.database")
 		// "path to static site builder
@@ -43,19 +45,12 @@ var rebuildStaticSiteCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// "path to site cache"
-		siteCacheFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.siteCacheDirectory", viper.GetString("tools.rebuildStaticSite.siteCacheDirectory"))
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-
 		db := database.NewDB(databaseName)
 		masterCron := cron.NewCron()
 		if skipPublishing {
 			masterCron.Stop()
 		}
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, siteCacheFolder)
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 
 		makeLists(db, hugoHelper)
 		makeUserLists(db, hugoHelper)

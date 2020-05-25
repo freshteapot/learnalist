@@ -6,8 +6,10 @@ GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y%m%dT%H%M%
 # Development commands
 #
 clear-site:
-	mkdir -p ./hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 	rm -rf ./hugo/public/*
+	mkdir -p ./hugo/{public/alist,public/alistsbyuser}
+	mkdir -p ./hugo/{content/alist,data/alist}
+	mkdir -p ./hugo/{content/alistsbyuser,data/alistsbyuser}
 	rm -f ./hugo/content/alist/*
 	rm -f ./hugo/content/alistsbyuser/*
 	rm -f ./hugo/data/alist/*

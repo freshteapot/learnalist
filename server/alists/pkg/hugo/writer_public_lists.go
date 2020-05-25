@@ -32,11 +32,3 @@ func (w HugoPublicListsWriter) Data(lists []alist.ShortInfo) {
 		fmt.Println(err)
 	}
 }
-
-func (w HugoPublicListsWriter) GetFilesToPublish() {
-	// TODO Do I want this function?
-}
-
-func (w HugoPublicListsWriter) GetFilesToClean() {
-	// TODO Do I want this function?
-}

@@ -42,7 +42,7 @@ var ServerCmd = &cobra.Command{
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
 
-		// "path to static site builder
+		// path to static site builder
 		hugoFolder, err := utils.CmdParsePathToFolder("server.hugo.directory", viper.GetString("server.hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
@@ -61,13 +61,6 @@ var ServerCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// "path to site cache"
-		siteCacheFolder, err := utils.CmdParsePathToFolder("server.siteCacheDirectory", viper.GetString("server.siteCacheDirectory"))
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-
 		// A hack would be to access it via
 		loginCookie := authenticate.CookieConfig{
 			Domain: viper.GetString("server.cookie.domain"),
@@ -82,7 +75,6 @@ var ServerCmd = &cobra.Command{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
 			HugoFolder:       hugoFolder,
-			SiteCacheFolder:  siteCacheFolder,
 		}
 		server.Init(serverConfig)
 
@@ -92,7 +84,7 @@ var ServerCmd = &cobra.Command{
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, hugoExternal, masterCron, serverConfig.SiteCacheFolder)
+		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.

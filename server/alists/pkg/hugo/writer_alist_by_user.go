@@ -96,27 +96,3 @@ func (w HugoAListUserWriter) GetFilesToPublish() []string {
 	}
 	return toPublish
 }
-
-func (w HugoAListUserWriter) GetFilesToClean() []string {
-	toPublish := w.GetFilesToPublish()
-	var toClean []string
-
-	for _, path := range toPublish {
-		filename := strings.TrimPrefix(path, w.contentDirectory+"/")
-
-		if strings.HasSuffix(filename, ".md") {
-			uuid := strings.TrimSuffix(filename, ".md")
-
-			filesToClean := []string{
-				fmt.Sprintf("%s/%s.md", w.contentDirectory, uuid),
-				fmt.Sprintf("%s/%s.json", w.dataDirectory, uuid),
-				// TODO this might not be needed
-				fmt.Sprintf("%s/alistsbyuser/%s.json", w.publishDirectory, uuid),
-				fmt.Sprintf("%s/alistsbyuser/%s.html", w.publishDirectory, uuid),
-			}
-			toClean = append(toClean, filesToClean...)
-		}
-	}
-
-	return toClean
-}

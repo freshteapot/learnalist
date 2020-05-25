@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/otiai10/copy"
+	"github.com/sirupsen/logrus"
 )
 
 func (h HugoHelper) Build() {
@@ -26,26 +26,7 @@ func (h HugoHelper) Build() {
 	}
 
 	h.buildSite()
-	//uuids := h.getPublishedFiles()
-	// TODO whats the downside of this?
-	// TODO should I have a publish list per type alist, user?
-
-	// Why copy?
-	// Maybe skip if paths are the same
-	//h.copyToSiteCache()
-
-	if h.SiteCacheFolder == h.PublishDirectory {
-		h.StopCronJob()
-		return
-	}
-
-	// Only remove what we processed, that way any that get added will not be lost (hopefully)
-	removeA := h.AlistWriter.GetFilesToClean()
-	removeB := h.AlistsByUserWriter.GetFilesToClean()
-	toDelete := append(removeA, removeB...)
-	fmt.Println("toDelete", toDelete)
-	//h.deleteFiles(toDelete)
-
+	h.StopCronJob()
 }
 
 func (h HugoHelper) buildSite() {
@@ -66,40 +47,26 @@ func (h HugoHelper) buildSite() {
 	fmt.Println(string(out))
 }
 
-// Copy each file over, including non alist files and directories
-func (h HugoHelper) copyToSiteCache() {
-	fmt.Println("Copy site")
-	siteCacheDir := h.SiteCacheFolder
-	destinationDir := h.PublishDirectory
-
-	err := copy.Copy(destinationDir, siteCacheDir)
-	fmt.Println(err)
-	fmt.Println(destinationDir)
-	fmt.Println(siteCacheDir)
-}
-
-// deleteBuildFiles
-// 	- Remove from content
-// 	- Remove from data directory
-//	- Remove from hugo publishe directory
-func (h HugoHelper) deleteBuildFiles(uuid string) {
-	panic("REMOVE")
-	//files := h.getBuildFiles(uuid)
-	//h.deleteFiles(files)
-}
-
 func (h HugoHelper) deleteFiles(files []string) {
+	log := h.logger
 	// TODO Create an issue about a command line option to purge lists that are not in the database
 	// Assume one day, this will get out of sync.
 	for _, path := range files {
-		fmt.Printf("Removing %s\n", path)
-
 		err := os.Remove(path)
 		if err != nil {
 			if !strings.HasSuffix(err.Error(), "no such file or directory") {
-				fmt.Println(fmt.Sprintf("Failed to remove %s", err))
+				log.WithFields(logrus.Fields{
+					"event": "delete-file",
+					"path":  path,
+					"err":   err,
+				}).Error("file removed")
+				continue
 			}
 		}
 
+		log.WithFields(logrus.Fields{
+			"event": "delete-file",
+			"path":  path,
+		}).Info("file removed")
 	}
 }

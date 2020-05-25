@@ -46,15 +46,9 @@ var deleteUserCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		publicFolder, err := utils.CmdParsePathToFolder("hugo.public", fmt.Sprintf("%s/public", hugoFolder))
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-
 		masterCron := cron.NewCron()
 		masterCron.Stop()
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, publicFolder)
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 
 		db := database.NewDB(dsn)
 		userManagement := user.NewManagement(
