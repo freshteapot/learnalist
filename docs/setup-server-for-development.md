@@ -33,7 +33,7 @@ make develop
 ```
 make clear-site
 make rebuild-db
-make build-prod-base
+make build-image-base
 make build-image
 ```
 

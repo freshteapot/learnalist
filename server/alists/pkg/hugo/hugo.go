@@ -47,6 +47,7 @@ const (
 
 func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.Cron, siteCacheFolder string) *HugoHelper {
 	// TODO maybe make a test run
+	// TODO maybe bake in %s/public
 	check := []string{
 		RealtivePathContentAlist,
 		RealtivePathDataAlist,

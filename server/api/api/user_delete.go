@@ -12,7 +12,6 @@ import (
 
 func (m *Manager) V1DeleteUser(c echo.Context) error {
 	logger := m.logger
-	insights := m.insights
 	response := HttpResponseMessage{}
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
@@ -23,22 +22,15 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
-	err := m.userManagement.DeleteUserFromDB(userUUID)
+	err := m.userManagement.DeleteUser(userUUID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"event":   event.UserDeleted,
-			"context": "delete-from-db",
-			"error":   err,
+			"event": event.UserDeleted,
+			"error": err,
 		}).Error("problem")
 		response.Message = i18n.InternalServerErrorFunny
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-
-	insights.Event(logrus.Fields{
-		"event":     event.UserDeleted,
-		"user_uuid": userUUID,
-	})
-
 	response.Message = "User has been removed"
 	return c.JSON(http.StatusOK, response)
 }

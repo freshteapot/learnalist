@@ -1,81 +1,73 @@
 package user
 
 import (
-	"errors"
+	"fmt"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/sirupsen/logrus"
 )
 
-type Management interface {
+type ManagementStorage interface {
 	FindUserUUID(search string) ([]string, error)
-	DeleteUserFromDB(userUUID string) error
+	GetLists(userUUID string) ([]string, error)
+	DeleteUser(userUUID string) error
 }
+
+type ManagementSite interface {
+	DeleteList(listUUID string) error
+	DeleteUser(userUUID string) error
+}
+
+type Management interface {
+	FindUser(search string) ([]string, error)
+	DeleteUser(userUUID string) error
+}
+
 type management struct {
-	db *sqlx.DB
+	storage  ManagementStorage
+	site     ManagementSite
+	insights event.Insights
 }
 
-func NewManagement(db *sqlx.DB) management {
-	return management{db: db}
-}
-
-// FindUserUUID Find the user uuid based on the search string
-func (m management) FindUserUUID(search string) ([]string, error) {
-	db := m.db
-	query := `
-SELECT
-	uuid as user_uuid
-FROM
-	user
-WHERE
-	username=?
-UNION
-SELECT
-	user_uuid
-FROM
-	user_from_idp
-WHERE
-	kind="email"
-AND
-	identifier=?`
-
-	userUUIDs := make([]string, 0)
-	err := db.Select(&userUUIDs, query, search, search)
-
-	if len(userUUIDs) > 1 {
-		return userUUIDs, errors.New("Too many userUUID found")
+func NewManagement(storage ManagementStorage, site ManagementSite, insights event.Insights) management {
+	return management{
+		storage:  storage,
+		site:     site,
+		insights: insights,
 	}
-	return userUUIDs, err
 }
 
-func (m management) DeleteUserFromDB(userUUID string) error {
-	db := m.db
-	queries := []string{
-		"DELETE FROM user_labels WHERE user_uuid=?",
-		"DELETE FROM user WHERE uuid=?",
-		"DELETE FROM alist_labels WHERE user_uuid=?",
-		"DELETE FROM acl_simple WHERE user_uuid=?",
-		"DELETE FROM oauth2_token_info WHERE user_uuid=?",
-		"DELETE FROM user_sessions WHERE user_uuid=?",
-		"DELETE FROM user_from_idp WHERE user_uuid=?"}
+// FindUser Find the user uuid based on the search string
+func (m management) FindUser(search string) ([]string, error) {
+	return m.storage.FindUserUUID(search)
+}
 
-	tx, err := db.Beginx()
+func (m management) DeleteUser(userUUID string) error {
+	lists, err := m.storage.GetLists(userUUID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	for _, query := range queries {
-		_, err = tx.Exec(query, userUUID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
+	// Remove from the site
+	for _, listUUID := range lists {
+		fmt.Printf("Remove list %s from static site", listUUID)
+		m.site.DeleteList(listUUID)
 	}
 
-	err = tx.Commit()
+	err = m.site.DeleteUser(userUUID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
+
+	err = m.storage.DeleteUser(userUUID)
+	if err != nil {
+		return err
+	}
+
+	// TODO event that this happened
+	m.insights.Event(logrus.Fields{
+		"event":     event.UserDeleted,
+		"user_uuid": userUUID,
+	})
 	return nil
 }

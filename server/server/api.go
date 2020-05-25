@@ -7,7 +7,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
@@ -15,7 +17,13 @@ import (
 )
 
 func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers oauth.Handlers, logger *logrus.Logger) {
-	userManagement := user.NewManagement(db)
+
+	userManagement := user.NewManagement(
+		userSqlite.NewSqliteManagementStorage(db),
+		hugoHelper,
+		event.NewInsights(logger),
+	)
+
 	m := api.NewManager(dal, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
 
 	authConfig := authenticate.Config{

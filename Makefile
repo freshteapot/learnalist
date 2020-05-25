@@ -56,10 +56,10 @@ sync-db-files:
 	--rsync-path="sudo rsync" \
 	./server/db ${SSH_SERVER}:/srv/learnalist
 
-build-prod-base:
+
+build-image-base:
 	cd server && \
-	docker build -f Dockerfile_prod_base  \
-	-t learnalist-prod-base:latest .
+	docker build -f Dockerfile_prod_base -t learnalist-prod-base:latest .
 
 build-image:
 	cd server && \
