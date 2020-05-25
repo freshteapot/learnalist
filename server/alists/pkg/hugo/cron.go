@@ -2,7 +2,8 @@ package hugo
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Job struct {
@@ -32,7 +33,9 @@ func (h HugoHelper) RegisterCronJob() {
 
 func (h HugoHelper) StopCronJob() {
 	if *h.cronEntryID != 0 {
-		fmt.Println("stopping cronjob")
+		h.logger.WithFields(logrus.Fields{
+			"event": "cron-stop",
+		}).Info("done")
 		h.cron.Remove(*h.cronEntryID)
 		*h.cronEntryID = 0
 	}
@@ -40,9 +43,11 @@ func (h HugoHelper) StopCronJob() {
 
 func (h HugoHelper) ProcessContent() {
 	h.inprogress.Lock()
-	now := time.Now()
-	fmt.Printf("Processing content within %s @ %s\n", h.Cwd, now)
-
+	logContext := h.logger.WithFields(logrus.Fields{
+		"event": "process-content",
+	})
+	logContext.Info("started")
 	h.Build()
 	h.inprogress.Unlock()
+	logContext.Info("finished")
 }

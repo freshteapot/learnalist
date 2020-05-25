@@ -2,7 +2,6 @@ package hugo
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -30,43 +29,53 @@ func (h HugoHelper) Build() {
 }
 
 func (h HugoHelper) buildSite() {
+	log := h.logger
+	logContext := log.WithFields(logrus.Fields{
+		"event": "build-site",
+	})
+
 	staticSiteFolder := h.Cwd
-	// TODO change this to be dynamic via config
 	parts := []string{
 		"-verbose",
-		fmt.Sprintf(`--environment=%s`, h.Environment),
+		fmt.Sprintf(`--environment=%s`, h.environment),
 	}
 
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
 	out, err := cmd.Output()
 	if err != nil {
-		fmt.Println(string(out))
-		log.Fatal(err)
+		logContext.WithFields(logrus.Fields{
+			"error": err,
+			"out":   string(out),
+		}).Fatal("failed")
 	}
-	fmt.Println(string(out))
+
+	logContext.WithFields(logrus.Fields{
+		"out": string(out),
+	}).Info("done")
 }
 
 func (h HugoHelper) deleteFiles(files []string) {
 	log := h.logger
+	logContext := log.WithFields(logrus.Fields{
+		"event": "delete-file",
+	})
 	// TODO Create an issue about a command line option to purge lists that are not in the database
 	// Assume one day, this will get out of sync.
 	for _, path := range files {
 		err := os.Remove(path)
 		if err != nil {
 			if !strings.HasSuffix(err.Error(), "no such file or directory") {
-				log.WithFields(logrus.Fields{
-					"event": "delete-file",
+				logContext.WithFields(logrus.Fields{
 					"path":  path,
-					"err":   err,
+					"error": err,
 				}).Error("file removed")
 				continue
 			}
 		}
 
-		log.WithFields(logrus.Fields{
-			"event": "delete-file",
-			"path":  path,
+		logContext.WithFields(logrus.Fields{
+			"path": path,
 		}).Info("file removed")
 	}
 }
