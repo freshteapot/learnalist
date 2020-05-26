@@ -1,3 +1,7 @@
+hugo:
+  directory: "/srv/learnalist/hugo"
+  environment: "docker"
+  external: "true"
 server:
   sqlite:
     database: /srv/learnalist/server.db
@@ -7,11 +11,6 @@ server:
   cookie:
     domain: "localhost"
     secure: false
-  siteCacheDirectory: /srv/learnalist/hugo/public
-  hugo:
-    directory: "/srv/learnalist/hugo"
-    environment: "docker"
-
   loginWith:
     google:
       clientID: "XXX"
@@ -21,10 +20,6 @@ tools:
   rebuildStaticSite:
     sqlite:
       database: /srv/learnalist/server.db
-    siteCacheDirectory: /srv/learnalist/hugo/public
-    hugo:
-      directory: "/srv/learnalist/hugo"
-      environment: "docker"
   integrationTests:
     username: ""
     password: ""

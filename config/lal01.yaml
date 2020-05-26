@@ -1,3 +1,7 @@
+hugo:
+  directory: "/srv/learnalist/hugo"
+  environment: "lal01"
+  external: "false"
 server:
   sqlite:
     database: /srv/learnalist/server.db
@@ -7,12 +11,6 @@ server:
   cookie:
     domain: "learnalist.net"
     secure: true
-  siteCacheDirectory: /srv/learnalist/hugo/public
-  hugo:
-    directory: "/srv/learnalist/hugo"
-    environment: "lal01"
-    external: "false"
-
   loginWith:
     google:
       clientID: "XXX"
@@ -22,11 +20,6 @@ tools:
   rebuildStaticSite:
     sqlite:
       database: /srv/learnalist/server.db
-    siteCacheDirectory: /srv/learnalist/hugo/public
-    hugo:
-      directory: "/srv/learnalist/hugo"
-      environment: "lal01"
-      external: "false"
   integrationTests:
     username: ""
     password: ""
