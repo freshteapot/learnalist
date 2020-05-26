@@ -24,8 +24,6 @@ type HugoSiteBuilder interface {
 type HugoHelper struct {
 	cwd                string
 	environment        string
-	DataDirectory      string
-	ContentDirectory   string
 	externalHugo       bool
 	cronEntryID        *cron.EntryID
 	cron               *cron.Cron
