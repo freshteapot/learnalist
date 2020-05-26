@@ -43,21 +43,21 @@ var ServerCmd = &cobra.Command{
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
 
 		// path to static site builder
-		hugoFolder, err := utils.CmdParsePathToFolder("server.hugo.directory", viper.GetString("server.hugo.directory"))
+		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 
-		hugoEnvironment := viper.GetString("server.hugo.environment")
+		hugoEnvironment := viper.GetString("hugo.environment")
 		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.environment is missing")
+			fmt.Println("hugo.environment is missing")
 			os.Exit(1)
 		}
 
-		hugoExternal := viper.GetBool("server.hugo.external")
+		hugoExternal := viper.GetBool("hugo.external")
 		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.external is missing")
+			fmt.Println("hugo.external is missing")
 			os.Exit(1)
 		}
 

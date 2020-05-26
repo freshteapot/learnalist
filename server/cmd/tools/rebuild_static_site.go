@@ -27,19 +27,19 @@ var rebuildStaticSiteCmd = &cobra.Command{
 		skipPublishing, _ := cmd.Flags().GetBool("skip-publishing")
 		databaseName := viper.GetString("tools.rebuildStaticSite.sqlite.database")
 		// "path to static site builder
-		hugoFolder, err := utils.CmdParsePathToFolder("tools.rebuildStaticSite.hugo.directory", viper.GetString("tools.rebuildStaticSite.hugo.directory"))
+		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 
-		hugoEnvironment := viper.GetString("tools.rebuildStaticSite.hugo.environment")
+		hugoEnvironment := viper.GetString("hugo.environment")
 		if hugoEnvironment == "" {
 			fmt.Println("server.hugo.environment is missing")
 			os.Exit(1)
 		}
 
-		hugoExternal := viper.GetBool("server.hugo.external")
+		hugoExternal := viper.GetBool("hugo.external")
 		if hugoEnvironment == "" {
 			fmt.Println("server.hugo.external is missing")
 			os.Exit(1)
