@@ -66,6 +66,7 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 	// This is required to keep track of the memory, I think.
 	var empty cron.EntryID
 	empty = 0
+
 	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
 
 	return &HugoHelper{

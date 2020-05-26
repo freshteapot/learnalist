@@ -36,5 +36,5 @@ func PrettyPrintJSON(input []byte) string {
 	var prettyJSON bytes.Buffer
 	// Based on jq standard output
 	json.Indent(&prettyJSON, input, "", "  ")
-	return string(prettyJSON.Bytes())
+	return prettyJSON.String()
 }

@@ -9,8 +9,8 @@ type Management struct {
 	mock.Mock
 }
 
-// DeleteUserFromDB provides a mock function with given fields: userUUID
-func (_m *Management) DeleteUserFromDB(userUUID string) error {
+// DeleteUser provides a mock function with given fields: userUUID
+func (_m *Management) DeleteUser(userUUID string) error {
 	ret := _m.Called(userUUID)
 
 	var r0 error
@@ -23,8 +23,8 @@ func (_m *Management) DeleteUserFromDB(userUUID string) error {
 	return r0
 }
 
-// FindUserUUID provides a mock function with given fields: search
-func (_m *Management) FindUserUUID(search string) ([]string, error) {
+// FindUser provides a mock function with given fields: search
+func (_m *Management) FindUser(search string) ([]string, error) {
 	ret := _m.Called(search)
 
 	var r0 []string
