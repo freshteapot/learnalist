@@ -22,7 +22,7 @@ type HugoSiteBuilder interface {
 }
 
 type HugoHelper struct {
-	Cwd                string
+	cwd                string
 	environment        string
 	DataDirectory      string
 	ContentDirectory   string
@@ -72,7 +72,7 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 
 	return &HugoHelper{
 		logger:       logger,
-		Cwd:          cwd,
+		cwd:          cwd,
 		environment:  environment,
 		externalHugo: isExternal,
 		cronEntryID:  &empty,

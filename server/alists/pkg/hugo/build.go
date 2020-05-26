@@ -34,7 +34,7 @@ func (h HugoHelper) buildSite() {
 		"event": "build-site",
 	})
 
-	staticSiteFolder := h.Cwd
+	staticSiteFolder := h.cwd
 	parts := []string{
 		"-verbose",
 		fmt.Sprintf(`--environment=%s`, h.environment),

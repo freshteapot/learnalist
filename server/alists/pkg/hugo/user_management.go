@@ -5,9 +5,9 @@ import (
 )
 
 func (h HugoHelper) DeleteList(listUUID string) error {
-	contentDirectory := fmt.Sprintf(RealtivePathContentAlist, h.Cwd)
-	dataDirectory := fmt.Sprintf(RealtivePathDataAlist, h.Cwd)
-	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlist, h.Cwd)
+	contentDirectory := fmt.Sprintf(RealtivePathContentAlist, h.cwd)
+	dataDirectory := fmt.Sprintf(RealtivePathDataAlist, h.cwd)
+	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlist, h.cwd)
 
 	files := []string{
 		fmt.Sprintf("%s/%s.md", contentDirectory, listUUID),
@@ -23,9 +23,9 @@ func (h HugoHelper) DeleteList(listUUID string) error {
 }
 
 func (h HugoHelper) DeleteUser(userUUID string) error {
-	contentDirectory := fmt.Sprintf(RealtivePathContentAlistsByUser, h.Cwd)
-	dataDirectory := fmt.Sprintf(RealtivePathDataAlistsByUser, h.Cwd)
-	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlistsByUser, h.Cwd)
+	contentDirectory := fmt.Sprintf(RealtivePathContentAlistsByUser, h.cwd)
+	dataDirectory := fmt.Sprintf(RealtivePathDataAlistsByUser, h.cwd)
+	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlistsByUser, h.cwd)
 
 	files := []string{
 		fmt.Sprintf("%s/%s.md", contentDirectory, userUUID),
