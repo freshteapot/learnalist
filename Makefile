@@ -1,3 +1,6 @@
+GIT_COMMIT:=$(shell git rev-parse HEAD)
+GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y%m%dT%H%M%SZ' --format="%cd" ${GIT_COMMIT})
+
 ###############################################################################
 #
 # Development commands
@@ -53,9 +56,17 @@ sync-db-files:
 	--rsync-path="sudo rsync" \
 	./server/db ${SSH_SERVER}:/srv/learnalist
 
+build-prod-base:
+	cd server && \
+	docker build -f Dockerfile_prod_base  \
+	-t learnalist-prod-base:latest .
+
 build-image:
 	cd server && \
-	docker build . -t learnalist:latest
+	docker build \
+	--build-arg GIT_COMMIT="${GIT_COMMIT}" \
+	--build-arg GIT_HASH_DATE="${GIT_HASH_DATE}" \
+	-t learnalist:latest .
 
 push-image:
 	cd server && \
