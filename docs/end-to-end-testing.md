@@ -10,8 +10,8 @@ Adding the clean testcache, makes sure it reconnects via http.
 - need to skip, due to the race conditions
 ```
 cd server/e2e
-go clean -testcache && go test  -ginkgo.v -ginkgo.progress -ginkgo.skip="Smoke list access"  -test.v .
-go clean -testcache && go test  -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.skip="Smoke list access"  -test.v .
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
 ```
 
 ```
