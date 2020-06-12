@@ -28,9 +28,9 @@ func (h HugoHelper) RegisterCronJob() {
 	*h.cronEntryID = entryID
 }
 
-func (h HugoHelper) StopCronJob() {
+func (h HugoHelper) StopCronJob(logContext *logrus.Entry) {
 	if *h.cronEntryID != 0 {
-		h.logger.WithFields(logrus.Fields{
+		logContext.WithFields(logrus.Fields{
 			"event": "cron-stop",
 		}).Info("done")
 		h.cron.Remove(*h.cronEntryID)
@@ -41,10 +41,11 @@ func (h HugoHelper) StopCronJob() {
 func (h HugoHelper) ProcessContent() {
 	h.inprogress.Lock()
 	logContext := h.logger.WithFields(logrus.Fields{
-		"event": "process-content",
+		"context": "hugo-build",
+		"event":   "process-content",
 	})
 	logContext.Info("started")
-	h.Build()
+	h.Build(logContext)
 	h.inprogress.Unlock()
 	logContext.Info("finished")
 }

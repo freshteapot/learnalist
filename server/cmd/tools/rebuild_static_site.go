@@ -35,13 +35,13 @@ var rebuildStaticSiteCmd = &cobra.Command{
 
 		hugoEnvironment := viper.GetString("hugo.environment")
 		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.environment is missing")
+			fmt.Println("hugo.environment is missing")
 			os.Exit(1)
 		}
 
 		hugoExternal := viper.GetBool("hugo.external")
 		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.external is missing")
+			fmt.Println("hugo.external is missing")
 			os.Exit(1)
 		}
 

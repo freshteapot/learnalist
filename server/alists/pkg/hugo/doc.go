@@ -10,7 +10,7 @@ import (
 
 type HugoSiteBuilder interface {
 	ProcessContent()
-	Build()
+	Build(logContext *logrus.Entry)
 	WriteList(aList alist.Alist)
 	WriteListsByUser(userUUID string, lists []alist.ShortInfo)
 	WritePublicLists(lists []alist.ShortInfo)

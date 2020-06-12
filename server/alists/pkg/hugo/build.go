@@ -9,28 +9,32 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (h HugoHelper) Build() {
+func (h HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
 
-	fmt.Printf("Build static site for %d lists\n", len(a))
-	fmt.Printf("Build static site for %d my lists\n", len(b))
+	logContext.WithFields(logrus.Fields{
+		"event":      "build-stats",
+		"lists":      len(a),
+		"user_lists": len(b),
+	}).Info("stats")
 
 	toPublish := append(a, b...)
 
 	if len(toPublish) == 0 {
-		fmt.Println("Nothing to publish")
-		h.StopCronJob()
+		logContext.WithFields(logrus.Fields{
+			"event": "no-content",
+		}).Info("Nothing to publish")
+		h.StopCronJob(logContext)
 		return
 	}
 
-	h.buildSite()
-	h.StopCronJob()
+	h.buildSite(logContext)
+	h.StopCronJob(logContext)
 }
 
-func (h HugoHelper) buildSite() {
-	log := h.logger
-	logContext := log.WithFields(logrus.Fields{
+func (h HugoHelper) buildSite(logContext *logrus.Entry) {
+	logContext = logContext.WithFields(logrus.Fields{
 		"event": "build-site",
 	})
 

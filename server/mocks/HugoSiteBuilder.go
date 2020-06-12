@@ -5,6 +5,8 @@ package mocks
 import (
 	alist "github.com/freshteapot/learnalist-api/server/api/alist"
 
+	logrus "github.com/sirupsen/logrus"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,9 +15,9 @@ type HugoSiteBuilder struct {
 	mock.Mock
 }
 
-// Build provides a mock function with given fields:
-func (_m *HugoSiteBuilder) Build() {
-	_m.Called()
+// Build provides a mock function with given fields: logContext
+func (_m *HugoSiteBuilder) Build(logContext *logrus.Entry) {
+	_m.Called(logContext)
 }
 
 // DeleteList provides a mock function with given fields: uuid

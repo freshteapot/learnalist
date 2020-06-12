@@ -23,6 +23,7 @@ func Init(_config Config) {
 	// This might not be great todo, as it is a little confusing.
 	config = _config
 	server = echo.New()
+
 	server.HideBanner = true
 	// Middleware
 	server.Use(middleware.Recover())

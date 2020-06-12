@@ -104,5 +104,5 @@ func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
-	viper.BindEnv("server.hugo.external", "HUGO_EXTERNAL")
+	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }
