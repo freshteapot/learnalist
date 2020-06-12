@@ -13,12 +13,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-type HugoAListUserWriter struct {
-	dataDirectory    string
-	contentDirectory string
-	publishDirectory string
-}
-
 func NewHugoAListByUserWriter(contentDirectory string, dataDirectory string, publishDirectory string) HugoAListUserWriter {
 	return HugoAListUserWriter{
 		dataDirectory:    dataDirectory,

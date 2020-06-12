@@ -60,8 +60,9 @@ func (h HugoHelper) deleteFiles(files []string) {
 	logContext := log.WithFields(logrus.Fields{
 		"event": "delete-file",
 	})
-	// TODO Create an issue about a command line option to purge lists that are not in the database
-	// Assume one day, this will get out of sync.
+
+	// Command to remove lists in hugo that are no longer in the DB
+	// https://github.com/freshteapot/learnalist-api/issues/98
 	for _, path := range files {
 		err := os.Remove(path)
 		if err != nil {

@@ -18,7 +18,6 @@ func (h HugoHelper) DeleteList(listUUID string) error {
 	}
 
 	h.deleteFiles(files)
-	// TODO do I need to return anything?
 	return nil
 }
 
@@ -36,6 +35,5 @@ func (h HugoHelper) DeleteUser(userUUID string) error {
 	}
 
 	h.deleteFiles(files)
-	// TODO do I need to return anything?
 	return nil
 }
