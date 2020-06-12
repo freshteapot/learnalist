@@ -15,7 +15,8 @@ type HugoSiteBuilder interface {
 	WriteListsByUser(userUUID string, lists []alist.ShortInfo)
 	WritePublicLists(lists []alist.ShortInfo)
 	// Remove list via uuid
-	Remove(uuid string)
+	DeleteList(uuid string) error
+	DeleteUser(uuid string) error
 }
 
 type HugoHelper struct {

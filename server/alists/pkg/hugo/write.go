@@ -4,10 +4,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-func (h HugoHelper) Remove(uuid string) {
-	h.DeleteList(uuid)
-}
-
 func (h HugoHelper) WriteList(aList alist.Alist) {
 	h.AlistWriter.Data(aList)
 	h.AlistWriter.Content(aList)
