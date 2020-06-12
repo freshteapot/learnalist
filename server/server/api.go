@@ -16,7 +16,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 )
 
-func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers oauth.Handlers, logger *logrus.Logger) {
+func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers *oauth.Handlers, logger *logrus.Logger) {
 
 	userManagement := user.NewManagement(
 		userSqlite.NewSqliteManagementStorage(db),
@@ -24,7 +24,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 		event.NewInsights(logger),
 	)
 
-	m := api.NewManager(dal, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
+	m := api.NewManager(dal, userManagement, acl, "", hugoHelper, *oauthHandlers, logger)
 
 	authConfig := authenticate.Config{
 		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,

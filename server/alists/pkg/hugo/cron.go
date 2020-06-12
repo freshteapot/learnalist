@@ -21,11 +21,9 @@ func (h HugoHelper) RegisterCronJob() {
 		return
 	}
 
-	entryID, _ := h.cron.AddJob("@every 1s", Job{
-		Helper: &h,
+	*h.cronEntryID, _ = h.cron.AddJob("@every 1s", Job{
+		Helper: h,
 	})
-
-	*h.cronEntryID = entryID
 }
 
 func (h HugoHelper) StopCronJob(logContext *logrus.Entry) {
@@ -35,6 +33,7 @@ func (h HugoHelper) StopCronJob(logContext *logrus.Entry) {
 		}).Info("done")
 		h.cron.Remove(*h.cronEntryID)
 		*h.cronEntryID = 0
+		//h.cronEntryID = 0
 	}
 }
 

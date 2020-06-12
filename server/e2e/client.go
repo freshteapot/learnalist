@@ -146,7 +146,7 @@ func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Re
 }
 
 func (c Client) PostListV1(userInfo RegisterResponse, input string) (alist.Alist, error) {
-	fmt.Println("Posting a list via PostListV1")
+	//fmt.Println("Posting a list via PostListV1")
 	var response alist.Alist
 	resp, err := c.RawPostListV1(userInfo, input)
 	if err != nil {
@@ -156,6 +156,7 @@ func (c Client) PostListV1(userInfo RegisterResponse, input string) (alist.Alist
 	}
 	defer resp.Body.Close()
 
+	fmt.Println(resp.StatusCode)
 	data, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(data, &response)
 	return response, nil
@@ -246,7 +247,6 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 
 func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) HttpResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
-	fmt.Println("here")
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		// handle err

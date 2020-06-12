@@ -11,6 +11,7 @@ type ManagementStorage interface {
 	FindUserUUID(search string) ([]string, error)
 	GetLists(userUUID string) ([]string, error)
 	DeleteUser(userUUID string) error
+	DeleteList(listUUID string) error
 }
 
 type ManagementSite interface {
@@ -43,15 +44,24 @@ func (m management) FindUser(search string) ([]string, error) {
 }
 
 func (m management) DeleteUser(userUUID string) error {
+	// This code is not deleting from the database
 	lists, err := m.storage.GetLists(userUUID)
+	fmt.Println(lists)
+	fmt.Println(err)
 	if err != nil {
+
 		return err
 	}
 
 	// Remove from the site
 	for _, listUUID := range lists {
-		fmt.Printf("Remove list %s from static site", listUUID)
+		fmt.Printf("Remove list %s from static site\n", listUUID)
 		m.site.DeleteList(listUUID)
+		fmt.Printf("Remove list %sfrom db \n", listUUID)
+		err = m.storage.DeleteList(listUUID)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = m.site.DeleteUser(userUUID)

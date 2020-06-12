@@ -12,22 +12,23 @@ import (
 )
 
 func (m *Manager) GetMyLists(c echo.Context) error {
+	publicFolder := m.HugoHelper.GetPubicDirectory()
 	user := c.Get("loggedInUser")
 	if user == nil {
-		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", m.SiteCacheFolder))
+		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", publicFolder))
 		return c.HTMLBlob(http.StatusForbidden, data)
 	}
 	userUUID := user.(uuid.User).Uuid
 
 	// At this point, we assume the user is real
-	pathToAlist := fmt.Sprintf("%s/alistsbyuser/%s.html", m.SiteCacheFolder, userUUID)
+	pathToAlist := fmt.Sprintf("%s/alistsbyuser/%s.html", publicFolder, userUUID)
 
 	_, err := os.Stat(pathToAlist)
 
 	if err != nil {
 		// TODO something is broken, if this happens
 		// How do we handle first time users?
-		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/500.html", m.SiteCacheFolder))
+		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/500.html", publicFolder))
 		return c.HTMLBlob(http.StatusInternalServerError, data)
 	}
 
@@ -35,6 +36,7 @@ func (m *Manager) GetMyLists(c echo.Context) error {
 }
 
 func (m *Manager) GetMyListsByURI(c echo.Context) error {
+	publicFolder := m.HugoHelper.GetPubicDirectory()
 	// If the userID in the url matches the one via loggedInUser
 	// then let them see the list, if not reject.
 	url := c.Request().URL.Path
@@ -43,13 +45,13 @@ func (m *Manager) GetMyListsByURI(c echo.Context) error {
 
 	user := c.Get("loggedInUser")
 	if user == nil {
-		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", m.SiteCacheFolder))
+		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", publicFolder))
 		return c.HTMLBlob(http.StatusForbidden, data)
 	}
 	userUUID := user.(uuid.User).Uuid
 
 	if userUUID != userUUIDviaURL {
-		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", m.SiteCacheFolder))
+		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", publicFolder))
 		return c.HTMLBlob(http.StatusForbidden, data)
 	}
 

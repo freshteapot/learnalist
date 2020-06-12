@@ -33,7 +33,7 @@ type HugoHelper struct {
 }
 
 type Job struct {
-	Helper *HugoHelper
+	Helper HugoHelper
 }
 
 type HugoAListUserWriter struct {

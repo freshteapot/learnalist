@@ -15,6 +15,7 @@ clear-site:
 	rm -f ./hugo/data/alist/*
 	rm -f ./hugo/data/alistsbyuser/*
 	echo "[]" > ./hugo/data/public_lists.json
+	cd ./hugo && hugo
 
 rebuild-db:
 	mkdir -p /tmp/learnalist/
@@ -35,6 +36,11 @@ develop:
 
 build-mocks:
 	cd server && mockery -all -recursive
+
+run-e2e-tests:
+	cd server && \
+	./run-e2e.sh
+
 
 ###############################################################################
 #

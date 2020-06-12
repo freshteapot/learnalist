@@ -15,11 +15,9 @@ type HttpResponseMessage struct {
 }
 
 type Manager struct {
-	Acl       acl.Acl
-	Datastore models.Datastore
-	// Todo do I need this?
-	SiteCacheFolder string
-	HugoHelper      hugo.HugoHelper
+	Acl        acl.Acl
+	Datastore  models.Datastore
+	HugoHelper hugo.HugoHelper
 }
 
 func GetAlistUUIDFromURL(input string) (string, string, error) {

@@ -10,12 +10,11 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 )
 
-func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper *hugo.HugoHelper) {
+func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper hugo.HugoHelper) {
 	m := alists.Manager{
-		Acl:             acl,
-		Datastore:       dal,
-		SiteCacheFolder: config.SiteCacheFolder,
-		HugoHelper:      *hugoHelper,
+		Acl:        acl,
+		Datastore:  dal,
+		HugoHelper: hugoHelper,
 	}
 
 	authConfig := authenticate.Config{

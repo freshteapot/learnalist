@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("Testing Smoke test 1", func() {
-	It("share public", func() {
+	FIt("share public", func() {
 
 		var httpResponse e2e.HttpResponse
 		var messageResponse e2e.MessageResponse
@@ -42,7 +42,7 @@ var _ = Describe("Testing Smoke test 1", func() {
 
 		for j := 0; j <= 100; j++ {
 			go func() {
-				learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+				learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 			}()
 		}
 	})

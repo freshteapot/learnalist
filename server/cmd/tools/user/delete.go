@@ -3,14 +3,19 @@ package user
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/database"
+	"github.com/freshteapot/learnalist-api/server/api/models"
+	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -47,10 +52,19 @@ var deleteUserCmd = &cobra.Command{
 		}
 
 		masterCron := cron.NewCron()
-		masterCron.Stop()
+		//masterCron.Stop()
 		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 
 		db := database.NewDB(dsn)
+
+		// Setup access control layer.
+		acl := aclStorage.NewAcl(db)
+		userSession := userStorage.NewUserSession(db)
+		userFromIDP := userStorage.NewUserFromIDP(db)
+		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
+		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
+		dal := models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+
 		userManagement := user.NewManagement(
 			userSqlite.NewSqliteManagementStorage(db),
 			hugoHelper,
@@ -58,7 +72,8 @@ var deleteUserCmd = &cobra.Command{
 		)
 
 		err = userManagement.DeleteUser(userUUID)
-		fmt.Println(err)
+		hugoHelper.WritePublicLists(dal.GetPublicLists())
+		time.Sleep(1 * time.Second)
 	},
 }
 
