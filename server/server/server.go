@@ -13,8 +13,6 @@ type Config struct {
 	Port             string
 	CorsAllowOrigins string
 	// TODO do I need this
-	HugoFolder string
-	// TODO do I need this
 	SiteCacheFolder string
 }
 

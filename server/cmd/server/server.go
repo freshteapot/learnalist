@@ -74,7 +74,6 @@ var ServerCmd = &cobra.Command{
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
-			HugoFolder:       hugoFolder,
 		}
 		server.Init(serverConfig)
 
@@ -84,7 +83,7 @@ var ServerCmd = &cobra.Command{
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.
