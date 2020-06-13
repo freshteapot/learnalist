@@ -25,7 +25,11 @@ go test -run TestSharePublic2 -v .
 
 ### Run specific test
 ```
-go clean -testcache && go test  -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
+```
+
+```
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke user"  -test.v .
 ```
 
 Smoke tests, which dont clean up

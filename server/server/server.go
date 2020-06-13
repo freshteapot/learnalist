@@ -12,8 +12,6 @@ import (
 type Config struct {
 	Port             string
 	CorsAllowOrigins string
-	// TODO do I need this
-	SiteCacheFolder string
 }
 
 var server *echo.Echo

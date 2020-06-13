@@ -32,5 +32,5 @@ func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper hugo.HugoHelper) {
 
 	alists.GET("/*", m.GetAlist)
 
-	server.Static("/", config.SiteCacheFolder)
+	server.Static("/", m.HugoHelper.GetPubicDirectory())
 }

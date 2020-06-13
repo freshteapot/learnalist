@@ -25,8 +25,9 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 	err := m.userManagement.DeleteUser(userUUID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
-			"event": event.UserDeleted,
-			"error": err,
+			"event":     event.UserDeleted,
+			"error":     err,
+			"user_uuid": userUUID,
 		}).Error("problem")
 		response.Message = i18n.InternalServerErrorFunny
 		return c.JSON(http.StatusInternalServerError, response)

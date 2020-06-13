@@ -129,6 +129,20 @@ func (c Client) RawLogin(username string, password string) (*http.Response, erro
 	return c.httpClient.Do(req)
 }
 
+func (c Client) DeleteUser(credentials api.HTTPLoginResponse) (*http.Response, error) {
+	url := fmt.Sprintf("%s/api/v1/user/%s", c.getServerURL(), credentials.UserUUID)
+	req, err := http.NewRequest("DELETE", url, nil)
+	req = req.WithContext(context.Background())
+	if err != nil {
+		// handle err
+		fmt.Println("Failed NewRequest")
+		panic(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
+	req.Header.Set("Content-Type", "application/json")
+	return c.httpClient.Do(req)
+}
+
 func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Response, error) {
 	var response *http.Response
 	body := strings.NewReader(input)

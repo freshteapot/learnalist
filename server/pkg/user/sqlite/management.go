@@ -32,10 +32,24 @@ FROM
 WHERE
 	kind="email"
 AND
-	identifier=?`
+	identifier=?
+UNION
+SELECT
+	user_uuid
+FROM
+	user_from_idp
+WHERE
+	user_uuid=?
+UNION
+SELECT
+	uuid as user_uuid
+FROM
+	user
+WHERE
+	uuid=?`
 
 	userUUIDs := make([]string, 0)
-	err := db.Select(&userUUIDs, query, search, search)
+	err := db.Select(&userUUIDs, query, search, search, search, search)
 
 	if len(userUUIDs) > 1 {
 		return userUUIDs, errors.New("Too many userUUID found")
