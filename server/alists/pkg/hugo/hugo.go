@@ -10,8 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var entryID cron.EntryID
-
 func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.Cron, logger *logrus.Logger) HugoHelper {
 	check := []string{
 		RealtivePathContentAlist,
@@ -33,7 +31,6 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 	// This is required to keep track of the memory, I think.
 	var empty cron.EntryID
 	empty = 0
-	entryID = 0
 	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
 
 	return HugoHelper{

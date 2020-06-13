@@ -81,7 +81,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	// Look up the user based on their email and association with google.
 	userUUID, err := userFromIDP.Lookup("google", userInfo.Email)
 	if err != nil {
-		if err != user.NotFound {
+		if err != user.ErrNotFound {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
 				"error": err,

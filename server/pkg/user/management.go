@@ -1,37 +1,11 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
-
-type ManagementStorage interface {
-	FindUserUUID(search string) ([]string, error)
-	GetLists(userUUID string) ([]string, error)
-	DeleteUser(userUUID string) error
-	DeleteList(listUUID string) error
-}
-
-type ManagementSite interface {
-	DeleteList(listUUID string) error
-	DeleteUser(userUUID string) error
-}
-
-type Management interface {
-	FindUser(search string) ([]string, error)
-	DeleteUser(userUUID string) error
-}
-
-type management struct {
-	storage  ManagementStorage
-	site     ManagementSite
-	insights event.Insights
-}
-
-var ErrUserNotFound = errors.New("user-not-found")
 
 func NewManagement(storage ManagementStorage, site ManagementSite, insights event.Insights) management {
 	return management{
@@ -47,9 +21,9 @@ func (m management) FindUser(search string) ([]string, error) {
 }
 
 func (m management) DeleteUser(userUUID string) error {
-	found, err := m.storage.FindUserUUID(userUUID)
+	found, _ := m.storage.FindUserUUID(userUUID)
 	if len(found) == 0 {
-		return ErrUserNotFound
+		return ErrNotFound
 	}
 
 	// This code is not deleting from the database

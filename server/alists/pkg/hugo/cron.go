@@ -33,7 +33,6 @@ func (h HugoHelper) StopCronJob(logContext *logrus.Entry) {
 		}).Info("done")
 		h.cron.Remove(*h.cronEntryID)
 		*h.cronEntryID = 0
-		//h.cronEntryID = 0
 	}
 }
 

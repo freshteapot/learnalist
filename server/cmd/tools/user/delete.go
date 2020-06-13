@@ -14,7 +14,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
-	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/spf13/cobra"
@@ -63,14 +63,14 @@ var deleteUserCmd = &cobra.Command{
 		dal := models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
 		userManagement := user.NewManagement(
-			userSqlite.NewSqliteManagementStorage(db),
+			userStorage.NewSqliteManagementStorage(db),
 			hugoHelper,
 			event.NewInsights(logger),
 		)
 
 		err = userManagement.DeleteUser(userUUID)
 		if err != nil {
-			if err != user.ErrUserNotFound {
+			if err != user.ErrNotFound {
 				fmt.Println("Issue deleting")
 				fmt.Println(err)
 				return
