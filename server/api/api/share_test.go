@@ -40,7 +40,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			testHugoHelper.On("WriteList", mock.Anything)
 			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("Remove", mock.Anything)
+			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
 			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{
@@ -270,7 +270,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			testHugoHelper.On("WriteList", mock.Anything)
 			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("Remove", mock.Anything)
+			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
 			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{

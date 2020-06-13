@@ -12,7 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/mock"
 )
 
 var _ = Describe("Testing Api endpoints that get lists", func() {
@@ -28,11 +27,6 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 		alistUUID string
 	)
 	BeforeEach(func() {
-		testHugoHelper := &mocks.HugoSiteBuilder{}
-		testHugoHelper.On("Write", mock.Anything)
-		testHugoHelper.On("Remove", mock.Anything)
-		m.HugoHelper = testHugoHelper
-
 		datastore = &mocks.Datastore{}
 		acl = &mocks.Acl{}
 		m.Datastore = datastore
@@ -155,7 +149,6 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			Expect(cleanEchoResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
-
 		})
 	})
 })
