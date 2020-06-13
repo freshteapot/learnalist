@@ -26,7 +26,8 @@ var deleteUserCmd = &cobra.Command{
 	Short: "Remove a user from the system",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		dsn, _ := cmd.Flags().GetString("dsn")
+		dsn := viper.GetString("server.sqlite.database")
+
 		userUUID := args[0]
 		if userUUID == "" {
 			fmt.Println("Can't delete an empty user")
@@ -46,10 +47,6 @@ var deleteUserCmd = &cobra.Command{
 		}
 
 		hugoExternal := viper.GetBool("hugo.external")
-		if hugoEnvironment == "" {
-			fmt.Println("hugo.external is missing")
-			os.Exit(1)
-		}
 
 		masterCron := cron.NewCron()
 		//masterCron.Stop()
@@ -72,11 +69,17 @@ var deleteUserCmd = &cobra.Command{
 		)
 
 		err = userManagement.DeleteUser(userUUID)
+		if err != nil {
+			if err != user.ErrUserNotFound {
+				fmt.Println("Issue deleting")
+				fmt.Println(err)
+				return
+			}
+			fmt.Println("user not found")
+			return
+		}
+
 		hugoHelper.WritePublicLists(dal.GetPublicLists())
 		time.Sleep(1 * time.Second)
 	},
-}
-
-func init() {
-	deleteUserCmd.Flags().String("dsn", "", "Path to database")
 }

@@ -22,7 +22,7 @@ var findCmd = &cobra.Command{
 	Short: "Find a user based on a username or email",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		dsn, _ := cmd.Flags().GetString("dsn")
+		dsn := viper.GetString("server.sqlite.database")
 		search := args[0]
 		if search == "" {
 			fmt.Println("Nothing to search for, means nothing to find")
@@ -71,8 +71,4 @@ var findCmd = &cobra.Command{
 		b, _ := json.Marshal(userUUIDs)
 		fmt.Println(utils.PrettyPrintJSON(b))
 	},
-}
-
-func init() {
-	findCmd.Flags().String("dsn", "", "Path to database")
 }

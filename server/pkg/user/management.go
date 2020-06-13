@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -30,6 +31,8 @@ type management struct {
 	insights event.Insights
 }
 
+var ErrUserNotFound = errors.New("user-not-found")
+
 func NewManagement(storage ManagementStorage, site ManagementSite, insights event.Insights) management {
 	return management{
 		storage:  storage,
@@ -44,12 +47,14 @@ func (m management) FindUser(search string) ([]string, error) {
 }
 
 func (m management) DeleteUser(userUUID string) error {
+	found, err := m.storage.FindUserUUID(userUUID)
+	if len(found) == 0 {
+		return ErrUserNotFound
+	}
+
 	// This code is not deleting from the database
 	lists, err := m.storage.GetLists(userUUID)
-	fmt.Println(lists)
-	fmt.Println(err)
 	if err != nil {
-
 		return err
 	}
 

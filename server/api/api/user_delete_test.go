@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
@@ -14,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/stretchr/testify/mock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,6 +28,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 		endpoint       string
 		datastore      *mocks.Datastore
 		userManagement *mocks.Management
+		hugoHelper     *mocks.HugoSiteBuilder
 		session        user.UserSession
 		user           *uuid.User
 		manager        *api.Manager
@@ -43,9 +46,9 @@ var _ = Describe("Testing user delete endpoint", func() {
 		userManagement = &mocks.Management{}
 		acl := &mocks.Acl{}
 		oauthHandlers := oauth.Handlers{}
-		testHugoHelper := &mocks.HugoSiteBuilder{}
+		hugoHelper = &mocks.HugoSiteBuilder{}
 
-		manager = api.NewManager(datastore, userManagement, acl, "", testHugoHelper, oauthHandlers, logger)
+		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
 
 		userUUID = "fake-123"
 		session.Token = "fake-token"
@@ -85,6 +88,8 @@ var _ = Describe("Testing user delete endpoint", func() {
 			c.SetParamNames("uuid")
 			c.SetParamValues(userUUID)
 			userManagement.On("DeleteUser", userUUID).Return(nil)
+			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
+			hugoHelper.On("WritePublicLists", mock.Anything)
 
 			manager.V1DeleteUser(c)
 

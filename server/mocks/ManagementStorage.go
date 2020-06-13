@@ -9,6 +9,20 @@ type ManagementStorage struct {
 	mock.Mock
 }
 
+// DeleteList provides a mock function with given fields: listUUID
+func (_m *ManagementStorage) DeleteList(listUUID string) error {
+	ret := _m.Called(listUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(listUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteUser provides a mock function with given fields: userUUID
 func (_m *ManagementStorage) DeleteUser(userUUID string) error {
 	ret := _m.Called(userUUID)
