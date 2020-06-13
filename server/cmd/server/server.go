@@ -56,10 +56,6 @@ var ServerCmd = &cobra.Command{
 		}
 
 		hugoExternal := viper.GetBool("hugo.external")
-		if hugoEnvironment == "" {
-			fmt.Println("hugo.external is missing")
-			os.Exit(1)
-		}
 
 		// A hack would be to access it via
 		loginCookie := authenticate.CookieConfig{
