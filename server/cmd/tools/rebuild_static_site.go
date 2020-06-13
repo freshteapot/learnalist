@@ -25,7 +25,7 @@ var rebuildStaticSiteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		skipPublishing, _ := cmd.Flags().GetBool("skip-publishing")
-		databaseName := viper.GetString("tools.rebuildStaticSite.sqlite.database")
+		databaseName := viper.GetString("server.sqlite.database")
 		// "path to static site builder
 		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {

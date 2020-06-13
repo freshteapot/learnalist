@@ -17,9 +17,6 @@ server:
       clientSecret: "XXX"
       server: "https://learnalist.net"
 tools:
-  rebuildStaticSite:
-    sqlite:
-      database: /srv/learnalist/server.db
   integrationTests:
     username: ""
     password: ""

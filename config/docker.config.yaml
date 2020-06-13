@@ -17,9 +17,6 @@ server:
       clientSecret: "XXX"
       server: "http://localhost:1234"
 tools:
-  rebuildStaticSite:
-    sqlite:
-      database: /srv/learnalist/server.db
   integrationTests:
     username: ""
     password: ""
