@@ -2,7 +2,6 @@ package e2e_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -32,7 +31,6 @@ var _ = Describe("Smoke user", func() {
 		var userCredentials api.HTTPLoginResponse
 		err = decoder.Decode(&userCredentials)
 		Expect(err).ShouldNot(HaveOccurred())
-		fmt.Println(userCredentials.Token)
 
 		response, err = learnalistClient.DeleteUser(userCredentials)
 		Expect(err).ShouldNot(HaveOccurred())
