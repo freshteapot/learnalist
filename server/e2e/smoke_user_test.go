@@ -2,7 +2,6 @@ package e2e_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/api"
@@ -32,11 +31,8 @@ var _ = Describe("Smoke user", func() {
 		err = decoder.Decode(&userCredentials)
 		Expect(err).ShouldNot(HaveOccurred())
 
-		response, err = learnalistClient.DeleteUser(userCredentials)
-		Expect(err).ShouldNot(HaveOccurred())
-		Expect(response.StatusCode).To(Equal(http.StatusOK))
-		defer response.Body.Close()
-		data, _ := ioutil.ReadAll(response.Body)
-		Expect(cleanEchoResponse(data)).To(Equal(`{"message":"User has been removed"}`))
+		statusCode, httpResponse := learnalistClient.DeleteUser(userCredentials)
+		Expect(statusCode).To(Equal(http.StatusOK))
+		Expect(convertResponseToString(httpResponse)).To(Equal(`{"message":"User has been removed"}`))
 	})
 })

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/e2e"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ import (
 var _ = Describe("Testing Smoke test 2", func() {
 	It("share public2", func() {
 
-		var messageResponse e2e.MessageResponse
+		var messageResponse api.HttpResponseMessage
 
 		assert := assert.New(GinkgoT())
 		username := generateUsername()

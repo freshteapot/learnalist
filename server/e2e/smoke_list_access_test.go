@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/e2e"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	. "github.com/onsi/ginkgo"
@@ -17,7 +18,7 @@ var _ = Describe("Smoke list access", func() {
 	It("list access", func() {
 
 		var httpResponse e2e.HttpResponse
-		var messageResponse e2e.MessageResponse
+		var messageResponse api.HttpResponseMessage
 		var err error
 		var aList alist.Alist
 

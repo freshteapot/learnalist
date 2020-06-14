@@ -10,10 +10,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 )
 
-type HttpResponseMessage struct {
-	Message string `json:"message"`
-}
-
 type Manager struct {
 	Acl        acl.Acl
 	Datastore  models.Datastore

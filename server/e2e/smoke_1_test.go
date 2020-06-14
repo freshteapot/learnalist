@@ -5,16 +5,17 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/e2e"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 )
 
 var _ = Describe("Testing Smoke test 1", func() {
-	FIt("share public", func() {
+	It("share public", func() {
 
 		var httpResponse e2e.HttpResponse
-		var messageResponse e2e.MessageResponse
+		var messageResponse api.HttpResponseMessage
 
 		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)

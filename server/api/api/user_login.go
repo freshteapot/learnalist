@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
@@ -17,7 +18,7 @@ type HTTPLoginResponse struct {
 }
 
 func (m *Manager) V1PostLogin(c echo.Context) error {
-	var input HttpUserRegisterInput
+	var input api.HttpUserRegisterInput
 	response := HttpResponseMessage{}
 
 	defer c.Request().Body.Close()
@@ -29,7 +30,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	cleanedUser := user.RegisterInput{
+	cleanedUser := api.HttpUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,
 	}

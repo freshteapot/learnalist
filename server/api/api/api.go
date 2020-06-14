@@ -10,22 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// m exposing the data abstraction layer
-type Manager struct {
-	Datastore      models.Datastore
-	userManagement user.Management
-	Acl            acl.Acl
-	DatabaseName   string
-	HugoHelper     hugo.HugoSiteBuilder
-	OauthHandlers  oauth.Handlers
-	logger         *logrus.Logger
-	insights       event.Insights
-}
-
-type HttpResponseMessage struct {
-	Message string `json:"message"`
-}
-
 func NewManager(
 	datastore models.Datastore,
 	userManagement user.Management,
