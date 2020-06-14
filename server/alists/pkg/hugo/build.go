@@ -2,104 +2,85 @@ package hugo
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/otiai10/copy"
+	"github.com/sirupsen/logrus"
 )
 
-func (h HugoHelper) Build() {
+func (h HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
 
-	fmt.Printf("Build static site for %d lists\n", len(a))
-	fmt.Printf("Build static site for %d my lists\n", len(b))
+	logContext.WithFields(logrus.Fields{
+		"event":      "build-stats",
+		"lists":      len(a),
+		"user_lists": len(b),
+	}).Info("stats")
 
 	toPublish := append(a, b...)
 
 	if len(toPublish) == 0 {
-		fmt.Println("Nothing to publish")
-		h.StopCronJob()
+		logContext.WithFields(logrus.Fields{
+			"event": "no-content",
+		}).Info("Nothing to publish")
+		h.StopCronJob(logContext)
 		return
 	}
 
-	h.buildSite()
-	//uuids := h.getPublishedFiles()
-	// TODO whats the downside of this?
-	// TODO should I have a publish list per type alist, user?
-
-	// Why copy?
-	// Maybe skip if paths are the same
-	//h.copyToSiteCache()
-
-	if h.SiteCacheFolder == h.PublishDirectory {
-		h.StopCronJob()
-		return
-	}
-
-	// Only remove what we processed, that way any that get added will not be lost (hopefully)
-	removeA := h.AlistWriter.GetFilesToClean()
-	removeB := h.AlistsByUserWriter.GetFilesToClean()
-	toDelete := append(removeA, removeB...)
-	fmt.Println("toDelete", toDelete)
-	//h.deleteFiles(toDelete)
-
+	h.buildSite(logContext)
+	h.StopCronJob(logContext)
 }
 
-func (h HugoHelper) buildSite() {
-	staticSiteFolder := h.Cwd
-	// TODO change this to be dynamic via config
+func (h HugoHelper) buildSite(logContext *logrus.Entry) {
+	logContext = logContext.WithFields(logrus.Fields{
+		"event": "build-site",
+	})
+
+	staticSiteFolder := h.cwd
 	parts := []string{
 		"-verbose",
-		fmt.Sprintf(`--environment=%s`, h.Environment),
+		fmt.Sprintf(`--environment=%s`, h.environment),
 	}
 
 	cmd := exec.Command("hugo", parts...)
 	cmd.Dir = staticSiteFolder
 	out, err := cmd.Output()
 	if err != nil {
-		fmt.Println(string(out))
-		log.Fatal(err)
+		logContext.WithFields(logrus.Fields{
+			"error": err,
+			"out":   string(out),
+		}).Fatal("failed")
 	}
-	fmt.Println(string(out))
-}
 
-// Copy each file over, including non alist files and directories
-func (h HugoHelper) copyToSiteCache() {
-	fmt.Println("Copy site")
-	siteCacheDir := h.SiteCacheFolder
-	destinationDir := h.PublishDirectory
-
-	err := copy.Copy(destinationDir, siteCacheDir)
-	fmt.Println(err)
-	fmt.Println(destinationDir)
-	fmt.Println(siteCacheDir)
-}
-
-// deleteBuildFiles
-// 	- Remove from content
-// 	- Remove from data directory
-//	- Remove from hugo publishe directory
-func (h HugoHelper) deleteBuildFiles(uuid string) {
-	panic("REMOVE")
-	//files := h.getBuildFiles(uuid)
-	//h.deleteFiles(files)
+	logContext.WithFields(logrus.Fields{
+		"out": string(out),
+	}).Info("done")
 }
 
 func (h HugoHelper) deleteFiles(files []string) {
-	// TODO Create an issue about a command line option to purge lists that are not in the database
-	// Assume one day, this will get out of sync.
-	for _, path := range files {
-		fmt.Printf("Removing %s\n", path)
+	log := h.logger
+	logContext := log.WithFields(logrus.Fields{
+		"event": "delete-file",
+	})
 
+	// Command to remove lists in hugo that are no longer in the DB
+	// https://github.com/freshteapot/learnalist-api/issues/98
+	for _, path := range files {
 		err := os.Remove(path)
 		if err != nil {
 			if !strings.HasSuffix(err.Error(), "no such file or directory") {
-				fmt.Println(fmt.Sprintf("Failed to remove %s", err))
+				logContext.WithFields(logrus.Fields{
+					"path":  path,
+					"error": err,
+				}).Error("file removed")
+				continue
 			}
 		}
 
+		logContext.WithFields(logrus.Fields{
+			"path": path,
+		}).Info("file removed")
 	}
 }

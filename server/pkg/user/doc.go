@@ -3,7 +3,32 @@ package user
 import (
 	"errors"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 )
+
+type ManagementStorage interface {
+	FindUserUUID(search string) ([]string, error)
+	GetLists(userUUID string) ([]string, error)
+	DeleteUser(userUUID string) error
+	DeleteList(listUUID string) error
+}
+
+type ManagementSite interface {
+	DeleteList(listUUID string) error
+	DeleteUser(userUUID string) error
+}
+
+type Management interface {
+	FindUser(search string) ([]string, error)
+	DeleteUser(userUUID string) error
+}
+
+type management struct {
+	storage  ManagementStorage
+	site     ManagementSite
+	insights event.Insights
+}
 
 type UserInfoFromUsernameAndPassword struct {
 	UserUUID string
@@ -24,8 +49,6 @@ type UserSession struct {
 	// TODO I want to know what client it is, web, mobile, chrome-extension, so I can handle different responses.
 	Created time.Time
 }
-
-var NotFound = errors.New("user-not-found")
 
 type Session interface {
 	NewSession(userUUID string) (session UserSession, err error)
@@ -53,3 +76,5 @@ type UserFromIDP interface {
 	Register(idp string, identifier string, info []byte) (userUUID string, err error)
 	Lookup(idp string, identifier string) (userUUID string, err error)
 }
+
+var ErrNotFound = errors.New("user-not-found")

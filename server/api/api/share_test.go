@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -40,7 +40,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			testHugoHelper.On("WriteList", mock.Anything)
 			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("Remove", mock.Anything)
+			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
 			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{
@@ -270,7 +270,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			testHugoHelper.On("WriteList", mock.Anything)
 			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("Remove", mock.Anything)
+			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
 			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{

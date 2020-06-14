@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/labstack/echo/v4"
 )
@@ -18,19 +19,19 @@ When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
 */
 func (m *Manager) V1PostRegister(c echo.Context) error {
-	var input HttpUserRegisterInput
+	var input api.HttpUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	cleanedUser := user.RegisterInput{
+	cleanedUser := api.HttpUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,
 	}
@@ -38,7 +39,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
 
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -49,7 +50,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	userWithUsernameAndPassword := m.Datastore.UserWithUsernameAndPassword()
 	userUUID, err := userWithUsernameAndPassword.Lookup(cleanedUser.Username, hash)
 	if err == nil {
-		response := user.RegisterResponse{
+		response := api.HttpUserRegisterResponse{
 			Uuid:     userUUID,
 			Username: cleanedUser.Username,
 		}
@@ -59,13 +60,13 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	aUser, err := userWithUsernameAndPassword.Register(cleanedUser.Username, hash)
 	if err != nil {
 		// TODO Log this
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := user.RegisterResponse{
+	response := api.HttpUserRegisterResponse{
 		Uuid:     aUser.UserUUID,
 		Username: aUser.Username,
 	}

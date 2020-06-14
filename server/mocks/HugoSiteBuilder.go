@@ -5,6 +5,8 @@ package mocks
 import (
 	alist "github.com/freshteapot/learnalist-api/server/api/alist"
 
+	logrus "github.com/sirupsen/logrus"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,19 +15,42 @@ type HugoSiteBuilder struct {
 	mock.Mock
 }
 
-// Build provides a mock function with given fields:
-func (_m *HugoSiteBuilder) Build() {
-	_m.Called()
+// Build provides a mock function with given fields: logContext
+func (_m *HugoSiteBuilder) Build(logContext *logrus.Entry) {
+	_m.Called(logContext)
+}
+
+// DeleteList provides a mock function with given fields: uuid
+func (_m *HugoSiteBuilder) DeleteList(uuid string) error {
+	ret := _m.Called(uuid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteUser provides a mock function with given fields: uuid
+func (_m *HugoSiteBuilder) DeleteUser(uuid string) error {
+	ret := _m.Called(uuid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // ProcessContent provides a mock function with given fields:
 func (_m *HugoSiteBuilder) ProcessContent() {
 	_m.Called()
-}
-
-// Remove provides a mock function with given fields: uuid
-func (_m *HugoSiteBuilder) Remove(uuid string) {
-	_m.Called(uuid)
 }
 
 // WriteList provides a mock function with given fields: aList

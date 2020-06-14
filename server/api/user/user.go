@@ -3,25 +3,16 @@ package user
 import (
 	"errors"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/gookit/validate"
 )
-
-type RegisterInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type RegisterResponse struct {
-	Uuid     string `json:"uuid"`
-	Username string `json:"username"`
-}
 
 /*
 Username is required, needs to be at least 5 characters and can only be letters, numbers _ and -.
 Password is required, minimum length of 7.
 */
-func Validate(input RegisterInput) (RegisterInput, error) {
-	var cleaned RegisterInput
+func Validate(input api.HttpUserRegisterInput) (api.HttpUserRegisterInput, error) {
+	var cleaned api.HttpUserRegisterInput
 
 	v := validate.New(&input)
 	v.StopOnError = false

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -28,4 +30,11 @@ func CmdParsePathToFolder(key string, dir string) (string, error) {
 	}
 
 	return pathToFolder, nil
+}
+
+func PrettyPrintJSON(input []byte) string {
+	var prettyJSON bytes.Buffer
+	// Based on jq standard output
+	json.Indent(&prettyJSON, input, "", "  ")
+	return prettyJSON.String()
 }

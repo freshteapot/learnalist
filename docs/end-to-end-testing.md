@@ -25,7 +25,18 @@ go test -run TestSharePublic2 -v .
 
 ### Run specific test
 ```
-go clean -testcache && go test  -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke list access"  -test.v .
+```
+
+```
+go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Smoke user"  -test.v .
+```
+
+Smoke tests, which dont clean up
+```
+make run-e2e-tests
+cd -
+sqlite3 /tmp/learnalist/server.db  'SELECT uuid FROM user' | HUGO_EXTERNAL=false  xargs -I {}  go run --tags="json1" main.go tools user delete --config=../config/dev.config.yaml --dsn=/tmp/learnalist/server.db {}
 ```
 
 

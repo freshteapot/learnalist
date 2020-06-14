@@ -3,8 +3,8 @@ package main
 import (
 	"io/ioutil"
 
-	"github.com/freshteapot/learnalist-api/server/api/event"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 )

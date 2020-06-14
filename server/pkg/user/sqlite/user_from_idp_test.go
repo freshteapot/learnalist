@@ -71,7 +71,7 @@ var _ = Describe("Testing User from IDP", func() {
 			})
 
 			It("Nothing found", func() {
-				want := user.NotFound
+				want := user.ErrNotFound
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
 					WillReturnError(want)
 

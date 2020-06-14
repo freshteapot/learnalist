@@ -1,38 +1,41 @@
 package hugo
 
 import (
-	"fmt"
-	"time"
+	"github.com/sirupsen/logrus"
 )
-
-type Job struct {
-	Helper *HugoHelper
-}
 
 func (d Job) Run() {
 	d.Helper.ProcessContent()
 }
 
 func (h HugoHelper) RegisterCronJob() {
+	logContext := h.logger.WithFields(logrus.Fields{
+		"context": "hugo-register",
+	})
+
 	if h.externalHugo {
-		fmt.Println("Will not process request as external hugo enabled")
+		logContext.Info("skipping, hugo.external enabled")
 		return
 	}
 
 	// Have a way to skip if hugoRunning as its own process / service
 	if *h.cronEntryID != 0 {
+		logContext.Info("skipping, cron already scheduled")
 		return
 	}
-	entryID, _ := h.cron.AddJob("@every 1s", Job{
-		Helper: &h,
+
+	*h.cronEntryID, _ = h.cron.AddJob("@every 1s", Job{
+		Helper: h,
 	})
 
-	*h.cronEntryID = entryID
+	logContext.Info("scheduled")
 }
 
-func (h HugoHelper) StopCronJob() {
+func (h HugoHelper) StopCronJob(logContext *logrus.Entry) {
 	if *h.cronEntryID != 0 {
-		fmt.Println("stopping cronjob")
+		logContext.WithFields(logrus.Fields{
+			"event": "cron-stop",
+		}).Info("done")
 		h.cron.Remove(*h.cronEntryID)
 		*h.cronEntryID = 0
 	}
@@ -40,9 +43,12 @@ func (h HugoHelper) StopCronJob() {
 
 func (h HugoHelper) ProcessContent() {
 	h.inprogress.Lock()
-	now := time.Now()
-	fmt.Printf("Processing content within %s @ %s\n", h.Cwd, now)
-
-	h.Build()
+	logContext := h.logger.WithFields(logrus.Fields{
+		"context": "hugo-build",
+		"event":   "process-content",
+	})
+	logContext.Info("started")
+	h.Build(logContext)
 	h.inprogress.Unlock()
+	logContext.Info("finished")
 }

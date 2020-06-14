@@ -6,7 +6,7 @@
   "author": "freshteapot (https://github.com/freshteapot)",
   "scripts": {
     "dev:api-server": "cd ../ && make run-api-server",
-    "dev:hugo": "cd ../hugo && rm -rf ./public/* && hugo server -w --disableFastRender  --forceSyncStatic --renderToDisk",
+    "dev:hugo": "cd ../hugo && hugo server -w --disableFastRender  --forceSyncStatic --renderToDisk",
     "dev:js:shared": "rollup -c rollup.config.store.js -w",
     "dev:js:user": "rollup -c rollup.config.server.js -w",
     "dev:js:alist:v1": "rollup -c rollup.config.alist.v1.js -w",

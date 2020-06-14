@@ -8,20 +8,21 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
 func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	// TODO maybe we support an array
-	var input = &HttpShareListWithUserInput{}
+	var input = &api.HttpShareListWithUserInput{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.PostShareListJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -33,7 +34,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	case aclKeys.ActionRevoke:
 		break
 	default:
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ApiShareValidationError,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -42,40 +43,40 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	aList, err := m.Datastore.GetAlist(input.AlistUUID)
 	if err != nil {
 		if err.Error() == i18n.SuccessAlistNotFound {
-			response := HttpResponseMessage{
+			response := api.HttpResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
 			return c.JSON(http.StatusNotFound, response)
 		}
 
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
 	if aList.User.Uuid != user.Uuid {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
 	}
 
 	if aList.Info.SharedWith == aclKeys.NotShared {
-		return c.JSON(http.StatusBadRequest, HttpResponseMessage{
+		return c.JSON(http.StatusBadRequest, api.HttpResponseMessage{
 			Message: i18n.ApiShareReadAccessInvalidWithNotShared,
 		})
 	}
 
 	if input.UserUUID == user.Uuid {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ApiShareYouCantShareWithYourself,
 		}
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	if !m.Datastore.UserExists(input.UserUUID) {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.SuccessUserNotFound,
 		}
 		return c.JSON(http.StatusNotFound, response)
@@ -93,14 +94,14 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 
 func (m *Manager) V1ShareAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	var input = &HttpShareListInput{}
+	var input = &api.HttpShareListInput{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.PostShareListJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -114,7 +115,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 	case aclKeys.SharedWithFriends:
 		break
 	default:
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ApiShareValidationError,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -122,21 +123,21 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
 	if aList.Uuid == "" {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.SuccessAlistNotFound,
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
 
 	if aList.User.Uuid != user.Uuid {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
 	}
 
 	if aList.Info.SharedWith == input.Action {
-		return c.JSON(http.StatusOK, HttpResponseMessage{
+		return c.JSON(http.StatusOK, api.HttpResponseMessage{
 			Message: i18n.ApiShareNoChange,
 		})
 	}
@@ -159,7 +160,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		message = i18n.ApiShareListSuccessWithFriends
 	}
 
-	return c.JSON(http.StatusOK, HttpResponseMessage{
+	return c.JSON(http.StatusOK, api.HttpResponseMessage{
 		Message: message,
 	})
 }

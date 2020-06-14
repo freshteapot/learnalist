@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/e2e"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,8 +14,8 @@ import (
 var _ = Describe("Testing Smoke test 1", func() {
 	It("share public", func() {
 
-		var httpResponse e2e.HttpResponse
-		var messageResponse e2e.MessageResponse
+		var httpResponse api.HttpResponse
+		var messageResponse api.HttpResponseMessage
 
 		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)
@@ -42,13 +43,13 @@ var _ = Describe("Testing Smoke test 1", func() {
 
 		for j := 0; j <= 100; j++ {
 			go func() {
-				learnalistClient.PostListV1(userInfoOwner, inputAlistV1)
+				learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 			}()
 		}
 	})
 	It("share private", func() {
 
-		var httpResponse e2e.HttpResponse
+		var httpResponse api.HttpResponse
 		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)
 

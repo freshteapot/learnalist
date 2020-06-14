@@ -10,15 +10,10 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 )
 
-type HttpResponseMessage struct {
-	Message string `json:"message"`
-}
-
 type Manager struct {
-	Acl             acl.Acl
-	Datastore       models.Datastore
-	SiteCacheFolder string
-	HugoHelper      hugo.HugoHelper
+	Acl        acl.Acl
+	Datastore  models.Datastore
+	HugoHelper hugo.HugoHelper
 }
 
 func GetAlistUUIDFromURL(input string) (string, string, error) {

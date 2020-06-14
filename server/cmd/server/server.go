@@ -42,31 +42,20 @@ var ServerCmd = &cobra.Command{
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
 
-		// "path to static site builder
-		hugoFolder, err := utils.CmdParsePathToFolder("server.hugo.directory", viper.GetString("server.hugo.directory"))
+		// path to static site builder
+		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 
-		hugoEnvironment := viper.GetString("server.hugo.environment")
+		hugoEnvironment := viper.GetString("hugo.environment")
 		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.environment is missing")
+			fmt.Println("hugo.environment is missing")
 			os.Exit(1)
 		}
 
-		hugoExternal := viper.GetBool("server.hugo.external")
-		if hugoEnvironment == "" {
-			fmt.Println("server.hugo.external is missing")
-			os.Exit(1)
-		}
-
-		// "path to site cache"
-		siteCacheFolder, err := utils.CmdParsePathToFolder("server.siteCacheDirectory", viper.GetString("server.siteCacheDirectory"))
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
+		hugoExternal := viper.GetBool("hugo.external")
 
 		// A hack would be to access it via
 		loginCookie := authenticate.CookieConfig{
@@ -81,8 +70,6 @@ var ServerCmd = &cobra.Command{
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
-			HugoFolder:       hugoFolder,
-			SiteCacheFolder:  siteCacheFolder,
 		}
 		server.Init(serverConfig)
 
@@ -92,7 +79,7 @@ var ServerCmd = &cobra.Command{
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(serverConfig.HugoFolder, hugoEnvironment, hugoExternal, masterCron, serverConfig.SiteCacheFolder)
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 		hugoHelper.RegisterCronJob()
 
 		// Setup access control layer.
@@ -103,7 +90,7 @@ var ServerCmd = &cobra.Command{
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		dal := models.NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
-		server.InitApi(db, acl, dal, *hugoHelper, *oauthHandlers, logger)
+		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers, logger)
 		server.InitAlists(acl, dal, hugoHelper)
 		server.Run()
 	},
@@ -113,5 +100,5 @@ func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
-	viper.BindEnv("server.hugo.external", "HUGO_EXTERNAL")
+	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }

@@ -7,14 +7,24 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 )
 
-func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers oauth.Handlers, logger *logrus.Logger) {
-	m := api.NewManager(dal, acl, "", hugoHelper, oauthHandlers, logger)
+func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelper, oauthHandlers *oauth.Handlers, logger *logrus.Logger) {
+
+	userManagement := user.NewManagement(
+		userSqlite.NewSqliteManagementStorage(db),
+		hugoHelper,
+		event.NewInsights(logger),
+	)
+
+	m := api.NewManager(dal, userManagement, acl, "", hugoHelper, *oauthHandlers, logger)
 
 	authConfig := authenticate.Config{
 		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,
@@ -31,6 +41,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	v1.POST("/user/register", m.V1PostRegister)
 	v1.POST("/user/login", m.V1PostLogin)
 	v1.POST("/user/logout", m.V1PostLogout)
+	v1.DELETE("/user/:uuid", m.V1DeleteUser)
 
 	// Route => handler
 	v1.GET("/", m.V1GetRoot)

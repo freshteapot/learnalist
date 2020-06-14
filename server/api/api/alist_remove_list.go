@@ -6,13 +6,14 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
 func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	alistUUID := c.Param("uuid")
 	user := c.Get("loggedInUser").(uuid.User)
-	response := HttpResponseMessage{}
+	response := api.HttpResponseMessage{}
 
 	err := m.Datastore.RemoveAlist(alistUUID, user.Uuid)
 	if err != nil {
@@ -31,7 +32,7 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	}
 
 	// Remove from cache
-	m.HugoHelper.Remove(alistUUID)
+	m.HugoHelper.DeleteList(alistUUID)
 	// TODO this might become a painful bottle neck
 	m.HugoHelper.WriteListsByUser(user.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())

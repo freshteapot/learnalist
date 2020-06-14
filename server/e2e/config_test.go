@@ -1,6 +1,7 @@
 package e2e_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -143,4 +144,9 @@ func generateUsername() string {
 
 func cleanEchoResponse(data []byte) string {
 	return strings.TrimSuffix(string(data), "\n")
+}
+
+func convertResponseToString(data interface{}) string {
+	b, _ := json.Marshal(data)
+	return strings.TrimSuffix(string(b), "\n")
 }

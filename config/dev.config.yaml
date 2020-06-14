@@ -1,3 +1,8 @@
+hugo:
+  directory: "./../hugo"
+  environment: "dev"
+  external: "true"
+
 server:
   sqlite:
     database: /tmp/learnalist/server.db
@@ -7,28 +12,12 @@ server:
   cookie:
     domain: "localhost"
     secure: false
-  #siteCacheDirectory: /tmp/learnalist/site-cache
-  siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
-  hugo:
-    directory: "/Users/tinkerbell/git/learnalist-api/hugo"
-    environment: "dev"
-    external: "true"
-
   loginWith:
     google:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "http://localhost:1234"
 tools:
-  rebuildStaticSite:
-    sqlite:
-      database: /tmp/learnalist/server.db
-    #siteCacheDirectory: /tmp/learnalist/site-cache
-    siteCacheDirectory: /Users/tinkerbell/git/learnalist-api/hugo/public
-    hugo:
-      directory: "./../hugo"
-      environment: "dev"
-      external: "true"
   integrationTests:
     username: ""
     password: ""

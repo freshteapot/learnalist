@@ -96,6 +96,7 @@ ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 
 # Install
 ```sh
+make build-image
 export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context

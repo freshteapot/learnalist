@@ -38,7 +38,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 		testHugoHelper := &mocks.HugoSiteBuilder{}
 		testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
 		testHugoHelper.On("WritePublicLists", mock.Anything)
-		testHugoHelper.On("Remove", mock.Anything)
+		testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
 		m.HugoHelper = testHugoHelper
 
 		datastore = &mocks.Datastore{}

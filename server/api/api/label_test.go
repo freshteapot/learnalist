@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/freshteapot/learnalist-api/server/api/api"
-
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"

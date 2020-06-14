@@ -61,7 +61,7 @@ func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string
 	var item DatabaseUserFromIDP
 	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
 	if err == sql.ErrNoRows {
-		err = user.NotFound
+		err = user.ErrNotFound
 	}
 	return item.UserUUID, err
 }

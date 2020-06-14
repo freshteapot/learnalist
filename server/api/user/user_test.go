@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -9,8 +10,8 @@ import (
 var _ = Describe("Testing user login endpoint", func() {
 	var (
 		err         error
-		cleanedUser user.RegisterInput
-		input       user.RegisterInput
+		cleanedUser api.HttpUserRegisterInput
+		input       api.HttpUserRegisterInput
 	)
 
 	It("Test cases", func() {
@@ -48,7 +49,7 @@ var _ = Describe("Testing user login endpoint", func() {
 		}
 
 		for _, test := range tests {
-			input = user.RegisterInput{
+			input = api.HttpUserRegisterInput{
 				Username: test.Username,
 				Password: test.Password,
 			}

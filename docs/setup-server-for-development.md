@@ -33,7 +33,7 @@ make develop
 ```
 make clear-site
 make rebuild-db
-make build-prod-base
+make build-image-base
 make build-image
 ```
 
@@ -43,5 +43,6 @@ docker run --rm --name learnalist \
 -v $(pwd)/config:/srv/learnalist/config \
 -v /tmp/learnalist/server.db:/srv/learnalist/server.db \
 -p 1234:1234 \
+-e HUGO_EXTERNAL=false \
 learnalist:latest --config=/srv/learnalist/config/docker.config.yaml server
 ```

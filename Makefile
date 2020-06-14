@@ -6,13 +6,16 @@ GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y%m%dT%H%M%
 # Development commands
 #
 clear-site:
-	mkdir -p ./hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser}
 	rm -rf ./hugo/public/*
+	mkdir -p ./hugo/{public/alist,public/alistsbyuser}
+	mkdir -p ./hugo/{content/alist,data/alist}
+	mkdir -p ./hugo/{content/alistsbyuser,data/alistsbyuser}
 	rm -f ./hugo/content/alist/*
 	rm -f ./hugo/content/alistsbyuser/*
 	rm -f ./hugo/data/alist/*
 	rm -f ./hugo/data/alistsbyuser/*
 	echo "[]" > ./hugo/data/public_lists.json
+	cd ./hugo && hugo
 
 rebuild-db:
 	mkdir -p /tmp/learnalist/
@@ -33,6 +36,11 @@ develop:
 
 build-mocks:
 	cd server && mockery -all -recursive
+
+run-e2e-tests:
+	cd server && \
+	./run-e2e.sh
+
 
 ###############################################################################
 #
@@ -56,10 +64,10 @@ sync-db-files:
 	--rsync-path="sudo rsync" \
 	./server/db ${SSH_SERVER}:/srv/learnalist
 
-build-prod-base:
+
+build-image-base:
 	cd server && \
-	docker build -f Dockerfile_prod_base  \
-	-t learnalist-prod-base:latest .
+	docker build -f Dockerfile_prod_base -t learnalist-prod-base:latest .
 
 build-image:
 	cd server && \

@@ -82,19 +82,3 @@ func (_m *OAuth2ConfigInterface) Exchange(ctx context.Context, code string, opts
 
 	return r0, r1
 }
-
-// TokenSource provides a mock function with given fields: ctx, token
-func (_m *OAuth2ConfigInterface) TokenSource(ctx context.Context, token *oauth2.Token) oauth2.TokenSource {
-	ret := _m.Called(ctx, token)
-
-	var r0 oauth2.TokenSource
-	if rf, ok := ret.Get(0).(func(context.Context, *oauth2.Token) oauth2.TokenSource); ok {
-		r0 = rf(ctx, token)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(oauth2.TokenSource)
-		}
-	}
-
-	return r0
-}
