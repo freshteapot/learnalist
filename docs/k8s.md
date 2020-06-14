@@ -22,7 +22,7 @@ I did this as cert-manager just seemed a lot of overhead, once I add a cronjob t
 ```sh
 kubectl create secret tls tls \
 --key /Users/tinkerbell/.acme.sh/learnalist.net/learnalist.net.key \
---cert /Users/tinkerbell/.acme.sh/learnalist.net/learnalist.net.cer
+--cert /Users/tinkerbell/.acme.sh/learnalist.net/fullchain.cer
 ```
 
 # Setup Configmap
