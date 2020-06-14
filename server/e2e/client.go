@@ -28,11 +28,6 @@ type AlistUuidResponse struct {
 	Uuid string `json:"uuid"`
 }
 
-type HttpResponse struct {
-	StatusCode int
-	Body       []byte
-}
-
 type Client struct {
 	server     string
 	httpClient *http.Client
@@ -193,7 +188,7 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 	return response
 }
 
-func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) HttpResponse {
+func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) api.HttpResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -213,7 +208,7 @@ func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) HttpResp
 
 	defer resp.Body.Close()
 
-	var response HttpResponse
+	var response api.HttpResponse
 	response.StatusCode = resp.StatusCode
 	data, err := ioutil.ReadAll(resp.Body)
 	response.Body = data
@@ -278,8 +273,8 @@ func (c Client) GetListsByMe(userInfo RegisterResponse, labels string, listType 
 	return response, nil
 }
 
-func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (HttpResponse, error) {
-	var response HttpResponse
+func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (api.HttpResponse, error) {
+	var response api.HttpResponse
 	var err error
 	url := fmt.Sprintf("%s/alist/%s.html", c.getServerURL(), uuid)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -305,8 +300,8 @@ func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (HttpRespon
 	return response, err
 }
 
-func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, userUUID string, action string) (HttpResponse, error) {
-	var response HttpResponse
+func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, userUUID string, action string) (api.HttpResponse, error) {
+	var response api.HttpResponse
 	var err error
 	url := fmt.Sprintf("%s/api/v1/share/readaccess", c.getServerURL())
 

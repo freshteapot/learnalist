@@ -17,7 +17,7 @@ import (
 var _ = Describe("Smoke list access", func() {
 	It("list access", func() {
 
-		var httpResponse e2e.HttpResponse
+		var httpResponse api.HttpResponse
 		var messageResponse api.HttpResponseMessage
 		var err error
 		var aList alist.Alist

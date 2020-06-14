@@ -1,5 +1,10 @@
 package api
 
+type HttpResponse struct {
+	StatusCode int
+	Body       []byte
+}
+
 type HttpUserRegisterInput struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
