@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -104,6 +105,24 @@ func (c Client) Register(username string, password string) RegisterResponse {
 	}
 	response.BasicAuth = getBasicAuth(username, password)
 	return response
+}
+
+func (c Client) Login(credentials api.HttpLoginRequest) (statusCode int, response api.HttpLoginResponse) {
+	url := fmt.Sprintf("%s/api/v1/user/login", c.getServerURL())
+
+	b, _ := json.Marshal(credentials)
+	req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+	req = req.WithContext(context.Background())
+	if err != nil {
+		// handle err
+		fmt.Println("Failed NewRequest")
+		panic(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	statusCode, _ = c.doRequest(req, &response, http.StatusOK)
+	return statusCode, response
 }
 
 func (c Client) DeleteUser(credentials api.HttpLoginResponse) (statusCode int, response api.HttpResponseMessage) {

@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/freshteapot/learnalist-api/server/cmd/tools/api"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/user"
 	"github.com/spf13/cobra"
 )
@@ -16,5 +17,6 @@ func init() {
 	RootCmd.AddCommand(stubSQLFileCmd)
 	RootCmd.AddCommand(fixInteractV1Cmd)
 	RootCmd.AddCommand(user.RootCmd)
+	RootCmd.AddCommand(api.RootCmd)
 
 }

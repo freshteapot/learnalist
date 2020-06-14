@@ -45,3 +45,5 @@ type HttpLoginResponse struct {
 	Token    string `json:"token"`
 	UserUUID string `json:"user_uuid"`
 }
+
+type HttpLoginRequest HttpUserRegisterInput
