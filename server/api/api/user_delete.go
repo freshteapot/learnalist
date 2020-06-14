@@ -5,6 +5,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -12,7 +13,7 @@ import (
 
 func (m *Manager) V1DeleteUser(c echo.Context) error {
 	logger := m.logger
-	response := HttpResponseMessage{}
+	response := api.HttpResponseMessage{}
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
 

@@ -4,7 +4,7 @@ package mocks
 
 import (
 	alist "github.com/freshteapot/learnalist-api/server/api/alist"
-	api "github.com/freshteapot/learnalist-api/server/api/api"
+	api "github.com/freshteapot/learnalist-api/server/pkg/api"
 
 	io "io"
 

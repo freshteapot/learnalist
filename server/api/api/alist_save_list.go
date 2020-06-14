@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,7 +22,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	case http.MethodPut:
 		break
 	default:
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ApiMethodNotSupported,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -33,7 +34,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	var aList alist.Alist
 	err := aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InputAlistJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -43,7 +44,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	if method == http.MethodPut {
 		inputUuid = c.Param("uuid")
 		if inputUuid == "" {
-			response := HttpResponseMessage{
+			response := api.HttpResponseMessage{
 				Message: i18n.ValidationAlists,
 			}
 			return c.JSON(http.StatusBadRequest, response)
@@ -51,7 +52,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 		if aList.Uuid != "" {
 			if inputUuid != aList.Uuid {
-				response := HttpResponseMessage{
+				response := api.HttpResponseMessage{
 					Message: i18n.ValidationUUIDMismatch,
 				}
 				return c.JSON(http.StatusBadRequest, response)
@@ -64,17 +65,17 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	if err != nil {
 		switch err.Error() {
 		case i18n.SuccessAlistNotFound:
-			response := HttpResponseMessage{
+			response := api.HttpResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
 			return c.JSON(http.StatusNotFound, response)
 		case i18n.InputSaveAlistOperationOwnerOnly:
-			response := HttpResponseMessage{
+			response := api.HttpResponseMessage{
 				Message: i18n.InputSaveAlistOperationOwnerOnly,
 			}
 			return c.JSON(http.StatusForbidden, response)
 		default:
-			response := HttpResponseMessage{
+			response := api.HttpResponseMessage{
 				Message: err.Error(),
 			}
 			return c.JSON(http.StatusBadRequest, response)

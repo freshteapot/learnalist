@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 
-	"github.com/freshteapot/learnalist-api/server/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/gookit/validate"
 )
 

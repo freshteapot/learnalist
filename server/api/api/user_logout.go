@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,7 +22,7 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 	var err error
 	var input HTTPLogoutRequest
 	defer c.Request().Body.Close()
-	response := HttpResponseMessage{}
+	response := api.HttpResponseMessage{}
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err = json.Unmarshal(jsonBytes, &input)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 )
@@ -16,7 +17,7 @@ func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
 
 	challenge, err := m.Datastore.UserSession().CreateWithChallenge()
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)

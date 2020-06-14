@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/e2e"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -27,7 +27,7 @@ var _ = Describe("Smoke user", func() {
 		defer response.Body.Close()
 
 		decoder := json.NewDecoder(response.Body)
-		var userCredentials api.HTTPLoginResponse
+		var userCredentials api.HttpLoginResponse
 		err = decoder.Decode(&userCredentials)
 		Expect(err).ShouldNot(HaveOccurred())
 

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/server/api/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 )
 
 func (c Client) RawRequest(request *http.Request) (response *http.Response, err error) {

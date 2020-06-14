@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/e2e"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 )

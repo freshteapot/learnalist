@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,7 +28,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	uuid := c.Param("uuid")
 	if uuid == "" {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InputMissingListUuid,
 		}
 		return c.JSON(http.StatusNotFound, response)
@@ -35,13 +36,13 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 
 	allow, err := m.Acl.HasUserListReadAccess(uuid, user.Uuid)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InternalServerErrorAclLookup,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 	if !allow {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
@@ -51,7 +52,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	if err != nil {
 		// With the look up of access before, this one doesnt fully make sense anymore.
 		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: message,
 		}
 		return c.JSON(http.StatusNotFound, response)

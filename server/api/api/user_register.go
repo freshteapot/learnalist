@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/labstack/echo/v4"
 )
@@ -25,7 +25,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -39,7 +39,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
 
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -60,7 +60,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	aUser, err := userWithUsernameAndPassword.Register(cleanedUser.Username, hash)
 	if err != nil {
 		// TODO Log this
-		response := HttpResponseMessage{
+		response := api.HttpResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)

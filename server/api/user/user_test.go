@@ -1,8 +1,8 @@
 package user_test
 
 import (
-	"github.com/freshteapot/learnalist-api/server/api"
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

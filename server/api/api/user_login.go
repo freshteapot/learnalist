@@ -5,21 +5,16 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/labstack/echo/v4"
 )
 
-type HTTPLoginResponse struct {
-	Token    string `json:"token"`
-	UserUUID string `json:"user_uuid"`
-}
-
 func (m *Manager) V1PostLogin(c echo.Context) error {
 	var input api.HttpUserRegisterInput
-	response := HttpResponseMessage{}
+	response := api.HttpResponseMessage{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -58,7 +53,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
 
-	return c.JSON(http.StatusOK, &HTTPLoginResponse{
+	return c.JSON(http.StatusOK, &api.HttpLoginResponse{
 		Token:    session.Token,
 		UserUUID: userUUID,
 	})
