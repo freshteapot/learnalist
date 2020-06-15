@@ -21,7 +21,7 @@ var _ = Describe("Testing Oauth", func() {
 		userUUID   string
 		token      *oauth2.Token
 		err        error
-		repoistory oauth.OAuthReadWriter
+		repository oauth.OAuthReadWriter
 		dbCon      *sqlx.DB
 		mockSql    sqlmock.Sqlmock
 	)
@@ -48,8 +48,8 @@ var _ = Describe("Testing Oauth", func() {
 					WithArgs(userUUID).
 					WillReturnError(want)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				_, err = repoistory.GetTokenInfo(userUUID)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				_, err = repository.GetTokenInfo(userUUID)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(sql.ErrNoRows))
 			})
@@ -67,8 +67,8 @@ var _ = Describe("Testing Oauth", func() {
 					WithArgs(userUUID).
 					WillReturnRows(rs)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				found, err := repoistory.GetTokenInfo(userUUID)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				found, err := repository.GetTokenInfo(userUUID)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found.AccessToken).To(Equal(token.AccessToken))
 			})
@@ -85,8 +85,8 @@ var _ = Describe("Testing Oauth", func() {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mockSql.ExpectCommit()
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				err := repoistory.WriteTokenInfo(userUUID, token)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				err := repository.WriteTokenInfo(userUUID, token)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
@@ -94,8 +94,8 @@ var _ = Describe("Testing Oauth", func() {
 				want := errors.New("sql: TX")
 				mockSql.ExpectBegin().WillReturnError(want)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				err := repoistory.WriteTokenInfo(userUUID, token)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				err := repository.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -107,8 +107,8 @@ var _ = Describe("Testing Oauth", func() {
 					WithArgs(userUUID).
 					WillReturnError(want)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				err := repoistory.WriteTokenInfo(userUUID, token)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				err := repository.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -122,8 +122,8 @@ var _ = Describe("Testing Oauth", func() {
 				mockSql.ExpectExec(oauthStorage.InsertEntry).
 					WillReturnError(want)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				err := repoistory.WriteTokenInfo(userUUID, token)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				err := repository.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -140,8 +140,8 @@ var _ = Describe("Testing Oauth", func() {
 				mockSql.ExpectCommit().
 					WillReturnError(want)
 
-				repoistory = oauthStorage.NewOAuthReadWriter(dbCon)
-				err := repoistory.WriteTokenInfo(userUUID, token)
+				repository = oauthStorage.NewOAuthReadWriter(dbCon)
+				err := repository.WriteTokenInfo(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})

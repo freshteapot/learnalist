@@ -17,7 +17,7 @@ var _ = Describe("Testing User from IDP", func() {
 	When("Working with the user session", func() {
 		var (
 			err        error
-			repoistory user.UserFromIDP
+			repository user.UserFromIDP
 			dbCon      *sqlx.DB
 			mockSql    sqlmock.Sqlmock
 			idp        string
@@ -42,8 +42,8 @@ var _ = Describe("Testing User from IDP", func() {
 				mockSql.ExpectExec(storage.UserFromIDPInsertEntry).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserFromIDP(dbCon)
-				_, err = repoistory.Register(idp, identifier, info)
+				repository = storage.NewUserFromIDP(dbCon)
+				_, err = repository.Register(idp, identifier, info)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -52,8 +52,8 @@ var _ = Describe("Testing User from IDP", func() {
 				mockSql.ExpectExec(storage.UserFromIDPInsertEntry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserFromIDP(dbCon)
-				_, err := repoistory.Register(idp, identifier, info)
+				repository = storage.NewUserFromIDP(dbCon)
+				_, err := repository.Register(idp, identifier, info)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -64,8 +64,8 @@ var _ = Describe("Testing User from IDP", func() {
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserFromIDP(dbCon)
-				_, err = repoistory.Lookup(idp, identifier)
+				repository = storage.NewUserFromIDP(dbCon)
+				_, err = repository.Lookup(idp, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -75,8 +75,8 @@ var _ = Describe("Testing User from IDP", func() {
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserFromIDP(dbCon)
-				_, err = repoistory.Lookup(idp, identifier)
+				repository = storage.NewUserFromIDP(dbCon)
+				_, err = repository.Lookup(idp, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -88,8 +88,8 @@ var _ = Describe("Testing User from IDP", func() {
 					WithArgs(idp, identifier).
 					WillReturnRows(rs)
 
-				repoistory = storage.NewUserFromIDP(dbCon)
-				found, err := repoistory.Lookup(idp, identifier)
+				repository = storage.NewUserFromIDP(dbCon)
+				found, err := repository.Lookup(idp, identifier)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(Equal(userUUID))
 			})
