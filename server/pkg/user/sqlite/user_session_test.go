@@ -19,7 +19,7 @@ var _ = Describe("Testing User", func() {
 	When("Working with the user session", func() {
 		var (
 			err        error
-			repoistory user.Session
+			repository user.Session
 			dbCon      *sqlx.DB
 			mockSql    sqlmock.Sqlmock
 		)
@@ -38,8 +38,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionInsertEntry).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				_, err = repoistory.CreateWithChallenge()
+				repository = storage.NewUserSession(dbCon)
+				_, err = repository.CreateWithChallenge()
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(sql.ErrNoRows))
 			})
@@ -48,8 +48,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionInsertEntry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				_, err = repoistory.CreateWithChallenge()
+				repository = storage.NewUserSession(dbCon)
+				_, err = repository.CreateWithChallenge()
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -70,8 +70,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionUpdateEntry).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				err = repoistory.Activate(session)
+				repository = storage.NewUserSession(dbCon)
+				err = repository.Activate(session)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -81,8 +81,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionUpdateEntry).
 					WillReturnResult(sqlmock.NewErrorResult(want))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err = repoistory.Activate(session)
+				repository = storage.NewUserSession(dbCon)
+				err = repository.Activate(session)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -91,8 +91,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionUpdateEntry).
 					WillReturnResult(sqlmock.NewResult(0, 0))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err = repoistory.Activate(session)
+				repository = storage.NewUserSession(dbCon)
+				err = repository.Activate(session)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(i18n.ErrorUserSessionActivate))
 			})
@@ -101,8 +101,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionUpdateEntry).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err = repoistory.Activate(session)
+				repository = storage.NewUserSession(dbCon)
+				err = repository.Activate(session)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -115,8 +115,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectQuery(storage.UserSessionSelectUserUUIDByToken).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				_, err := repoistory.GetUserUUIDByToken(token)
+				repository = storage.NewUserSession(dbCon)
+				_, err := repository.GetUserUUIDByToken(token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -133,8 +133,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(token).
 					WillReturnRows(rs)
 
-				repoistory = storage.NewUserSession(dbCon)
-				found, err := repoistory.GetUserUUIDByToken(token)
+				repository = storage.NewUserSession(dbCon)
+				found, err := repository.GetUserUUIDByToken(token)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(Equal(userUUID))
 			})
@@ -149,8 +149,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(challenge).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				found, err := repoistory.IsChallengeValid(challenge)
+				repository = storage.NewUserSession(dbCon)
+				found, err := repository.IsChallengeValid(challenge)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 				Expect(found).To(BeFalse())
@@ -163,8 +163,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(challenge).
 					WillReturnRows(rs)
 
-				repoistory = storage.NewUserSession(dbCon)
-				found, err := repoistory.IsChallengeValid(challenge)
+				repository = storage.NewUserSession(dbCon)
+				found, err := repository.IsChallengeValid(challenge)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(BeFalse())
 			})
@@ -176,8 +176,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(challenge).
 					WillReturnRows(rs)
 
-				repoistory = storage.NewUserSession(dbCon)
-				found, err := repoistory.IsChallengeValid(challenge)
+				repository = storage.NewUserSession(dbCon)
+				found, err := repository.IsChallengeValid(challenge)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(BeTrue())
 			})
@@ -192,8 +192,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(userUUID).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveSessionsForUser(userUUID)
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveSessionsForUser(userUUID)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -204,8 +204,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(userUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveSessionsForUser(userUUID)
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveSessionsForUser(userUUID)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -220,8 +220,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(userUUID, token).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveSessionForUser(userUUID, token)
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveSessionForUser(userUUID, token)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -234,8 +234,8 @@ var _ = Describe("Testing User", func() {
 					WithArgs(userUUID, token).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveSessionForUser(userUUID, token)
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveSessionForUser(userUUID, token)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -247,8 +247,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionDeleteUnActiveChallenges).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveExpiredChallenges()
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveExpiredChallenges()
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -257,8 +257,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionDeleteUnActiveChallenges).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				err := repoistory.RemoveExpiredChallenges()
+				repository = storage.NewUserSession(dbCon)
+				err := repository.RemoveExpiredChallenges()
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -271,8 +271,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionInsertFullRecord).
 					WillReturnError(want)
 
-				repoistory = storage.NewUserSession(dbCon)
-				_, err := repoistory.NewSession(userUUID)
+				repository = storage.NewUserSession(dbCon)
+				_, err := repository.NewSession(userUUID)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -282,8 +282,8 @@ var _ = Describe("Testing User", func() {
 				mockSql.ExpectExec(storage.UserSessionInsertFullRecord).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				repoistory = storage.NewUserSession(dbCon)
-				session, err := repoistory.NewSession(userUUID)
+				repository = storage.NewUserSession(dbCon)
+				session, err := repository.NewSession(userUUID)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(session.UserUUID).To(Equal(userUUID))
 			})

@@ -17,7 +17,7 @@ import (
 var _ = Describe("Testing User with username and password", func() {
 	var (
 		err        error
-		repoistory user.UserWithUsernameAndPassword
+		repository user.UserWithUsernameAndPassword
 		dbCon      *sqlx.DB
 		mockSql    sqlmock.Sqlmock
 		username   string
@@ -28,7 +28,7 @@ var _ = Describe("Testing User with username and password", func() {
 		dbCon, mockSql, err = helper.GetMockDB()
 		username = "iamusera"
 		hash = "fake-hash"
-		repoistory = storage.NewUserWithUsernameAndPassword(dbCon)
+		repository = storage.NewUserWithUsernameAndPassword(dbCon)
 	})
 
 	AfterEach(func() {
@@ -41,7 +41,7 @@ var _ = Describe("Testing User with username and password", func() {
 			mockSql.ExpectExec(storage.UserWithUsernameAndPasswordInsertEntry).
 				WillReturnError(want)
 
-			_, err = repoistory.Register(username, hash)
+			_, err = repository.Register(username, hash)
 			Expect(err).Should(HaveOccurred())
 			Expect(err).To(Equal(want))
 		})
@@ -51,7 +51,7 @@ var _ = Describe("Testing User with username and password", func() {
 			mockSql.ExpectExec(storage.UserWithUsernameAndPasswordInsertEntry).
 				WillReturnError(want)
 
-			_, err = repoistory.Register(username, hash)
+			_, err = repository.Register(username, hash)
 			Expect(err).Should(HaveOccurred())
 			Expect(err).To(Equal(want))
 		})
@@ -63,7 +63,7 @@ var _ = Describe("Testing User with username and password", func() {
 			mockSql.ExpectQuery(storage.UserWithUsernameAndPasswordSelectUserUUIDByHash).
 				WillReturnError(want)
 
-			_, err = repoistory.Lookup(username, hash)
+			_, err = repository.Lookup(username, hash)
 			Expect(err).Should(HaveOccurred())
 			Expect(err).To(Equal(want))
 		})
@@ -74,7 +74,7 @@ var _ = Describe("Testing User with username and password", func() {
 				WithArgs(username, hash).
 				WillReturnError(want)
 
-			_, err = repoistory.Lookup(username, hash)
+			_, err = repository.Lookup(username, hash)
 			Expect(err).Should(HaveOccurred())
 			Expect(err).To(Equal(want))
 		})
@@ -86,7 +86,7 @@ var _ = Describe("Testing User with username and password", func() {
 				WithArgs(username, hash).
 				WillReturnRows(rs)
 
-			found, err := repoistory.Lookup(username, hash)
+			found, err := repository.Lookup(username, hash)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(found).To(Equal(userUUID))
 		})

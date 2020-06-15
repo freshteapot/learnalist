@@ -15,7 +15,7 @@ import (
 var _ = Describe("Testing Acl", func() {
 	var (
 		db         *sqlx.DB
-		repoistory user.UserFromIDP
+		repository user.UserFromIDP
 	)
 	BeforeEach(func() {
 		db = database.NewTestDB()
@@ -26,12 +26,12 @@ var _ = Describe("Testing Acl", func() {
 	})
 
 	XIt("Testing with real queries", func() {
-		repoistory = storage.NewUserFromIDP(db)
-		userUUID, err := repoistory.Register("google", "fake@freshteapot.net", []byte(`{"name", "chris"}`))
+		repository = storage.NewUserFromIDP(db)
+		userUUID, err := repository.Register("google", "fake@freshteapot.net", []byte(`{"name", "chris"}`))
 		Expect(err).ShouldNot(HaveOccurred())
 		fmt.Println(userUUID)
 
-		userUUID_2, err := repoistory.Lookup("google", "fake@freshteapot.net")
+		userUUID_2, err := repository.Lookup("google", "fake@freshteapot.net")
 		fmt.Println(userUUID_2)
 		fmt.Println(err)
 	})
