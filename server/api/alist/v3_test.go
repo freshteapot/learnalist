@@ -151,7 +151,7 @@ var _ = Describe("Testing List type V3", func() {
 					Expect(err.Error()).To(Equal("When should be YYYY-MM-DD."))
 				})
 
-				It("The date cant be seperated with /", func() {
+				It("The date cant be separated with /", func() {
 					input := "2019/05/01"
 					err := alist.ValidateTypeV3When(input)
 					Expect(err).Should(HaveOccurred())

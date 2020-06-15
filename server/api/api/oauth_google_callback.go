@@ -171,7 +171,7 @@ localStorage.setItem("app.user.uuid", JSON.stringify(userUUID))
 </script>
 </head>
 <body>
-<h1>You have succesfully logged in via {{.idp}}</h1>
+<h1>You have successfully logged in via {{.idp}}</h1>
 <p>You will now be redirected</p>
 </body>
 </html>
