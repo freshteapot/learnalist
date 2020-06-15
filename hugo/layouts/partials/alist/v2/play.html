@@ -1,0 +1,7 @@
+{{- $aList := . -}}
+{{- with .info.interact -}}
+<div id="play" class="measure center" style="display:none">
+    <script id="play-data" type="application/json">{{ $aList | jsonify | safeJS }}</script>
+    <div id="play-screen"></div>
+</div>
+{{- end -}}

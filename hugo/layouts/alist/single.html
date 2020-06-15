@@ -1,7 +1,7 @@
 <html lang="en">
 {{- $aList := getJSON "data/alist/" $.Params.Uuid ".json" -}}
 {{- $allowed := slice "v1" "v2" "v4" -}}
-{{- $interactAllowed := slice "v1" -}}
+{{- $interactAllowed := slice "v1" "v2" -}}
 {{- partial "head.html" $ -}}
 
 <body onload="measureCRP()">

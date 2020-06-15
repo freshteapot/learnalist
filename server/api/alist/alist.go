@@ -109,6 +109,11 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	case FromToList:
+		aList.Info, err = parseInfoV2(aList.Info)
+		if err != nil {
+			err = errors.New(i18n.ValidationErrorListV2)
+			return err
+		}
 		break
 	case Concept2:
 		break
