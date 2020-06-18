@@ -62,13 +62,13 @@ func validateTypeV1(aList Alist) error {
 	return nil
 }
 
-func parseTypeV1(jsonBytes []byte) (TypeV1, error) {
-	listData := new(TypeV1)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
+type mapToV1 struct{}
+
+func NewMapToV1() AlistTypeMarshalJSON {
+	return &mapToV1{}
 }
 
-func parseInfoV1(info AlistInfo) (AlistInfo, error) {
+func (m mapToV1) ParseInfo(info AlistInfo) (AlistInfo, error) {
 	if info.Interact == nil {
 		info.Interact = &Interact{
 			Slideshow:   InteractDisabled,
@@ -77,4 +77,17 @@ func parseInfoV1(info AlistInfo) (AlistInfo, error) {
 	}
 
 	return info, nil
+}
+
+func (m mapToV1) ParseData(jsonBytes []byte) (interface{}, error) {
+	var listData TypeV1
+	err := json.Unmarshal(jsonBytes, &listData)
+	if err != nil {
+		err = errors.New(i18n.ValidationErrorListV1)
+	}
+	return listData, err
+}
+
+func (m mapToV1) Enrich(aList Alist) Alist {
+	return aList
 }

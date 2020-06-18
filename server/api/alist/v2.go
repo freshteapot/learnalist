@@ -36,12 +36,6 @@ func NewTypeV2() Alist {
 	return aList
 }
 
-func parseTypeV2(jsonBytes []byte) (TypeV2, error) {
-	listData := new(TypeV2)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
-}
-
 func validateTypeV2(aList Alist) error {
 	hasError := false
 	if !utils.IntArrayContains(ValidInteract, aList.Info.Interact.TotalRecall) {
@@ -62,7 +56,13 @@ func validateTypeV2(aList Alist) error {
 	return nil
 }
 
-func parseInfoV2(info AlistInfo) (AlistInfo, error) {
+type mapToV2 struct{}
+
+func NewMapToV2() AlistTypeMarshalJSON {
+	return &mapToV2{}
+}
+
+func (m mapToV2) ParseInfo(info AlistInfo) (AlistInfo, error) {
 	if info.Interact == nil {
 		info.Interact = &Interact{
 			TotalRecall: InteractDisabled,
@@ -70,4 +70,17 @@ func parseInfoV2(info AlistInfo) (AlistInfo, error) {
 	}
 
 	return info, nil
+}
+
+func (m mapToV2) ParseData(jsonBytes []byte) (interface{}, error) {
+	var listData TypeV2
+	err := json.Unmarshal(jsonBytes, &listData)
+	if err != nil {
+		err = errors.New(i18n.ValidationErrorListV2)
+	}
+	return listData, err
+}
+
+func (m mapToV2) Enrich(aList Alist) Alist {
+	return aList
 }

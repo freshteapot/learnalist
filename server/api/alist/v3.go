@@ -17,7 +17,8 @@ func NewTypeV3() Alist {
 	data := make(TypeV3, 0)
 	aList.Data = data
 
-	aList = enrichTypeV3(aList)
+	mapper := NewMapToV3()
+	aList = mapper.Enrich(aList)
 	return aList
 }
 
@@ -54,24 +55,6 @@ type V3Split struct {
       },
       {
 */
-
-func enrichTypeV3(aList Alist) Alist {
-	labels := aList.Info.Labels
-	if !utils.StringArrayContains(labels, "rowing") {
-		labels = append(labels, "rowing")
-	}
-	if !utils.StringArrayContains(labels, "concept2") {
-		labels = append(labels, "concept2")
-	}
-	aList.Info.Labels = labels
-	return aList
-}
-
-func ParseTypeV3(jsonBytes []byte) (TypeV3, error) {
-	listData := new(TypeV3)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
-}
 
 func ValidateTypeV3(typeV3 TypeV3) error {
 	var err error
@@ -174,4 +157,36 @@ func ValidateTypeV3When(input string) error {
 
 func ValidateTypeV3P500(input string) error {
 	return ValidateTypeV3Time(input)
+}
+
+type mapToV3 struct{}
+
+func NewMapToV3() AlistTypeMarshalJSON {
+	return &mapToV3{}
+}
+
+func (m mapToV3) ParseInfo(info AlistInfo) (AlistInfo, error) {
+	return info, nil
+}
+
+func (m mapToV3) ParseData(jsonBytes []byte) (interface{}, error) {
+	var listData TypeV3
+	err := json.Unmarshal(jsonBytes, &listData)
+	if err != nil {
+		err = errors.New(i18n.ValidationErrorListV3)
+	}
+	return listData, err
+}
+
+func (m mapToV3) Enrich(aList Alist) Alist {
+	labels := aList.Info.Labels
+	if !utils.StringArrayContains(labels, "rowing") {
+		labels = append(labels, "rowing")
+	}
+	if !utils.StringArrayContains(labels, "concept2") {
+		labels = append(labels, "concept2")
+	}
+	aList.Info.Labels = labels
+	return aList
+
 }

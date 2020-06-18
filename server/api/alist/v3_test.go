@@ -61,6 +61,7 @@ var _ = Describe("Testing List type V3", func() {
 	When("Checking the data structure", func() {
 		Context("Json", func() {
 			var input string
+			var mapper alist.AlistTypeMarshalJSON
 			BeforeEach(func() {
 				input = `[{
 					"when": "2019-05-06",
@@ -79,44 +80,47 @@ var _ = Describe("Testing List type V3", func() {
 						}
 					]
 				}]`
+				mapper = alist.NewMapToV3()
 			})
 			It("Parse", func() {
-				_, err := alist.ParseTypeV3([]byte(input))
+				_, err := mapper.ParseData([]byte(input))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
 			It("Validate", func() {
-				data, err := alist.ParseTypeV3([]byte(input))
+				data, err := mapper.ParseData([]byte(input))
 				Expect(err).ShouldNot(HaveOccurred())
-				err = alist.ValidateTypeV3(data)
+				err = alist.ValidateTypeV3(data.(alist.TypeV3))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
 			Context("Reject just enough to check the logic on ValidateTypeV3", func() {
-				var data alist.TypeV3
+				var data interface{}
 				var err error
+				var mapper alist.AlistTypeMarshalJSON
 				BeforeEach(func() {
-					data, err = alist.ParseTypeV3([]byte(input))
+					mapper = alist.NewMapToV3()
+					data, err = mapper.ParseData([]byte(input))
 					Expect(err).ShouldNot(HaveOccurred())
 				})
 
 				It("When", func() {
-					data[0].When = ""
-					err = alist.ValidateTypeV3(data)
+					data.(alist.TypeV3)[0].When = ""
+					err = alist.ValidateTypeV3(data.(alist.TypeV3))
 					Expect(err).Should(HaveOccurred())
 					Expect(err.Error()).To(Equal(i18n.ValidationAlistTypeV3))
 				})
 
 				It("Overall", func() {
-					data[0].Overall.Distance = 0
-					err = alist.ValidateTypeV3(data)
+					data.(alist.TypeV3)[0].Overall.Distance = 0
+					err = alist.ValidateTypeV3(data.(alist.TypeV3))
 					Expect(err).Should(HaveOccurred())
 					Expect(err.Error()).To(Equal(i18n.ValidationAlistTypeV3))
 				})
 
 				It("A bad Split", func() {
-					data[0].Splits[0].Distance = 0
-					err = alist.ValidateTypeV3(data)
+					data.(alist.TypeV3)[0].Splits[0].Distance = 0
+					err = alist.ValidateTypeV3(data.(alist.TypeV3))
 					Expect(err).Should(HaveOccurred())
 					Expect(err.Error()).To(Equal(i18n.ValidationAlistTypeV3))
 				})

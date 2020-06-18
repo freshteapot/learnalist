@@ -23,6 +23,7 @@ func Validate(aList Alist) error {
 		return err
 	}
 
+	// TODO why is this not the same for all?
 	switch aList.Info.ListType {
 	case SimpleList:
 		err = validateTypeV1(aList)
