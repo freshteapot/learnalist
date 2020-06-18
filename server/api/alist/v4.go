@@ -67,5 +67,4 @@ func (m mapToV4) ParseData(jsonBytes []byte) (interface{}, error) {
 
 func (m mapToV4) Enrich(aList Alist) Alist {
 	return aList
-
 }
