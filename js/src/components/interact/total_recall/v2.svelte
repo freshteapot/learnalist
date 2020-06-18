@@ -85,21 +85,18 @@
         <input type="number" bind:value={speed} max={5} min="1" />
       </p>
 
-      <pre>{JSON.stringify(data.slice(0, 2), '', 2)}</pre>
       <p>
         <span>Which to show?</span>
-
-        <label>
-          <input type="radio" bind:group={showKey} value={'from'} />
-          From
-        </label>
-
-        <label>
-          <input type="radio" bind:group={showKey} value={'to'} />
-          To
-        </label>
       </p>
-
+      <p>
+        <input type="radio" bind:group={showKey} value={'from'} />
+        from
+      </p>
+      <p>
+        <input type="radio" bind:group={showKey} value={'to'} />
+        to
+      </p>
+      <pre>{JSON.stringify(data.slice(0, 2), '', 2)}</pre>
       <button class="br3" on:click={play}>Are you ready to play?</button>
     {/if}
 
