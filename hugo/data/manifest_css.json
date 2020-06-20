@@ -1,10 +1,10 @@
 {
- "v2": "/css/v2.1592665063756.css",
- "main": "/css/main.1592665058399.css",
- "v1": "/css/v1.1592665061287.css",
- "editor": "/css/editor.1592665069301.css",
- "shared": "/css/shared.1592665060431.css",
- "v3": "/css/v3.1592665066108.css",
- "v4": "/css/v4.1592665067711.css",
- "base": "/css/base.1592665075273.css"
+ "v2": "/css/v2.dev.css",
+ "main": "/css/main.dev.css",
+ "v1": "/css/v1.dev.css",
+ "editor": "/css/editor.dev.css",
+ "shared": "/css/shared.dev.css",
+ "v3": "/css/v3.dev.css",
+ "v4": "/css/v4.dev.css",
+ "base": "/css/base.1592147262682.css"
 }
