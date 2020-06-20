@@ -38,25 +38,6 @@ func Validate(aList Alist) error {
 		break
 	}
 	return mapper.Validate(aList)
-	/*
-			// TODO why is this not the same for all?
-			switch aList.Info.ListType {
-			case SimpleList:
-				err = validateTypeV1(aList)
-			case FromToList:
-				err = validateTypeV2(aList)
-			case Concept2:
-				err = ValidateTypeV3(aList.Data.(TypeV3))
-			case ContentAndUrl:
-				err = validateTypeV4(aList)
-			}
-
-
-		if err != nil {
-			return err
-		}
-		return nil
-	*/
 }
 
 func validateAListInfo(info AlistInfo) error {
