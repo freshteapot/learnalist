@@ -8,12 +8,18 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 )
 
 func NewTypeV3() Alist {
-	aList := Alist{}
+	aList := Alist{
+		Info: AlistInfo{
+			Labels:     make([]string, 0),
+			ListType:   Concept2,
+			SharedWith: aclKeys.NotShared,
+		},
+	}
 
-	aList.Info.ListType = Concept2
 	data := make(TypeV3, 0)
 	aList.Data = data
 
@@ -163,6 +169,10 @@ type mapToV3 struct{}
 
 func NewMapToV3() AlistTypeMarshalJSON {
 	return &mapToV3{}
+}
+
+func (m mapToV3) Validate(aList Alist) error {
+	return ValidateTypeV3(aList.Data.(TypeV3))
 }
 
 func (m mapToV3) ParseInfo(info AlistInfo) (AlistInfo, error) {

@@ -1,0 +1,15 @@
+{
+    "data": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1"
+    }
+}

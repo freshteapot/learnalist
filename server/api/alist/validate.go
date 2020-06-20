@@ -23,22 +23,40 @@ func Validate(aList Alist) error {
 		return err
 	}
 
-	// TODO why is this not the same for all?
+	var mapper AlistTypeMarshalJSON
 	switch aList.Info.ListType {
 	case SimpleList:
-		err = validateTypeV1(aList)
+		mapper = NewMapToV1()
 	case FromToList:
-		err = validateTypeV2(aList)
+		mapper = NewMapToV2()
+		break
 	case Concept2:
-		err = ValidateTypeV3(aList.Data.(TypeV3))
+		mapper = NewMapToV3()
+		break
 	case ContentAndUrl:
-		err = validateTypeV4(aList)
+		mapper = NewMapToV4()
+		break
 	}
+	return mapper.Validate(aList)
+	/*
+			// TODO why is this not the same for all?
+			switch aList.Info.ListType {
+			case SimpleList:
+				err = validateTypeV1(aList)
+			case FromToList:
+				err = validateTypeV2(aList)
+			case Concept2:
+				err = ValidateTypeV3(aList.Data.(TypeV3))
+			case ContentAndUrl:
+				err = validateTypeV4(aList)
+			}
 
-	if err != nil {
-		return err
-	}
-	return nil
+
+		if err != nil {
+			return err
+		}
+		return nil
+	*/
 }
 
 func validateAListInfo(info AlistInfo) error {

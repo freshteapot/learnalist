@@ -62,6 +62,7 @@ type AlistTypeMarshalJSON interface {
 	ParseInfo(info AlistInfo) (AlistInfo, error)
 	ParseData([]byte) (interface{}, error)
 	Enrich(Alist) Alist
+	Validate(Alist) error
 }
 
 // MarshalJSON convert alist into json
@@ -94,6 +95,11 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	if raw["data"] == nil {
+		err = errors.New("Failed to pass list. Data is missing.")
+		return err
+	}
+
 	jsonBytes, _ = json.Marshal(raw["info"])
 	aList.Info, err = parseAlistInfo(jsonBytes)
 	if err != nil {
@@ -103,11 +109,6 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 
 	if !utils.StringArrayContains(allowedListTypes, aList.Info.ListType) {
 		err = errors.New("Unsupported list type.")
-		return err
-	}
-
-	if raw["data"] == nil {
-		err = errors.New("Failed to pass list. Data is missing.")
 		return err
 	}
 

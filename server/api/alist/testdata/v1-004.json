@@ -1,0 +1,11 @@
+{
+    "data": [],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1",
+        "interact": {
+            "slideshow": 1,
+            "totalrecall": 2
+        }
+    }
+}

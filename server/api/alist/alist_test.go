@@ -31,7 +31,7 @@ var _ = Describe("Testing alist.Alist", func() {
 			})
 
 			It("When info is not an object", func() {
-				input := `{"info": ""}`
+				input := `{"data":[], "info": ""}`
 
 				err := aList.UnmarshalJSON([]byte(input))
 				Expect(err).Should(HaveOccurred())

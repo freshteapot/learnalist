@@ -36,7 +36,7 @@ func NewTypeV2() Alist {
 	return aList
 }
 
-func validateTypeV2(aList Alist) error {
+func (m mapToV2) Validate(aList Alist) error {
 	hasError := false
 	if !utils.IntArrayContains(ValidInteract, aList.Info.Interact.TotalRecall) {
 		hasError = true
