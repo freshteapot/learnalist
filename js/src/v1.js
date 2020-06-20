@@ -1,9 +1,9 @@
 
 import Menu from './components/interact/menu.wc.svelte';
-import Interact from "./components/interact/interact.svelte";
+import Interact from "./components/interact/interact_v1.svelte";
 
 // Webcomponent
-customElements.define('v1-menu', Menu);
+customElements.define('interact-menu', Menu);
 
 // Actual app to handle the interactions
 let app;

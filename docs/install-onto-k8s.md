@@ -96,7 +96,10 @@ ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 
 # Install
 ```sh
+make build-site-assets
+make build-image-base
 make build-image
+
 export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context
@@ -117,8 +120,24 @@ kubectl scale deployment/container-registry  --replicas=1
 ssh $SSH_SERVER sudo kubectl port-forward deployment/container-registry 5000:5000 &
 ```
 
+Push latest image and sync site-assets (js, css)
+```sh
+make push-image
+make sync-site-assets
+```
+
+Make sure k8s file is uptodate
 ```sh
 kubectl apply -f k8s/learnalist.yaml
+```
+
+Patch if only bumped latest version
+```sh
+PATCH=$(cat <<_EOF_
+  {"spec":{"template":{"metadata":{"creationTimestamp":"$(date -u '+%FT%TZ')"}}}}
+  _EOF_
+)
+kubectl patch deployment learnalist -p "${PATCH}"
 ```
 
 ```sh

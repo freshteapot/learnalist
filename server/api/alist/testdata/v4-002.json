@@ -1,0 +1,16 @@
+{
+    "info": {
+        "title": "A list of fine quotes.",
+        "type": "v4"
+    },
+    "data": [
+        {
+            "content": "Im tough, Im ambitious, and I know exactly what I want. If that makes me a bitch, okay. ― Madonna",
+            "url": "https://www.goodreads.com/quotes/54377-i-m-tough-i-m-ambitious-and-i-know-exactly-what-i"
+        },
+        {
+            "content": "Design is the art of arranging code to work today, and be changeable forever. – Sandi Metz",
+            "url": "https://dave.cheney.net/paste/clear-is-better-than-clever.pdf"
+        }
+    ]
+}

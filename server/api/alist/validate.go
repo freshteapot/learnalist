@@ -23,21 +23,21 @@ func Validate(aList Alist) error {
 		return err
 	}
 
+	var mapper AlistTypeMarshalJSON
 	switch aList.Info.ListType {
 	case SimpleList:
-		err = validateTypeV1(aList)
+		mapper = NewMapToV1()
 	case FromToList:
-		err = validateTypeV2(aList)
+		mapper = NewMapToV2()
+		break
 	case Concept2:
-		err = ValidateTypeV3(aList.Data.(TypeV3))
+		mapper = NewMapToV3()
+		break
 	case ContentAndUrl:
-		err = validateTypeV4(aList)
+		mapper = NewMapToV4()
+		break
 	}
-
-	if err != nil {
-		return err
-	}
-	return nil
+	return mapper.Validate(aList)
 }
 
 func validateAListInfo(info AlistInfo) error {

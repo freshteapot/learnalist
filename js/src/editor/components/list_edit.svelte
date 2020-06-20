@@ -13,6 +13,8 @@
   import ListEditDataV4 from "./list_edit_data_v4.svelte";
   import ListEditDataTodo from "./list_edit_data_todo.svelte";
   import ListEditLabels from "./list_edit_labels.svelte";
+  import ListEditInteractV1 from "./list_edit_interact_v1.svelte";
+  import ListEditInteractV2 from "./list_edit_interact_v2.svelte";
 
   export let aList;
 
@@ -23,13 +25,22 @@
     v4: ListEditDataV4
   };
 
+  let listTypesCanInteract = {
+    v1: ListEditInteractV1,
+    v2: ListEditInteractV2
+  };
+
   let renderItem = Object.keys(listTypes)
     .filter(key => aList.info.type === key)
     .reduce((notFound, key) => {
       return listTypes[key];
     }, ListEditDataTodo);
 
-  $: canInteract = aList && aList.info.type === "v1";
+  let interactElement = Object.keys(listTypesCanInteract)
+    .filter(key => aList.info.type === key)
+    .reduce((notFound, key) => {
+      return listTypesCanInteract[key];
+    }, null);
 
   function cancel() {
     listsEdits.remove(aList.uuid);
@@ -82,6 +93,7 @@
 <Box>
   <svelte:component this={renderItem} bind:listData={aList.data} />
 </Box>
+
 <Box>
   <button on:click={save}>Save</button>
   <button on:click={cancel}>Cancel</button>
@@ -105,45 +117,13 @@
     </label>
   </Box>
 
-  {#if canInteract}
+  {#if interactElement}
     <Box>
       <h2>Interact</h2>
-      <Box>
-        <h3>Slideshow</h3>
-        <label>
-          <input
-            type="radio"
-            bind:group={aList.info.interact.slideshow}
-            value={0} />
-          Disable
-        </label>
 
-        <label>
-          <input
-            type="radio"
-            bind:group={aList.info.interact.slideshow}
-            value={1} />
-          Enable
-        </label>
-      </Box>
-      <Box>
-        <h3>Total Recall</h3>
-        <label>
-          <input
-            type="radio"
-            bind:group={aList.info.interact.totalrecall}
-            value={0} />
-          Disable
-        </label>
-
-        <label>
-          <input
-            type="radio"
-            bind:group={aList.info.interact.totalrecall}
-            value={1} />
-          Enable
-        </label>
-      </Box>
+      <svelte:component
+        this={interactElement}
+        bind:interact={aList.info.interact} />
 
     </Box>
   {/if}

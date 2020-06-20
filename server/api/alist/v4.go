@@ -5,13 +5,19 @@ import (
 	"errors"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/gookit/validate"
 )
 
 func NewTypeV4() Alist {
-	aList := Alist{}
+	aList := Alist{
+		Info: AlistInfo{
+			Labels:     make([]string, 0),
+			ListType:   ContentAndUrl,
+			SharedWith: aclKeys.NotShared,
+		},
+	}
 
-	aList.Info.ListType = ContentAndUrl
 	data := make(TypeV4, 0)
 	aList.Data = data
 	return aList
@@ -24,13 +30,13 @@ type TypeV4Item struct {
 	Url     string `json:"url" validate:"required|url"`
 }
 
-func parseTypeV4(jsonBytes []byte) (TypeV4, error) {
-	listData := new(TypeV4)
-	err := json.Unmarshal(jsonBytes, &listData)
-	return *listData, err
+type mapToV4 struct{}
+
+func NewMapToV4() AlistTypeMarshalJSON {
+	return &mapToV4{}
 }
 
-func validateTypeV4(aList Alist) error {
+func (m mapToV4) Validate(aList Alist) error {
 	hasError := false
 	items := aList.Data.(TypeV4)
 	for _, item := range items {
@@ -44,4 +50,21 @@ func validateTypeV4(aList Alist) error {
 		return errors.New(i18n.ValidationAlistTypeV4)
 	}
 	return nil
+}
+
+func (m mapToV4) ParseInfo(info AlistInfo) (AlistInfo, error) {
+	return info, nil
+}
+
+func (m mapToV4) ParseData(jsonBytes []byte) (interface{}, error) {
+	var listData TypeV4
+	err := json.Unmarshal(jsonBytes, &listData)
+	if err != nil {
+		err = errors.New(i18n.ValidationErrorListV4)
+	}
+	return listData, err
+}
+
+func (m mapToV4) Enrich(aList Alist) Alist {
+	return aList
 }

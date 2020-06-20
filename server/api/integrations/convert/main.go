@@ -23,7 +23,7 @@ func main() {
 	check(err)
 	rawStrings := string(data)
 	rows := strings.Split(rawStrings, "\n")
-	var aList *alist.Alist
+	var aList alist.Alist
 
 	switch *listType {
 	case alist.FromToList:
@@ -39,7 +39,7 @@ func main() {
 	fmt.Println(string(jsonBytes))
 }
 
-func parseTypeV1(rows []string) *alist.Alist {
+func parseTypeV1(rows []string) alist.Alist {
 	aList := alist.NewTypeV1()
 	data := aList.Data.(alist.TypeV1)
 
@@ -55,7 +55,7 @@ func parseTypeV1(rows []string) *alist.Alist {
 	return aList
 }
 
-func parseTypeV2(rows []string) *alist.Alist {
+func parseTypeV2(rows []string) alist.Alist {
 	aList := alist.NewTypeV2()
 	data := aList.Data.(alist.TypeV2)
 

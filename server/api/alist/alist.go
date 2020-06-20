@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 )
@@ -59,6 +58,13 @@ type Alist struct {
 	Data interface{} `json:"data"`
 }
 
+type AlistTypeMarshalJSON interface {
+	ParseInfo(info AlistInfo) (AlistInfo, error)
+	ParseData([]byte) (interface{}, error)
+	Enrich(Alist) Alist
+	Validate(Alist) error
+}
+
 // MarshalJSON convert alist into json
 func (a Alist) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
@@ -89,6 +95,11 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	if raw["data"] == nil {
+		err = errors.New("Failed to pass list. Data is missing.")
+		return err
+	}
+
 	jsonBytes, _ = json.Marshal(raw["info"])
 	aList.Info, err = parseAlistInfo(jsonBytes)
 	if err != nil {
@@ -101,54 +112,28 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	var mapper AlistTypeMarshalJSON
 	switch aList.Info.ListType {
 	case SimpleList:
-		aList.Info, err = parseInfoV1(aList.Info)
-		if err != nil {
-			err = errors.New(i18n.ValidationErrorListV1)
-			return err
-		}
+		mapper = NewMapToV1()
 	case FromToList:
+		mapper = NewMapToV2()
 		break
 	case Concept2:
+		mapper = NewMapToV3()
 		break
 	case ContentAndUrl:
+		mapper = NewMapToV4()
 		break
 	}
 
-	if raw["data"] == nil {
-		err = errors.New("Failed to pass list. Data is missing.")
-		return err
-	}
+	aList.Info, _ = mapper.ParseInfo(aList.Info)
 
 	jsonBytes, _ = json.Marshal(raw["data"])
-	switch aList.Info.ListType {
-	case SimpleList:
-		aList.Data, err = parseTypeV1(jsonBytes)
-		if err != nil {
-			err = errors.New(i18n.ValidationErrorListV1)
-			return err
-		}
-	case FromToList:
-		aList.Data, err = parseTypeV2(jsonBytes)
-		if err != nil {
-			err = errors.New(i18n.ValidationErrorListV2)
-			return err
-		}
-	case Concept2:
-		aList.Data, err = ParseTypeV3(jsonBytes)
-		if err != nil {
-			err = errors.New(i18n.ValidationErrorListV3)
-			return err
-		}
-		// TODO This is ugly
-		*aList = enrichTypeV3(*aList)
-	case ContentAndUrl:
-		aList.Data, err = parseTypeV4(jsonBytes)
-		if err != nil {
-			err = errors.New(i18n.ValidationErrorListV4)
-			return err
-		}
+	aList.Data, err = mapper.ParseData(jsonBytes)
+	if err != nil {
+		return err
 	}
+	*aList = mapper.Enrich(*aList)
 	return nil
 }
