@@ -33,8 +33,7 @@
 </script>
 
 <style>
-  @import "../../../hugo/assets/css/base-v1.css";
-  @import "tachyons";
+  @import "../../all.css";
 </style>
 
 <svelte:options tag={null} />

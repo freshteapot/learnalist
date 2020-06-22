@@ -110,7 +110,8 @@
 </script>
 
 <style>
-  @import "tachyons";
+  @import "../../../../all.css";
+
   .notfound {
     border: 4px solid #ff725c;
     border-radius: 2px;
