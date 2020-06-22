@@ -153,3 +153,8 @@ kill -9 $(lsof -ti tcp:5000)
 
 unset SSH_SERVER
 ```
+
+Remove any tunnels
+```sh
+ps  | grep 'ssh ' | grep 'learnalist.net' | cut -d' ' -f1 | xargs kill -9
+```
