@@ -68,7 +68,7 @@
 </script>
 
 <style>
-  @import "tachyons";
+  @import "../../../../all.css";
 </style>
 
 <svelte:window on:keydown={handleKeydown} />

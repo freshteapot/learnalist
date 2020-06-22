@@ -73,7 +73,7 @@
 </script>
 
 <style>
-  @import "tachyons";
+  @import "../../../../all.css";
 </style>
 
 <svelte:options tag={null} accessors={true} />

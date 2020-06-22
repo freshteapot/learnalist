@@ -23,7 +23,7 @@
 </script>
 
 <style>
-  @import "tachyons";
+  @import "../../../all.css";
   .error {
     background-color: #ffdfdf;
   }
