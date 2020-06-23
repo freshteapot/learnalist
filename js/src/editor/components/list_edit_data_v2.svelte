@@ -1,28 +1,3 @@
-<style>
-  input:disabled {
-    background: #ffcccc;
-    color: #333;
-  }
-
-  .container {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-  }
-
-  .item-container {
-    display: flex;
-  }
-
-  .item-container .item {
-  }
-
-  .item-container .item-left {
-    flex-grow: 1; /* Set the middle element to grow and stretch */
-    margin-right: 0.5em;
-  }
-</style>
-
 <script>
   import { copyObject, isDeviceMobile } from "../lib/helper.js";
   import { tap } from "@sveltejs/gestures";
@@ -153,35 +128,58 @@
   }
 </script>
 
+<style>
+  input:disabled {
+    background: #ffcccc;
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .item-container {
+    display: flex;
+  }
+
+  .item-container .item {
+  }
+
+  .item-container .item-left {
+    flex-grow: 1; /* Set the middle element to grow and stretch */
+    margin-right: 0.5em;
+  }
+</style>
+
 <h1>Items</h1>
 
-<div bind:this="{itemsContainer}">
+<div bind:this={itemsContainer}>
   {#if !enableSortable}
     {#each listData as listItem}
       <div class="item-container pv2 bb b--black-05">
         <div class="flex flex-column item-left">
           <input
             placeholder="from"
-            bind:value="{listItem.from}"
-            class="item item-left"
-          />
+            bind:value={listItem.from}
+            class="item item-left" />
           <input
             placeholder="to"
-            bind:value="{listItem.to}"
-            class="item item-left"
-          />
+            bind:value={listItem.to}
+            class="item item-left" />
         </div>
         <div class="flex flex-column">
-          <button on:click="{() => remove(listItem)}" class="item">x</button>
+          <button on:click={() => remove(listItem)} class="item">x</button>
         </div>
       </div>
     {/each}
 
-    <button on:click="{add}">New</button>
+    <button on:click={add}>New</button>
 
-    <button on:click="{removeAll}">Remove all</button>
+    <button on:click={removeAll}>Remove all</button>
 
-    <button on:click="{toggleSortable}">Change Order</button>
+    <button on:click={toggleSortable}>Change Order</button>
   {/if}
 
   {#if enableSortable}
@@ -189,29 +187,26 @@
       <div
         draggable="true"
         class="dropzone item-container"
-        data-index="{pos}"
-        on:dragstart="{dragstart}"
-        on:dragover="{dragover}"
-        on:drop="{drop}"
+        data-index={pos}
+        on:dragstart={dragstart}
+        on:dragover={dragover}
+        on:drop={drop}
         use:tap
-        on:tap="{tapHandler}"
-      >
+        on:tap={tapHandler}>
         <input
           placeholder="from"
           class="item item-left"
-          value="{listItem.from}"
-          disabled
-        />
+          value={listItem.from}
+          disabled />
         <input
           placeholder="to"
           class="item item-left"
-          value="{listItem.to}"
-          disabled
-        />
+          value={listItem.to}
+          disabled />
       </div>
     {/each}
 
-    <button on:click="{toggleSortable}">
+    <button on:click={toggleSortable}>
       Finished ordering? ({orderHelperText})
     </button>
   {/if}
