@@ -1,5 +1,7 @@
 <script>
   import { push } from "svelte-spa-router";
+  import { tap } from "@sveltejs/gestures";
+
   // {DomElement}
   export let listElement;
   // {DomElement}
@@ -65,13 +67,34 @@
         break;
     }
   }
+
+  function tapHandler(event) {
+    event.preventDefault();
+    const margin = 150;
+    const width = event.target.innerWidth; // window
+    const pageX = event.detail.x; // event.pageX when touchstart
+    const left = 0 + pageX < margin;
+    const right = width - margin < pageX;
+
+    if (left) {
+      backward(event);
+      return;
+    }
+
+    if (right) {
+      forward(event);
+      return;
+    }
+
+    return;
+  }
 </script>
 
 <style>
   @import "../../../../all.css";
 </style>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} use:tap on:tap={tapHandler} />
 <svelte:options tag={null} accessors={true} />
 <article>
   <header>
