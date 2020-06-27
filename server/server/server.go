@@ -29,6 +29,13 @@ func Init(_config Config) {
 	server.Use(middleware.RequestID())
 
 	server.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		/*
+			// TODO add Skipper for SSE
+			Skipper: func(c echo.Context) bool {
+				accept := c.Request().Header.Get("Accept")
+				return strings.HasSuffix(accept, "text/event-stream")
+			},
+		*/
 		Level: 9,
 	}))
 

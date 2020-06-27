@@ -20,9 +20,11 @@
             {{- end -}}
             {{- if in $allowed $aList.info.type -}}
             <h2>Data</h2>
-            {{- $name := printf "alist/%s/data.html" $aList.info.type -}}
-            {{ partial $name $aList }}
-            {{- end -}}
+            <div id="list-data">
+                {{- $name := printf "alist/%s/data.html" $aList.info.type -}}
+                {{ partial $name $aList }}
+                {{- end -}}
+            </div>
         </article>
         {{- with $aList.info.interact -}}
         {{- if in $interactAllowed $aList.info.type -}}

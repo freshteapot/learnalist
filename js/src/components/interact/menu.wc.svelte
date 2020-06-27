@@ -9,6 +9,16 @@
   function showTotalRecall(event) {
     window.location.hash = "#/play/total_recall";
   }
+
+  function showSpacedRepetition(event) {
+    const goto = "#/interact/spaced_repetition";
+    if (window.location.hash !== goto) {
+      window.location.hash = goto;
+      return;
+    }
+
+    window.location.hash = "#/";
+  }
 </script>
 
 <style>
@@ -23,3 +33,5 @@
 {#if totalrecall == '1'}
   <button class="br3" on:click={showTotalRecall}>Total Recall</button>
 {/if}
+
+<button class="br3" on:click={showSpacedRepetition}>🧠 + 💪</button>

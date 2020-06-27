@@ -1,9 +1,10 @@
 {
- "v4": "/css/v4.dev.css",
+ "v2": "/css/v2.dev.css",
+ "editor": "/css/editor.dev.css",
  "shared": "/css/shared.dev.css",
+ "v4": "/css/v4.dev.css",
  "v3": "/css/v3.dev.css",
  "main": "/css/main.dev.css",
  "v1": "/css/v1.dev.css",
- "v2": "/css/v2.dev.css",
- "editor": "/css/editor.dev.css"
+ "srs": "/css/srs.dev.css"
 }

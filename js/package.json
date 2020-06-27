@@ -13,8 +13,9 @@
     "dev:js:alist:v2": "rollup -c rollup.config.alist.v2.js -w",
     "dev:js:alist:v3": "rollup -c rollup.config.alist.v3.js -w",
     "dev:js:alist:v4": "rollup -c rollup.config.alist.v4.js -w",
+    "dev:js:alist:srs": "rollup -c rollup.config.alist.srs.js -w",
     "dev:js:alist:editor": "rollup -c rollup.config.alist.editor.js -w",
-    "dev:js:components": "concurrently 'npm run dev:js:shared' 'npm run dev:js:user' 'npm run dev:js:alist:v1' 'npm run dev:js:alist:v2' 'npm run dev:js:alist:v3' 'npm run dev:js:alist:v4' 'npm run dev:js:alist:editor'",
+    "dev:js:components": "concurrently 'npm run dev:js:shared' 'npm run dev:js:user' 'npm run dev:js:alist:v1' 'npm run dev:js:alist:v2' 'npm run dev:js:alist:v3' 'npm run dev:js:alist:v4' 'npm run dev:js:alist:srs' 'npm run dev:js:alist:editor'",
     "dev": "concurrently \"npm run dev:hugo\" \"npm run dev:js:components\" \"npm run dev:api-server\"",
     "build:hugo": "cd ../hugo && hugo",
     "build:js:shared": "rollup -c rollup.config.store.js",
@@ -24,7 +25,8 @@
     "build:js:alist:v2": "rollup -c rollup.config.alist.v2.js",
     "build:js:alist:v3": "rollup -c rollup.config.alist.v3.js",
     "build:js:alist:v4": "rollup -c rollup.config.alist.v4.js",
-    "build:js:components": "npm run build:js:user && npm run build:js:shared && npm run build:js:alist:v1 && npm run build:js:alist:v2 && npm run build:js:alist:v3 && npm run build:js:alist:v4 && npm run build:js:alist:editor",
+    "build:js:alist:srs": "rollup -c rollup.config.alist.srs.js",
+    "build:js:components": "npm run build:js:user && npm run build:js:shared && npm run build:js:alist:v1 && npm run build:js:alist:v2 && npm run build:js:alist:v3 && npm run build:js:alist:v4 && npm run build:js:alist:srs && npm run build:js:alist:editor",
     "build": "npm run build:js:components && npm run build:hugo"
   },
   "devDependencies": {

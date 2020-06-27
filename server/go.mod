@@ -19,6 +19,7 @@ require (
 	github.com/onsi/ginkgo v1.10.2
 	github.com/onsi/gomega v1.7.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
+	github.com/r3labs/sse v0.0.0-20200310095403-ee05428e4d0e
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/satori/go.uuid v1.2.0

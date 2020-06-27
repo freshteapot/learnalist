@@ -1,9 +1,10 @@
 {
- "v2": "/js/v2.dev.js",
  "v3": "/js/v3.dev.js",
  "main": "/js/main.dev.js",
  "v1": "/js/v1.dev.js",
+ "v2": "/js/v2.dev.js",
  "editor": "/js/editor.dev.js",
+ "srs": "/js/srs.dev.js",
  "shared": "/js/shared.dev.js",
  "v4": "/js/v4.dev.js"
 }

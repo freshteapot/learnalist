@@ -1,6 +1,11 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
@@ -11,6 +16,8 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
+	"github.com/r3labs/sse"
 	"github.com/sirupsen/logrus"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
@@ -65,4 +72,82 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	// Oauth
 	v1.GET("/oauth/google/redirect", m.V1OauthGoogleRedirect)
 	v1.GET("/oauth/google/callback", m.V1OauthGoogleCallback)
+
+	v2 := server.Group("/api/v2")
+
+	sseServer := sse.New()
+
+	v2.GET("/reminder/events", sseForEcho(sseServer))
+	streamKey := "hello"
+	sseServer.CreateStream(streamKey)
+
+	type event struct {
+		UUID string    `json:"uuid"`
+		When time.Time `json:"when"`
+	}
+
+	now := time.Now()
+	e := event{UUID: "tine", When: now}
+	b, _ := json.Marshal(e)
+	sseServer.Publish(streamKey, &sse.Event{
+		Data: b,
+	})
+
+	//time.Sleep(2000 * time.Millisecond)
+
+	e = event{UUID: "tine1", When: now}
+	b, _ = json.Marshal(e)
+	sseServer.Publish(streamKey, &sse.Event{
+		Data: b,
+	})
+
+	server.Router().Add("GET", "/spaced-repetition", echo.WrapHandler(http.HandlerFunc(hello)))
+}
+
+func sseForEcho(server *sse.Server) echo.HandlerFunc {
+	th := http.HandlerFunc(server.HTTPHandler)
+	return func(c echo.Context) error {
+		th.ServeHTTP(c.Response().Writer, c.Request())
+		return nil
+	}
+}
+
+/**
+- drillsrs
+- https://github.com/ulangi/ulangi
+- https://github.com/kantord/LibreLingo
+- https://www.supermemo.com/en/archives1990-2015/english/ol/sm2
+
+/spaced-repetition/next
+	-> correct
+		-> correct
+	-> wrong
+		-> correct
+	-> wrong
+-> wrong
+
+/spaced-repetition/add
+	- uuid
+	- payload = list type item
+
+/spaced-repetition/remove ->
+	- uuid
+
+/spaced-repetition/list
+
+# Thoughts
+- can I use aList?
+- should I use aList?
+- What value is there in storing the list via hugo
+```
+{
+	"payload": {},
+	"settings": {},
+	"uuid": ""
+}
+```
+*/
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Hello motto!")
 }
