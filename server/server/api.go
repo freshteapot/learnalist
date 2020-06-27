@@ -13,6 +13,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
@@ -73,11 +74,13 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	v1.GET("/oauth/google/redirect", m.V1OauthGoogleRedirect)
 	v1.GET("/oauth/google/callback", m.V1OauthGoogleCallback)
 
-	v2 := server.Group("/api/v2")
-
+	srs := server.Group("/api/v1/spaced-repetition")
+	srs.Use(authenticate.Auth(authConfig))
 	sseServer := sse.New()
+	srsServer := spaced_repetition.NewService(db)
+	srsServer.Endpoints(srs)
+	srs.GET("/events", sseForEcho(sseServer))
 
-	v2.GET("/reminder/events", sseForEcho(sseServer))
 	streamKey := "hello"
 	sseServer.CreateStream(streamKey)
 
@@ -100,8 +103,6 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	sseServer.Publish(streamKey, &sse.Event{
 		Data: b,
 	})
-
-	server.Router().Add("GET", "/spaced-repetition", echo.WrapHandler(http.HandlerFunc(hello)))
 }
 
 func sseForEcho(server *sse.Server) echo.HandlerFunc {
@@ -149,5 +150,6 @@ func sseForEcho(server *sse.Server) echo.HandlerFunc {
 */
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Hello motto!")
+	method := r.Method
+	fmt.Fprintf(w, "url is %s method is %s", r.RequestURI, method)
 }

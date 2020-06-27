@@ -2,6 +2,8 @@
   import { loggedIn } from "../store.js";
   export let loginurl = "/login.html";
 
+  // TODO bring this to life
+  let hasSpacedRepetition = true;
   function preLogout() {
     localStorage.clear();
     console.log("It should still click");
@@ -16,6 +18,15 @@
 
 <div class="fr mt0">
   {#if loggedIn()}
+    {#if hasSpacedRepetition}
+      <a
+        title="You have something to learn."
+        href="/design/spaced-repetition"
+        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
+        <button class="br3">🧠 + 💪</button>
+      </a>
+    {/if}
+
     <a
       title="create, edit, share"
       href="/editor.html"

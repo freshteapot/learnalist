@@ -1,3 +1,5 @@
+const lockfile = require('proper-lockfile');
+
 const fs = require('fs-extra')
 const del = require('del');
 
@@ -43,14 +45,38 @@ const getComponentInfo = (componentKey, dev) => {
 }
 
 const write = async (manifestFile, key, value) => {
+    const retryOptions = {
+        retries: {
+            retries: 5,
+            factor: 3,
+            minTimeout: 1 * 1000,
+            maxTimeout: 60 * 1000,
+            randomize: true,
+        }
+    };
     let newManifest = {
         [key]: value
     };
+
+    let file;
+    let cleanup;
+    try {
+        file = '/var/tmp/file.txt';
+        await fs.ensureFile(file); // fs-extra creates file if needed
+    } catch (err) {
+        console.log(err);
+        return;
+    }
+
+    cleanup = await lockfile.lock(file, retryOptions);
 
     try {
         await fs.ensureFile(manifestFile)
     } catch (err) {
         // skip error
+        console.log(err);
+        cleanup();
+        return
     }
 
 
@@ -60,6 +86,9 @@ const write = async (manifestFile, key, value) => {
         newManifest = { ...manifest, ...newManifest }
     } catch (err) {
         // skip error
+        console.log(err);
+        cleanup();
+        return
     }
 
     try {
@@ -67,8 +96,13 @@ const write = async (manifestFile, key, value) => {
         console.log('success!')
     } catch (err) {
         console.log('failed to update manifest!')
-        // skip erro
+        console.log(err);
+        // skip error
+        cleanup();
+        return
     }
+
+    cleanup();
 }
 
 const syncManifest = async (componentInfo) => {
