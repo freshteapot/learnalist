@@ -1,19 +1,18 @@
 <script>
   import { push } from "svelte-spa-router";
-  import { onMount, onDestroy } from "svelte";
+  import { createEventDispatcher, onMount, onDestroy } from "svelte";
 
-  export let params;
-  let aList = JSON.parse(document.querySelector("#play-data").innerHTML);
-  let listElement = document.querySelector("#list-info");
-  let listDataElement = document.querySelector("#list-data");
-  let playElement = document.querySelector("#play");
-  let data;
+  const dispatch = createEventDispatcher();
+  const close = () => dispatch("close");
 
-  //listElement.style.display = "none";
-  playElement.style.display = "";
+  export let aList;
+  export let listDataElement;
+  export let playElement;
+  export let show;
 
   onMount(() => {
     listDataElement.addEventListener("click", handler);
+    playElement.style.display = "";
   });
 
   onDestroy(() => {
@@ -23,23 +22,17 @@
 
   function handler(event) {
     const index = event.target.getAttribute("data-index");
-    data = aList.data[index];
-  }
+    if (!index) {
+      return;
+    }
 
-  function add(event) {
-    console.log("Add item to spaced based learning");
-    // TODO maybe make a hash out of "show", to lookup to see if unique?
-    const input = {
-      show: data,
-      data: data,
-      kind: aList.info.type
-    };
-    console.log(input);
-    console.log("Send to server for enhanced learning");
+    dispatch("edit", {
+      data: aList.data[index]
+    });
   }
 
   function handleClose(event) {
-    data = null;
+    dispatch("close");
   }
 </script>
 
@@ -68,20 +61,15 @@
     border-radius: 0.2em;
     background: white;
   }
-
-  button {
-    display: block;
-  }
 </style>
 
 <svelte:options tag={null} accessors={true} />
-{#if data}
+{#if show}
   <div class="modal-background" on:click={handleClose} />
 
   <div class="modal" role="dialog" aria-modal="true">
-    <pre>{JSON.stringify(data, '', 2)}</pre>
-
-    <button class="br3" on:click={add}>Add</button>
-    <button class="br3" on:click={handleClose}>close modal</button>
+    <slot />
+    <button class="br3" on:click={() => dispatch('add')}>Add</button>
+    <button class="br3" on:click={handleClose}>cancel</button>
   </div>
 {/if}
