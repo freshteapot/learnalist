@@ -1,5 +1,5 @@
 
-
+# Add V1
 ```sh
 curl -XPOST -H "Content-Type: application/json"  'http://localhost:1234/api/v1/spaced-repetition/' -u'iamchris:test123' -d '
 {
@@ -10,6 +10,7 @@ curl -XPOST -H "Content-Type: application/json"  'http://localhost:1234/api/v1/s
 '
 ```
 
+# Add V2
 ```sh
 curl -XPOST -H "Content-Type: application/json"  'http://localhost:1234/api/v1/spaced-repetition/' -u'iamchris:test123' -d '
 {
@@ -27,7 +28,28 @@ curl -XPOST -H "Content-Type: application/json"  'http://localhost:1234/api/v1/s
 ```
 
 
-curl -XDELETE 'http://localhost:1234/api/v1/spaced-repetition/75698c0f5a7b904f1799ceb68e2afe67ad987689' -u'iamchris:test123'
+# Delete BY UUID
+```sh
+curl -XDELETE 'http://localhost:1234/api/v1/spaced-repetition/ba9277fc4c6190fb875ad8f9cee848dba699937f' -u'iamchris:test123'
+```
 
-
+# Get Next item to learn
+```sh
 curl -XGET 'http://localhost:1234/api/v1/spaced-repetition/next' -u'iamchris:test123'
+```
+
+# Get All
+```sh
+curl -XGET 'http://localhost:1234/api/v1/spaced-repetition/all' -u'iamchris:test123'
+```
+
+
+# Item was viewedx
+```sh
+curl -XPOST -H "Content-Type: application/json"  'http://localhost:1234/api/v1/spaced-repetition/viewed' -u'iamchris:test123' -d '
+{
+  "uuid": "75698c0f5a7b904f1799ceb68e2afe67ad987689",
+  "action": "decr"
+}
+'
+```

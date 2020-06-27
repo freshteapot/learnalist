@@ -1,12 +1,10 @@
 package spaced_repetition
 
 import (
-	"crypto/sha1"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
@@ -28,6 +26,7 @@ func (s service) Endpoints(group *echo.Group) {
 	group.GET("/all", s.GetAll)
 	group.DELETE("/:uuid", s.DeleteItem)
 	group.POST("/", s.SaveItem)
+	group.POST("/viewed", s.ItemViewed)
 }
 
 func (s service) SaveItem(c echo.Context) error {
@@ -46,54 +45,26 @@ func (s service) SaveItem(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	var (
-		hash     string
-		b        []byte
-		whenNext time.Time
-	)
+	var entry ItemInput
 
 	if what.Kind == "v1" {
-		var input HttpRequestInputV1
-		json.Unmarshal(raw, &input)
-		input.Settings.Level = Level_0
-		whenNext = time.Now().Add(time.Hour * 1).UTC()
-		b, _ = json.Marshal(input.Data)
-		hash = fmt.Sprintf("%x", sha1.Sum(b))
-		input.UUID = hash
-		input.Settings.WhenNext = whenNext.Format(time.RFC3339)
-		b, _ = json.Marshal(input)
+		entry = V1FromPOST(raw)
 	}
 
 	if what.Kind == "v2" {
-		var input HttpRequestInputV2
-		json.Unmarshal(raw, &input)
-		input.Settings.Level = Level_0
-		whenNext = time.Now().Add(time.Hour * 1).UTC()
-		b, _ = json.Marshal(input.Data)
-		hash = fmt.Sprintf("%x", sha1.Sum(b))
-		input.UUID = hash
-		input.Settings.WhenNext = whenNext.Format(time.RFC3339)
-		b, _ = json.Marshal(input)
+		entry = V2FromPOST(raw)
 	}
 
 	item := SpacedRepetitionItem{
 		UserUUID: user.Uuid,
-		UUID:     hash,
-		Body:     string(b),
-		WhenNext: whenNext,
+		UUID:     entry.UUID(),
+		Body:     entry.String(),
+		WhenNext: entry.WhenNext(),
 	}
 
-	_, err := s.db.Exec(SQL_SAVE_ITEM, item.UUID, item.Body, item.UserUUID, item.WhenNext)
+	_, err := s.db.Exec(SQL_SAVE_ITEM, item.UUID, item.Body, item.UserUUID, item.WhenNext, item.Body, item.WhenNext)
 	fmt.Println(err)
-	// Write to db
-	/*
-		uuid = hash of data
-		user_uuid,
-		body,
-		when
 
-		unique index = (uuid, user_hash)
-	*/
 	response := api.HttpResponseMessage{
 		Message: "TODO",
 	}
@@ -162,4 +133,64 @@ func (s service) GetAll(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, items)
+}
+
+func (s service) ItemViewed(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+
+	// Lookup uuid
+
+	defer c.Request().Body.Close()
+
+	var input HttpRequestViewed
+	json.NewDecoder(c.Request().Body).Decode(&input)
+
+	item := SpacedRepetitionItem{}
+	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
+	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.NoContent(http.StatusNotFound)
+		}
+
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	// hmm maybe add kind to the table
+
+	var what HttpRequestInputKind
+	json.Unmarshal([]byte(item.Body), &what)
+
+	var entry ItemInput
+	if what.Kind == "v1" {
+		entry = V1FromDB(item.Body)
+	}
+
+	if what.Kind == "v2" {
+		entry = V2FromDB(item.Body)
+	}
+
+	// increment level
+	// increment threshold
+	if input.Action == "incr" {
+		entry.IncrThreshold()
+	}
+
+	if input.Action == "decr" {
+		entry.DecrThreshold()
+	}
+
+	item.Body = entry.String()
+	item.WhenNext = entry.WhenNext()
+	fmt.Println(item.WhenNext)
+	// save to db
+	_, err = s.db.Exec(SQL_SAVE_ITEM, item.UUID, item.Body, item.UserUUID, item.WhenNext, item.Body, item.WhenNext)
+	fmt.Println(err)
+
+	response := api.HttpResponseMessage{
+		Message: "TODO",
+	}
+	return c.JSON(http.StatusOK, response)
 }
