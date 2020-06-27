@@ -2,12 +2,14 @@ package spaced_repetition
 
 import (
 	"crypto/sha1"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/jmoiron/sqlx"
@@ -22,7 +24,8 @@ func NewService(db *sqlx.DB) service {
 
 func (s service) Endpoints(group *echo.Group) {
 	group.GET("/next", s.GetNext)
-	group.GET("/list", s.GetAll)
+	group.GET("/list", s.GetAll) // I wonder if list or all is better
+	group.GET("/all", s.GetAll)
 	group.DELETE("/:uuid", s.DeleteItem)
 	group.POST("/", s.SaveItem)
 }
@@ -33,18 +36,45 @@ func (s service) SaveItem(c echo.Context) error {
 
 	defer c.Request().Body.Close()
 
-	var input HttpRequestInput
-	json.NewDecoder(c.Request().Body).Decode(&input)
+	var temp interface{}
+	json.NewDecoder(c.Request().Body).Decode(&temp)
+	raw, _ := json.Marshal(temp)
 
-	// Set level
-	input.Settings.Level = Level_0
-	b, _ := json.Marshal(input.Data)
-	hash := fmt.Sprintf("%x", sha1.Sum(b))
+	var what HttpRequestInputKind
+	json.Unmarshal(raw, &what)
+	if !utils.StringArrayContains([]string{"v1", "v2"}, what.Kind) {
+		return c.NoContent(http.StatusBadRequest)
+	}
 
-	// Based on level
-	whenNext := time.Now().Add(time.Hour * 1).UTC()
-	input.Settings.WhenNext = whenNext.Format(time.RFC3339)
-	b, _ = json.Marshal(input)
+	var (
+		hash     string
+		b        []byte
+		whenNext time.Time
+	)
+
+	if what.Kind == "v1" {
+		var input HttpRequestInputV1
+		json.Unmarshal(raw, &input)
+		input.Settings.Level = Level_0
+		whenNext = time.Now().Add(time.Hour * 1).UTC()
+		b, _ = json.Marshal(input.Data)
+		hash = fmt.Sprintf("%x", sha1.Sum(b))
+		input.UUID = hash
+		input.Settings.WhenNext = whenNext.Format(time.RFC3339)
+		b, _ = json.Marshal(input)
+	}
+
+	if what.Kind == "v2" {
+		var input HttpRequestInputV2
+		json.Unmarshal(raw, &input)
+		input.Settings.Level = Level_0
+		whenNext = time.Now().Add(time.Hour * 1).UTC()
+		b, _ = json.Marshal(input.Data)
+		hash = fmt.Sprintf("%x", sha1.Sum(b))
+		input.UUID = hash
+		input.Settings.WhenNext = whenNext.Format(time.RFC3339)
+		b, _ = json.Marshal(input)
+	}
 
 	item := SpacedRepetitionItem{
 		UserUUID: user.Uuid,
@@ -92,18 +122,44 @@ func (s service) DeleteItem(c echo.Context) error {
 
 func (s service) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	fmt.Println(user)
-	response := api.HttpResponseMessage{
-		Message: "TODO",
+	item := SpacedRepetitionItem{}
+	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
+	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.NoContent(http.StatusNoContent)
+		}
+
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	var body interface{}
+	json.Unmarshal([]byte(item.Body), &body)
+	return c.JSON(http.StatusOK, body)
 }
 
 func (s service) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	fmt.Println(user)
-	response := api.HttpResponseMessage{
-		Message: "TODO",
+	items := make([]interface{}, 0)
+	dbItems := make([]string, 0)
+	err := s.db.Select(&dbItems, SQL_GET_ALL, user.Uuid)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.NoContent(http.StatusNoContent)
+		}
+
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	for _, item := range dbItems {
+		var body interface{}
+		json.Unmarshal([]byte(item), &body)
+		items = append(items, body)
+	}
+
+	return c.JSON(http.StatusOK, items)
 }
