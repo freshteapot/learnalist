@@ -27,7 +27,7 @@
 </script>
 
 <style>
-  @import "tachyons";
+  @import "../../../../all.css";
 </style>
 
 <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">

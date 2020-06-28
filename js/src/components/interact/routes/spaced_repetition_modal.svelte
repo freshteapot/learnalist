@@ -10,14 +10,17 @@
   export let playElement;
   export let show;
 
+  let listTitleElement = document.querySelector("#list-title");
   onMount(() => {
     listDataElement.addEventListener("click", handler);
     playElement.style.display = "";
+    listTitleElement.innerHTML = "Click below to add";
   });
 
   onDestroy(() => {
     listDataElement.removeEventListener("click", handler);
     playElement.style.display = "none";
+    listTitleElement.innerHTML = "Data";
   });
 
   function handler(event) {

@@ -1,9 +1,11 @@
 <script>
   import Modal from "./spaced_repetition_modal.svelte";
+  import { addEntry } from "../../spaced-repetition/api.js";
 
   let aList = JSON.parse(document.querySelector("#play-data").innerHTML);
   let listDataElement = document.querySelector("#list-data");
   let playElement = document.querySelector("#play");
+
   let data;
   let show = false;
   function edit(event) {
@@ -16,7 +18,7 @@
     show = false;
   }
 
-  function add(event) {
+  async function add(event) {
     console.log("Add item to spaced based learning");
     // TODO maybe make a hash out of "show", to lookup to see if unique?
     const input = {
@@ -24,8 +26,13 @@
       data: data,
       kind: aList.info.type
     };
-    console.log(input);
-    console.log("Send to server for enhanced learning");
+    const response = await addEntry(input);
+
+    if (response.status !== 200) {
+      console.log("failed to add for spaced learning");
+      console.log(response);
+      return;
+    }
 
     close();
   }

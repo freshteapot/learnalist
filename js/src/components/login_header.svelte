@@ -30,14 +30,22 @@
       hasSpacedRepetition = true;
     }
 
+    // How to handle when
+    // The user has no spaced learning vs not ready
     if (response.status == 204) {
       console.log("nothing to see");
     }
   }
 
-  poller = setInterval(function() {
-    checkForSpacedRepetition();
-  }, 5000);
+  // TODO how to make this run straight away then every 1 minute
+  async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
+    await checkForSpacedRepetition();
+    poller = setInterval(function() {
+      checkForSpacedRepetition();
+    }, 60 * 1000);
+  }
+
+  checkForSpacedRepetitionStraightAwayThenPeriodically();
 </script>
 
 <style>

@@ -37,7 +37,27 @@ async function viewed(uuid) {
 
     return res.status;
 }
+
+async function addEntry(input) {
+    const url = getServer() + "/api/v1/spaced-repetition/";
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input)
+    });
+
+    let response = {
+        status: res.status,
+        body: await res.json(),
+    };
+
+    return response;
+}
+
 export {
     getNext,
     viewed,
+    addEntry,
 };

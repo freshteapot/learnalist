@@ -5,6 +5,9 @@
   let show;
   let data;
 
+  let listElement = document.querySelector("#list-info");
+  let playElement = document.querySelector("#play");
+
   function flipIt() {
     if (show) {
       show = false;
@@ -36,12 +39,27 @@
       // show nothing to see
       return;
     }
+
     // TODO
     state = "loading";
     data = null;
   }
 
   get();
+
+  function showInfo(state) {
+    console.log("showInfo", state);
+    if (state !== "nothing-to-see") {
+      listElement.style.display = "none";
+      playElement.style.display = "";
+      return;
+    }
+
+    listElement.style.display = "";
+    playElement.style.display = "none";
+  }
+
+  $: showInfo(state);
 </script>
 
 <style>
