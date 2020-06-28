@@ -59,7 +59,7 @@
     {#if hasSpacedRepetition}
       <a
         title="You have something to learn."
-        href="/design/spaced-repetition"
+        href="/spaced-repetition.html"
         class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
         <button class="br3">🧠 + 💪</button>
       </a>

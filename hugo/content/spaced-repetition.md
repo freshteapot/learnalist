@@ -1,6 +1,6 @@
 ---
 title: "Spaced Repetition"
-url: /design/spaced-repetition
+url: /spaced-repetition.html
 type: alist
 layout: spaced-repetition
 js_include: ["main", "srs"]
