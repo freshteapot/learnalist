@@ -1,5 +1,5 @@
 
-import SpacedRepetition from "./components/spaced-repetition/sample.svelte";
+import SpacedRepetition from "./components/spaced-repetition/view.svelte";
 
 // Actual app to handle the interactions
 let app;

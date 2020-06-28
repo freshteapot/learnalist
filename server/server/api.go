@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -77,12 +78,28 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	srs := server.Group("/api/v1/spaced-repetition")
 	srs.Use(authenticate.Auth(authConfig))
 	sseServer := sse.New()
+
+	sseServer.AutoReplay = false
 	srsServer := spaced_repetition.NewService(db)
 	srsServer.Endpoints(srs)
-	srs.GET("/events", sseForEcho(sseServer))
+	srs.GET("/events", sseForEcho(sseServer), echoExampleMiddleware, echo.WrapMiddleware(exampleMiddleware))
+
+	// Lets come back to server side events and fake it for now
+	//events := make(chan *sse.Event)
+	// client := sse.NewClient("/api/v1/spaced-repetition/events")
+
+	// TODO change to 1m
+	// TODO how to get active users
+	// Possible help https://github.com/ReneKroon/ttlcache
+	//_cron.AddFunc("@every 1s", srsServer.CheckForNewItems)
 
 	streamKey := "hello"
+	// I wonder how light this is?
 	sseServer.CreateStream(streamKey)
+
+	for index, _ := range sseServer.Streams {
+		fmt.Println(index)
+	}
 
 	type event struct {
 		UUID string    `json:"uuid"`
@@ -113,43 +130,19 @@ func sseForEcho(server *sse.Server) echo.HandlerFunc {
 	}
 }
 
-/**
-- drillsrs
-- https://github.com/ulangi/ulangi
-- https://github.com/kantord/LibreLingo
-- https://www.supermemo.com/en/archives1990-2015/english/ol/sm2
-
-/spaced-repetition/next
-	-> correct
-		-> correct
-	-> wrong
-		-> correct
-	-> wrong
--> wrong
-
-/spaced-repetition/add
-	- uuid
-	- payload = list type item
-
-/spaced-repetition/remove ->
-	- uuid
-
-/spaced-repetition/list
-
-# Thoughts
-- can I use aList?
-- should I use aList?
-- What value is there in storing the list via hugo
-```
-{
-	"payload": {},
-	"settings": {},
-	"uuid": ""
+func exampleMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Could capture active users here
+		fmt.Println("Hello wrapped")
+		next.ServeHTTP(w, r)
+	})
 }
-```
-*/
-func hello(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	method := r.Method
-	fmt.Fprintf(w, "url is %s method is %s", r.RequestURI, method)
+
+func echoExampleMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		fmt.Println("Hello echo")
+		user := c.Get("loggedInUser").(uuid.User)
+		fmt.Println(user.Uuid)
+		return next(c)
+	}
 }

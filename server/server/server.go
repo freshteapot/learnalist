@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/robfig/cron/v3"
 )
 
 type Config struct {
@@ -15,7 +16,12 @@ type Config struct {
 }
 
 var server *echo.Echo
+var _cron *cron.Cron
 var config Config
+
+func SetCron(c *cron.Cron) {
+	_cron = c
+}
 
 func Init(_config Config) {
 	// This might not be great todo, as it is a little confusing.

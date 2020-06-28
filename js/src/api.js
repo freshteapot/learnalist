@@ -160,8 +160,10 @@ async function deleteList(uuid) {
   throw new Error('Unexpected response from the server when deleting a list');
 }
 
+
 export {
   getServer,
+  getHeaders,
   getListsByMe,
   getVersion,
   postLogin,

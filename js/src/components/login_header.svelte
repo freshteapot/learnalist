@@ -1,13 +1,43 @@
 <script>
+  import { getNext } from "./spaced-repetition/api.js";
   import { loggedIn } from "../store.js";
   export let loginurl = "/login.html";
 
+  let poller;
+
   // TODO bring this to life
-  let hasSpacedRepetition = true;
+  let hasSpacedRepetition = false;
   function preLogout() {
     localStorage.clear();
     console.log("It should still click");
   }
+
+  async function checkForSpacedRepetition() {
+    if (window.location.pathname.indexOf("/spaced-repetition") !== -1) {
+      clearInterval(poller);
+      return;
+    }
+
+    const response = await getNext();
+
+    if (![200, 204].includes(response.status)) {
+      clearInterval(poller);
+      return;
+    }
+
+    if (response.status == 200) {
+      clearInterval(poller);
+      hasSpacedRepetition = true;
+    }
+
+    if (response.status == 204) {
+      console.log("nothing to see");
+    }
+  }
+
+  poller = setInterval(function() {
+    checkForSpacedRepetition();
+  }, 5000);
 </script>
 
 <style>

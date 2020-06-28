@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
@@ -106,6 +107,10 @@ func (s service) GetNext(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
+	if !time.Now().UTC().After(item.WhenNext) {
+		return c.NoContent(http.StatusNoContent)
+	}
+
 	var body interface{}
 	json.Unmarshal([]byte(item.Body), &body)
 	return c.JSON(http.StatusOK, body)
@@ -194,3 +199,14 @@ func (s service) ItemViewed(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response)
 }
+
+// This is the start of the "magic"
+// Linking the data to active users
+// Make it work
+func (s service) CheckForNewItems() {
+	// Get for all users?
+	//
+	fmt.Println("Check for new items")
+}
+
+//var Events := make(chan *sse.Event)
