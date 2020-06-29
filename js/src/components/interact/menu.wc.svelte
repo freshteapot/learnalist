@@ -11,7 +11,7 @@
   }
 
   function showSpacedRepetition(event) {
-    const goto = "#/interact/spaced_repetition";
+    const goto = "#/interact/spaced_repetition/add";
     if (window.location.hash !== goto) {
       window.location.hash = goto;
       return;

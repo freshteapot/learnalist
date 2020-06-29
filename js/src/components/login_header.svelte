@@ -1,5 +1,5 @@
 <script>
-  import { getNext } from "./spaced-repetition/api.js";
+  import { getNext } from "./interact/spaced_repetition/api.js";
   import { loggedIn } from "../store.js";
   export let loginurl = "/login.html";
 
@@ -13,13 +13,17 @@
   }
 
   async function checkForSpacedRepetition() {
+    if (!loggedIn()) {
+      clearInterval(poller);
+      return;
+    }
+
     if (window.location.pathname.indexOf("/spaced-repetition") !== -1) {
       clearInterval(poller);
       return;
     }
 
     const response = await getNext();
-
     if (![200, 204].includes(response.status)) {
       clearInterval(poller);
       return;

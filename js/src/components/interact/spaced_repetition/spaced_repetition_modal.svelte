@@ -1,4 +1,5 @@
 <script>
+  import { loggedIn } from "../../../store.js";
   import { push } from "svelte-spa-router";
   import { createEventDispatcher, onMount, onDestroy } from "svelte";
 
@@ -8,9 +9,9 @@
   export let aList;
   export let listDataElement;
   export let playElement;
+  export let listTitleElement;
   export let show;
 
-  let listTitleElement = document.querySelector("#list-title");
   onMount(() => {
     listDataElement.addEventListener("click", handler);
     playElement.style.display = "";
@@ -34,8 +35,12 @@
     });
   }
 
-  function handleClose(event) {
+  function handleClose() {
     dispatch("close");
+  }
+
+  function handleLogin() {
+    window.location = "/login.html";
   }
 </script>
 
@@ -67,12 +72,18 @@
 </style>
 
 <svelte:options tag={null} accessors={true} />
+
 {#if show}
   <div class="modal-background" on:click={handleClose} />
 
   <div class="modal" role="dialog" aria-modal="true">
-    <slot />
-    <button class="br3" on:click={() => dispatch('add')}>Add</button>
+    {#if loggedIn()}
+      <slot />
+      <button class="br3" on:click={() => dispatch('add')}>Add</button>
+    {:else}
+      <p>You need to be logged in to use spaced repetition</p>
+      <button class="br3" on:click={handleLogin}>Login</button>
+    {/if}
     <button class="br3" on:click={handleClose}>cancel</button>
   </div>
 {/if}

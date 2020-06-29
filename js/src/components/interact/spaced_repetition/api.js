@@ -1,10 +1,21 @@
 
-import { getServer, getHeaders } from '../../api.js';
+import { getServer, getHeaders } from '../../../api.js';
 
 async function getNext() {
     const url = getServer() + "/api/v1/spaced-repetition/next";
+    let headers;
+    try {
+        headers = getHeaders();
+    } catch (error) {
+        let response = {
+            status: 403,
+            body: {}
+        };
+        return response;
+    }
+
     const res = await fetch(url, {
-        headers: getHeaders()
+        headers: headers
     });
 
     let response = {
