@@ -51,8 +51,6 @@
         break;
     }
   }
-
-  // How to handle when not logged in
 </script>
 
 <style>

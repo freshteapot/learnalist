@@ -5,15 +5,15 @@
 
   let poller;
 
-  // TODO bring this to life
   let hasSpacedRepetition = false;
+  let dontLookup = false;
   function preLogout() {
     localStorage.clear();
     console.log("It should still click");
   }
 
   async function checkForSpacedRepetition() {
-    if (!loggedIn()) {
+    if (!loggedIn() || dontLookup) {
       clearInterval(poller);
       return;
     }
@@ -24,24 +24,25 @@
     }
 
     const response = await getNext();
-    if (![200, 204].includes(response.status)) {
+    if (![200, 204, 404].includes(response.status)) {
       clearInterval(poller);
       return;
     }
 
-    if (response.status == 200) {
-      clearInterval(poller);
-      hasSpacedRepetition = true;
-    }
-
-    // How to handle when
-    // The user has no spaced learning vs not ready
-    if (response.status == 204) {
-      console.log("nothing to see");
+    switch (response.status) {
+      case 200:
+        clearInterval(poller);
+        hasSpacedRepetition = true;
+        break;
+      case 204:
+        console.log("nothing to see");
+        break;
+      case 404:
+        dontLookup = true;
+        break;
     }
   }
 
-  // TODO how to make this run straight away then every 1 minute
   async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
     await checkForSpacedRepetition();
     poller = setInterval(function() {
