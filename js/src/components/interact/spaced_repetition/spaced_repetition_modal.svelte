@@ -11,6 +11,7 @@
   export let playElement;
   export let listTitleElement;
   export let show;
+  export let state;
 
   onMount(() => {
     listDataElement.addEventListener("click", handler);
@@ -78,8 +79,13 @@
 
   <div class="modal" role="dialog" aria-modal="true">
     {#if loggedIn()}
-      <slot />
-      <button class="br3" on:click={() => dispatch('add')}>Add</button>
+      {#if state === 'edit'}
+        <slot />
+        <button class="br3" on:click={() => dispatch('add')}>Add</button>
+      {/if}
+      {#if state === 'feedback'}
+        <slot />
+      {/if}
     {:else}
       <p>You need to be logged in to use spaced repetition</p>
       <button class="br3" on:click={handleLogin}>Login</button>

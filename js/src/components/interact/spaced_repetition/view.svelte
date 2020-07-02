@@ -63,7 +63,7 @@
 </script>
 
 <style>
-  @import "../../../all.css";
+  @import "../../../../all.css";
 </style>
 
 <svelte:options tag={null} />

@@ -3,9 +3,7 @@ package spaced_repetition
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
@@ -17,22 +15,25 @@ import (
 
 func NewService(db *sqlx.DB) service {
 	return service{
-		db: db,
+		db:   db,
+		repo: NewSqliteRepository(db),
 	}
 }
 
 func (s service) Endpoints(group *echo.Group) {
 	group.GET("/next", s.GetNext)
-	group.GET("/list", s.GetAll) // I wonder if list or all is better
 	group.GET("/all", s.GetAll)
-	group.DELETE("/:uuid", s.DeleteItem)
-	group.POST("/", s.SaveItem)
-	group.POST("/viewed", s.ItemViewed)
+	group.DELETE("/:uuid", s.DeleteEntry)
+	group.POST("/", s.SaveEntry)
+	group.POST("/viewed", s.EntryViewed)
 }
 
-func (s service) SaveItem(c echo.Context) error {
+// 400 bad input
+// 201 created
+// 200 not created and returned current
+// 500 something went wrong
+func (s service) SaveEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	fmt.Println(user)
 
 	defer c.Request().Body.Close()
 
@@ -56,26 +57,35 @@ func (s service) SaveItem(c echo.Context) error {
 		entry = V2FromPOST(raw)
 	}
 
-	item := SpacedRepetitionItem{
+	item := SpacedRepetitionEntry{
 		UserUUID: user.Uuid,
 		UUID:     entry.UUID(),
 		Body:     entry.String(),
 		WhenNext: entry.WhenNext(),
 	}
 
-	_, err := s.db.Exec(SQL_SAVE_ITEM, item.UUID, item.Body, item.UserUUID, item.WhenNext, item.Body, item.WhenNext)
-	fmt.Println(err)
-
-	response := api.HttpResponseMessage{
-		Message: "TODO",
+	err := s.repo.SaveEntry(item)
+	statusCode := http.StatusCreated
+	if err != nil {
+		if err != ErrSpacedRepetitionEntryExists {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+		statusCode = http.StatusOK
 	}
-	return c.JSON(http.StatusOK, response)
+
+	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.JSON(statusCode, current)
 }
 
-func (s service) DeleteItem(c echo.Context) error {
+// 404 = not found
+// 200, delete attempted
+// 500 issue, try again
+func (s service) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
-	fmt.Println(user)
 
 	if UUID == "" {
 		response := api.HttpResponseMessage{
@@ -84,73 +94,59 @@ func (s service) DeleteItem(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	_, err := s.db.Exec(SQL_DELETE_ITEM, UUID, user.Uuid)
-	fmt.Println(err)
-	response := api.HttpResponseMessage{
-		Message: "TODO",
+	err := s.repo.DeleteEntry(user.Uuid, UUID)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
 	}
-	return c.JSON(http.StatusOK, response)
+	return c.NoContent(http.StatusOK)
 }
 
+// 404 = not found, meaning there is currently no future entry
+// 204 = found, but not yet
+// 200 = found, and ready
 func (s service) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	item := SpacedRepetitionItem{}
-	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
-	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
+	body, err := s.repo.GetNext(user.Uuid)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == ErrNotFound {
+			return c.NoContent(http.StatusNotFound)
+		}
+
+		if err == ErrFoundNotTime {
 			return c.NoContent(http.StatusNoContent)
 		}
 
-		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	if !time.Now().UTC().After(item.WhenNext) {
-		return c.NoContent(http.StatusNoContent)
-	}
-
-	var body interface{}
-	json.Unmarshal([]byte(item.Body), &body)
 	return c.JSON(http.StatusOK, body)
 }
 
+// 200
+// 500
 func (s service) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	items := make([]interface{}, 0)
-	dbItems := make([]string, 0)
-	err := s.db.Select(&dbItems, SQL_GET_ALL, user.Uuid)
+
+	items, err := s.repo.GetEntries(user.Uuid)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-
-		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	for _, item := range dbItems {
-		var body interface{}
-		json.Unmarshal([]byte(item), &body)
-		items = append(items, body)
 	}
 
 	return c.JSON(http.StatusOK, items)
 }
 
-func (s service) ItemViewed(c echo.Context) error {
+func (s service) EntryViewed(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
 	// Lookup uuid
-
 	defer c.Request().Body.Close()
 
 	var input HttpRequestViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
-	item := SpacedRepetitionItem{}
+	item := SpacedRepetitionEntry{}
 	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
 	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
 
@@ -158,11 +154,9 @@ func (s service) ItemViewed(c echo.Context) error {
 		if err == sql.ErrNoRows {
 			return c.NoContent(http.StatusNotFound)
 		}
-
-		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
-
+	// TODO could get this via the json_XXX functions in sqlite
 	// hmm maybe add kind to the table
 
 	var what HttpRequestInputKind
@@ -189,24 +183,16 @@ func (s service) ItemViewed(c echo.Context) error {
 
 	item.Body = entry.String()
 	item.WhenNext = entry.WhenNext()
-	fmt.Println(item.WhenNext)
 	// save to db
-	_, err = s.db.Exec(SQL_SAVE_ITEM, item.UUID, item.Body, item.UserUUID, item.WhenNext, item.Body, item.WhenNext)
-	fmt.Println(err)
+	err = s.repo.UpdateEntry(item)
 
-	response := api.HttpResponseMessage{
-		Message: "TODO",
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
 	}
-	return c.JSON(http.StatusOK, response)
-}
 
-// This is the start of the "magic"
-// Linking the data to active users
-// Make it work
-func (s service) CheckForNewItems() {
-	// Get for all users?
-	//
-	fmt.Println("Check for new items")
+	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.JSON(http.StatusOK, current)
 }
-
-//var Events := make(chan *sse.Event)

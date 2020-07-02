@@ -15,7 +15,9 @@
   export let aList;
 
   let data;
+  let state = "edit";
   let show = false;
+
   function edit(event) {
     data = event.detail.data;
     show = true;
@@ -24,6 +26,7 @@
   function close() {
     data = null;
     show = false;
+    state = "edit";
   }
 
   async function add(event) {
@@ -34,13 +37,19 @@
     };
     const response = await addEntry(input);
 
-    if (response.status !== 200) {
-      console.log("failed to add for spaced learning");
-      console.log(response);
-      return;
+    switch (response.status) {
+      case 201:
+        close();
+        break;
+      case 200:
+        state = "feedback";
+        data = response.body;
+        break;
+      default:
+        console.log("failed to add for spaced learning");
+        console.log(response);
+        break;
     }
-
-    close();
   }
 
   // How to handle when not logged in
@@ -58,8 +67,17 @@
   {playElement}
   {listTitleElement}
   {show}
+  {state}
   on:add={add}
   on:edit={edit}
   on:close={close}>
-  <pre>{JSON.stringify(data, '', 2)}</pre>
+
+  {#if state === 'edit'}
+    <pre>{JSON.stringify(data, '', 2)}</pre>
+  {/if}
+
+  {#if state === 'feedback'}
+    <p>Already in the system</p>
+    <p>You will be reminded on X {data.settings.when_next}</p>
+  {/if}
 </Modal>

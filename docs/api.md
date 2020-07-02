@@ -15,3 +15,4 @@
 | PUT | /v1/share/alist | Share a list with public, self or friends. | 200, 404, 400, 403 |
 | PUT | /v1/share/readaccess | Give another users read access to your list. | 200, 404, 400, 403, 422 |
 | DELETE | /v1/user/{uuid} | Delete user via uuid. | 200, 403, 500 |
+| POST | /api/v1/spaced-repetition/ | Add entry for spaced based learning. | 200 403, 500 |

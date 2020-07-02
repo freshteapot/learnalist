@@ -15,8 +15,10 @@
   export let aList;
 
   let data;
+  let state = "edit";
   let showKey = "from";
   let show = false;
+
   function edit(event) {
     data = event.detail.data;
     show = true;
@@ -24,6 +26,7 @@
 
   function close() {
     data = null;
+    state = "edit";
     showKey = "from";
     show = false;
   }
@@ -39,14 +42,19 @@
     };
 
     const response = await addEntry(input);
-
-    if (response.status !== 200) {
-      console.log("failed to add for spaced learning");
-      console.log(response);
-      return;
+    switch (response.status) {
+      case 201:
+        close();
+        break;
+      case 200:
+        state = "feedback";
+        data = response.body;
+        break;
+      default:
+        console.log("failed to add for spaced learning");
+        console.log(response);
+        break;
     }
-
-    close();
   }
 </script>
 
@@ -62,19 +70,27 @@
   {playElement}
   {listTitleElement}
   {show}
+  {state}
   on:add={add}
   on:edit={edit}
   on:close={close}>
-  <p>
-    <span>Which to show?</span>
-  </p>
-  <p>
-    <input type="radio" bind:group={showKey} value={'from'} />
-    from
-  </p>
-  <p>
-    <input type="radio" bind:group={showKey} value={'to'} />
-    to
-  </p>
-  <pre>{JSON.stringify(data, '', 2)}</pre>
+  {#if state === 'edit'}
+    <p>
+      <span>Which to show?</span>
+    </p>
+    <p>
+      <input type="radio" bind:group={showKey} value={'from'} />
+      from
+    </p>
+    <p>
+      <input type="radio" bind:group={showKey} value={'to'} />
+      to
+    </p>
+    <pre>{JSON.stringify(data, '', 2)}</pre>
+  {/if}
+
+  {#if state === 'feedback'}
+    <p>Already in the system</p>
+    <p>You will be reminded on {data.settings.when_next}</p>
+  {/if}
 </Modal>

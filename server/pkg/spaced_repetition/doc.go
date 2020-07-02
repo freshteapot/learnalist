@@ -1,6 +1,7 @@
 package spaced_repetition
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -48,7 +49,7 @@ type HttpRequestInputSettingsV2 struct {
 	Show string `json:"show"`
 }
 
-type SpacedRepetitionItem struct {
+type SpacedRepetitionEntry struct {
 	UUID     string    `db:"uuid"`
 	Body     string    `db:"body"`
 	UserUUID string    `db:"user_uuid"`
@@ -79,9 +80,10 @@ const (
 	THRESHOLD_8 = time.Duration(TIME_DAY * 60)
 	THRESHOLD_9 = time.Duration(TIME_DAY * 120)
 
-	SQL_SAVE_ITEM   = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
-	SQL_DELETE_ITEM = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
-	SQL_GET_ITEM    = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
+	SQL_SAVE_ITEM              = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?)`
+	SQL_SAVE_ITEM_AUTO_UPDATED = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
+	SQL_DELETE_ITEM            = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
+	SQL_GET_ITEM               = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
 	// TODO add order by when_next
 	// ADD index when_next
 	SQL_GET_ALL  = `SELECT body FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next`
@@ -198,7 +200,17 @@ var decrThresholds = []struct {
 }
 
 type service struct {
-	db *sqlx.DB
+	db   *sqlx.DB
+	repo Repository
+}
+
+type Repository interface {
+	GetNext(userUUID string) (interface{}, error)
+	GetEntry(userUUID string, UUID string) (interface{}, error)
+	GetEntries(userUUID string) ([]interface{}, error)
+	SaveEntry(entry SpacedRepetitionEntry) error
+	UpdateEntry(entry SpacedRepetitionEntry) error
+	DeleteEntry(userUUID string, UUID string) error
 }
 
 type ItemInput interface {
@@ -208,3 +220,9 @@ type ItemInput interface {
 	IncrThreshold()
 	DecrThreshold()
 }
+
+var (
+	ErrNotFound                    = errors.New("not.found")
+	ErrFoundNotTime                = errors.New("found.not.time")
+	ErrSpacedRepetitionEntryExists = errors.New("item.exists")
+)

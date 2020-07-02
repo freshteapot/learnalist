@@ -1,10 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
@@ -77,49 +75,12 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 
 	srs := server.Group("/api/v1/spaced-repetition")
 	srs.Use(authenticate.Auth(authConfig))
-	sseServer := sse.New()
 
-	sseServer.AutoReplay = false
 	srsServer := spaced_repetition.NewService(db)
 	srsServer.Endpoints(srs)
-	srs.GET("/events", sseForEcho(sseServer), echoExampleMiddleware, echo.WrapMiddleware(exampleMiddleware))
-
-	// Lets come back to server side events and fake it for now
-	//events := make(chan *sse.Event)
-	// client := sse.NewClient("/api/v1/spaced-repetition/events")
-
-	// TODO change to 1m
 	// TODO how to get active users
 	// Possible help https://github.com/ReneKroon/ttlcache
-	//_cron.AddFunc("@every 1s", srsServer.CheckForNewItems)
-
-	streamKey := "hello"
-	// I wonder how light this is?
-	sseServer.CreateStream(streamKey)
-
-	for index, _ := range sseServer.Streams {
-		fmt.Println(index)
-	}
-
-	type event struct {
-		UUID string    `json:"uuid"`
-		When time.Time `json:"when"`
-	}
-
-	now := time.Now()
-	e := event{UUID: "tine", When: now}
-	b, _ := json.Marshal(e)
-	sseServer.Publish(streamKey, &sse.Event{
-		Data: b,
-	})
-
-	//time.Sleep(2000 * time.Millisecond)
-
-	e = event{UUID: "tine1", When: now}
-	b, _ = json.Marshal(e)
-	sseServer.Publish(streamKey, &sse.Event{
-		Data: b,
-	})
+	//_cron.AddFunc("@every 1m", srsServer.CheckForNewItems)
 }
 
 func sseForEcho(server *sse.Server) echo.HandlerFunc {
