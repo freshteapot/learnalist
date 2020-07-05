@@ -8,6 +8,8 @@ server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
 server/c.out
+## Ignoring this as we generate it
+server/pkg/openapi/
 
 # hugo
 hugo/content/alist/
