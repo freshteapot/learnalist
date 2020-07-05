@@ -1,11 +1,11 @@
 {
- "v4": "/css/v4.1593975404680.css",
- "shared": "/css/shared.1593975395937.css",
- "v3": "/css/v3.1593975402943.css",
- "main": "/css/main.1593975393872.css",
- "srs": "/css/srs.1593975406729.css",
- "v1": "/css/v1.1593975396858.css",
- "v2": "/css/v2.1593975399932.css",
- "editor": "/css/editor.1593975408217.css",
- "base": "/css/base.1593975413763.css"
+ "v4": "/css/v4.dev.css",
+ "shared": "/css/shared.dev.css",
+ "v3": "/css/v3.dev.css",
+ "main": "/css/main.dev.css",
+ "srs": "/css/srs.dev.css",
+ "v1": "/css/v1.dev.css",
+ "v2": "/css/v2.dev.css",
+ "editor": "/css/editor.dev.css",
+ "base": "/css/base.1593977153821.css"
 }

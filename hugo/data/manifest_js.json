@@ -1,10 +1,10 @@
 {
- "v3": "/js/v3.1593975402943.js",
- "main": "/js/main.1593975393872.js",
- "v4": "/js/v4.1593975404680.js",
- "shared": "/js/shared.1593975395937.js",
- "srs": "/js/srs.1593975406729.js",
- "v1": "/js/v1.1593975396858.js",
- "v2": "/js/v2.1593975399932.js",
- "editor": "/js/editor.1593975408217.js"
+ "v3": "/js/v3.dev.js",
+ "main": "/js/main.dev.js",
+ "v4": "/js/v4.dev.js",
+ "shared": "/js/shared.dev.js",
+ "srs": "/js/srs.dev.js",
+ "v1": "/js/v1.dev.js",
+ "v2": "/js/v2.dev.js",
+ "editor": "/js/editor.dev.js"
 }
