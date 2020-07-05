@@ -54,14 +54,15 @@
 
   function showInfo(state) {
     // If nothing to see, we leave the call to action
-    if (state !== "nothing-to-see") {
-      listElement.style.display = "none";
-      playElement.style.display = "";
+    if (state !== "show-entry") {
+      listElement.style.display = "";
+      playElement.style.display = "none";
       return;
     }
-    // We want to display Entry
-    listElement.style.display = "";
-    playElement.style.display = "none";
+
+    // We want to display the entry
+    listElement.style.display = "none";
+    playElement.style.display = "";
   }
 
   $: get();
@@ -74,38 +75,40 @@
 
 <svelte:options tag={null} />
 
-<article>
-  {#if state === 'show-entry'}
-    <header>
-      <button class="br3" on:click={flipIt}>Flip</button>
-      <button class="br3" on:click={next}>Next</button>
-    </header>
-    <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-      {#if !show}
-        <h1>{data.show}</h1>
-      {/if}
+{#if loggedIn()}
+  <article>
+    {#if state === 'show-entry'}
+      <header>
+        <button class="br3" on:click={flipIt}>Flip</button>
+        <button class="br3" on:click={next}>Next</button>
+      </header>
+      <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
+        {#if !show}
+          <h1>{data.show}</h1>
+        {/if}
 
-      {#if show}
-        <pre>{JSON.stringify(data, '', 2)}</pre>
-      {/if}
-    </blockquote>
-  {/if}
+        {#if show}
+          <pre>{JSON.stringify(data, '', 2)}</pre>
+        {/if}
+      </blockquote>
+    {/if}
 
-  {#if state === 'nothing-to-see'}
-    <script>
-      superstore.notifications.add(
-        "info",
-        "Its not time, yet! You can always add more entries."
-      );
-    </script>
-  {/if}
+    {#if state === 'nothing-to-see'}
+      <script>
+        superstore.notifications.add(
+          "info",
+          "None of your entries are ready, add more?"
+        );
+      </script>
+    {/if}
 
-  {#if state === 'no-entries'}
-    <script>
-      superstore.notifications.add(
-        "info",
-        "You have nothing, perhaps you want to add some"
-      );
-    </script>
-  {/if}
-</article>
+    {#if state === 'no-entries'}
+      <script>
+        superstore.notifications.add(
+          "info",
+          "Would you like to try Spaced Repetition?"
+        );
+      </script>
+    {/if}
+  </article>
+{/if}
