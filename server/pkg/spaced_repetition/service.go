@@ -28,10 +28,7 @@ func (s service) Endpoints(group *echo.Group) {
 	group.POST("/viewed", s.EntryViewed)
 }
 
-// 400 bad input
-// 201 created
-// 200 not created and returned current
-// 500 something went wrong
+// SaveEntry Add entry for spaced based learning
 func (s service) SaveEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
@@ -68,18 +65,19 @@ func (s service) SaveEntry(c echo.Context) error {
 	statusCode := http.StatusCreated
 	if err != nil {
 		if err != ErrSpacedRepetitionEntryExists {
-			return c.NoContent(http.StatusInternalServerError)
+			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
 		statusCode = http.StatusOK
 	}
 
 	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	return c.JSON(statusCode, current)
 }
 
+// DeleteEntry Deletes a single entry based on the UUID
 func (s service) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
@@ -98,6 +96,7 @@ func (s service) DeleteEntry(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// GetNext Get next entry for spaced based learning
 func (s service) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	body, err := s.repo.GetNext(user.Uuid)
@@ -117,6 +116,7 @@ func (s service) GetNext(c echo.Context) error {
 	return c.JSON(http.StatusOK, body)
 }
 
+//GetAll Get all entries for spaced repetition learning
 func (s service) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
