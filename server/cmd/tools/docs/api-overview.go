@@ -1,4 +1,4 @@
-package tools
+package docs
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/itchyny/gojq"
@@ -88,7 +89,8 @@ func (d DocsApiOverview) parseEndpoint(key string, value map[string]interface{})
 
 func (d DocsApiOverview) Render(endpoints []Endpoint) string {
 	funcMap := template.FuncMap{
-		"join_string_array": func(input []string) string {
+		"join_string_array_sorted": func(input []string) string {
+			sort.Strings(input)
 			return strings.Join(input, ",")
 		},
 	}
@@ -103,12 +105,12 @@ func (d DocsApiOverview) Render(endpoints []Endpoint) string {
 | Method | Uri | Description | Status Codes |
 | --- | --- | --- | --- |
 {{- range .endpoints }}
-| {{.Method}} | {{.Path}} | {{.Description}} | {{join_string_array .StatusCodes}} |
+| {{.Method}} | {{.Path}} | {{.Description}} | {{join_string_array_sorted .StatusCodes}} |
 {{- end }}
 
 # Auto generated via
 {{ $tick }}
-yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs-api  > ../docs/api.auto.md
+make generate-docs-api-overview
 {{ $tick }}
 `))
 	var tpl bytes.Buffer
@@ -117,8 +119,8 @@ yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/
 	return strings.TrimSpace(tpl.String())
 }
 
-var docsApiCmd = &cobra.Command{
-	Use:   "docs-api",
+var apiOverviewCMD = &cobra.Command{
+	Use:   "api-overview",
 	Short: "Create markdown for api contents via openapi",
 	Run: func(cmd *cobra.Command, args []string) {
 		builder := DocsApiOverview{}

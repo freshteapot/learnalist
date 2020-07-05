@@ -48,8 +48,9 @@ generate-openapi-go:
 	rm /tmp/learnalist/pkg/openapi/go.mod && \
 	rm /tmp/learnalist/pkg/openapi/go.sum
 
-docs-generate-api:
-	sh scripts/generate-api.sh
+generate-docs-api-overview:
+	cd server && \
+	yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 
 ###############################################################################
 #
