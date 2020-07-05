@@ -76,6 +76,6 @@
 
   {#if state === 'feedback'}
     <p>Already in the system</p>
-    <p>You will be reminded on X {data.settings.when_next}</p>
+    <p>You will be reminded on {data.settings.when_next}</p>
   {/if}
 </Modal>
