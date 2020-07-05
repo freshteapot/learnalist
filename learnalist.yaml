@@ -215,16 +215,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /spaced-repetition/{uuid}:
-    get:
-      description: Get next entry for spaced based learning
-      operationId: getNextSpacedRepetitionEntry
-      responses:
-        "200":
-          description: Return entry
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SpacedRepetition"
     delete:
       description: Deletes a single entry based on the UUID
       operationId: deleteSpacedRepetitionEntry
