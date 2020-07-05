@@ -1,5 +1,6 @@
 <script>
   import { getNext, viewed } from "./api.js";
+  import { loggedIn } from "../../../store.js";
 
   let state = "loading";
   let show;
@@ -18,15 +19,18 @@
   }
 
   async function next() {
-    console.log("Update that we saw this");
     const status = await viewed(data.uuid);
-    console.log(status);
-    console.log("Get next item");
     get();
   }
 
   async function get() {
+    if (!loggedIn()) {
+      state = "nothing-to-see";
+      return;
+    }
+
     const response = await getNext();
+
     if (response.status == 200) {
       // show card
       data = response.body;
@@ -36,29 +40,31 @@
 
     if (response.status == 204) {
       state = "nothing-to-see";
-      // show nothing to see
       return;
     }
 
-    // TODO
+    if (response.status == 404) {
+      state = "no-entries";
+      return;
+    }
+
     state = "loading";
     data = null;
   }
 
-  get();
-
   function showInfo(state) {
-    console.log("showInfo", state);
+    // If nothing to see, we leave the call to action
     if (state !== "nothing-to-see") {
       listElement.style.display = "none";
       playElement.style.display = "";
       return;
     }
-
+    // We want to display Entry
     listElement.style.display = "";
     playElement.style.display = "none";
   }
 
+  $: get();
   $: showInfo(state);
 </script>
 
@@ -85,7 +91,12 @@
     </blockquote>
   {/if}
 
-  {#if state === 'nothing-to-see'}
-    <p>Nothing to show</p>
+  {#if state === 'no-entries'}
+    <script>
+      superstore.notifications.add(
+        "info",
+        "You have nothing, perhaps you want to add some"
+      );
+    </script>
   {/if}
 </article>
