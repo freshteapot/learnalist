@@ -91,6 +91,15 @@
     </blockquote>
   {/if}
 
+  {#if state === 'nothing-to-see'}
+    <script>
+      superstore.notifications.add(
+        "info",
+        "Its not time, yet! You can always add more entries."
+      );
+    </script>
+  {/if}
+
   {#if state === 'no-entries'}
     <script>
       superstore.notifications.add(
