@@ -48,6 +48,9 @@ generate-openapi-go:
 	rm /tmp/learnalist/pkg/openapi/go.mod && \
 	rm /tmp/learnalist/pkg/openapi/go.sum
 
+docs-generate-api:
+	sh scripts/generate-api.sh
+
 ###############################################################################
 #
 # More production than development

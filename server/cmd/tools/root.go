@@ -18,5 +18,6 @@ func init() {
 	RootCmd.AddCommand(fixInteractV1Cmd)
 	RootCmd.AddCommand(user.RootCmd)
 	RootCmd.AddCommand(api.RootCmd)
+	RootCmd.AddCommand(docsApiCmd)
 
 }

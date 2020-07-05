@@ -164,6 +164,20 @@ components:
       scheme: basic
 
 paths:
+  /version:
+    get:
+      operationId: getServerVersion
+      description: Get information about the server, linked to the git repo
+      security:
+        - {}
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+
   /spaced-repetition/:
     post:
       operationId: addSpacedRepetitionEntry
@@ -201,6 +215,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /spaced-repetition/{uuid}:
+    get:
+      description: Get next entry for spaced based learning
+      operationId: getNextSpacedRepetitionEntry
+      responses:
+        "200":
+          description: Return entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
     delete:
       description: Deletes a single entry based on the UUID
       operationId: deleteSpacedRepetitionEntry
@@ -294,20 +318,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
-  /version:
-    get:
-      operationId: getServerVersion
-      description: Get information about the server, linked to the git repo
-      security:
-        - {}
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Version"
-
 security:
   - bearerAuth: []
   - basicAuth: []
