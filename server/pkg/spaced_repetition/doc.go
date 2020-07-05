@@ -39,7 +39,6 @@ type HttpRequestInputV2Item struct {
 	To   string `json:"to"`
 }
 
-// TODO add level here
 type HttpRequestInputSettings struct {
 	Level    string `json:"level"`
 	WhenNext string `json:"when_next"`
@@ -84,10 +83,8 @@ const (
 	SQL_SAVE_ITEM_AUTO_UPDATED = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
 	SQL_DELETE_ITEM            = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
 	SQL_GET_ITEM               = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
-	// TODO add order by when_next
-	// ADD index when_next
-	SQL_GET_ALL  = `SELECT body FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next`
-	SQL_GET_NEXT = `SELECT * FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next LIMIT 1`
+	SQL_GET_ALL                = `SELECT body FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next`
+	SQL_GET_NEXT               = `SELECT * FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next LIMIT 1`
 )
 
 var incrThresholds = []struct {
