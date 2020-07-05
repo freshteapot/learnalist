@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -30,8 +29,7 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 			"error":     err,
 			"user_uuid": userUUID,
 		}).Error("problem")
-		response.Message = i18n.InternalServerErrorFunny
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())

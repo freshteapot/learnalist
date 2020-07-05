@@ -42,11 +42,12 @@ run-e2e-tests:
 	./run-e2e.sh
 
 generate-openapi-go:
-	mkdir -p /tmp/learnalist/pkg/openapi && \
+	rm -rf ./server/pkg/openapi && \
+	mkdir -p ./server/pkg/openapi && \
 	GO_POST_PROCESS_FILE="/usr/local/bin/gofmt -w" \
-	openapi-generator generate -i ./learnalist.yaml -g go -o /tmp/learnalist/pkg/openapi && \
-	rm /tmp/learnalist/pkg/openapi/go.mod && \
-	rm /tmp/learnalist/pkg/openapi/go.sum
+	openapi-generator generate -i ./learnalist.yaml -g go -o ./server/pkg/openapi && \
+	rm ./server/pkg/openapi/go.mod && \
+	rm ./server/pkg/openapi/go.sum
 
 generate-docs-api-overview:
 	cd server && \
