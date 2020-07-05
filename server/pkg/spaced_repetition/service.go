@@ -80,9 +80,6 @@ func (s service) SaveEntry(c echo.Context) error {
 	return c.JSON(statusCode, current)
 }
 
-// 404 = not found
-// 200, delete attempted
-// 500 issue, try again
 func (s service) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
@@ -91,19 +88,16 @@ func (s service) DeleteEntry(c echo.Context) error {
 		response := api.HttpResponseMessage{
 			Message: i18n.InputMissingListUuid,
 		}
-		return c.JSON(http.StatusNotFound, response)
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	err := s.repo.DeleteEntry(user.Uuid, UUID)
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
-// 404 = not found, meaning there is currently no future entry
-// 204 = found, but not yet
-// 200 = found, and ready
 func (s service) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	body, err := s.repo.GetNext(user.Uuid)
@@ -117,21 +111,19 @@ func (s service) GetNext(c echo.Context) error {
 			return c.NoContent(http.StatusNoContent)
 		}
 
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	return c.JSON(http.StatusOK, body)
 }
 
-// 200
-// 500
 func (s service) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
 	items, err := s.repo.GetEntries(user.Uuid)
 
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	return c.JSON(http.StatusOK, items)
@@ -154,7 +146,8 @@ func (s service) EntryViewed(c echo.Context) error {
 		if err == sql.ErrNoRows {
 			return c.NoContent(http.StatusNotFound)
 		}
-		return c.NoContent(http.StatusInternalServerError)
+
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	// TODO could get this via the json_XXX functions in sqlite
 	// hmm maybe add kind to the table
@@ -187,12 +180,12 @@ func (s service) EntryViewed(c echo.Context) error {
 	err = s.repo.UpdateEntry(item)
 
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	return c.JSON(http.StatusOK, current)
 }

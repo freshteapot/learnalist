@@ -1,0 +1,194 @@
+openapi: "3.0.2"
+info:
+  title: Learnalist API
+  version: "1.0"
+servers:
+  - url: https://learnalist.net/api/v1
+  - url: http://localhost:1234/api/v1
+
+components:
+  schemas:
+    HttpResponseMessage:
+      type: object
+      properties:
+        message:
+          type: string
+    Kind:
+      type: object
+      properties:
+        kind:
+          type: string
+    Version:
+      type: object
+      properties:
+        gitHash:
+          type: string
+        gitDate:
+          type: string
+          format: date-time
+        version:
+          type: string
+        url:
+          type: string
+    SpacedRepetition:
+      discriminator:
+        propertyName: kind
+        anyOf:
+          - $ref: "#/components/schemas/SpacedRepetitionV1"
+          - $ref: "#/components/schemas/SpacedRepetitionV2"
+
+    SpacedRepetitionBase:
+      type: object
+      properties:
+        show:
+          type: string
+        uuid:
+          type: string
+        kind:
+          type: string
+
+    SpacedRepetitionBaseSettings:
+      type: object
+      properties:
+        level:
+          type: string
+        when_next:
+          type: string
+          format: date-time
+
+    SpacedRepetitionBaseSettingsShow:
+      type: object
+      properties:
+        show:
+          type: string
+
+    SpacedRepetitionV1:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SpacedRepetitionDataV1"
+            settings:
+              $ref: "#/components/schemas/SpacedRepetitionSettingsV1"
+
+    SpacedRepetitionDataV1:
+      type: string
+
+    SpacedRepetitionSettingsV1:
+      $ref: "#/components/schemas/SpacedRepetitionBaseSettings"
+
+    SpacedRepetitionV2:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SpacedRepetitionDataV2"
+            settings:
+              $ref: "#/components/schemas/SpacedRepetitionSettingsV2"
+
+    SpacedRepetitionDataV2:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+
+    SpacedRepetitionSettingsV2:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBaseSettingsShow"
+        - $ref: "#/components/schemas/SpacedRepetitionBaseSettings"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    basicAuth:
+      type: http
+      scheme: basic
+
+paths:
+  /spaced-repetition/{uuid}:
+    delete:
+      description: deletes a single entry based on the UUID
+      operationId: deleteSpacedRepetitionEntry
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: entry deleted
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+  /spaced-repetition/all:
+    get:
+      operationId: getSpacedRepetitionEntries
+      responses:
+        "200":
+          description: Get all entries for spaced repetition learning
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpacedRepetition"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/next:
+    get:
+      operationId: getNextSpacedRepetitionEntry
+      responses:
+        "200":
+          description: User has an entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
+        "204":
+          description: User has entries, but time has not passed to show any
+        "404":
+          description: User has no entries.
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /version:
+    get:
+      operationId: getServerVersion
+      description: Get information about the server, linked to the git repo
+      security:
+        - {}
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+
+security:
+  - bearerAuth: []
+  - basicAuth: []

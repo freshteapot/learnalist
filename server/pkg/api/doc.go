@@ -1,5 +1,7 @@
 package api
 
+import "github.com/freshteapot/learnalist-api/server/api/i18n"
+
 type HttpResponse struct {
 	StatusCode int
 	Body       []byte
@@ -47,3 +49,9 @@ type HttpLoginResponse struct {
 }
 
 type HttpLoginRequest HttpUserRegisterInput
+
+var (
+	HTTPErrorResponse = HttpResponseMessage{
+		Message: i18n.InternalServerErrorFunny,
+	}
+)

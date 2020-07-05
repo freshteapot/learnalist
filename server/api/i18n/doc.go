@@ -1,6 +1,8 @@
 package i18n
 
-import "errors"
+import (
+	"errors"
+)
 
 const (
 	ValidationErrorList                     = "Failed to pass list info. %s"
