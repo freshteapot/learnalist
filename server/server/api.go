@@ -1,14 +1,10 @@
 package server
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -16,8 +12,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo/v4"
-	"github.com/r3labs/sse"
 	"github.com/sirupsen/logrus"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
@@ -76,34 +70,7 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	srs := server.Group("/api/v1/spaced-repetition")
 	srs.Use(authenticate.Auth(authConfig))
 
+	// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 	srsServer := spaced_repetition.NewService(db)
 	srsServer.Endpoints(srs)
-	// TODO how to get active users
-	// Possible help https://github.com/ReneKroon/ttlcache
-	//_cron.AddFunc("@every 1m", srsServer.CheckForNewItems)
-}
-
-func sseForEcho(server *sse.Server) echo.HandlerFunc {
-	th := http.HandlerFunc(server.HTTPHandler)
-	return func(c echo.Context) error {
-		th.ServeHTTP(c.Response().Writer, c.Request())
-		return nil
-	}
-}
-
-func exampleMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Could capture active users here
-		fmt.Println("Hello wrapped")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func echoExampleMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		fmt.Println("Hello echo")
-		user := c.Get("loggedInUser").(uuid.User)
-		fmt.Println(user.Uuid)
-		return next(c)
-	}
 }
