@@ -53,16 +53,20 @@
   }
 
   function showInfo(state) {
-    // If nothing to see, we leave the call to action
-    if (state !== "show-entry") {
-      listElement.style.display = "";
+    if (state === "loading") {
+      listElement.style.display = "none";
       playElement.style.display = "none";
       return;
     }
 
-    // We want to display the entry
-    listElement.style.display = "none";
-    playElement.style.display = "";
+    if (state === "show-entry") {
+      listElement.style.display = "none";
+      playElement.style.display = "";
+      return;
+    }
+
+    listElement.style.display = "";
+    playElement.style.display = "none";
   }
 
   $: get();
