@@ -15,3 +15,10 @@
 | PUT | /v1/share/alist | Share a list with public, self or friends. | 200, 404, 400, 403 |
 | PUT | /v1/share/readaccess | Give another users read access to your list. | 200, 404, 400, 403, 422 |
 | DELETE | /v1/user/{uuid} | Delete user via uuid. | 200, 403, 500 |
+
+
+# Auto generated
+[made from the openapi file](./api.auto.md)
+
+# Reference
+- https://apihandyman.io/api-toolbox-jq-and-openapi-part-1-using-jq-to-extract-data-from-openapi-files/

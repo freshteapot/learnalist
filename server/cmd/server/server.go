@@ -76,6 +76,7 @@ var ServerCmd = &cobra.Command{
 		authenticate.SetLoginCookieConfig(loginCookie)
 
 		masterCron := cron.NewCron()
+		server.SetCron(masterCron)
 
 		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)

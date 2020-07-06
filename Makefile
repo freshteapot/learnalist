@@ -41,6 +41,17 @@ run-e2e-tests:
 	cd server && \
 	./run-e2e.sh
 
+generate-openapi-go:
+	rm -rf ./server/pkg/openapi && \
+	mkdir -p ./server/pkg/openapi && \
+	GO_POST_PROCESS_FILE="/usr/local/bin/gofmt -w" \
+	openapi-generator generate -i ./learnalist.yaml -g go -o ./server/pkg/openapi && \
+	rm ./server/pkg/openapi/go.mod && \
+	rm ./server/pkg/openapi/go.sum
+
+generate-docs-api-overview:
+	cd server && \
+	yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 
 ###############################################################################
 #

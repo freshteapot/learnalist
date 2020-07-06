@@ -60,10 +60,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	aUser, err := userWithUsernameAndPassword.Register(cleanedUser.Username, hash)
 	if err != nil {
 		// TODO Log this
-		response := api.HttpResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	response := api.HttpUserRegisterResponse{

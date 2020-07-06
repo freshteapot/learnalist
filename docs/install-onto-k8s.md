@@ -158,3 +158,20 @@ Remove any tunnels
 ```sh
 ps  | grep 'ssh ' | grep 'learnalist.net' | cut -d' ' -f1 | xargs kill -9
 ```
+
+
+# Update db
+## On local machine
+
+```sh
+make sync-db-files
+```
+
+## Via a pod
+```sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -- sh
+```
+Update tables
+```sh
+cat  /srv/learnalist/db/XXX | sqlite3 /srv/learnalist/server.db
+```

@@ -1,11 +1,56 @@
 <script>
+  import { getNext } from "./interact/spaced_repetition/api.js";
   import { loggedIn } from "../store.js";
   export let loginurl = "/login.html";
 
+  let poller;
+
+  let hasSpacedRepetition = false;
+  let dontLookup = false;
   function preLogout() {
     localStorage.clear();
     console.log("It should still click");
   }
+
+  async function checkForSpacedRepetition() {
+    if (!loggedIn() || dontLookup) {
+      clearInterval(poller);
+      return;
+    }
+
+    if (window.location.pathname.indexOf("/spaced-repetition") !== -1) {
+      clearInterval(poller);
+      return;
+    }
+
+    const response = await getNext();
+    if (![200, 204, 404].includes(response.status)) {
+      clearInterval(poller);
+      return;
+    }
+
+    switch (response.status) {
+      case 200:
+        clearInterval(poller);
+        hasSpacedRepetition = true;
+        break;
+      case 204:
+        console.log("nothing to see");
+        break;
+      case 404:
+        dontLookup = true;
+        break;
+    }
+  }
+
+  async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
+    await checkForSpacedRepetition();
+    poller = setInterval(function() {
+      checkForSpacedRepetition();
+    }, 60 * 1000);
+  }
+
+  checkForSpacedRepetitionStraightAwayThenPeriodically();
 </script>
 
 <style>
@@ -16,6 +61,15 @@
 
 <div class="fr mt0">
   {#if loggedIn()}
+    {#if hasSpacedRepetition}
+      <a
+        title="You have something to learn."
+        href="/spaced-repetition.html"
+        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
+        <button class="br3">🧠 + 💪</button>
+      </a>
+    {/if}
+
     <a
       title="create, edit, share"
       href="/editor.html"

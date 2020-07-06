@@ -11,6 +11,7 @@ js_include: ["main"]
 - You can make private lists.
 - You can make public lists.
 - You can share your lists (however it will be a challenge to figure out how to share to a specific person).
+- You can learn via [spaced repetition](/spaced-repetition.html).
 
 # Known issues
 - The editor UI, in its atttempt to be helpful, sometimes leaves you in a state that can be annoying.

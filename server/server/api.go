@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
@@ -65,4 +66,11 @@ func InitApi(db *sqlx.DB, acl acl.Acl, dal *models.DAL, hugoHelper hugo.HugoHelp
 	// Oauth
 	v1.GET("/oauth/google/redirect", m.V1OauthGoogleRedirect)
 	v1.GET("/oauth/google/callback", m.V1OauthGoogleCallback)
+
+	srs := server.Group("/api/v1/spaced-repetition")
+	srs.Use(authenticate.Auth(authConfig))
+
+	// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
+	srsServer := spaced_repetition.NewService(db)
+	srsServer.Endpoints(srs)
 }

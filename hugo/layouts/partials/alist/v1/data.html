@@ -1,5 +1,5 @@
 <ul class="lh-copy ph0 list">
-    {{- range .data -}}
-    <li class="pv3 pr3 bb b--black-20">{{ . }}</li>
+    {{- range $index, $element := .data -}}
+    <li class="pv3 pr3 bb b--black-20" data-index="{{ $index }}">{{ $element }}</li>
     {{- end -}}
 </ul>

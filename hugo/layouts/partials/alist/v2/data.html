@@ -6,10 +6,10 @@
         </tr>
     </thead>
     <tbody class="lh-copy">
-        {{- range .data -}}
-        <tr>
-            <td class="pv3 pr3 bb b--black-20">{{ .from }}</td>
-            <td class="pv3 pr3 bb b--black-20">{{ .to }}</td>
+        {{- range $index, $element := .data -}}
+        <tr data-index="{{ $index }}">
+            <td class="pv3 pr3 bb b--black-20" data-index="{{ $index }}">{{ $element.from }}</td>
+            <td class="pv3 pr3 bb b--black-20" data-index="{{ $index }}">{{ $element.to }}</td>
         </tr>
         {{- end -}}
     </tbody>
