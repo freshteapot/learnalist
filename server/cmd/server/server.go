@@ -10,16 +10,21 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
+	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
@@ -44,8 +49,9 @@ var ServerCmd = &cobra.Command{
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
-
-		// path to static site builder
+		// Assets
+		assetsDirectory := viper.GetString("server.assets.directory")
+		// Static site
 		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
@@ -101,7 +107,21 @@ var ServerCmd = &cobra.Command{
 			storageAlist,
 			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
-		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers, logger)
+		userManagement := user.NewManagement(
+			userStorage.NewSqliteManagementStorage(db),
+			hugoHelper,
+			event.NewInsights(logger),
+		)
+
+		apiManager := api.NewManager(dal, userManagement, acl, "", hugoHelper, *oauthHandlers, logger)
+
+		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
+		spacedRepetitionService := spaced_repetition.NewService(db)
+
+		assetService := assets.NewService(assetsDirectory, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
+		assetService.InitCheck()
+
+		server.InitApi(apiManager, assetService, spacedRepetitionService)
 		server.InitAlists(acl, dal, hugoHelper)
 		server.Run()
 	},

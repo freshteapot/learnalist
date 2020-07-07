@@ -3,6 +3,9 @@ components:
   schemas:
     HttpUserRegisterInput:
       type: object
+      required:
+        - username
+        - password
       properties:
         username:
           type: string
@@ -10,6 +13,9 @@ components:
           type: string
     HttpUserRegisterResponse:
       type: object
+      required:
+        - username
+        - uuid
       properties:
         username:
           type: string

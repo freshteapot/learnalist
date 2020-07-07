@@ -13,23 +13,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func NewService(db *sqlx.DB) service {
-	return service{
+func NewService(db *sqlx.DB) SpacedRepetitionService {
+	return SpacedRepetitionService{
 		db:   db,
 		repo: NewSqliteRepository(db),
 	}
 }
 
-func (s service) Endpoints(group *echo.Group) {
-	group.GET("/next", s.GetNext)
-	group.GET("/all", s.GetAll)
-	group.DELETE("/:uuid", s.DeleteEntry)
-	group.POST("/", s.SaveEntry)
-	group.POST("/viewed", s.EntryViewed)
-}
-
 // SaveEntry Add entry for spaced based learning
-func (s service) SaveEntry(c echo.Context) error {
+func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
 	defer c.Request().Body.Close()
@@ -79,7 +71,7 @@ func (s service) SaveEntry(c echo.Context) error {
 }
 
 // DeleteEntry Deletes a single entry based on the UUID
-func (s service) DeleteEntry(c echo.Context) error {
+func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
 
@@ -98,7 +90,7 @@ func (s service) DeleteEntry(c echo.Context) error {
 }
 
 // GetNext Get next entry for spaced based learning
-func (s service) GetNext(c echo.Context) error {
+func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	body, err := s.repo.GetNext(user.Uuid)
 
@@ -118,7 +110,7 @@ func (s service) GetNext(c echo.Context) error {
 }
 
 //GetAll Get all entries for spaced repetition learning
-func (s service) GetAll(c echo.Context) error {
+func (s SpacedRepetitionService) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
 	items, err := s.repo.GetEntries(user.Uuid)
@@ -130,7 +122,7 @@ func (s service) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, items)
 }
 
-func (s service) EntryViewed(c echo.Context) error {
+func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
 	// Lookup uuid

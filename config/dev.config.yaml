@@ -4,6 +4,8 @@ hugo:
   external: "true"
 
 server:
+  assets:
+    directory: "/tmp/learnalist/assets"
   sqlite:
     database: /tmp/learnalist/server.db
   port: "1234"
@@ -17,6 +19,7 @@ server:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "http://localhost:1234"
+
 tools:
   integrationTests:
     username: ""

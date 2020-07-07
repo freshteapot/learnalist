@@ -1,0 +1,42 @@
+components:
+  schemas:
+    HttpAssetUploadRequestBody:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+    HttpAssetUploadResponse:
+      type: object
+      required:
+        - href
+      properties:
+        href:
+          type: string
+paths:
+  /assets/upload:
+    post:
+      operationId: addUserAsset
+      description: Upload asset and link it to the user logged in
+      requestBody:
+        description: File to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/HttpAssetUploadRequestBody"
+      responses:
+        "201":
+          description: Asset uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpAssetUploadResponse"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

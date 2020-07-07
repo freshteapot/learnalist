@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
@@ -11,7 +12,6 @@ import (
 )
 
 var _ = Describe("Testing openapi", func() {
-
 	It("Get version", func() {
 		config := openapi.NewConfiguration()
 		config.BasePath = "http://localhost:1234/api/v1"
@@ -65,5 +65,36 @@ var _ = Describe("Testing openapi", func() {
 
 		data, response, err := client.UserApi.DeleteUser(auth, data1.Uuid)
 		fmt.Println(data, response, err)
+	})
+
+	// go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Testing openapi Upload asset" -test.v .
+	It("Upload asset", func() {
+		config := openapi.NewConfiguration()
+		config.BasePath = "http://localhost:1234/api/v1"
+		client := openapi.NewAPIClient(config)
+		input := openapi.HttpUserRegisterInput{
+			Username: "iamchris2",
+			Password: "test123",
+		}
+
+		auth := context.WithValue(context.Background(), openapi.ContextBasicAuth, openapi.BasicAuth{
+			UserName: input.Username,
+			Password: input.Password,
+		})
+
+		user, _, err := client.DefaultApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		Expect(err).To(BeNil())
+
+		uploadFile, _ := os.Open("./testdata/sample.png")
+		defer uploadFile.Close()
+
+		asset, response, err := client.DefaultApi.AddUserAsset(auth, uploadFile)
+		Expect(err).To(BeNil())
+		Expect(response.StatusCode).To(Equal(http.StatusCreated))
+		Expect(asset.Href).ToNot(BeEmpty())
+		Expect(asset.Href).To(ContainSubstring(user.Uuid))
+
+		_, _, err = client.DefaultApi.DeleteUser(auth, user.Uuid)
+		Expect(err).To(BeNil())
 	})
 })
