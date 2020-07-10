@@ -1,17 +1,19 @@
 <script>
   import { login, notify } from "../store.js";
+  import { loginHelper } from "../utils/login_helper.js";
   import {
     save as cacheSave,
     KeyUserUuid,
     KeyUserAuthentication
   } from "../cache.js";
-  import { postLogin } from "../api.js";
-
-  let isLoggedIn = false;
+  import { postLogin } from "../api2.js";
+  // TODO actually check if logged in
+  let isLoggedIn = $loginHelper.loggedIn;
   let username = "";
   let password = "";
   let message;
 
+  // https://github.com/sveltejs/svelte/issues/2118#issuecomment-531586875
   async function handleSubmit() {
     if (username === "" || password === "") {
       message = "Please enter in a username and password";
@@ -19,7 +21,8 @@
       return;
     }
 
-    let response = await postLogin(username, password);
+    const response = await postLogin(username, password);
+
     if (response.status != 200) {
       notify("error", "Please try again");
       return;
@@ -28,6 +31,7 @@
     cacheSave(KeyUserUuid, response.body.user_uuid);
     cacheSave(KeyUserAuthentication, response.body.token);
     login("/welcome.html");
+
     return;
   }
 </script>

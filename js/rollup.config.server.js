@@ -1,3 +1,5 @@
+import typescript from '@rollup/plugin-typescript';
+
 import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -37,6 +39,9 @@ export default {
     postcss({
       extract: true,
     }),
+
+    typescript(),
+
     svelte({
       dev: !IS_PROD,
       customElement: true,
