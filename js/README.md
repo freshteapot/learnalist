@@ -43,7 +43,7 @@ a
 docker run --name learnalist-static-dev \
 -p 8080:80 \
 -v $PWD/hugo/public/:/usr/share/nginx/html:ro \
--v $PWD/nginx.conf:/etc/nginx/nginx.conf:ro \
+-v $PWD/config/nginx.conf:/etc/nginx/nginx.conf:ro \
 -P -d nginx:1.17-alpine
 ```
 
