@@ -29,46 +29,6 @@ function getHeaders() {
     Authorization: getAuth()
   };
 }
-async function getListsByMe() {
-  const url = getServer() + "/api/v1/alist/by/me";
-  const res = await fetch(url, {
-    headers: getHeaders()
-  });
-
-  let manyLists = await res.json();
-  if (res.ok) {
-    return manyLists;
-  }
-  throw new Error("Failed to get lists by me");
-}
-
-
-async function putList(aList) {
-  const response = {
-    status: 400,
-    data: {}
-  }
-
-  const url = getServer() + '/api/v1/alist/' + aList.uuid;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(aList)
-  });
-
-  const data = await res.json();
-  switch (res.status) {
-    case 200:
-    case 403:
-    case 400:
-      response.status = res.status
-      response.data = data
-      return response;
-      break;
-  }
-  throw new Error('Unexpected response from the server');
-}
-
 
 // postList title: string listType: string
 async function postList(title, listType) {
@@ -99,31 +59,8 @@ async function postList(title, listType) {
   throw new Error('Unexpected response from the server when posting a list');
 }
 
-// deleteList uuid: string
-async function deleteList(uuid) {
-  const url = getServer() + "/api/v1/alist/" + uuid;
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: getHeaders()
-  });
-
-  const data = await res.json();
-  // TODO double check we handle the codes we send from the server.
-  if (res.status === 400 || res.status === 200 || res.status === 404) {
-    return {
-      status: res.status,
-      body: data
-    };
-  }
-  throw new Error('Unexpected response from the server when deleting a list');
-}
-
-
 export {
   getServer,
   getHeaders,
-  getListsByMe,
-  putList,
   postList,
-  deleteList,
 };
