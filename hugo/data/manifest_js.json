@@ -1,11 +1,11 @@
 {
- "v3": "/js/v3.1594581972485.js",
- "main": "/js/main.1594581955963.js",
- "v4": "/js/v4.1594581974785.js",
- "shared": "/js/shared.1594581959748.js",
- "srs": "/js/srs.1594581977084.js",
- "v1": "/js/v1.1594581962627.js",
- "v2": "/js/v2.1594581967508.js",
- "editor": "/js/editor.1594581980287.js",
+ "v3": "/js/v3.dev.js",
+ "main": "/js/main.dev.js",
+ "v4": "/js/v4.dev.js",
+ "shared": "/js/shared.dev.js",
+ "srs": "/js/srs.dev.js",
+ "v1": "/js/v1.dev.js",
+ "v2": "/js/v2.dev.js",
+ "editor": "/js/editor.dev.js",
  "plank-v1": "/js/plank-v1.dev.js"
 }
