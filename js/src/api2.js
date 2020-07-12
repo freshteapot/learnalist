@@ -113,10 +113,38 @@ async function updateList(aList) {
   }
 }
 
+async function getServerVersion() {
+  const api = getApi();
+  return await api.getServerVersion();
+}
+
+async function getSpacedRepetitionNext() {
+  const api = getApi();
+
+  const response = {
+    status: 404,
+    body: {}
+  }
+
+  try {
+    const res = await api.getNextSpacedRepetitionEntryRaw();
+    response.status = res.raw.status;
+    response.body = await res.value();
+    return response;
+  } catch (error) {
+    response.status = error.status;
+    return response;
+  }
+
+}
+
+
 export {
   postLogin,
   getListsByMe,
   addList,
   updateList,
   getPlanks,
+  getServerVersion,
+  getSpacedRepetitionNext
 };

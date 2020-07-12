@@ -8,7 +8,16 @@ if (installed === null) {
     clearCache();
 }
 
-// TODO setup
-customElements.define('login-header', LoginHeader);
-customElements.define('user-login', UserLogin);
-customElements.define('notification-center', Banner);
+
+function connect(id, element) {
+    const el = document.querySelector(id);
+    if (el) {
+        new element({
+            target: el,
+        });
+    }
+}
+
+connect("#notification-center", Banner)
+connect("#user-login", UserLogin)
+connect("#login-header", LoginHeader)

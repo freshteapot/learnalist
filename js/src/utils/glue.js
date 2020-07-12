@@ -45,6 +45,7 @@ const getComponentInfo = (componentKey, dev) => {
 }
 
 const write = async (manifestFile, key, value) => {
+    console.log(manifestFile)
     const retryOptions = {
         retries: {
             retries: 5,
@@ -81,7 +82,7 @@ const write = async (manifestFile, key, value) => {
 
 
     try {
-        manifest = await fs.readJson(manifestFile)
+        const manifest = await fs.readJson(manifestFile)
         console.log('success!')
         newManifest = { ...manifest, ...newManifest }
     } catch (err) {
@@ -152,7 +153,7 @@ const syncManifestCSSBase = async () => {
     }
 }
 
-module.exports = {
+export {
     getComponentInfo,
     rollupPluginManifestSync,
     syncManifestCSSBase,

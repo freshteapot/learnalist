@@ -1,5 +1,5 @@
 <script>
-  import { loggedIn } from "../store.js";
+  import { loggedIn, notifications } from "../store.js";
   import { formatTime } from "./utils.js";
   import {
     get as cacheGet,

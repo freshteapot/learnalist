@@ -4,6 +4,7 @@ url: /spaced-repetition.html
 type: alist
 layout: spaced-repetition
 js_include: ["main", "srs"]
+css_include: ["main", "srs"]
 ---
 # Learn with Spaced Repetition
 

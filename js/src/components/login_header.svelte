@@ -1,6 +1,6 @@
 <script>
-  import { getNext } from "./interact/spaced_repetition/api.js";
-  import { loggedIn } from "../store.js";
+  //import { getNext } from "./interact/spaced_repetition/api.js";
+  import { loggedIn, api } from "../store.js";
   export let loginurl = "/login.html";
 
   let poller;
@@ -23,7 +23,8 @@
       return;
     }
 
-    const response = await getNext();
+    const response = await api.getSpacedRepetitionNext();
+
     if (![200, 204, 404].includes(response.status)) {
       clearInterval(poller);
       return;

@@ -1,6 +1,5 @@
 import { copyObject } from '../utils/utils.js';
-import { loggedIn } from "../store.js";
-import { getListsByMe, addList, updateList } from "../api2.js";
+import { loggedIn, api } from "../store.js";
 
 async function today() {
     if (!loggedIn()) {
@@ -13,7 +12,7 @@ async function today() {
     console.log("labels", labels);
 
     try {
-        let data = await getListsByMe({
+        let data = await api.getListsByMe({
             labels: labels
         });
 
@@ -21,7 +20,7 @@ async function today() {
         if (data.length === 0) {
             // TODO create today
             try {
-                data = await addList({
+                data = await api.addList({
                     data: [],
                     info: {
                         title: "Todays planks",
@@ -49,7 +48,7 @@ async function today() {
 async function history() {
 
     try {
-        let items = await getListsByMe({
+        let items = await api.getListsByMe({
             labels: "plank"
         });
 
@@ -91,7 +90,7 @@ async function history() {
 async function save(aList) {
     let input = convertToV1(aList);
     try {
-        let aList = await updateList(input);
+        let aList = await api.updateList(input);
         console.log("planks", aList);
         return convertFromV1(aList);
     } catch (error) {

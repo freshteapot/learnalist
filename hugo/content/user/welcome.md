@@ -3,6 +3,7 @@ title: "Welcome"
 type: "user"
 url: /welcome.html
 js_include: ["main"]
+css_include: ["main"]
 ---
 # Welcome
 - Please excuse the mess and I am sorry if things dont work from time to time

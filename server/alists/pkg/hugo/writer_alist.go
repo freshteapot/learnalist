@@ -56,6 +56,7 @@ func (w HugoAListWriter) Content(aList alist.Alist) {
 
 		"css_include": func(info alist.AlistInfo) string {
 			include := make([]string, 0)
+			include = append(include, "main")
 			include = append(include, info.ListType)
 			b, _ := json.Marshal(include)
 			return string(b)
