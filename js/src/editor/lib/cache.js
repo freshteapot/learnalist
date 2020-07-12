@@ -24,6 +24,7 @@ function rm(key) {
   localStorage.removeItem(key);
 }
 
+// TODO remove this
 function clear() {
   localStorage.clear();
   save(keys['settings.install.defaults'], true);

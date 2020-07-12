@@ -1,8 +1,12 @@
-import { get as cacheGet, KeyUserAuthentication, KeySettingsServer } from './cache.js';
+import {
+  getConfiguration,
+  KeyUserAuthentication,
+  KeySettingsServer
+} from './configuration.js';
 import { Configuration, DefaultApi, HttpUserLoginRequestFromJSON, AlistInputFromJSON, AlistFromJSON } from "./openapi";
 
 function getApi() {
-  const server = cacheGet(KeySettingsServer, null)
+  const server = getConfiguration(KeySettingsServer, null)
   if (server === null) {
     throw new Error('settings.server.missing');
   }

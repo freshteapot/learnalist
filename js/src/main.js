@@ -1,13 +1,13 @@
-import { KeySettingsInstallDefaults, get as cacheGet, clear as clearCache } from './cache.js';
+import { KeySettingsInstallDefaults, getConfiguration, clearConfiguration } from './configuration.js';
 import Banner from './components/banner/banner.svelte';
 import LoginHeader from './components/login_header.svelte';
 import UserLogin from './components/user_login.svelte';
 
-const installed = cacheGet(KeySettingsInstallDefaults, null)
+// The crudest attempt to see if we have setup the site with configuration in localstorage
+const installed = getConfiguration(KeySettingsInstallDefaults, null)
 if (installed === null) {
-    clearCache();
+    clearConfiguration();
 }
-
 
 function connect(id, element) {
     const el = document.querySelector(id);

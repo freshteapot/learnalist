@@ -1,7 +1,12 @@
-import { get as cacheGet, KeyUserAuthentication, KeySettingsServer } from './cache.js';
+import {
+  getConfiguration,
+  KeyUserAuthentication,
+  KeySettingsServer
+} from './configuration.js';
 
+// TODO remove this file
 function getAuth() {
-  const token = cacheGet(KeyUserAuthentication, null)
+  const token = getConfiguration(KeyUserAuthentication, null)
   if (token === null) {
     throw new Error('login.required');
   }
@@ -9,7 +14,7 @@ function getAuth() {
 }
 
 function getServer() {
-  const server = cacheGet(KeySettingsServer, null)
+  const server = getConfiguration(KeySettingsServer, null)
   if (server === null) {
     throw new Error('settings.server.missing');
   }

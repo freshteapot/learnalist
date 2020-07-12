@@ -1,5 +1,5 @@
 import { notifications } from './notifications.js';
-import { KeyUserAuthentication } from './cache.js';
+import { KeyUserAuthentication } from './configuration.js';
 import * as api from './api2.js';
 
 // Link any component to be able to notify the banner component

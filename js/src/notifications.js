@@ -1,5 +1,10 @@
 import { writable } from 'svelte/store';
-import { rm as rmCache, save as saveCache, get as cacheGet, KeyNotifications } from './cache.js';
+import {
+    removeConfiguration,
+    getConfiguration,
+    saveConfiguration,
+    KeyNotifications
+} from './configuration.js';
 import { copyObject } from './utils/utils.js';
 
 const data = {
@@ -11,7 +16,7 @@ const emptyData = JSON.parse(JSON.stringify(data));
 let liveData = JSON.parse(JSON.stringify(data));
 
 
-const storedData = cacheGet(KeyNotifications, null);
+const storedData = getConfiguration(KeyNotifications, null);
 
 if (storedData !== null) {
     liveData = storedData;
@@ -27,14 +32,13 @@ function wrapper() {
             update(notification => {
                 notification.level = level;
                 notification.message = message;
-                saveCache(KeyNotifications, notification)
+                saveConfiguration(KeyNotifications, notification)
                 return notification;
             });
         },
 
         clear: () => {
-
-            rmCache(KeyNotifications);
+            removeConfiguration(KeyNotifications);
             set(copyObject(emptyData));
         }
     };

@@ -1,5 +1,10 @@
 import { writable } from 'svelte/store';
-import { save as saveCache, get as cacheGet, KeyUserAuthentication } from '../../cache.js';
+import {
+	save as saveCache,
+	get as cacheGet,
+	KeyUserAuthentication,
+	clear as clearCache
+} from '../../configuration.js';
 
 function copyObject(item) {
 	return JSON.parse(JSON.stringify(item))
@@ -47,7 +52,7 @@ function loginHelperSingleton() {
 		}),
 
 		logout: () => {
-			cache.clear()
+			clearCache();
 			update(n => {
 				n.loggedIn = false;
 				return n;

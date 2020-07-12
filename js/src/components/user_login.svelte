@@ -2,10 +2,10 @@
   import { login, notify, api } from "../store.js";
   import { loginHelper } from "../utils/login_helper.js";
   import {
-    save as cacheSave,
+    saveConfiguration,
     KeyUserUuid,
     KeyUserAuthentication
-  } from "../cache.js";
+  } from "../configuration.js";
 
   // TODO actually check if logged in
   let isLoggedIn = $loginHelper.loggedIn;
@@ -28,8 +28,8 @@
       return;
     }
 
-    cacheSave(KeyUserUuid, response.body.user_uuid);
-    cacheSave(KeyUserAuthentication, response.body.token);
+    saveConfiguration(KeyUserUuid, response.body.user_uuid);
+    saveConfiguration(KeyUserAuthentication, response.body.token);
     login("/welcome.html");
 
     return;

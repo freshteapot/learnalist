@@ -14,6 +14,10 @@ function rm(key) {
     localStorage.removeItem(key);
 }
 
+function clear() {
+
+}
+
 
 export {
     get,

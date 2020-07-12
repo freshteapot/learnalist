@@ -1,6 +1,6 @@
 <script>
-  //import { getNext } from "./interact/spaced_repetition/api.js";
   import { loggedIn, api } from "../store.js";
+  import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
 
   let poller;
@@ -8,8 +8,7 @@
   let hasSpacedRepetition = false;
   let dontLookup = false;
   function preLogout() {
-    localStorage.clear();
-    console.log("It should still click");
+    clearConfiguration();
   }
 
   async function checkForSpacedRepetition() {

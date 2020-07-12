@@ -13,6 +13,10 @@
   function formatWhen(entry) {
     return new Date(entry.beginningTime).toISOString();
   }
+
+  function deleteEntry(entry) {
+    console.log("remove", entry);
+  }
   /*
   class TravellerCollection extends Array {
     sum(key) {
@@ -62,6 +66,7 @@
     <p>
       {formatTime(entry.timerNow)}
       {#if details}({formatWhen(entry)}){/if}
+      <span on:click={deleteEntry(entry)}>delete</span>
     </p>
     {#if details}
       <pre>{JSON.stringify(entry, '', 2)}</pre>

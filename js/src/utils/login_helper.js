@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { save as saveCache, get as cacheGet } from './storage.js';
-import { KeyUserAuthentication } from '../cache.js';
+import { KeyUserAuthentication } from '../configuration.js';
 
 function loginHelperSingleton() {
     const defaultRedirectURL = '/';
@@ -26,6 +26,7 @@ function loginHelperSingleton() {
         }),
 
         logout: () => {
+            // TODO replace with clearConfiguration
             cache.clear()
             update(n => {
                 n.loggedIn = false;
