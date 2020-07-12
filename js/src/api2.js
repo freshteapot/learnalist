@@ -121,6 +121,21 @@ async function updateList(aList) {
   }
 }
 
+async function deleteList(uuid) {
+  try {
+    const api = getApi();
+
+    const input = {
+      uuid: uuid,
+    }
+    return await api.deleteListByUuid(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete list");
+  }
+}
+
+
 async function getServerVersion() {
   const api = getApi();
   return await api.getServerVersion();
@@ -153,6 +168,7 @@ export {
   getListsByMe,
   addList,
   updateList,
+  deleteList,
   getPlanks,
   getServerVersion,
   getSpacedRepetitionNext

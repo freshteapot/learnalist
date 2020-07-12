@@ -32,6 +32,14 @@ components:
             - $ref: "#/components/schemas/AlistDataV1"
             - $ref: "#/components/schemas/AlistDataV2"
 
+    AlistInteract:
+      type: object
+      properties:
+        slideshow:
+          type: integer
+        totalrecall:
+          type: integer
+
     AlistInfo:
       type: object
       required:
@@ -48,6 +56,8 @@ components:
             type: string
         shared_with:
           type: string
+        interact:
+          $ref: "#/components/schemas/AlistInteract"
 
     AlistItemV1:
       type: string
