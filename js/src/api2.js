@@ -159,11 +159,15 @@ async function getSpacedRepetitionNext() {
   try {
     const res = await api.getNextSpacedRepetitionEntryRaw();
     response.status = res.raw.status;
-    response.body = await res.value();
+    try {
+      response.body = await res.value();
+    } catch (error) {
+
+    }
+
     return response;
   } catch (error) {
-    response.status = error.status;
-    return response;
+    throw (error);
   }
 
 }
