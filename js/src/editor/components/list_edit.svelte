@@ -3,7 +3,7 @@
   import { putList, deleteList } from "../../api.js";
   import goto from "../lib/goto.js";
   import myLists from "../store/lists_by_me";
-  import listsEdits from "../store/lists_edits.js";
+  import listsEdits from "../../stores/editor_lists_edits.js";
   import Box from "./Box.svelte";
   import ListEditTitle from "./list_edit_title.svelte";
   import ListEditDataV1 from "./list_edit_data_v1.svelte";

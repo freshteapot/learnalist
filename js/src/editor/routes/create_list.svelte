@@ -2,7 +2,7 @@
   import goto from "../lib/goto.js";
   import { postList } from "../../api.js";
   import myLists from "../store/lists_by_me";
-  import listsEdits from "../store/lists_edits.js";
+  import listsEdits from "../../stores/editor_lists_edits.js";
   import { push } from "svelte-spa-router";
   import ErrorBox from "../components/error_box.svelte";
   let title = "";

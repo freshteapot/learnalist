@@ -3,7 +3,7 @@ import {
   getConfiguration,
   saveConfiguration,
   KeyEditorMyEditedLists
-} from "../../configuration.js";
+} from "../configuration.js";
 
 const current = getConfiguration(KeyEditorMyEditedLists, []);
 const { subscribe, set, update } = writable(current);

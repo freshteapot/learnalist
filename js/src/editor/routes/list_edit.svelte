@@ -1,5 +1,5 @@
 <script>
-  import listsEdits from "../store/lists_edits.js";
+  import listsEdits from "../../stores/editor_lists_edits.js";
   import Box from "../components/Box.svelte";
   import ListEdit from "../components/list_edit.svelte";
 

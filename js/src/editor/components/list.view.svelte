@@ -3,7 +3,7 @@
   import { getServer } from "../../api2.js";
   import { copyObject } from "../../utils/utils.js";
 
-  import listsEdits from "../store/lists_edits.js";
+  import listsEdits from "../../stores/editor_lists_edits.js";
   import ItemV1 from "./list.view.data.item.v1.svelte";
   import ItemV2 from "./list.view.data.item.v2.svelte";
   import ItemV3 from "./list.view.data.item.v3.svelte";
@@ -30,10 +30,6 @@
   let renderItem = items[listType];
 
   function edit() {
-    // This is really useful to know.
-    // I dont want to store the copy.
-    // TODO consider moving this into the store!
-    //const edit = JSON.parse(JSON.stringify(aList));
     const edit = copyObject(aList);
     listsEdits.add(edit);
     goto.list.edit(uuid);
