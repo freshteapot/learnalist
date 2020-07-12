@@ -1,6 +1,5 @@
 <script>
   import { replace } from "svelte-spa-router";
-  import cache from "../lib/cache.js";
   import { putList, deleteList } from "../../api.js";
   import goto from "../lib/goto.js";
   import myLists from "../store/lists_by_me";

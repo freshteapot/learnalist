@@ -1,5 +1,5 @@
 <script>
-  import cache from "./lib/cache.js";
+  import { saveConfiguration, KeyLastScreen } from "../configuration.js";
   import Router from "svelte-spa-router";
   import TopMenu from "./components/menu_top.svelte";
 
@@ -24,21 +24,12 @@
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
   function conditionsFailed(event) {
-    // eslint-disable-next-line no-console
-    // console.error('Caught event conditionsFailed', event.detail)
-    // logbox += 'conditionsFailed - ' + JSON.stringify(event.detail) + '\n'
-
-    // Replace the route
     replace("/login");
   }
 
   // Handles the "routeLoaded" event dispatched by the router after a route has been successfully loaded
   function routeLoaded(event) {
-    console.log(event);
-    // eslint-disable-next-line no-console
-    // console.info('Caught event routeLoaded', event.detail)
-    // logbox += 'routeLoaded - ' + JSON.stringify(event.detail) + '\n'
-    cache.save(cache.keys["last.screen"], "#" + event.detail.location);
+    saveConfiguration(KeyLastScreen, "#" + event.detail.location);
   }
 </script>
 

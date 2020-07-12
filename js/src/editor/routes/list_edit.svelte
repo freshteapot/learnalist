@@ -1,5 +1,4 @@
 <script>
-  import cache from "../lib/cache.js";
   import listsEdits from "../store/lists_edits.js";
   import Box from "../components/Box.svelte";
   import ListEdit from "../components/list_edit.svelte";

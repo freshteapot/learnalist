@@ -8,6 +8,9 @@ const KeyUserAuthentication = "app.user.authentication"
 const KeyNotifications = "app.notifications";
 const KeyEditorMyEditedLists = "my.edited.lists";
 const KeyEditorMyLists = "my.lists";
+const KeyLastScreen = "last.screen";
+// Hmmm
+const KeyListsByMe = "lists.by.me";
 
 function clear() {
   console.log("clearing configuration");
@@ -29,6 +32,10 @@ export {
   KeyUserUuid,
   KeyUserAuthentication,
   KeyNotifications,
+  KeyLastScreen,
+  KeyListsByMe,
+  KeyEditorMyEditedLists,
+  KeyEditorMyLists,
   get,
   getConfiguration,
   save,

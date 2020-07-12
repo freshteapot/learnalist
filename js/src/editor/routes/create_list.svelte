@@ -1,6 +1,5 @@
 <script>
   import goto from "../lib/goto.js";
-  import cache from "../lib/cache.js";
   import { postList } from "../../api.js";
   import myLists from "../store/lists_by_me";
   import listsEdits from "../store/lists_edits.js";
