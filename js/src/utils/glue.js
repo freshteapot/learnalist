@@ -1,7 +1,6 @@
-const lockfile = require('proper-lockfile');
-
-const fs = require('fs-extra')
-const del = require('del');
+import lockfile from 'proper-lockfile';
+import fs from 'fs-extra';
+import del from 'del';
 
 const pathToManifestFile = "../hugo/data/manifest_js.json";
 const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
