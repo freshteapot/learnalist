@@ -39,6 +39,7 @@ export default (key, format) => {
                     { find: './store.js', replacement: 'superstore' },
                     { find: '../store.js', replacement: 'superstore' },
                     { find: '../../store.js', replacement: 'superstore' },
+                    { find: '../../../store.js', replacement: 'superstore' },
                 ]
             }),
             del({ targets: componentInfo.rollupDeleteTargets, verbose: true, force: true }),

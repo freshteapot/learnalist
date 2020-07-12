@@ -99,6 +99,10 @@
   $: listLabels = getSelectListLabels(filterLists);
 </script>
 
+<style>
+  @import "../../../all.css";
+</style>
+
 <div class="pa3 pa2-ns">
 
   <div class="pl0 measure center">

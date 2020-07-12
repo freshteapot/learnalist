@@ -4,6 +4,10 @@
   version.get();
 </script>
 
+<style>
+  @import "../../../all.css";
+</style>
+
 <div class="pa3 pa5-ns">
   <div class="pl0 measure center">
     {#if $error}

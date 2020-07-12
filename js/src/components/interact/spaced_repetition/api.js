@@ -1,7 +1,7 @@
 
-import { getSpacedRepetitionNext, addSpacedRepetitionEntry, updateSpacedRepetitionEntry } from '../../../api2.js';
+import { api } from '../../../store.js';
 async function getNext() {
-    return await getSpacedRepetitionNext();
+    return await api.getSpacedRepetitionNext();
 }
 
 async function viewed(uuid) {
@@ -9,11 +9,11 @@ async function viewed(uuid) {
         uuid: uuid,
         action: "incr"
     }
-    return await updateSpacedRepetitionEntry(input)
+    return await api.updateSpacedRepetitionEntry(input)
 }
 
 async function addEntry(input) {
-    return await addSpacedRepetitionEntry(input);
+    return await api.addSpacedRepetitionEntry(input);
 }
 
 export {

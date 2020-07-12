@@ -74,6 +74,10 @@
   }
 </script>
 
+<style>
+  @import "../../../all.css";
+</style>
+
 <div class="pv0 mw100">
   <div class="flex items-center justify-center pa1 bg-light-red pv3">
     <svg
