@@ -19,8 +19,13 @@
   }
 
   async function next() {
-    const status = await viewed(data.uuid);
-    get();
+    try {
+      const response = await viewed(data.uuid);
+      console.log("next response", response);
+      get();
+    } catch (error) {
+      alert("Failed to talk to the server, try again");
+    }
   }
 
   async function get() {

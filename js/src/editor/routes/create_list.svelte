@@ -1,7 +1,7 @@
 <script>
   import goto from "../lib/goto.js";
   // TODO replace with api2
-  import { postList } from "../../api.js";
+  import { addList } from "../../api2.js";
   import storeListsByMe from "../../stores/lists_by_me";
   import storeListEdits from "../../stores/editor_lists_edits.js";
   import { push } from "svelte-spa-router";
@@ -43,19 +43,30 @@
       message = "Pick a list type";
       return;
     }
+    // TODO
 
-    const response = await postList(title, selected);
-    if (response.status === 201) {
-      const aList = response.body;
-      const uuid = aList.uuid;
+    let aList = {
+      data: [],
+      info: {
+        title: title,
+        type: selected,
+        labels: []
+      }
+    };
 
-      storeListEdits.add(aList);
-      storeListsByMe.add(aList);
-
-      goto.list.edit(uuid);
+    try {
+      aList = await addList(aList);
+    } catch (error) {
+      alert("failed try again");
+      console.error("status from server was", error);
+      message = error;
       return;
     }
-    message = response.body.message;
+
+    storeListEdits.add(aList);
+    storeListsByMe.add(aList);
+
+    goto.list.edit(aList.uuid);
   }
 
   function init(el) {

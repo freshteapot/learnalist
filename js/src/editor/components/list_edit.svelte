@@ -70,7 +70,7 @@
       console.error("status from server was", error);
       return;
     }
-    console.log(aList);
+
     try {
       storeListsEdits.remove(aList.uuid);
       storeListsByMe.update(aList);

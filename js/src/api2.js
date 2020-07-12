@@ -3,7 +3,14 @@ import {
   KeyUserAuthentication,
   KeySettingsServer
 } from './configuration.js';
-import { Configuration, DefaultApi, HttpUserLoginRequestFromJSON, AlistInputFromJSON, AlistFromJSON } from "./openapi";
+import {
+  Configuration,
+  DefaultApi,
+  HttpUserLoginRequestFromJSON,
+  AlistInputFromJSON,
+  AlistFromJSON,
+  SpacedRepetitionEntryViewedFromJSON
+} from "./openapi";
 
 function getServer() {
   const server = getConfiguration(KeySettingsServer, null)
@@ -162,6 +169,43 @@ async function getSpacedRepetitionNext() {
 }
 
 
+async function addSpacedRepetitionEntry(entry) {
+  const response = {
+    status: 500,
+    body: {}
+  }
+
+  try {
+    const api = getApi();
+    const input = {
+      body: entry,
+    }
+    const res = await api.addSpacedRepetitionEntryRaw(input);
+    response.status = res.raw.status;
+    response.body = await res.value();
+    return response;
+  } catch (error) {
+    response.status = error.status;
+    response.body = await error.json();
+    return response;
+  }
+}
+
+async function updateSpacedRepetitionEntry(entry) {
+  try {
+    const api = getApi();
+
+    const input = {
+      spacedRepetitionEntryViewed: SpacedRepetitionEntryViewedFromJSON(entry)
+    }
+    return api.updateSpacedRepetitionEntry(input);
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to get lists by me");
+  }
+
+}
+
 export {
   getServer,
   postLogin,
@@ -171,5 +215,7 @@ export {
   deleteList,
   getPlanks,
   getServerVersion,
-  getSpacedRepetitionNext
+  getSpacedRepetitionNext,
+  addSpacedRepetitionEntry,
+  updateSpacedRepetitionEntry
 };

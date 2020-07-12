@@ -1,24 +1,7 @@
 
-import { getServer, getHeaders } from '../../../api.js';
-
+import { getSpacedRepetitionNext, addSpacedRepetitionEntry, updateSpacedRepetitionEntry } from '../../../api2.js';
 async function getNext() {
-    const url = getServer() + "/api/v1/spaced-repetition/next";
-
-    const res = await fetch(url, {
-        headers: getHeaders()
-    });
-
-    let response = {
-        status: res.status,
-        body: {}
-    };
-
-    if (res.status == 200) {
-        response.body = await res.json();
-        return response;
-    }
-
-    return response;
+    return await getSpacedRepetitionNext();
 }
 
 async function viewed(uuid) {
@@ -26,35 +9,11 @@ async function viewed(uuid) {
         uuid: uuid,
         action: "incr"
     }
-
-    const url = getServer() + "/api/v1/spaced-repetition/viewed";
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(input)
-    });
-
-    return res.status;
+    return await updateSpacedRepetitionEntry(input)
 }
 
 async function addEntry(input) {
-    const url = getServer() + "/api/v1/spaced-repetition/";
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(input)
-    });
-
-    let response = {
-        status: res.status,
-        body: await res.json(),
-    };
-
-    return response;
+    return await addSpacedRepetitionEntry(input);
 }
 
 export {
