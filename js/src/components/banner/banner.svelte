@@ -19,7 +19,7 @@
 
   $: level = $notifications.level;
   $: message = $notifications.message;
-  $: show = level != "" ? true : false;
+  $: show = $notifications.level != "" ? true : false;
 </script>
 
 <style>
@@ -33,6 +33,7 @@
 </style>
 
 <svelte:options tag={null} />
+
 {#if show}
   <div
     class="flex items-center justify-center pa3 navy"

@@ -1,8 +1,46 @@
 <script>
+  import { loggedIn } from "../store.js";
   import { formatTime } from "./utils.js";
+  import {
+    get as cacheGet,
+    rm as cacheRm,
+    save as cacheSave
+  } from "../utils/storage.js";
   import Timer from "./timer.svelte";
+  import { today, history as getHistory2, save } from "./api.js";
   import Settings from "./settings.svelte";
   import History from "./history.svelte";
+  import LoginModal from "../components/login_modal.svelte";
+  // Used for when the user is not logged in
+  const StorageKeyPlankSavedItems = "plank.saved.items";
+  // History of planks, maybe this is an api call
+  const StorageKeyPlankHistory = "plank.history";
+  const StorageKeyTodaysPlank = "plank.today";
+
+  cacheRm(StorageKeyTodaysPlank);
+  /*
+  (async () => {
+    const aList = await today();
+    cacheSave(StorageKeyTodaysPlank, aList);
+  })();
+  */
+
+  today().then(aList => {
+    // TODO check, do we handle cleaning up after logged in, logged out.
+    if (!aList) {
+      cacheRm(StorageKeyTodaysPlank);
+    }
+
+    cacheSave(StorageKeyTodaysPlank, aList);
+
+    saveEntriesFromStorage();
+    /*
+    if (window.location.search.includes("login_redirect=true")) {
+      saveEntriesFromStorage();
+    }
+    */
+  });
+
   let state = "plank_start";
   let showIntervals = false;
   let intervalTime = 15;
@@ -69,6 +107,80 @@
   function showHistory() {
     state = "history";
   }
+
+  function closeLoginModal() {
+    entry = {};
+    state = "plank_start";
+  }
+
+  function handleSave() {
+    console.log("save");
+    entry.intervalTimerNow = intervalTimerNow;
+    entry.laps = laps;
+    let items = cacheGet(StorageKeyPlankSavedItems, []);
+    items.push(entry);
+    cacheSave(StorageKeyPlankSavedItems, items);
+
+    if (!loggedIn()) {
+      state = "plank_summary_login";
+      return;
+    }
+
+    saveEntriesFromStorage();
+  }
+
+  function saveEntriesFromStorage() {
+    // How to notify that items are saved
+    // Could always call this function and include loggedIn
+    // Could always just auto save
+    if (!loggedIn()) {
+      return;
+    }
+    const aList = cacheGet(StorageKeyTodaysPlank, null);
+    if (!aList) {
+      console.error("Something has gone wrong, why is there no list");
+      return;
+    }
+
+    const items = cacheGet(StorageKeyPlankSavedItems, []);
+    if (items.length == 0) {
+      return;
+    }
+
+    aList.data.push(...items);
+    save(aList)
+      .then(saved => {
+        cacheSave(StorageKeyPlankSavedItems, []);
+        cacheSave(StorageKeyTodaysPlank, saved);
+      })
+      .catch(error => {
+        console.error("saveEntriesFromStorage", error);
+      });
+
+    entry = {};
+    state = "plank_start";
+  }
+
+  async function getHistory() {
+    if (loggedIn()) {
+      return getHistory2();
+    }
+    return Promise.resolve(cacheGet(StorageKeyPlankSavedItems, []));
+
+    const aList = cacheGet(StorageKeyTodaysPlank, null);
+    if (aList) {
+      return aList.data;
+    }
+
+    // If user is not logged in, show them the unsaved history
+    // TODO make it clear this has not been saved, on the history screen
+    if (!loggedIn()) {
+      return cacheGet(StorageKeyPlankSavedItems, []);
+    }
+    return [];
+  }
+
+  // TODO highlight there are items to be saved.
 </script>
 
 <style>
@@ -77,6 +189,9 @@
 
 <div class="tc">
   {#if state === 'plank_start'}
+    <script>
+      superstore.clearNotification();
+    </script>
     <button class="br3" on:click={showSettings}>Settings</button>
     <button class="br3" on:click={start}>Start</button>
     <button class="br3" on:click={showHistory}>History</button>
@@ -93,7 +208,7 @@
     <button class="br3" on:click={stop}>Stop</button>
   {/if}
 
-  {#if state === 'plank_summary'}
+  {#if state.startsWith('plank_summary')}
     <Timer
       {timerNow}
       {showIntervals}
@@ -110,18 +225,13 @@
       Discard
     </button>
 
-    <button
-      class="br3"
-      on:click={() => {
-        console.log('save');
-        entry.intervalTimerNow = intervalTimerNow;
-        entry.laps = laps;
-        history.push(entry);
-        entry = {};
-        state = 'plank_start';
-      }}>
-      Save
-    </button>
+    <button class="br3" on:click={handleSave}>Save</button>
+
+    {#if state === 'plank_summary_login'}
+      <LoginModal on:close={closeLoginModal}>
+        <p>Abc</p>
+      </LoginModal>
+    {/if}
   {/if}
 
   {#if state === 'settings'}
@@ -134,8 +244,7 @@
   {/if}
 
   {#if state === 'history'}
-    <p>Show history</p>
-    <History entries={history} />
+    <History entries={getHistory()} loggedIn={loggedIn()} />
     <button
       class="br3"
       on:click={() => {

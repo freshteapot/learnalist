@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { rm as rmCache, save as saveCache, get as cacheGet, KeyNotifications } from './cache.js';
+import { copyObject } from './utils/utils.js';
 
 const data = {
     level: "",
@@ -32,8 +33,9 @@ function wrapper() {
         },
 
         clear: () => {
+
             rmCache(KeyNotifications);
-            set(emptyData);
+            set(copyObject(emptyData));
         }
     };
 }

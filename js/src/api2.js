@@ -1,5 +1,5 @@
 import { get as cacheGet, KeyUserAuthentication, KeySettingsServer } from './cache.js';
-import { Configuration, DefaultApi, HttpUserLoginRequestFromJSON } from "./openapi";
+import { Configuration, DefaultApi, HttpUserLoginRequestFromJSON, AlistInputFromJSON, AlistFromJSON } from "./openapi";
 
 function getApi() {
   const server = cacheGet(KeySettingsServer, null)
@@ -77,14 +77,46 @@ async function getPlanks() {
   try {
     return await api.getListsByMe({ labels: "plank", listType: "v1" });
   } catch (error) {
-    console.log("error", error);
-    throw new Error("Failed to get lists by me");
+    throw new Error({
+      message: "Failed to get lists by me",
+      error: error
+    });
   }
 }
 
+async function addList(aList) {
+  try {
+    const api = getApi();
+
+    const input = {
+      alistInput: AlistInputFromJSON(aList)
+    }
+    return await api.addList(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to save list");
+  }
+}
+
+async function updateList(aList) {
+  try {
+    const api = getApi();
+
+    const input = {
+      uuid: aList.uuid,
+      alist: AlistFromJSON(aList)
+    }
+    return await api.updateListByUuid(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to update list");
+  }
+}
 
 export {
   postLogin,
   getListsByMe,
+  addList,
+  updateList,
   getPlanks,
 };

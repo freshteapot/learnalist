@@ -1,5 +1,5 @@
-
 import HumblePlank from "./plank/index.svelte";
+/*
 import { Configuration, DefaultApi } from "./openapi";
 
 import { getApiServer } from "./utils/setup.js";
@@ -26,7 +26,7 @@ getListsByMe().then(data => {
 getPlanks().then(data => {
     console.log("planks", data);
 })
-
+*/
 // Actual app to handle the interactions
 let app;
 const el = document.querySelector("#list-info")

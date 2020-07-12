@@ -6,6 +6,10 @@ const notify = (level, message) => {
     notifications.add(level, message);
 }
 
+const clearNotification = () => {
+    notifications.clear();
+}
+
 const loggedIn = () => {
     return localStorage.hasOwnProperty(KeyUserAuthentication);
 }
@@ -40,4 +44,5 @@ export {
     loggedIn,
     notify,
     notifications,
+    clearNotification,
 }

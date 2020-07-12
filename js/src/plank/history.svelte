@@ -1,78 +1,73 @@
 <script>
   import { formatTime } from "./utils.js";
-  import { AlistInputFromJSON, Configuration, DefaultApi } from "../openapi";
-  export let entries;
-  let details = false;
 
+  let details = false;
+  // Promise
+  export let loggedIn;
+  export let entries;
+
+  function totals(entries) {
+    return entries.reduce((a, b) => a + (b["timerNow"] || 0), 0);
+  }
+
+  function formatWhen(entry) {
+    return new Date(entry.beginningTime).toISOString();
+  }
+  /*
   class TravellerCollection extends Array {
     sum(key) {
       return this.reduce((a, b) => a + (b[key] || 0), 0);
     }
   }
-
   const c = new TravellerCollection(...entries);
   const total = c.sum("timerNow");
-  const total2 = entries.reduce((a, b) => a + (b["timerNow"] || 0), 0);
+  */
 
-  function fakeNewList() {
-    var config = new Configuration({
-      accessToken: "e0cfb872-37e6-47a8-9574-2bbdf1f306ca"
-    });
-    var api = new DefaultApi(config);
-
-    const aList = {
-      alistInput: AlistInputFromJSON({
-        data: [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday"
-        ],
-        info: {
-          title: "Days of the Week",
-          type: "v1",
-          labels: []
-        }
-      })
-    };
-
-    api.addList(aList).then(
-      function(data) {
-        console.log("API called successfully. Returned data: " + data);
-        console.log(data);
-        api.deleteListByUuid({ uuid: data.uuid }).then(
-          function(data) {
-            console.log("API called successfully. Returned data: " + data);
-            console.log(data);
-          },
-          function(error) {
-            console.error(error);
-          }
-        );
-      },
-      function(error) {
-        console.error(error);
-      }
-    );
-  }
+  // let entries2 = [];
+  // https://github.com/sveltejs/svelte/issues/2118#issuecomment-531586875
+  // $: (async () => (entries2 = await history()))();
 </script>
 
 <style>
   @import "../../all.css";
 </style>
 
-<p>Total Planking: {formatTime(total)}</p>
-<p>Total Planking: {formatTime(total2)}</p>
+{#if loggedIn}
+  <script>
+    superstore.clearNotification();
+  </script>
+{:else}
+  <script>
+    superstore.notify(
+      "error",
+      "History is not saved, you need to login to save it"
+    );
+  </script>
+{/if}
 
-<p>Planks</p>
-{#each entries.reverse() as entry}
-  <p>{formatTime(entry.timerNow)}</p>
-  {#if details}
-    <pre>{JSON.stringify(entry, '', 2)}</pre>
-  {/if}
-{/each}
+{#await entries}
+  <p>...waiting</p>
+{:then entries}
+  <p>Total Planking: {formatTime(totals(entries))}</p>
+  <p>Planks</p>
+  <button
+    class="br3"
+    on:click={() => {
+      details = !details;
+    }}>
+    Details
+  </button>
 
-<button class="br3" on:click={fakeNewList}>Stop</button>
+  {#each entries.reverse() as entry}
+    <p>
+      {formatTime(entry.timerNow)}
+      {#if details}({formatWhen(entry)}){/if}
+    </p>
+    {#if details}
+      <pre>{JSON.stringify(entry, '', 2)}</pre>
+    {/if}
+  {/each}
+
+{:catch error}
+  <p style="color: red">{error.message}</p>
+{/await}
