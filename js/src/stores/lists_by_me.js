@@ -1,10 +1,10 @@
 import { get, writable } from 'svelte/store';
-import { getListsByMe } from "../../api.js";
+import { getListsByMe } from "../api.js";
 import {
   getConfiguration,
   saveConfiguration,
   KeyListsByMe
-} from "../../configuration.js";
+} from "../configuration.js";
 
 
 const current = getConfiguration(KeyListsByMe, []);

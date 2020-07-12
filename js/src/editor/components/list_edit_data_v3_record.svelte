@@ -1,6 +1,5 @@
 <script>
-  import { copyObject, isDeviceMobile } from "../lib/helper.js";
-  import { tap } from "@sveltejs/gestures";
+  import { copyObject } from "../../utils/utils.js";
   import { afterUpdate } from "svelte";
 
   import Split from "./list_edit_data_v3_split.svelte";

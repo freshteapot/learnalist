@@ -1,28 +1,5 @@
-<style>
-  .draggableContainer {
-    outline: none;
-  }
-
-  input:disabled {
-    background: #fff;
-    color: #333;
-  }
-
-  .container {
-    display: flex;
-  }
-
-  span {
-    text-decoration: underline;
-  }
-
-  span + span {
-    margin-left: 0.5em;
-  }
-</style>
-
 <script>
-  import { copyObject } from "../lib/helper.js";
+  import { copyObject } from "../../utils/utils.js";
   import { onMount } from "svelte";
 
   let labelElement;
@@ -57,19 +34,42 @@
   }
 </script>
 
+<style>
+  .draggableContainer {
+    outline: none;
+  }
+
+  input:disabled {
+    background: #fff;
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+  }
+
+  span {
+    text-decoration: underline;
+  }
+
+  span + span {
+    margin-left: 0.5em;
+  }
+</style>
+
 {#if !enableSortable}
   <div>
-    <input bind:this="{labelElement}" placeholder="Label" />
+    <input bind:this={labelElement} placeholder="Label" />
 
-    <button on:click="{add}">Add</button>
+    <button on:click={add}>Add</button>
     {#if labelElement && labelElement.value !== ''}
-      <button on:click="{remove}">x</button>
+      <button on:click={remove}>x</button>
     {/if}
 
   </div>
   <div class="container">
     {#each labels as label}
-      <span class="item" on:click="{() => edit(label)}">{label}</span>
+      <span class="item" on:click={() => edit(label)}>{label}</span>
     {/each}
   </div>
 {/if}

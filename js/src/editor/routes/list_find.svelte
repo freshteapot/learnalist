@@ -1,19 +1,17 @@
 <script>
   import ErrorBox from "../components/error_box.svelte";
   import ListItem from "../components/list_find_item.svelte";
-  import ListsByMeStore from "../store/lists_by_me";
-  const loading = ListsByMeStore.loading;
-  const error = ListsByMeStore.error;
+  import store from "../../stores/lists_by_me.js";
+  const loading = store.loading;
+  const error = store.error;
 
-  ListsByMeStore.get();
+  store.get();
 
   let find = "all";
   let filterByLabel = "Any label";
 
-  let lists = $ListsByMeStore;
-  const foundListTypes = [
-    ...new Set($ListsByMeStore.map(item => item.info.type))
-  ];
+  let lists = $store;
+  const foundListTypes = [...new Set($store.map(item => item.info.type))];
 
   const defaultListTypes = [
     {
@@ -96,7 +94,7 @@
     filterByLabel = "Any label";
   }
 
-  $: filterLists = filterListsByFilters($ListsByMeStore, find, filterByLabel);
+  $: filterLists = filterListsByFilters($store, find, filterByLabel);
   $: listTypes = getSelectListTypes(filterLists);
   $: listLabels = getSelectListLabels(filterLists);
 </script>

@@ -1,8 +1,9 @@
 <script>
   import goto from "../lib/goto.js";
+  // TODO replace with api2
   import { postList } from "../../api.js";
-  import myLists from "../store/lists_by_me";
-  import listsEdits from "../../stores/editor_lists_edits.js";
+  import storeListsByMe from "../../stores/lists_by_me";
+  import storeListEdits from "../../stores/editor_lists_edits.js";
   import { push } from "svelte-spa-router";
   import ErrorBox from "../components/error_box.svelte";
   let title = "";
@@ -48,8 +49,8 @@
       const aList = response.body;
       const uuid = aList.uuid;
 
-      listsEdits.add(aList);
-      myLists.add(aList);
+      storeListEdits.add(aList);
+      storeListsByMe.add(aList);
 
       goto.list.edit(uuid);
       return;

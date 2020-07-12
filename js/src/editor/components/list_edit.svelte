@@ -2,8 +2,9 @@
   import { replace } from "svelte-spa-router";
   import { putList, deleteList } from "../../api.js";
   import goto from "../lib/goto.js";
-  import myLists from "../store/lists_by_me";
-  import listsEdits from "../../stores/editor_lists_edits.js";
+  import storeListsByMe from "../../stores/lists_by_me.js";
+  import storeListsEdits from "../../stores/editor_lists_edits.js";
+
   import Box from "./Box.svelte";
   import ListEditTitle from "./list_edit_title.svelte";
   import ListEditDataV1 from "./list_edit_data_v1.svelte";
@@ -42,7 +43,7 @@
     }, null);
 
   function cancel() {
-    listsEdits.remove(aList.uuid);
+    storeListsEdits.remove(aList.uuid);
     goto.list.view(aList.uuid);
   }
 
@@ -54,8 +55,8 @@
       return;
     }
 
-    myLists.remove(aList.uuid);
-    listsEdits.remove(aList.uuid);
+    storeListsByMe.remove(aList.uuid);
+    storeListsEdits.remove(aList.uuid);
     // TODO how to remove /lists/view/:uuid as well
     replace("/list/deleted");
   }
@@ -70,15 +71,15 @@
     }
 
     try {
-      listsEdits.remove(aList.uuid);
-      myLists.update(aList);
+      storeListsEdits.remove(aList.uuid);
+      storeListsByMe.update(aList);
       goto.list.view(aList.uuid);
     } catch (e) {
       alert("failed to clean up your edits");
     }
   }
 
-  $: listsEdits.update(aList);
+  $: storeListsEdits.update(aList);
 </script>
 
 <Box>
