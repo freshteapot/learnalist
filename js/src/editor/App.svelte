@@ -2,9 +2,6 @@
   import cache from "./lib/cache.js";
   import Router from "svelte-spa-router";
   import TopMenu from "./components/menu_top.svelte";
-  import Footer from "./components/footer.svelte";
-  import Menu from "./components/menu.svelte";
-  import Box from "./components/Box.svelte";
 
   // Import the "link" action and the methods to control history programmatically from the same module, as well as the location store
   import {
@@ -37,6 +34,7 @@
 
   // Handles the "routeLoaded" event dispatched by the router after a route has been successfully loaded
   function routeLoaded(event) {
+    console.log(event);
     // eslint-disable-next-line no-console
     // console.info('Caught event routeLoaded', event.detail)
     // logbox += 'routeLoaded - ' + JSON.stringify(event.detail) + '\n'
@@ -44,13 +42,12 @@
   }
 </script>
 
-<style global>
-  @import "tachyons";
+<style>
+  @import "../../all.css";
 </style>
 
 <TopMenu />
 
-<!-- <Menu /> -->
 <Router
   {routes}
   on:conditionsFailed={conditionsFailed}

@@ -29,18 +29,6 @@ function getHeaders() {
     Authorization: getAuth()
   };
 }
-
-async function getVersion() {
-  const url = getServer() + "/api/v1/version";
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (res.ok) {
-    return data;
-  }
-  throw new Error("Failed to get learnalist server version information");
-}
-
 async function getListsByMe() {
   const url = getServer() + "/api/v1/alist/by/me";
   const res = await fetch(url, {
@@ -75,41 +63,6 @@ async function putList(aList) {
     case 400:
       response.status = res.status
       response.data = data
-      return response;
-      break;
-  }
-  throw new Error('Unexpected response from the server');
-}
-
-
-// Look at https://github.com/freshteapot/learnalist-api/blob/master/docs/api.user.login.md
-async function postLogin(username, password) {
-  const response = {
-    status: 400,
-    body: {}
-  }
-
-  const input = {
-    username: username,
-    password: password
-  }
-
-  const url = getServer() + "/api/v1/user/login";
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(input)
-  });
-
-  const data = await res.json();
-  switch (res.status) {
-    case 200:
-    case 403:
-    case 400:
-      response.status = res.status
-      response.body = data
       return response;
       break;
   }
@@ -170,8 +123,6 @@ export {
   getServer,
   getHeaders,
   getListsByMe,
-  getVersion,
-  postLogin,
   putList,
   postList,
   deleteList,

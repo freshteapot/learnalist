@@ -1,5 +1,5 @@
 <script>
-  import version from "../store/version";
+  import version from "../../stores/version";
   const { loading, error } = version;
   version.get();
 </script>
@@ -16,7 +16,7 @@
       <p>Git date is {$version.gitDate}</p>
       <p>
         On
-        <a href="{$version.url}" target="_blank">Github</a>
+        <a href={$version.url} target="_blank">Github</a>
       </p>
     {/if}
   </div>

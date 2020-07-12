@@ -1,40 +1,10 @@
-<style>
-  input:disabled {
-    background: #ffcccc;
-    color: #333;
-  }
-  textarea:disabled {
-    background: #ffcccc;
-    color: #333;
-  }
-
-  .container {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-  }
-
-  .item-container {
-    display: flex;
-  }
-
-  .item-container .item {
-  }
-
-  .item-container .item-left {
-    flex-grow: 1; /* Set the middle element to grow and stretch */
-    margin-right: 0.5em;
-  }
-</style>
-
 <script>
-  import { copyObject, isDeviceMobile } from "../lib/helper.js";
+  import { copyObject } from "../../utils/utils.js";
+  import { isDeviceMobile } from "../lib/helper.js";
   import { tap } from "@sveltejs/gestures";
   import { afterUpdate } from "svelte";
 
   export let listData;
-
-  console.log("listData", listData);
 
   const possibleCommands = {
     nothing: "",
@@ -161,36 +131,65 @@
   }
 </script>
 
+<style>
+  @import "../../../all.css";
+
+  input:disabled {
+    background: #ffcccc;
+    color: #333;
+  }
+  textarea:disabled {
+    background: #ffcccc;
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .item-container {
+    display: flex;
+  }
+
+  .item-container .item {
+  }
+
+  .item-container .item-left {
+    flex-grow: 1; /* Set the middle element to grow and stretch */
+    margin-right: 0.5em;
+  }
+</style>
+
 <h1>Items</h1>
 
-<div bind:this="{itemsContainer}">
+<div bind:this={itemsContainer}>
   {#if !enableSortable}
     {#each listData as listItem}
       <div class="item-container pv2 bb b--black-05">
         <div class="flex flex-column item-left">
           <textarea
             placeholder="content"
-            bind:value="{listItem.content}"
-            class="item item-left"
-          ></textarea>
+            bind:value={listItem.content}
+            class="item item-left" />
           <input
             placeholder="url"
-            bind:value="{listItem.url}"
-            class="item item-left mv2"
-          />
+            bind:value={listItem.url}
+            class="item item-left mv2" />
         </div>
         <div class="flex flex-column">
-          <button on:click="{() => remove(listItem)}" class="item">x</button>
+          <button on:click={() => remove(listItem)} class="item">x</button>
         </div>
       </div>
     {/each}
 
     <div class="flex pv1">
-      <button class="mr1 ph1" on:click="{add}">New</button>
+      <button class="mr1 ph1" on:click={add}>New</button>
 
-      <button class="mh1 ph1" on:click="{removeAll}">Remove all</button>
+      <button class="mh1 ph1" on:click={removeAll}>Remove all</button>
 
-      <button class="mh1 ph1" on:click="{toggleSortable}">Change Order</button>
+      <button class="mh1 ph1" on:click={toggleSortable}>Change Order</button>
     </div>
   {/if}
 
@@ -199,31 +198,28 @@
       <div
         draggable="true"
         class="dropzone item-container pv2 bb b--black-05"
-        data-index="{pos}"
-        on:dragstart="{dragstart}"
-        on:dragover="{dragover}"
-        on:drop="{drop}"
+        data-index={pos}
+        on:dragstart={dragstart}
+        on:dragover={dragover}
+        on:drop={drop}
         use:tap
-        on:tap="{tapHandler}"
-      >
+        on:tap={tapHandler}>
         <div class="flex flex-column item-left">
           <textarea
             placeholder="content"
-            bind:value="{listItem.content}"
+            bind:value={listItem.content}
             class="item item-left"
-            disabled
-          ></textarea>
+            disabled />
           <input
             placeholder="url"
-            bind:value="{listItem.url}"
+            bind:value={listItem.url}
             class="item item-left mv2"
-            disabled
-          />
+            disabled />
         </div>
       </div>
     {/each}
 
-    <button on:click="{toggleSortable}">
+    <button on:click={toggleSortable}>
       Finished ordering? ({orderHelperText})
     </button>
   {/if}

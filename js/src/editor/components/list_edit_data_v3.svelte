@@ -1,23 +1,3 @@
-<style>
-  .container {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-  }
-
-  .item-container {
-    display: flex;
-  }
-
-  .item-container .item {
-  }
-
-  .item-container .item-left {
-    flex-grow: 1; /* Set the middle element to grow and stretch */
-    margin-right: 0.5em;
-  }
-</style>
-
 <script>
   import { copyObject, isDeviceMobile } from "../lib/helper.js";
   import { tap } from "@sveltejs/gestures";
@@ -155,18 +135,39 @@
   }
 </script>
 
+<style>
+  @import "../../../all.css";
+  .container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .item-container {
+    display: flex;
+  }
+
+  .item-container .item {
+  }
+
+  .item-container .item-left {
+    flex-grow: 1; /* Set the middle element to grow and stretch */
+    margin-right: 0.5em;
+  }
+</style>
+
 <h1>Items</h1>
 
-<div bind:this="{itemsContainer}">
+<div bind:this={itemsContainer}>
   {#if !enableSortable}
     {#each listData as listItem, index}
-      <Record {index} bind:record="{listItem}" on:removeRecord="{remove}" />
+      <Record {index} bind:record={listItem} on:removeRecord={remove} />
     {/each}
 
     <div class="flex pv1">
-      <button class="mr1 ph1" on:click="{add}">New</button>
-      <button class="mh1 ph1" on:click="{removeAll}">Remove all</button>
-      <button class="mh1 ph1" on:click="{toggleSortable}">Change Order</button>
+      <button class="mr1 ph1" on:click={add}>New</button>
+      <button class="mh1 ph1" on:click={removeAll}>Remove all</button>
+      <button class="mh1 ph1" on:click={toggleSortable}>Change Order</button>
 
     </div>
   {/if}
@@ -176,18 +177,17 @@
       <div
         draggable="true"
         class="dropzone pv2 bb b--black-05"
-        data-index="{pos}"
-        on:dragstart="{dragstart}"
-        on:dragover="{dragover}"
-        on:drop="{drop}"
+        data-index={pos}
+        on:dragstart={dragstart}
+        on:dragover={dragover}
+        on:drop={drop}
         use:tap
-        on:tap="{tapHandler}"
-      >
-        <Record disabled="true" index="{pos}" bind:record="{listItem}" />
+        on:tap={tapHandler}>
+        <Record disabled="true" index={pos} bind:record={listItem} />
       </div>
     {/each}
 
-    <button on:click="{toggleSortable}">
+    <button on:click={toggleSortable}>
       Finished ordering? ({orderHelperText})
     </button>
   {/if}

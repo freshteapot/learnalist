@@ -1,6 +1,8 @@
 <script>
   import goto from "../lib/goto.js";
-  import { getServer } from "../../api.js";
+  import { getServer } from "../../api2.js";
+  import { copyObject } from "../../utils/utils.js";
+
   import listsEdits from "../store/lists_edits.js";
   import ItemV1 from "./list.view.data.item.v1.svelte";
   import ItemV2 from "./list.view.data.item.v2.svelte";
@@ -31,7 +33,8 @@
     // This is really useful to know.
     // I dont want to store the copy.
     // TODO consider moving this into the store!
-    const edit = JSON.parse(JSON.stringify(aList));
+    //const edit = JSON.parse(JSON.stringify(aList));
+    const edit = copyObject(aList);
     listsEdits.add(edit);
     goto.list.edit(uuid);
   }
@@ -41,6 +44,10 @@
     window.open(`${server}/alist/${aList.uuid}.html`, "_blank");
   }
 </script>
+
+<style>
+  @import "../../../all.css";
+</style>
 
 <div class="pa3 pa5-ns">
   <div class="pl0 measure center">

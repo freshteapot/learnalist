@@ -1,3 +1,7 @@
+<script>
+  export let title;
+</script>
+
 <style>
   .container {
     display: flex;
@@ -9,10 +13,6 @@
   }
 </style>
 
-<script>
-  export let title;
-</script>
-
 <div class="container">
-  <input placeholder="Title" bind:value="{title}" />
+  <input placeholder="Title" bind:value={title} />
 </div>

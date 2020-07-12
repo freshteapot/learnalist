@@ -124,7 +124,6 @@
       <svelte:component
         this={interactElement}
         bind:interact={aList.info.interact} />
-
     </Box>
   {/if}
 

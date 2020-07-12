@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { getVersion } from "../../api.js";
+import { getServerVersion } from "../api2.js";
 
 
 const { subscribe, set, update } = writable({
@@ -18,12 +18,11 @@ const VersionStore = () => ({
   set,
   loading,
   error,
-  async get(query) {
-    console.log("Not here");
+  async get() {
     try {
       error.set('');
       loading.set(true);
-      const response = await getVersion();
+      const response = await getServerVersion();
       loading.set(false);
       set(response);
       return response;

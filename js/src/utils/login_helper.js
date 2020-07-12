@@ -1,13 +1,12 @@
 import { writable } from 'svelte/store';
-import { save as saveCache, get as cacheGet } from './storage.js';
-import { KeyUserAuthentication } from '../configuration.js';
+import { getConfiguration, saveConfiguration, clearConfiguration, KeyUserAuthentication } from '../configuration.js';
 
 function loginHelperSingleton() {
     const defaultRedirectURL = '/';
     let obj = {
         redirectURL: defaultRedirectURL,
         loggedIn: (() => {
-            const auth = cacheGet(KeyUserAuthentication);
+            const auth = getConfiguration(KeyUserAuthentication);
             return auth ? true : false;
         })()
     }
@@ -18,7 +17,7 @@ function loginHelperSingleton() {
         subscribe,
 
         login: ((session) => {
-            saveCache(KeyUserAuthentication, session.token);
+            saveConfiguration(KeyUserAuthentication, session.token);
             update(n => {
                 n.loggedIn = true;
                 return n;
@@ -27,7 +26,7 @@ function loginHelperSingleton() {
 
         logout: () => {
             // TODO replace with clearConfiguration
-            cache.clear()
+            clearConfiguration();
             update(n => {
                 n.loggedIn = false;
                 return n;

@@ -5,15 +5,19 @@ import {
 } from './configuration.js';
 import { Configuration, DefaultApi, HttpUserLoginRequestFromJSON, AlistInputFromJSON, AlistFromJSON } from "./openapi";
 
-function getApi() {
+function getServer() {
   const server = getConfiguration(KeySettingsServer, null)
   if (server === null) {
     throw new Error('settings.server.missing');
   }
+  return server;
+}
 
+
+function getApi() {
   var config = new Configuration({
-    basePath: `${server}/api/v1`,
-    accessToken: cacheGet(KeyUserAuthentication, undefined),
+    basePath: `${getServer()}/api/v1`,
+    accessToken: getConfiguration(KeyUserAuthentication, undefined),
   });
 
   return new DefaultApi(config);
@@ -144,6 +148,7 @@ async function getSpacedRepetitionNext() {
 
 
 export {
+  getServer,
   postLogin,
   getListsByMe,
   addList,
