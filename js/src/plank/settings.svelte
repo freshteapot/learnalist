@@ -1,13 +1,17 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import store from "../stores/plank.js";
+  import { copyObject } from "../utils/utils.js";
 
   const dispatch = createEventDispatcher();
 
-  export let showIntervals;
-  export let intervalTime;
+  export let settings;
 
   function close() {
-    dispatch("close");
+    store.settings(settings);
+    dispatch("close", {
+      settings
+    });
   }
 </script>
 
@@ -17,12 +21,12 @@
 
 <p>
   <span>Display intervals</span>
-  <input type="checkbox" bind:checked={showIntervals} />
+  <input type="checkbox" bind:checked={settings.showIntervals} />
 </p>
-{#if showIntervals}
+{#if settings.showIntervals}
   <p>
     <span>Interval time</span>
-    <input type="number" bind:value={intervalTime} max={60} min="1" />
+    <input type="number" bind:value={settings.intervalTime} max={60} min="1" />
     <span>(seconds)</span>
   </p>
 {/if}

@@ -10,8 +10,16 @@
 
   function handleLogin() {
     // TODO maybe add redirect
-    // Could use localstorage
-    window.location = "/login.html";
+    const searchParams = new URLSearchParams();
+    const redirectUrl = window.location.href.replace(
+      window.location.origin,
+      ""
+    );
+
+    searchParams.set("redirect", redirectUrl);
+    console.log(`/login.html?${searchParams.toString()}`);
+
+    window.location = `/login.html?${searchParams.toString()}`;
   }
   // TODO maybe make it so the user can use a slot
 </script>

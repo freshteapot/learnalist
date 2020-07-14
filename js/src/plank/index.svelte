@@ -1,5 +1,5 @@
 <script>
-  import { loggedIn, notifications } from "../store.js";
+  import { loggedIn, clearNotification } from "../store.js";
   import { formatTime } from "./utils.js";
   import {
     get as cacheGet,
@@ -7,55 +7,45 @@
     save as cacheSave
   } from "../utils/storage.js";
   import Timer from "./timer.svelte";
-  import { today, history as getHistory2, save } from "./api.js";
+  import store from "../stores/plank.js";
   import Settings from "./settings.svelte";
   import History from "./history.svelte";
   import LoginModal from "../components/login_modal.svelte";
   // Used for when the user is not logged in
   const StorageKeyPlankSavedItems = "plank.saved.items";
   // History of planks, maybe this is an api call
-  const StorageKeyPlankHistory = "plank.history";
   const StorageKeyTodaysPlank = "plank.today";
 
-  cacheRm(StorageKeyTodaysPlank);
-  /*
-  (async () => {
-    const aList = await today();
-    cacheSave(StorageKeyTodaysPlank, aList);
-  })();
-  */
-
-  today().then(aList => {
-    // TODO check, do we handle cleaning up after logged in, logged out.
-    if (!aList) {
-      cacheRm(StorageKeyTodaysPlank);
-    }
-
-    cacheSave(StorageKeyTodaysPlank, aList);
-
-    saveEntriesFromStorage();
-    /*
-    if (window.location.search.includes("login_redirect=true")) {
-      saveEntriesFromStorage();
-    }
-    */
-  });
-
   let state = "plank_start";
-  let showIntervals = false;
-  let intervalTime = 15;
+  let settings = store.settings();
 
   let intervalTimer;
   let timerNow = 0;
   let intervalTimerNow = 0;
   let laps = 0;
-  let history = [];
   let entry = {};
+
+  function loadCurrent() {
+    if (!loggedIn()) {
+      cacheRm(StorageKeyTodaysPlank);
+      return;
+    }
+
+    store.today().then(() => {
+      cacheSave(StorageKeyTodaysPlank, $store.today);
+      saveEntriesFromStorage();
+      if (window.location.search.includes("login_redirect=true")) {
+        console.log("Assumed redirect from login");
+      }
+      store.history();
+    });
+  }
+
   function startTime() {
     const beginning = new Date();
     const beginningTime = beginning.getTime();
-    entry.showIntervals = showIntervals;
-    entry.intervalTime = intervalTime;
+    entry.showIntervals = settings.showIntervals;
+    entry.intervalTime = settings.intervalTime;
     entry.beginningTime = beginningTime;
 
     let beginningTimeInterval;
@@ -71,7 +61,7 @@
       entry.timerNow = timerNow;
 
       if (showIntervals) {
-        if (intervalTimerNow > intervalTime * 1000) {
+        if (intervalTimerNow > settings.intervalTime * 1000) {
           const intervalBeginning = new Date();
           beginningTimeInterval = intervalBeginning.getTime();
           intervalTimerNow = 0;
@@ -136,6 +126,7 @@
     if (!loggedIn()) {
       return;
     }
+    // We could move this
     const aList = cacheGet(StorageKeyTodaysPlank, null);
     if (!aList) {
       console.error("Something has gone wrong, why is there no list");
@@ -148,10 +139,11 @@
     }
 
     aList.data.push(...items);
-    save(aList)
-      .then(saved => {
+    store
+      .record(aList)
+      .then(() => {
         cacheSave(StorageKeyPlankSavedItems, []);
-        cacheSave(StorageKeyTodaysPlank, saved);
+        cacheSave(StorageKeyTodaysPlank, $store.today);
       })
       .catch(error => {
         console.error("saveEntriesFromStorage", error);
@@ -161,26 +153,18 @@
     state = "plank_start";
   }
 
-  async function getHistory() {
-    if (loggedIn()) {
-      return getHistory2();
+  function shouldResetForStart(state) {
+    if (state !== "plank_start") {
+      return;
     }
-    return Promise.resolve(cacheGet(StorageKeyPlankSavedItems, []));
-
-    const aList = cacheGet(StorageKeyTodaysPlank, null);
-    if (aList) {
-      return aList.data;
-    }
-
-    // If user is not logged in, show them the unsaved history
-    // TODO make it clear this has not been saved, on the history screen
-    if (!loggedIn()) {
-      return cacheGet(StorageKeyPlankSavedItems, []);
-    }
-    return [];
+    clearNotification();
   }
 
+  $: loadCurrent();
+  $: shouldResetForStart(state);
+
   // TODO highlight there are items to be saved.
+  console.log("Plank index");
 </script>
 
 <style>
@@ -198,23 +182,13 @@
   {/if}
 
   {#if state === 'plank_active'}
-    <Timer
-      {timerNow}
-      {showIntervals}
-      {intervalTime}
-      {intervalTimerNow}
-      {laps} />
+    <Timer {timerNow} {settings} {intervalTimerNow} {laps} />
 
     <button class="br3" on:click={stop}>Stop</button>
   {/if}
 
   {#if state.startsWith('plank_summary')}
-    <Timer
-      {timerNow}
-      {showIntervals}
-      {intervalTime}
-      {intervalTimerNow}
-      {laps} />
+    <Timer {timerNow} {settings} {intervalTimerNow} {laps} />
 
     <button
       class="br3"
@@ -236,15 +210,18 @@
 
   {#if state === 'settings'}
     <Settings
-      bind:showIntervals
-      bind:intervalTime
-      on:close={() => {
+      {settings}
+      on:close={event => {
+        settings = event.detail.settings;
+        state = 'plank_start';
+      }}
+      on:cancel={() => {
         state = 'plank_start';
       }} />
   {/if}
 
   {#if state === 'history'}
-    <History entries={getHistory()} loggedIn={loggedIn()} />
+    <History />
     <button
       class="br3"
       on:click={() => {

@@ -7,8 +7,6 @@
     KeyUserAuthentication
   } from "../configuration.js";
 
-  // TODO actually check if logged in
-  let isLoggedIn = $loginHelper.loggedIn;
   let username = "";
   let password = "";
   let message;
@@ -30,9 +28,30 @@
 
     saveConfiguration(KeyUserUuid, response.body.user_uuid);
     saveConfiguration(KeyUserAuthentication, response.body.token);
-    login("/welcome.html");
 
+    const querystring = window.location.search;
+    const searchParams = new URLSearchParams(querystring);
+
+    if (!searchParams.has("redirect")) {
+      login("/welcome.html");
+      return;
+    }
+
+    const suffix = searchParams.get("redirect").replace(/^\/+/, "");
+    const redirectUrl = addLoginRedirect(`${api.getServer()}/${suffix}`);
+
+    login(redirectUrl);
     return;
+  }
+
+  function addLoginRedirect(redirectUrl) {
+    const url = document.createElement("a");
+    url.href = redirectUrl;
+    const querystring = url.search;
+    const searchParams = new URLSearchParams(querystring);
+    searchParams.set("login_redirect", "true");
+    url.search = `?${searchParams.toString()}`;
+    return url.href.replace(url.origin, "");
   }
 </script>
 
@@ -42,7 +61,7 @@
 
 <svelte:options tag={null} />
 
-{#if !isLoggedIn}
+{#if !$loginHelper.loggedIn()}
   <form class="measure center" on:submit|preventDefault={handleSubmit}>
     <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
       <div class="mt3">
