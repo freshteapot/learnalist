@@ -13,6 +13,8 @@ css_include: ["main"]
 - You can make public lists.
 - You can share your lists (however it will be a challenge to figure out how to share to a specific person).
 - You can learn via [spaced repetition](/spaced-repetition.html).
+- You can learn via total recall (TODO what is total recall)
+- You can use [plank timer](/plank.html) to record planks (not really learning).
 
 # Known issues
 - The editor UI, in its atttempt to be helpful, sometimes leaves you in a state that can be annoying.
