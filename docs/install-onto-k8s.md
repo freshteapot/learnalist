@@ -175,3 +175,16 @@ Update tables
 ```sh
 cat  /srv/learnalist/db/XXX | sqlite3 /srv/learnalist/server.db
 ```
+
+
+# Query the mount
+```
+- name: ls
+  image: "k8s.gcr.io/busybox"
+  command: ["/bin/sh", "-c"]
+  args: ["ls -lah /src;sleep 100000"]
+
+  volumeMounts:
+    - name: srv-learnalist-volume
+      mountPath: "/src"
+```

@@ -4,12 +4,10 @@
 FROM golang:1.14.2-alpine3.11 AS build_base
 RUN apk update && \
     apk add --no-cache \
-    bash \
     build-base \
     tzdata \
     git \
-    sqlite-dev \
-    sqlite
+    sqlite-dev
 RUN mkdir -p {/app/learnalist-api,/app/bin}
 WORKDIR /app/learnalist-api/server
 
