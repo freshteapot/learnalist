@@ -30,7 +30,6 @@
   }
 
   function beforeUnload() {
-    console.log("Why");
     dismiss();
   }
 

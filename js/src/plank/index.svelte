@@ -1,5 +1,5 @@
 <script>
-  import { loggedIn, clearNotification } from "../store.js";
+  import { loggedIn, notify, clearNotification } from "../store.js";
   import { formatTime } from "./utils.js";
   import {
     get as cacheGet,
@@ -11,8 +11,12 @@
   import Settings from "./settings.svelte";
   import History from "./history.svelte";
   import LoginModal from "../components/login_modal.svelte";
+  import { isObjectEmpty } from "../utils/utils.js";
+
   // Used for when the user is not logged in
   const StorageKeyPlankSavedItems = "plank.saved.items";
+
+  const error = store.error;
 
   let state = "plank_start";
   let settings = store.settings();
@@ -25,7 +29,6 @@
 
   function loadCurrent() {
     if (!loggedIn()) {
-      cacheRm(StorageKeyTodaysPlank);
       return;
     }
 
@@ -127,7 +130,7 @@
 
     // We could move this
     const aList = $store.today;
-    if (!aList) {
+    if (isObjectEmpty(aList)) {
       console.error("Something has gone wrong, why is there no list");
       return;
     }
@@ -157,6 +160,15 @@
     }
     clearNotification();
   }
+
+  function showError(error) {
+    if (error !== "") {
+      notify("error", error);
+    }
+  }
+
+  // TODO handle when the dates are wrong or empty
+  $: showError($error);
 
   $: loadCurrent();
   $: shouldResetForStart(state);

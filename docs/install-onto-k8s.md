@@ -74,8 +74,13 @@ kill -9 $(lsof -ti tcp:6443)
 
 
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -- sh
-HUGO_EXTERNAL=false  /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
+```
+
+## Clear when hugo is external
+- **HUGO_EXTERNAL=false**
+```sh
+/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 
 

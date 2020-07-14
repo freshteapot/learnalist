@@ -61,7 +61,7 @@
 
 <svelte:options tag={null} />
 
-{#if !$loginHelper.loggedIn()}
+{#if !$loginHelper.loggedIn}
   <form class="measure center" on:submit|preventDefault={handleSubmit}>
     <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
       <div class="mt3">

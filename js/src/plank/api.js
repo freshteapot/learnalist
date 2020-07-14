@@ -1,4 +1,5 @@
 import { copyObject } from '../utils/utils.js';
+import { dateYearMonthDay } from "../utils/date.js";
 import { loggedIn, api } from "../store.js";
 
 async function today() {
@@ -9,7 +10,6 @@ async function today() {
     const d = new Date();
     const datestring = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}`;
     const labels = `plank.${datestring}`;
-    console.log("labels", labels);
 
     try {
         let data = await api.getListsByMe({
@@ -31,7 +31,6 @@ async function today() {
                         ]
                     }
                 });
-                console.log("planks", data);
                 return convertFromV1(data);
             } catch (error) {
                 console.error("yo2", error);
@@ -45,6 +44,8 @@ async function today() {
     }
 }
 
+// if I kept all,
+// then it would be easier to delete
 async function history() {
 
     try {
@@ -59,28 +60,13 @@ async function history() {
         const reduced = items.reduce(function (filtered, item) {
             try {
                 const copy = convertFromV1(item);
-                filtered.push(...copy.data);
+                filtered.push(copy);
             } catch (error) {
 
             }
             return filtered;
         }, []);
         return reduced;
-        /*
-        return [].concat(...
-            items.filter(item => {
-                try {
-                    convertFromV1(item);
-                    return true;
-                } catch (error) {
-                    return false;
-                }
-            }).map(item => {
-                const copy = convertFromV1(item);
-                return copy.data;
-            }))
-        */
-
     } catch (error) {
         console.error("history", error);
         throw (error);
@@ -101,13 +87,23 @@ async function save(aList) {
 
 function convertToV1(aList) {
     let copy = copyObject(aList)
-    copy.data = copy.data.map(e => JSON.stringify(e))
+    copy.data = copy.data.map(e => {
+        delete e.uuid;
+        delete e.listIndex;
+        return JSON.stringify(e);
+    })
     return copy;
 }
 
 function convertFromV1(aList) {
     let copy = copyObject(aList)
-    copy.data = copy.data.map(e => JSON.parse(e))
+    copy.data = copy.data.map((e, index) => {
+        const obj = JSON.parse(e);
+        obj.uuid = aList.uuid;
+        obj.listIndex = index;
+        obj.whichDay = dateYearMonthDay(obj.beginningTime);
+        return obj;
+    })
     return copy;
 }
 
