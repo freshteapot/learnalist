@@ -13,8 +13,6 @@
   import LoginModal from "../components/login_modal.svelte";
   // Used for when the user is not logged in
   const StorageKeyPlankSavedItems = "plank.saved.items";
-  // History of planks, maybe this is an api call
-  const StorageKeyTodaysPlank = "plank.today";
 
   let state = "plank_start";
   let settings = store.settings();
@@ -32,7 +30,6 @@
     }
 
     store.today().then(() => {
-      cacheSave(StorageKeyTodaysPlank, $store.today);
       saveEntriesFromStorage();
       if (window.location.search.includes("login_redirect=true")) {
         console.log("Assumed redirect from login");
@@ -44,12 +41,13 @@
   function startTime() {
     const beginning = new Date();
     const beginningTime = beginning.getTime();
+
     entry.showIntervals = settings.showIntervals;
     entry.intervalTime = settings.intervalTime;
     entry.beginningTime = beginningTime;
 
     let beginningTimeInterval;
-    if (showIntervals) {
+    if (entry.showIntervals) {
       beginningTimeInterval = beginningTime;
     }
 
@@ -60,8 +58,8 @@
       entry.currentTime = currentTime;
       entry.timerNow = timerNow;
 
-      if (showIntervals) {
-        if (intervalTimerNow > settings.intervalTime * 1000) {
+      if (entry.showIntervals) {
+        if (intervalTimerNow > entry.intervalTime * 1000) {
           const intervalBeginning = new Date();
           beginningTimeInterval = intervalBeginning.getTime();
           intervalTimerNow = 0;
@@ -126,8 +124,9 @@
     if (!loggedIn()) {
       return;
     }
+
     // We could move this
-    const aList = cacheGet(StorageKeyTodaysPlank, null);
+    const aList = $store.today;
     if (!aList) {
       console.error("Something has gone wrong, why is there no list");
       return;
@@ -143,7 +142,6 @@
       .record(aList)
       .then(() => {
         cacheSave(StorageKeyPlankSavedItems, []);
-        cacheSave(StorageKeyTodaysPlank, $store.today);
       })
       .catch(error => {
         console.error("saveEntriesFromStorage", error);
