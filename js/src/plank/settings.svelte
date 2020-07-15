@@ -19,6 +19,8 @@
   @import "../../all.css";
 </style>
 
+<button class="br3" on:click={close}>Close Settings</button>
+
 <p>
   <span>Display intervals</span>
   <input type="checkbox" bind:checked={settings.showIntervals} />
@@ -30,5 +32,3 @@
     <span>(seconds)</span>
   </p>
 {/if}
-
-<button class="br3" on:click={close}>Close</button>

@@ -1,5 +1,4 @@
 import { copyObject } from '../utils/utils.js';
-import { dateYearMonthDay } from "../utils/date.js";
 import { loggedIn, api } from "../store.js";
 
 async function today() {
@@ -101,7 +100,6 @@ function convertFromV1(aList) {
         const obj = JSON.parse(e);
         obj.uuid = aList.uuid;
         obj.listIndex = index;
-        obj.whichDay = dateYearMonthDay(obj.beginningTime);
         return obj;
     })
     return copy;

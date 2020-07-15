@@ -1,13 +1,13 @@
 <script>
   import goto from "../lib/goto.js";
-  import { getServer } from "../../api2.js";
+  import { api } from "../../store.js";
   import { copyObject } from "../../utils/utils.js";
 
   import listsEdits from "../../stores/editor_lists_edits.js";
-  import ItemV1 from "./list.view.data.item.v1.svelte";
-  import ItemV2 from "./list.view.data.item.v2.svelte";
+  import DataV1 from "./list_view_data_v1.svelte";
+  import DataV2 from "./list_view_data_v2.svelte";
+  import DataV4 from "./list_view_data_v4.svelte";
   import ItemV3 from "./list.view.data.item.v3.svelte";
-  import ItemV4 from "./list.view.data.item.v4.svelte";
 
   // aList object
   export let aList = {};
@@ -22,10 +22,10 @@
   let labels = info.labels;
   let listType = info.type;
   let items = {
-    v1: ItemV1,
-    v2: ItemV2,
+    v1: DataV1,
+    v2: DataV2,
     v3: ItemV3,
-    v4: ItemV4
+    v4: DataV4
   };
   let renderItem = items[listType];
 
@@ -36,8 +36,7 @@
   }
 
   function view() {
-    const server = getServer();
-    window.open(`${server}/alist/${aList.uuid}.html`, "_blank");
+    window.open(`/alist/${aList.uuid}.html`, "_blank");
   }
 </script>
 
@@ -45,43 +44,42 @@
   @import "../../../all.css";
 </style>
 
-<div class="pa3 pa5-ns">
-  <div class="pl0 measure center">
-
-    <div>
-      <button on:click={edit}>Edit list</button>
-      <button on:click={view}>View ({aList.info.shared_with})</button>
-    </div>
-
-    <div>
-      <h1>{title}</h1>
-      <p>{uuid}</p>
-
-    </div>
-
-    {#if labels.length > 0}
-      <div class="nicebox">
-        <ul class="list pl0">
-
-          {#each labels as item}
-            <li class="dib mr1 mb2 pl0">
-              <span
-                href="#"
-                class="f6 f5-ns b db pa2 link dark-gray ba b--black-20">
-                {item}
-              </span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-
-    {#if data.length > 0}
-      <div class="nicebox">
-        {#each data as item}
-          <svelte:component this={renderItem} bind:item />
-        {/each}
-      </div>
-    {/if}
-  </div>
+<div>
+  <button on:click={edit}>Edit list</button>
+  <button on:click={view}>View ({aList.info.shared_with})</button>
 </div>
+
+<div>
+  <h1>{title}</h1>
+  <p>{uuid}</p>
+
+</div>
+
+{#if labels.length > 0}
+  <div class="nicebox">
+    <ul class="list pl0">
+
+      {#each labels as item}
+        <li class="dib mr1 mb2 pl0">
+          <span
+            href="#"
+            class="f6 f5-ns b db pa2 link dark-gray ba b--black-20">
+            {item}
+          </span>
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/if}
+
+{#if data.length > 0}
+  {#if ['v1', 'v2', 'v4'].includes(listType)}
+    <svelte:component this={renderItem} {data} />
+  {:else}
+    <div class="nicebox">
+      {#each data as item}
+        <svelte:component this={renderItem} bind:item />
+      {/each}
+    </div>
+  {/if}
+{/if}

@@ -29,6 +29,8 @@
 
   function loadCurrent() {
     if (!loggedIn()) {
+      store.today();
+      store.history();
       return;
     }
 
@@ -231,13 +233,9 @@
   {/if}
 
   {#if state === 'history'}
-    <History />
-    <button
-      class="br3"
-      on:click={() => {
+    <History
+      on:close={() => {
         state = 'plank_start';
-      }}>
-      Close
-    </button>
+      }} />
   {/if}
 </div>

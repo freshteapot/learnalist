@@ -1,4 +1,5 @@
 <script>
+  import { focusThis } from "../../utils/utils.js";
   export let title;
 </script>
 
@@ -14,5 +15,5 @@
 </style>
 
 <div class="container">
-  <input placeholder="Title" bind:value={title} />
+  <input placeholder="Title" bind:value={title} use:focusThis />
 </div>

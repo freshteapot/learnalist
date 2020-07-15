@@ -1,22 +1,71 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   import store from "../stores/plank.js";
   import { loggedIn, notify } from "../store.js";
   import { formatTime } from "./utils.js";
-  import { dateYearMonthDay } from "../utils/date.js";
+  import LoginModal from "../components/login_modal.svelte";
+
+  import dayjs from "dayjs";
+  import isBetween from "dayjs/plugin/isBetween";
+  import isToday from "dayjs/plugin/isToday";
+  dayjs.extend(isBetween);
+  dayjs.extend(isToday);
+
+  const dispatch = createEventDispatcher();
 
   const error = store.error;
 
   let details = false;
+  let loginNag = true;
+  const loginNagMessageDefault =
+    "History is not saved, you need to login to save it";
+  let loginNagMessage = loginNagMessageDefault;
+
+  function close() {
+    dispatch("close");
+  }
+
+  function closeLoginModal() {
+    loginNag = false;
+  }
 
   function totals(entries) {
     return entries.reduce((a, b) => a + (b["timerNow"] || 0), 0);
   }
 
   function todayTotals(entries) {
-    const today = dateYearMonthDay(new Date().getTime());
+    return entries.reduce((a, b) => {
+      if (!dayjs(b.beginningTime).isToday()) {
+        return a;
+      }
+      return a + (b["timerNow"] || 0);
+    }, 0);
+  }
+
+  function weekTotals(entries) {
+    const startOf = dayjs()
+      .startOf("week")
+      .add(1, "day");
+    const endOf = dayjs().endOf("week");
 
     return entries.reduce((a, b) => {
-      if (b["whichDay"] !== today) {
+      const now = dayjs(b.beginningTime);
+      if (!now.isBetween(startOf, endOf)) {
+        return a;
+      }
+      return a + (b["timerNow"] || 0);
+    }, 0);
+  }
+
+  function monthTotals(entries) {
+    const startOf = dayjs()
+      .startOf("month")
+      .add(1, "day");
+    const endOf = dayjs().endOf("month");
+
+    return entries.reduce((a, b) => {
+      const now = dayjs(b.beginningTime);
+      if (!now.isBetween(startOf, endOf)) {
         return a;
       }
       return a + (b["timerNow"] || 0);
@@ -28,11 +77,14 @@
   }
 
   function deleteEntry(entry) {
-    store.deleteRecord(entry);
-  }
+    if (!loggedIn()) {
+      // TODO make this a modal?
+      loginNagMessage = "You can only delete entries, if logged in";
+      loginNag = true;
+      return;
+    }
 
-  if (!loggedIn()) {
-    notify("error", "History is not saved, you need to login to save it");
+    store.deleteRecord(entry);
   }
 
   function showError(error) {
@@ -41,33 +93,88 @@
     }
   }
 
+  function checkShowLoginNag() {
+    console.log(loginNag && !loggedIn());
+    return loginNag && !loggedIn();
+  }
+  let showLoginNag = false;
+
   // TODO handle when the dates are wrong or empty
   $: showError($error);
+
+  $: showLoginNag = loginNag && !loggedIn();
+
+  $: stats = [
+    {
+      name: "Today",
+      value: formatTime(todayTotals($store.history))
+    },
+    {
+      name: "Week",
+      value: formatTime(weekTotals($store.history))
+    },
+    {
+      name: "Month",
+      value: formatTime(monthTotals($store.history))
+    },
+    {
+      name: "Overall",
+      value: formatTime(totals($store.history))
+    }
+  ];
 </script>
 
 <style>
   @import "../../all.css";
 </style>
 
-<p>Total Planking: {formatTime(totals($store.history))}</p>
-<p>Today Total: {formatTime(todayTotals($store.history))}</p>
+<button class="br3" on:click={close}>Close History</button>
 
-<p>Planks</p>
-<button
-  class="br3"
-  on:click={() => {
-    details = !details;
-  }}>
-  Details
-</button>
+<article class="pa3 w-100 center" data-name="slab-stat">
+  {#each stats as stat}
+    <dl class="dib mr4">
+      <dd class="f6 f5-ns b ml0">{stat.name}</dd>
+      <dd class="f3 f2-ns b ml0">{stat.value}</dd>
+    </dl>
+  {/each}
+</article>
 
-{#each $store.history as entry}
-  <p>
-    {formatTime(entry.timerNow)}
-    {#if details}({formatWhen(entry)}){/if}
-    <span on:click={() => deleteEntry(entry)}>delete</span>
-  </p>
-  {#if details}
-    <pre>{JSON.stringify(entry, '', 2)}</pre>
-  {/if}
-{/each}
+{#if $store.history.length > 0}
+  <div class="pa0">
+    <div class="overflow-auto">
+      <table class="f6 w-100 mw8 center" cellspacing="0">
+        <thead>
+          <tr>
+            <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Day</th>
+            <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Duration</th>
+            <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">When</th>
+            <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Action</th>
+          </tr>
+        </thead>
+        <tbody class="lh-copy">
+          {#each $store.history as entry}
+            <tr>
+              <td class="pv3 pr3 bb b--black-20">
+                {dayjs(entry.beginningTime).format('YY-MM-DD')}
+              </td>
+              <td class="pv3 pr3 bb b--black-20">
+                {formatTime(entry.timerNow)}
+              </td>
+              <td class="pv3 pr3 bb b--black-20">
+                {new Date(entry.beginningTime).toLocaleTimeString()}
+              </td>
+              <td class="pv3 pr3 bb b--black-20">
+                <span on:click={() => deleteEntry(entry)}>delete</span>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{/if}
+{#if showLoginNag}
+  <LoginModal on:close={closeLoginModal}>
+    <p>{loginNagMessage}</p>
+  </LoginModal>
+{/if}

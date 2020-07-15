@@ -9,10 +9,8 @@ if (last) {
     }
 }
 
-
-
 var app = new App({
-    target: document.querySelector("#list-info")
+    target: document.querySelector("#main-panel")
 });
 
 export default app;

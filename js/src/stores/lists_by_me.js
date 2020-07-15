@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store';
-import { getListsByMe } from "../api2.js";
+import { api } from "../store.js";
 import {
   getConfiguration,
   saveConfiguration,
@@ -27,7 +27,7 @@ const ListsByMeStore = () => ({
         loading.set(true);
       }
 
-      data = await getListsByMe();
+      data = await api.getListsByMe();
       loading.set(false);
       saveConfiguration(KeyListsByMe, data);
       set(data);

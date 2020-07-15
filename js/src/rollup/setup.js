@@ -17,7 +17,6 @@ export default (key, format) => {
         format = "umd";
     }
 
-    console.log(key, format)
     const componentKey = key;
     const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 

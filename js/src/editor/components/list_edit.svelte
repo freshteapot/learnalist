@@ -1,6 +1,6 @@
 <script>
   import { replace } from "svelte-spa-router";
-  import { updateList, deleteList } from "../../api2.js";
+  import { api } from "../../store.js";
   import goto from "../lib/goto.js";
   import storeListsByMe from "../../stores/lists_by_me.js";
   import storeListsEdits from "../../stores/editor_lists_edits.js";
@@ -49,7 +49,7 @@
 
   async function remove() {
     try {
-      await deleteList(aList.uuid);
+      await api.deleteList(aList.uuid);
     } catch (error) {
       alert("failed try again");
       console.error("status from server was", error);
@@ -64,7 +64,7 @@
 
   async function save() {
     try {
-      aList = await updateList(aList);
+      aList = await api.updateList(aList);
     } catch (error) {
       alert("failed try again");
       console.error("status from server was", error);

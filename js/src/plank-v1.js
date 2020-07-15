@@ -29,7 +29,7 @@ getPlanks().then(data => {
 */
 // Actual app to handle the interactions
 let app;
-const el = document.querySelector("#list-info")
+const el = document.querySelector("#main-panel")
 if (el) {
     app = new HumblePlank({
         target: el,
