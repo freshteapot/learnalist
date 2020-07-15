@@ -52,24 +52,6 @@ async function postLogin(username, password) {
     response.body = await error.json();
     return response;
   }
-
-  /*
-  return api.loginWithUsernameAndPasswordRaw(input).then(async data => {
-    return {
-      status: data.raw.status,
-      body: await data.value()
-    }
-  },
-    async error => {
-      return {
-        status: error.status,
-        body: await error.json()
-      }
-    }
-  ).then(response => {
-    return response;
-  });
-  */
 }
 
 async function getListsByMe(filter) {
