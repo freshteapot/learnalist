@@ -25,7 +25,6 @@ function loginHelperSingleton() {
         }),
 
         logout: () => {
-            // TODO replace with clearConfiguration
             clearConfiguration();
             update(n => {
                 n.loggedIn = false;
