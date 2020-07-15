@@ -36,12 +36,8 @@ export {
   KeyListsByMe,
   KeyEditorMyEditedLists,
   KeyEditorMyLists,
-  get,
   getConfiguration,
-  save,
   saveConfiguration,
-  rm,
   removeConfiguration,
-  clear,
   clearConfiguration
 };
