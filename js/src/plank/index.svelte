@@ -148,6 +148,10 @@
 
 <style>
   @import "../../all.css";
+
+  .actions {
+    list-style-type: decimal;
+  }
 </style>
 
 <div class="tc">
@@ -179,7 +183,17 @@
 
     {#if state === 'plank_summary_login'}
       <LoginModal on:close={closeLoginModal}>
-        <p>Abc</p>
+        <div class="tl">
+          <p>Your plank has been saved temporarily (in this browser)</p>
+
+          <p>Want to save it for good?</p>
+          <ul class="actions">
+            <li>login</li>
+            <li>return here</li>
+            <li>we will then save it for good</li>
+          </ul>
+        </div>
+
       </LoginModal>
     {/if}
   {/if}

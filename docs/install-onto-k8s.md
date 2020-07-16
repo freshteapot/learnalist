@@ -98,6 +98,20 @@ rsync -avzP \
 ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 ```
 
+# Install only assets
+
+```sh
+make build-site-assets
+
+export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export SSH_SERVER="lal01.learnalist.net"
+kubectl config unset current-context
+kubectl config use-context default
+kill -9 $(lsof -ti tcp:6443)
+ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
+make sync-site-assets
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+```
 
 # Install
 ```sh
