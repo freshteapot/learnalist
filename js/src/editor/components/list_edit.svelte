@@ -1,6 +1,6 @@
 <script>
   import { replace } from "svelte-spa-router";
-  import { api } from "../../store.js";
+  import { api } from "../../shared.js";
   import goto from "../lib/goto.js";
   import storeListsByMe from "../../stores/lists_by_me.js";
   import storeListsEdits from "../../stores/editor_lists_edits.js";

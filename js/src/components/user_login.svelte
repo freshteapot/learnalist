@@ -1,5 +1,5 @@
 <script>
-  import { login, notify, api } from "../store.js";
+  import { login, notify, api } from "../shared.js";
   import { loginHelper } from "../utils/login_helper.js";
   import {
     saveConfiguration,

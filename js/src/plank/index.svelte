@@ -1,24 +1,16 @@
 <script>
-  import { loggedIn, notify, clearNotification } from "../store.js";
+  import { loggedIn, notify, clearNotification } from "../shared.js";
   import { formatTime } from "./utils.js";
-  import {
-    get as cacheGet,
-    rm as cacheRm,
-    save as cacheSave
-  } from "../utils/storage.js";
   import Timer from "./timer.svelte";
-  import store from "../stores/plank.js";
+  import store from "./store.js";
   import Settings from "./settings.svelte";
   import History from "./history.svelte";
   import LoginModal from "../components/login_modal.svelte";
-  import { isObjectEmpty } from "../utils/utils.js";
-
-  // Used for when the user is not logged in
-  const StorageKeyPlankSavedItems = "plank.saved.items";
 
   const error = store.error;
 
   let state = "plank_start";
+  console.log(store);
   let settings = store.settings();
 
   let intervalTimer;
@@ -35,6 +27,7 @@
     }
 
     store.today().then(() => {
+      //TODO this might be a race condition
       saveEntriesFromStorage();
       if (window.location.search.includes("login_redirect=true")) {
         console.log("Assumed redirect from login");
@@ -110,16 +103,11 @@
     console.log("save");
     entry.intervalTimerNow = intervalTimerNow;
     entry.laps = laps;
-    let items = cacheGet(StorageKeyPlankSavedItems, []);
-    items.push(entry);
-    cacheSave(StorageKeyPlankSavedItems, items);
 
-    if (!loggedIn()) {
-      state = "plank_summary_login";
-      return;
-    }
+    store.record(entry);
 
-    saveEntriesFromStorage();
+    entry = {};
+    state = loggedIn() ? "plank_start" : "plank_summary_login";
   }
 
   function saveEntriesFromStorage() {
@@ -130,27 +118,7 @@
       return;
     }
 
-    // We could move this
-    const aList = $store.today;
-    if (isObjectEmpty(aList)) {
-      console.error("Something has gone wrong, why is there no list");
-      return;
-    }
-
-    const items = cacheGet(StorageKeyPlankSavedItems, []);
-    if (items.length == 0) {
-      return;
-    }
-
-    aList.data.push(...items);
-    store
-      .record(aList)
-      .then(() => {
-        cacheSave(StorageKeyPlankSavedItems, []);
-      })
-      .catch(error => {
-        console.error("saveEntriesFromStorage", error);
-      });
+    store.record();
 
     entry = {};
     state = "plank_start";
@@ -176,7 +144,6 @@
   $: shouldResetForStart(state);
 
   // TODO highlight there are items to be saved.
-  console.log("Plank index");
 </script>
 
 <style>
@@ -186,7 +153,7 @@
 <div class="tc">
   {#if state === 'plank_start'}
     <script>
-      superstore.clearNotification();
+      shared.clearNotification();
     </script>
     <button class="br3" on:click={showSettings}>Settings</button>
     <button class="br3" on:click={start}>Start</button>

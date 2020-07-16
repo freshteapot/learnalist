@@ -1,7 +1,9 @@
 <script>
+  // TODO visualise with colour the daily, weekly, monthly
+  // TODO visualise days in a row doing a plank
   import { createEventDispatcher } from "svelte";
-  import store from "../stores/plank.js";
-  import { loggedIn, notify } from "../store.js";
+  import store from "./store.js";
+  import { loggedIn, notify } from "../shared.js";
   import { formatTime } from "./utils.js";
   import LoginModal from "../components/login_modal.svelte";
 

@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { api } from "../store.js";
+import { api } from "../shared.js";
 
 const { subscribe, set, update } = writable({
   "gitHash": "na",

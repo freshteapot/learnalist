@@ -1,5 +1,5 @@
 <script>
-  import { notifications } from "./store.js";
+  import { notifications } from "./shared.js";
 
   function dismiss() {
     notifications.clear();

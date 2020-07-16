@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import store from "../stores/plank.js";
+  import store from "./store.js";
   import { copyObject } from "../utils/utils.js";
 
   const dispatch = createEventDispatcher();

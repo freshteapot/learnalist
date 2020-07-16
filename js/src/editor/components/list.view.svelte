@@ -1,6 +1,6 @@
 <script>
   import goto from "../lib/goto.js";
-  import { api } from "../../store.js";
+  import { api } from "../../shared.js";
   import { copyObject } from "../../utils/utils.js";
 
   import listsEdits from "../../stores/editor_lists_edits.js";

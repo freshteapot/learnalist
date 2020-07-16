@@ -1,6 +1,6 @@
 <script>
   import { getNext, viewed } from "./api.js";
-  import { loggedIn } from "../../../store.js";
+  import { loggedIn } from "../../../shared.js";
 
   let state = "loading";
   let show;
@@ -104,7 +104,7 @@
 
     {#if state === 'nothing-to-see'}
       <script>
-        superstore.notifications.add(
+        shared.notifications.add(
           "info",
           "None of your entries are ready, add more?"
         );
@@ -113,7 +113,7 @@
 
     {#if state === 'no-entries'}
       <script>
-        superstore.notifications.add(
+        shared.notifications.add(
           "info",
           "Would you like to try Spaced Repetition?"
         );

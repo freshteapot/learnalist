@@ -1,5 +1,6 @@
 <script>
-  import { loggedIn, api, clearConfiguration } from "../store.js";
+  import { loggedIn, api } from "../shared.js";
+  import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
 
   let poller;

@@ -2,7 +2,7 @@
   // TODO this does not work
   import { hasWhiteSpace } from "../lib/helper.js";
   import { focusThis } from "../../utils/utils.js";
-  import { notify } from "../../store.js";
+  import { notify } from "../../shared.js";
 
   let newLabel = "";
 

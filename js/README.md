@@ -11,7 +11,7 @@
 ```sh
 npm install
 ```
-- build the "superstore".
+- build the "shared".
 ```sh
 rollup -c rollup.config.store.js
 ```

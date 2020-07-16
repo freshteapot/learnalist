@@ -21,11 +21,11 @@ export default (key, format) => {
     const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 
     return {
-        external: ['superstore'],
+        external: ['shared'],
         input: `src/${componentKey}.js`,
         output: {
             globals: {
-                'superstore': 'superstore',
+                'shared': 'shared',
             },
             sourcemap: !IS_PROD,
             format: format, // if I want to use globals, this is the way
@@ -35,10 +35,10 @@ export default (key, format) => {
         plugins: [
             alias({
                 entries: [
-                    { find: './store.js', replacement: 'superstore' },
-                    { find: '../store.js', replacement: 'superstore' },
-                    { find: '../../store.js', replacement: 'superstore' },
-                    { find: '../../../store.js', replacement: 'superstore' },
+                    { find: '../shared.js', replacement: 'shared' },
+                    { find: '../shared.js', replacement: 'shared' },
+                    { find: '../../shared.js', replacement: 'shared' },
+                    { find: '../../../shared.js', replacement: 'shared' },
                 ]
             }),
             del({ targets: componentInfo.rollupDeleteTargets, verbose: true, force: true }),

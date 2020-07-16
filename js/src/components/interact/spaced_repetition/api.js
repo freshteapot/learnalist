@@ -1,5 +1,5 @@
 
-import { api } from '../../../store.js';
+import { api } from '../../../shared.js';
 async function getNext() {
     return await api.getSpacedRepetitionNext();
 }

@@ -10,7 +10,7 @@ import ListEdit from './routes/list_edit.svelte'
 import ListDeleted from './routes/list_deleted.svelte'
 import SettingsServerInformation from './routes/settings_server_information.svelte'
 import { loginHelper } from '../utils/login_helper.js';
-import { loggedIn } from "../store.js";
+import { loggedIn } from "../shared.js";
 
 // Outside of svelte, auto subscribing doesnt work.
 let lh;

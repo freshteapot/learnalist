@@ -1,5 +1,5 @@
 import { copyObject } from '../utils/utils.js';
-import { loggedIn, api } from "../store.js";
+import { loggedIn, api } from "../shared.js";
 
 async function today() {
     if (!loggedIn()) {

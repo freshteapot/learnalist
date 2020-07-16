@@ -1,8 +1,8 @@
 import { writable } from "svelte/store";
-import { today, history, save } from "../plank/api.js";
+import { today, history, save } from "./api.js";
 import { get as cacheGet, save as cacheSave } from "../utils/storage.js";
-import { copyObject } from "../utils/utils.js";
-import { loggedIn } from "../store.js";
+import { copyObject, isObjectEmpty } from "../utils/utils.js";
+import { loggedIn } from "../shared.js";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 
@@ -110,6 +110,56 @@ const deleteRecord = async (entry) => {
 
 }
 
+// If entry is not set we try
+const record = async (entry) => {
+  if (entry) {
+    // First we save to the temporary area.
+    let items = cacheGet(StorageKeyPlankSavedItems, []);
+    items.push(entry);
+    cacheSave(StorageKeyPlankSavedItems, items);
+  }
+
+
+  if (!loggedIn()) {
+    await loadToday();
+    await loadHistory();
+    return
+  }
+
+  console.log("loggedIn()", loggedIn());
+  console.log("data.today", data.today);
+
+  const aList = data.today;
+  if (isObjectEmpty(aList)) {
+    console.error("Something has gone wrong, why is there no list");
+    return;
+  }
+
+  const items = cacheGet(StorageKeyPlankSavedItems, []);
+  if (items.length == 0) {
+    return;
+  }
+
+  aList.data.push(...items);
+
+  try {
+    error.set('');
+    loading.set(true);
+
+    await save(aList);
+    cacheSave(StorageKeyPlankSavedItems, []);
+
+    await loadToday();
+    await loadHistory();
+  } catch (e) {
+    console.log(e);
+    loading.set(false);
+    data = copyObject(emptyData);
+    set(data);
+    error.set(`Error has been occurred. Details: ${e.message}`);
+  }
+}
+
 const PlankStore = () => ({
   subscribe,
   loading,
@@ -122,22 +172,7 @@ const PlankStore = () => ({
     return copyObject(data.history);
   },
 
-  async record(aList) {
-    try {
-      error.set('');
-      loading.set(true);
-
-      await save(aList);
-      await loadToday();
-      await loadHistory();
-    } catch (e) {
-      console.log(e);
-      loading.set(false);
-      data = copyObject(emptyData);
-      set(data);
-      error.set(`Error has been occurred. Details: ${e.message}`);
-    }
-  },
+  record,
 
   deleteRecord,
 

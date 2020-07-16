@@ -1,6 +1,6 @@
 <script>
   import goto from "../lib/goto.js";
-  import { notify, api } from "../../store.js";
+  import { notify, api } from "../../shared.js";
   import { focusThis } from "../../utils/utils.js";
 
   import storeListsByMe from "../../stores/lists_by_me";

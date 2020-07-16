@@ -12,9 +12,9 @@ const componentKey = "shared";
 const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 
 export default {
-    input: 'src/store.js',
+    input: 'src/shared.js',
     output: {
-        name: "superstore",
+        name: "shared",
         sourcemap: !IS_PROD,
         format: 'iife',
         file: componentInfo.outputPath

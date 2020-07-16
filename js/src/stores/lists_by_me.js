@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store';
-import { api } from "../store.js";
+import { api } from "../shared.js";
 import {
   getConfiguration,
   saveConfiguration,
