@@ -24,16 +24,16 @@ npm run develop
 - watch both change
 - Open developer tools
 - type
-```sh
-superstore.count.subscribe(value => a = value)
+```js
+shared.count.subscribe(value => a = value)
 ```
 - type and observe number matches count
-```sh
+```js
 a
 ```
 - click on "the count is X"
 - type and observe number matches count
-```sh
+```js
 a
 ```
 

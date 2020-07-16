@@ -3,8 +3,8 @@ import { KeyUserAuthentication } from './configuration.js';
 import * as api from './api.js';
 
 // Link any component to be able to notify the banner component
-const notify = (level, message) => {
-    notifications.add(level, message);
+const notify = (level, message, sticky) => {
+    notifications.add(level, message, sticky);
 }
 
 const clearNotification = () => {

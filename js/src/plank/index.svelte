@@ -152,9 +152,6 @@
 
 <div class="tc">
   {#if state === 'plank_start'}
-    <script>
-      shared.clearNotification();
-    </script>
     <button class="br3" on:click={showSettings}>Settings</button>
     <button class="br3" on:click={start}>Start</button>
     <button class="br3" on:click={showHistory}>History</button>

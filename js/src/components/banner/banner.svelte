@@ -21,12 +21,15 @@
     return level == "info" ? infoIcon : errorIcon;
   }
 
-  function setRemove(show) {
+  function setRemove(show, sticky) {
     if (!show) {
       return;
     }
     clearTimeout(timer);
-    timer = setTimeout(() => dismiss(), 3000);
+
+    if (!sticky) {
+      timer = setTimeout(() => dismiss(), 3000);
+    }
   }
 
   function beforeUnload() {
@@ -35,8 +38,9 @@
 
   $: level = $notifications.level;
   $: message = $notifications.message;
+  $: sticky = $notifications.sticky;
   $: show = $notifications.level != "" ? true : false;
-  $: setRemove(show);
+  $: setRemove(show, sticky);
 </script>
 
 <style>
