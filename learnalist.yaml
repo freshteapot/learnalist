@@ -306,6 +306,8 @@ paths:
 
   /user/register:
     post:
+      tags:
+        - user
       operationId: registerUserWithUsernameAndPassword
       description: Register a new user with username and password
       requestBody:
@@ -343,6 +345,8 @@ paths:
 
   /user/login:
     post:
+      tags:
+        - user
       operationId: loginWithUsernameAndPassword
       description: Login with username and password. The token can be used in future api requests via bearerAuth
       requestBody:
@@ -380,6 +384,8 @@ paths:
 
   /user/{uuid}:
     delete:
+      tags:
+        - user
       description: Deletes a user and there lists
       operationId: deleteUser
       parameters:
@@ -411,6 +417,8 @@ paths:
 
   /alist:
     post:
+      tags:
+        - aList
       operationId: addList
       description: add a new list
       requestBody:
@@ -441,6 +449,8 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /alist/{uuid}:
     get:
+      tags:
+        - aList
       description: Get a list
       operationId: getListByUuid
       parameters:
@@ -476,6 +486,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
     put:
+      tags:
+        - aList
       description: Update a list
       operationId: updateListByUuid
       parameters:
@@ -519,6 +531,8 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
 
     delete:
+      tags:
+        - aList
       description: Delete a list
       operationId: deleteListByUuid
       parameters:
@@ -557,6 +571,8 @@ paths:
 
   /alist/by/me:
     get:
+      tags:
+        - aList
       description: Get lists by me
       operationId: getListsByMe
       parameters:
@@ -582,6 +598,8 @@ paths:
 
   /spaced-repetition/:
     post:
+      tags:
+        - spacedRepetition
       operationId: addSpacedRepetitionEntry
       description: Add entry for spaced based learning
       requestBody:
@@ -618,6 +636,8 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /spaced-repetition/{uuid}:
     delete:
+      tags:
+        - spacedRepetition
       description: Deletes a single entry based on the UUID
       operationId: deleteSpacedRepetitionEntry
       parameters:
@@ -645,6 +665,8 @@ paths:
 
   /spaced-repetition/all:
     get:
+      tags:
+        - spacedRepetition
       description: Get all entries for spaced repetition learning
       operationId: getSpacedRepetitionEntries
       responses:
@@ -664,6 +686,8 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /spaced-repetition/next:
     get:
+      tags:
+        - spacedRepetition
       description: Get next entry for spaced based learning
       operationId: getNextSpacedRepetitionEntry
       responses:
@@ -686,6 +710,8 @@ paths:
 
   /spaced-repetition/viewed:
     post:
+      tags:
+        - spacedRepetition
       operationId: updateSpacedRepetitionEntry
       description: Update spaced entry with feedback from the user
       requestBody:

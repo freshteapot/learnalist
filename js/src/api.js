@@ -6,11 +6,21 @@ import {
 import {
   Configuration,
   DefaultApi,
+  UserApi,
+  AListApi,
+  SpacedRepetitionApi,
   HttpUserLoginRequestFromJSON,
   AlistInputFromJSON,
   AlistFromJSON,
   SpacedRepetitionEntryViewedFromJSON
 } from "./openapi";
+
+const Services = {
+  Default: DefaultApi,
+  User: UserApi,
+  Alist: AListApi,
+  SpacedRepetition: SpacedRepetitionApi
+}
 
 function getServer() {
   const server = getConfiguration(KeySettingsServer, null)
@@ -20,19 +30,19 @@ function getServer() {
   return server;
 }
 
-
-function getApi() {
+// getApi service = One of the services based on Services
+function getApi(service) {
   var config = new Configuration({
     basePath: `${getServer()}/api/v1`,
     accessToken: getConfiguration(KeyUserAuthentication, undefined),
   });
 
-  return new DefaultApi(config);
+  return new service(config);
 }
 
 
 async function postLogin(username, password) {
-  const api = getApi();
+  const api = getApi(Services.User);
   const response = {
     status: 400,
     body: {}
@@ -55,7 +65,7 @@ async function postLogin(username, password) {
 }
 
 async function getListsByMe(filter) {
-  const api = getApi();
+  const api = getApi(Services.Alist);
   if (!filter) {
     filter = {};
   }
@@ -69,7 +79,7 @@ async function getListsByMe(filter) {
 }
 
 async function getPlanks() {
-  const api = getApi();
+  const api = getApi(Services.Alist);
 
   try {
     return await api.getListsByMe({ labels: "plank", listType: "v1" });
@@ -83,7 +93,7 @@ async function getPlanks() {
 
 async function addList(aList) {
   try {
-    const api = getApi();
+    const api = getApi(Services.Alist);
 
     const input = {
       alistInput: AlistInputFromJSON(aList)
@@ -97,7 +107,7 @@ async function addList(aList) {
 
 async function updateList(aList) {
   try {
-    const api = getApi();
+    const api = getApi(Services.Alist);
 
     const input = {
       uuid: aList.uuid,
@@ -112,8 +122,7 @@ async function updateList(aList) {
 
 async function deleteList(uuid) {
   try {
-    const api = getApi();
-
+    const api = getApi(Services.Alist);
     const input = {
       uuid: uuid,
     }
@@ -126,12 +135,12 @@ async function deleteList(uuid) {
 
 
 async function getServerVersion() {
-  const api = getApi();
+  const api = getApi(Services.SpacedRepetition);
   return await api.getServerVersion();
 }
 
 async function getSpacedRepetitionNext() {
-  const api = getApi();
+  const api = getApi(Services.SpacedRepetition);
 
   const response = {
     status: 404,
@@ -162,7 +171,7 @@ async function addSpacedRepetitionEntry(entry) {
   }
 
   try {
-    const api = getApi();
+    const api = getApi(Services.SpacedRepetition);
     const input = {
       body: entry,
     }
@@ -179,7 +188,7 @@ async function addSpacedRepetitionEntry(entry) {
 
 async function updateSpacedRepetitionEntry(entry) {
   try {
-    const api = getApi();
+    const api = getApi(Services.SpacedRepetition);
 
     const input = {
       spacedRepetitionEntryViewed: SpacedRepetitionEntryViewedFromJSON(entry)
