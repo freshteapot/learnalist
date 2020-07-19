@@ -13,7 +13,6 @@ const KeyLastScreen = "last.screen";
 const KeyListsByMe = "lists.by.me";
 
 function clear() {
-  console.log("clearing configuration");
   localStorage.clear();
   save(KeySettingsInstallDefaults, true);
   save(KeySettingsServer, getApiServer())

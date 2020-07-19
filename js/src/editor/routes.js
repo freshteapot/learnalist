@@ -10,18 +10,14 @@ import ListEdit from './routes/list_edit.svelte'
 import ListDeleted from './routes/list_deleted.svelte'
 import SettingsServerInformation from './routes/settings_server_information.svelte'
 import { loginHelper } from '../utils/login_helper.js';
-import { loggedIn } from "../shared.js";
 
 // Outside of svelte, auto subscribing doesnt work.
 let lh;
-const unsubscribe = loginHelper.subscribe(value => {
+loginHelper.subscribe(value => {
   lh = value;
 });
 
 function checkIfLoggedIn(detail) {
-  loggedIn()
-  console.log(loggedIn());
-  console.log(lh.loggedIn);
   if (!lh.loggedIn) {
     loginHelper.redirectURLAfterLogin(detail.location);
     return false;

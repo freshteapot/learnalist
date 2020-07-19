@@ -22,7 +22,6 @@
     try {
       clearNotification();
       const response = await viewed(data.uuid);
-      console.log("next response", response);
       await get();
     } catch (error) {
       notify(
