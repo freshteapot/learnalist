@@ -49,6 +49,20 @@ generate-openapi-go:
 	rm ./server/pkg/openapi/go.mod && \
 	rm ./server/pkg/openapi/go.sum
 
+generate-openapi-js:
+	rm -rf ./js/src/openapi && \
+	mkdir -p ./js/src/openapi && \
+	openapi-generator generate -i ./learnalist.yaml -g typescript-fetch -o ./js/src/openapi \
+	--additional-properties typescriptThreePlus=true \
+	--additional-properties modelPropertyNaming=original \
+	--additional-properties enumPropertyNaming=original
+
+generate-openapi-dart:
+	rm -rf /tmp/openapi/dart && \
+	mkdir -p /tmp/openapi/dart && \
+	openapi-generator generate -i ./learnalist.yaml -g dart -o /tmp/openapi/dart \
+
+
 generate-docs-api-overview:
 	cd server && \
 	yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md

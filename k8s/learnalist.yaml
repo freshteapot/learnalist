@@ -14,9 +14,21 @@ spec:
         app: learnalist
     spec:
       containers:
+        - name: hugo
+          image: klakegg/hugo:0.72.0
+          command: [hugo-official]
+          args: ["--environment=lal01", "--verbose", "-w"]
+          volumeMounts:
+            - name: srv-learnalist-volume
+              mountPath: "/src"
+              subPath: hugo
+
         - name: learnalist
           image: registry.devbox/learnalist:latest
           args: ["server", "--config=/etc/learnalist/config.yaml"]
+          env:
+            - name: HUGO_EXTERNAL
+              value: "true"
 
           volumeMounts:
             - name: config-volume
@@ -55,6 +67,8 @@ kind: Ingress
 metadata:
   name: learnalist
   annotations:
+    acme.kubernetes.io/enable: "true"
+    acme.kubernetes.io/dns: "dns_namecom"
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:

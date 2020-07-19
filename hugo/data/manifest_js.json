@@ -6,5 +6,6 @@
  "srs": "/js/srs.dev.js",
  "v1": "/js/v1.dev.js",
  "v2": "/js/v2.dev.js",
- "editor": "/js/editor.dev.js"
+ "editor": "/js/editor.dev.js",
+ "plank-v1": "/js/plank-v1.dev.js"
 }

@@ -1,26 +1,5 @@
-<style>
-  input:disabled {
-    background: #ffcccc;
-    color: #333;
-  }
-
-  .item-container {
-    display: flex;
-  }
-
-  .nodrag {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-</style>
-
 <script>
-  import { copyObject, isDeviceMobile } from "../lib/helper.js";
-  import { tap } from "@sveltejs/gestures";
+  import { copyObject } from "../../utils/utils.js";
   import { afterUpdate } from "svelte";
 
   import Split from "./list_edit_data_v3_split.svelte";
@@ -56,15 +35,36 @@
   }
 </script>
 
+<style>
+  @import "../../../all.css";
+  input:disabled {
+    background: #ffcccc;
+    color: #333;
+  }
+
+  .item-container {
+    display: flex;
+  }
+
+  .nodrag {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+</style>
+
 <div class="item-container pv2">
   <div class="flex fl w-100">
     <div class="pa0 w-100 mr2">
-      <input placeholder="when" bind:value="{record.when}" {disabled} />
+      <input placeholder="when" bind:value={record.when} {disabled} />
     </div>
 
     <div class="pa0">
       {#if disabled === undefined}
-        <button on:click="{remove}" class="item">x</button>
+        <button on:click={remove} class="item">x</button>
       {:else}
         <span>&nbsp;</span>
       {/if}
@@ -97,7 +97,7 @@
 <!-- OVERALL:start -->
 <div class="item-container pv1 nodrag">
   <div class="flex flex-column pv2 fl w-100 bw1 bb bt b--moon-gray">
-    <Split {disabled} bind:split="{record.overall}" />
+    <Split {disabled} bind:split={record.overall} />
   </div>
 </div>
 <!-- OVERALL:finish -->
@@ -105,13 +105,13 @@
 {#each record.splits as split, splitIndex}
   <div class="item-container pv1">
     <div class="flex flex-column fl w-100">
-      <Split {disabled} {splitIndex} bind:split on:click="{removeSplit}" />
+      <Split {disabled} {splitIndex} bind:split on:click={removeSplit} />
     </div>
   </div>
 {/each}
 
 {#if disabled === undefined}
   <div class="flex pv1">
-    <button class="mr1 ph1" on:click="{() => addSplit()}">Add Split</button>
+    <button class="mr1 ph1" on:click={() => addSplit()}>Add Split</button>
   </div>
 {/if}

@@ -11,7 +11,7 @@
 ```sh
 npm install
 ```
-- build the "superstore".
+- build the "shared".
 ```sh
 rollup -c rollup.config.store.js
 ```
@@ -24,16 +24,16 @@ npm run develop
 - watch both change
 - Open developer tools
 - type
-```sh
-superstore.count.subscribe(value => a = value)
+```js
+shared.count.subscribe(value => a = value)
 ```
 - type and observe number matches count
-```sh
+```js
 a
 ```
 - click on "the count is X"
 - type and observe number matches count
-```sh
+```js
 a
 ```
 
@@ -43,7 +43,7 @@ a
 docker run --name learnalist-static-dev \
 -p 8080:80 \
 -v $PWD/hugo/public/:/usr/share/nginx/html:ro \
--v $PWD/nginx.conf:/etc/nginx/nginx.conf:ro \
+-v $PWD/config/nginx.conf:/etc/nginx/nginx.conf:ro \
 -P -d nginx:1.17-alpine
 ```
 

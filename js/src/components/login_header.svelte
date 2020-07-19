@@ -1,6 +1,6 @@
 <script>
-  import { getNext } from "./interact/spaced_repetition/api.js";
-  import { loggedIn } from "../store.js";
+  import { loggedIn, api } from "../shared.js";
+  import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
 
   let poller;
@@ -8,8 +8,7 @@
   let hasSpacedRepetition = false;
   let dontLookup = false;
   function preLogout() {
-    localStorage.clear();
-    console.log("It should still click");
+    clearConfiguration();
   }
 
   async function checkForSpacedRepetition() {
@@ -23,7 +22,8 @@
       return;
     }
 
-    const response = await getNext();
+    const response = await api.getSpacedRepetitionNext();
+
     if (![200, 204, 404].includes(response.status)) {
       clearInterval(poller);
       return;

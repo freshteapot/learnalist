@@ -2,11 +2,11 @@ FROM alpine:3.12
 ENV LC_ALL=en_US.UTF-8
 ENV LC_LANG=en_US.UTF-8
 ENV LC_LANGUAGE=en_US.UTF-8
-RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+#RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
 RUN apk update && \
     apk add --no-cache \
     tzdata \
     sqlite-dev \
     sqlite
 
-RUN apk add --no-cache hugo@edge
+#RUN apk add --no-cache hugo@edge

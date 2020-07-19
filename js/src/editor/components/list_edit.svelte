@@ -1,10 +1,10 @@
 <script>
   import { replace } from "svelte-spa-router";
-  import cache from "../lib/cache.js";
-  import { putList, deleteList } from "../../api.js";
+  import { api } from "../../shared.js";
   import goto from "../lib/goto.js";
-  import myLists from "../store/lists_by_me";
-  import listsEdits from "../store/lists_edits.js";
+  import storeListsByMe from "../../stores/lists_by_me.js";
+  import storeListsEdits from "../../stores/editor_lists_edits.js";
+
   import Box from "./Box.svelte";
   import ListEditTitle from "./list_edit_title.svelte";
   import ListEditDataV1 from "./list_edit_data_v1.svelte";
@@ -43,43 +43,44 @@
     }, null);
 
   function cancel() {
-    listsEdits.remove(aList.uuid);
+    storeListsEdits.remove(aList.uuid);
     goto.list.view(aList.uuid);
   }
 
   async function remove() {
-    const response = await deleteList(aList.uuid);
-    if (response.status !== 200) {
+    try {
+      await api.deleteList(aList.uuid);
+    } catch (error) {
       alert("failed try again");
-      console.log("status from server was", response.status);
+      console.error("status from server was", error);
       return;
     }
 
-    myLists.remove(aList.uuid);
-    listsEdits.remove(aList.uuid);
+    storeListsByMe.remove(aList.uuid);
+    storeListsEdits.remove(aList.uuid);
     // TODO how to remove /lists/view/:uuid as well
     replace("/list/deleted");
   }
 
   async function save() {
-    const response = await putList(aList);
-
-    if (response.status !== 200) {
+    try {
+      aList = await api.updateList(aList);
+    } catch (error) {
       alert("failed try again");
-      console.log("status from server was", response.status);
+      console.error("status from server was", error);
       return;
     }
 
     try {
-      listsEdits.remove(aList.uuid);
-      myLists.update(aList);
+      storeListsEdits.remove(aList.uuid);
+      storeListsByMe.update(aList);
       goto.list.view(aList.uuid);
     } catch (e) {
       alert("failed to clean up your edits");
     }
   }
 
-  $: listsEdits.update(aList);
+  $: storeListsEdits.update(aList);
 </script>
 
 <Box>
@@ -124,7 +125,6 @@
       <svelte:component
         this={interactElement}
         bind:interact={aList.info.interact} />
-
     </Box>
   {/if}
 

@@ -35,6 +35,7 @@ type: "alist"
 layout: "user"
 Uuid: {{.UUID}}
 js_include: ["main"]
+css_include: ["main"]
 ---
 `))
 	var tpl bytes.Buffer

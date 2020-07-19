@@ -1,6 +1,5 @@
 import { writable } from "svelte/store";
-import { getVersion } from "../../api.js";
-
+import { api } from "../shared.js";
 
 const { subscribe, set, update } = writable({
   "gitHash": "na",
@@ -18,12 +17,11 @@ const VersionStore = () => ({
   set,
   loading,
   error,
-  async get(query) {
-    console.log("Not here");
+  async get() {
     try {
       error.set('');
       loading.set(true);
-      const response = await getVersion();
+      const response = await api.getServerVersion();
       loading.set(false);
       set(response);
       return response;

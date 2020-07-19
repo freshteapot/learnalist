@@ -1,13 +1,13 @@
 <html lang="en">
 {{- partial "head.html" $ -}}
 
-<body onload="measureCRP()">
+<body onload="measureCRP()" class="w-100 bg-white">
     {{- partial "header.html" $ -}}
-    <notification-center></notification-center>
-    <main class="w-100 bt b--black-10 bg-white ">
-        <article id="list-info" class="mw9 mw6-ns center pt2">
+    <main class="bt b--black-10 pa0 overflow-auto">
+        <div id="main-panel" class="f6 w-100 mw8 center">
+            {{ block "header" . }}{{ end }}
             {{ block "main" . }}{{ end }}
-        </article>
+        </div>
     </main>
 </body>
 

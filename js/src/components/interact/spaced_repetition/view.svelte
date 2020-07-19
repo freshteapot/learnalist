@@ -1,6 +1,6 @@
 <script>
   import { getNext, viewed } from "./api.js";
-  import { loggedIn } from "../../../store.js";
+  import { loggedIn, notify, clearNotification } from "../../../shared.js";
 
   let state = "loading";
   let show;
@@ -19,37 +19,55 @@
   }
 
   async function next() {
-    const status = await viewed(data.uuid);
-    get();
+    try {
+      clearNotification();
+      const response = await viewed(data.uuid);
+      await get();
+    } catch (error) {
+      notify(
+        "error",
+        "Something went wrong talking to the server, please refresh the page",
+        true
+      );
+    }
   }
 
   async function get() {
-    if (!loggedIn()) {
-      state = "nothing-to-see";
-      return;
+    try {
+      if (!loggedIn()) {
+        state = "nothing-to-see";
+        return;
+      }
+
+      const response = await getNext();
+
+      if (response.status == 200) {
+        // show card
+        show = false;
+        data = response.body;
+        state = "show-entry";
+        return;
+      }
+
+      if (response.status == 204) {
+        state = "nothing-to-see";
+        return;
+      }
+
+      if (response.status == 404) {
+        state = "no-entries";
+        return;
+      }
+
+      state = "loading";
+      data = null;
+    } catch (error) {
+      notify(
+        "error",
+        "Something went wrong talking to the server, please refresh the page",
+        true
+      );
     }
-
-    const response = await getNext();
-
-    if (response.status == 200) {
-      // show card
-      data = response.body;
-      state = "show-entry";
-      return;
-    }
-
-    if (response.status == 204) {
-      state = "nothing-to-see";
-      return;
-    }
-
-    if (response.status == 404) {
-      state = "no-entries";
-      return;
-    }
-
-    state = "loading";
-    data = null;
   }
 
   function showInfo(state) {
@@ -69,8 +87,22 @@
     playElement.style.display = "none";
   }
 
+  function showMessage(state) {
+    if (state === "nothing-to-see") {
+      notify("info", "None of your entries are ready, add more?", true);
+      return;
+    }
+
+    if (state === "no-entries") {
+      notify("info", "Would you like to try Spaced Repetition?", true);
+      return;
+    }
+  }
+
   $: get();
   $: showInfo(state);
+
+  $: showMessage(state);
 </script>
 
 <style>
@@ -79,40 +111,20 @@
 
 <svelte:options tag={null} />
 
-{#if loggedIn()}
+{#if loggedIn() && state === 'show-entry'}
   <article>
-    {#if state === 'show-entry'}
-      <header>
-        <button class="br3" on:click={flipIt}>Flip</button>
-        <button class="br3" on:click={next}>Next</button>
-      </header>
-      <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-        {#if !show}
-          <h1>{data.show}</h1>
-        {/if}
+    <header>
+      <button class="br3" on:click={flipIt}>Flip</button>
+      <button class="br3" on:click={next}>Next</button>
+    </header>
+    <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
+      {#if !show}
+        <h1>{data.show}</h1>
+      {/if}
 
-        {#if show}
-          <pre>{JSON.stringify(data, '', 2)}</pre>
-        {/if}
-      </blockquote>
-    {/if}
-
-    {#if state === 'nothing-to-see'}
-      <script>
-        superstore.notifications.add(
-          "info",
-          "None of your entries are ready, add more?"
-        );
-      </script>
-    {/if}
-
-    {#if state === 'no-entries'}
-      <script>
-        superstore.notifications.add(
-          "info",
-          "Would you like to try Spaced Repetition?"
-        );
-      </script>
-    {/if}
+      {#if show}
+        <pre>{JSON.stringify(data, '', 2)}</pre>
+      {/if}
+    </blockquote>
   </article>
 {/if}

@@ -1,8 +1,12 @@
 <script>
-  import version from "../store/version";
+  import version from "../../stores/version";
   const { loading, error } = version;
   version.get();
 </script>
+
+<style>
+  @import "../../../all.css";
+</style>
 
 <div class="pa3 pa5-ns">
   <div class="pl0 measure center">
@@ -16,7 +20,7 @@
       <p>Git date is {$version.gitDate}</p>
       <p>
         On
-        <a href="{$version.url}" target="_blank">Github</a>
+        <a href={$version.url} target="_blank">Github</a>
       </p>
     {/if}
   </div>

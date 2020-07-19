@@ -1,2 +1,2 @@
-const { syncManifestCSSBase } = require("./src/utils/glue.js");
+import { syncManifestCSSBase } from "./src/utils/glue.js";
 syncManifestCSSBase();

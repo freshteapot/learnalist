@@ -1,8 +1,13 @@
 import { get, writable } from 'svelte/store';
-import { getListsByMe } from "../../api.js";
-import cache from '../lib/cache.js';
+import { api } from "../shared.js";
+import {
+  getConfiguration,
+  saveConfiguration,
+  KeyListsByMe
+} from "../configuration.js";
 
-const current = cache.get(cache.keys["lists.by.me"]);
+
+const current = getConfiguration(KeyListsByMe, []);
 const { subscribe, set, update } = writable(current);
 const loading = writable(false);
 const error = writable('');
@@ -13,24 +18,23 @@ const ListsByMeStore = () => ({
   loading,
   error,
   async get() {
-    let key = cache.keys['lists.by.me'];
     let data = [];
     try {
-      data = cache.get(key, data);
+      data = getConfiguration(KeyListsByMe, []);
       set(data);
       error.set('');
       if (data.length === 0) {
         loading.set(true);
       }
 
-      const response = await getListsByMe();
+      data = await api.getListsByMe();
       loading.set(false);
-      cache.save(key, response);
-      set(response);
-      return response;
+      saveConfiguration(KeyListsByMe, data);
+      set(data);
+      return data;
     } catch (e) {
       loading.set(false);
-      data = cache.get(key, data);
+      data = getConfiguration(KeyListsByMe, []);
       set(data);
       error.set(`Error has been occurred. Details: ${e.message}`);
     }
@@ -45,7 +49,7 @@ const ListsByMeStore = () => ({
   add(aList) {
     update(myLists => {
       myLists.push(aList);
-      cache.save(cache.keys["lists.by.me"], myLists);
+      saveConfiguration(KeyListsByMe, myLists);
       return myLists;
     });
   },
@@ -58,7 +62,7 @@ const ListsByMeStore = () => ({
         }
         return item;
       });
-      cache.save(cache.keys["lists.by.me"], updated);
+      saveConfiguration(KeyListsByMe, updated);
       return updated;
     });
   },
@@ -66,7 +70,7 @@ const ListsByMeStore = () => ({
   remove(uuid) {
     update(myLists => {
       const found = myLists.filter(aList => aList.uuid !== uuid);
-      cache.save(cache.keys["lists.by.me"], found);
+      saveConfiguration(KeyListsByMe, found);
       return found;
     });
   }

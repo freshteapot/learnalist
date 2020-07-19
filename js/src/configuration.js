@@ -1,3 +1,6 @@
+import { get, save, rm } from "./utils/storage.js";
+import { getApiServer } from "./utils/setup.js";
+
 const KeySettingsServer = "settings.server";
 const KeySettingsInstallDefaults = "settings.install.defaults";
 const KeyUserUuid = "app.user.uuid";
@@ -5,36 +8,22 @@ const KeyUserAuthentication = "app.user.authentication"
 const KeyNotifications = "app.notifications";
 const KeyEditorMyEditedLists = "my.edited.lists";
 const KeyEditorMyLists = "my.lists";
-
-function get(key, defaultResult) {
-  if (!localStorage.hasOwnProperty(key)) {
-    return defaultResult;
-  }
-
-  return JSON.parse(localStorage.getItem(key))
-}
-
-function save(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-function rm(key) {
-  localStorage.removeItem(key);
-}
+const KeyLastScreen = "last.screen";
+// Hmmm
+const KeyListsByMe = "lists.by.me";
 
 function clear() {
   localStorage.clear();
   save(KeySettingsInstallDefaults, true);
-  const apiServer = document.querySelector('meta[name="api.server"]');
-  if (apiServer) {
-    save(KeySettingsServer, apiServer.content);
-  } else {
-    save(KeySettingsServer, "https://learnalist.net");
-  }
-
+  save(KeySettingsServer, getApiServer())
   save(KeyEditorMyEditedLists, []);
   save(KeyEditorMyLists, []);
 }
+
+const clearConfiguration = clear;
+const saveConfiguration = save;
+const removeConfiguration = rm;
+const getConfiguration = get;
 
 export {
   KeySettingsServer,
@@ -42,8 +31,12 @@ export {
   KeyUserUuid,
   KeyUserAuthentication,
   KeyNotifications,
-  get,
-  save,
-  rm,
-  clear
+  KeyLastScreen,
+  KeyListsByMe,
+  KeyEditorMyEditedLists,
+  KeyEditorMyLists,
+  getConfiguration,
+  saveConfiguration,
+  removeConfiguration,
+  clearConfiguration
 };

@@ -1,19 +1,16 @@
 <script>
-  import ErrorBox from "../components/error_box.svelte";
   import ListItem from "../components/list_find_item.svelte";
-  import ListsByMeStore from "../store/lists_by_me";
-  const loading = ListsByMeStore.loading;
-  const error = ListsByMeStore.error;
+  import store from "../../stores/lists_by_me.js";
+  const loading = store.loading;
+  const error = store.error;
 
-  ListsByMeStore.get();
+  store.get();
 
   let find = "all";
   let filterByLabel = "Any label";
 
-  let lists = $ListsByMeStore;
-  const foundListTypes = [
-    ...new Set($ListsByMeStore.map(item => item.info.type))
-  ];
+  let lists = $store;
+  const foundListTypes = [...new Set($store.map(item => item.info.type))];
 
   const defaultListTypes = [
     {
@@ -96,53 +93,53 @@
     filterByLabel = "Any label";
   }
 
-  $: filterLists = filterListsByFilters($ListsByMeStore, find, filterByLabel);
+  $: filterLists = filterListsByFilters($store, find, filterByLabel);
   $: listTypes = getSelectListTypes(filterLists);
   $: listLabels = getSelectListLabels(filterLists);
 </script>
 
-<div class="pa3 pa2-ns">
+<style>
+  @import "../../../all.css";
+</style>
 
-  <div class="pl0 measure center">
-    {#if $error}
-      error is {$error}
-    {:else if $loading}
-      Loading...
-    {:else}
-      <div>
-        <fieldset class="bn">
-          <div class="flex items-center mb2">
-            <span>Filter</span>
-          </div>
-
-          <div class="flex items-center mb2">
-            <select bind:value={find}>
-              {#each listTypes as listType}
-                <option value={listType.key}>{listType.description}</option>
-              {/each}
-            </select>
-          </div>
-
-          {#if hasLabels(listLabels)}
-            <div class="flex items-center mb2">
-              <select bind:value={filterByLabel}>
-                {#each listLabels as label}
-                  <option value={label}>{label}</option>
-                {/each}
-              </select>
-            </div>
-          {/if}
-
-          <div class="flex items-center mb2">
-            <button on:click={reset}>reset</button>
-          </div>
-        </fieldset>
+{#if $error}
+  error is {$error}
+{:else if $loading}
+  Loading...
+{:else}
+  <div class="tc">
+    <fieldset class="bn measure center">
+      <div class="flex items-center mb2">
+        <span>Filter</span>
       </div>
-      <ul class="list pl0 measure center">
-        {#each filterLists as aList}
-          <ListItem title={aList.info.title} uuid={aList.uuid} />
-        {/each}
-      </ul>
-    {/if}
+
+      <div class="flex items-center mb2">
+        <select bind:value={find}>
+          {#each listTypes as listType}
+            <option value={listType.key}>{listType.description}</option>
+          {/each}
+        </select>
+      </div>
+
+      {#if hasLabels(listLabels)}
+        <div class="flex items-center mb2">
+          <select bind:value={filterByLabel}>
+            {#each listLabels as label}
+              <option value={label}>{label}</option>
+            {/each}
+          </select>
+        </div>
+      {/if}
+
+      <div class="flex items-center mb2">
+        <button on:click={reset}>reset</button>
+      </div>
+    </fieldset>
   </div>
-</div>
+
+  <ul class="list center">
+    {#each filterLists as aList}
+      <ListItem title={aList.info.title} uuid={aList.uuid} />
+    {/each}
+  </ul>
+{/if}

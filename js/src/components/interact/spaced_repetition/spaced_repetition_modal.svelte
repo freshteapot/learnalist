@@ -1,5 +1,5 @@
 <script>
-  import { loggedIn } from "../../../store.js";
+  import { loggedIn } from "../../../shared.js";
   import { push } from "svelte-spa-router";
   import { createEventDispatcher, onMount, onDestroy } from "svelte";
 

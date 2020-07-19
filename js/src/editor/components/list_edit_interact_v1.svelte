@@ -3,6 +3,10 @@
   export let interact;
 </script>
 
+<style>
+  @import "../../../all.css";
+</style>
+
 <Box>
   <h3>Slideshow</h3>
   <label>

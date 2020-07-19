@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "removeComments": true,
+        "importHelpers": true,
+        "target": "es6"
+    }
+}

@@ -38,7 +38,7 @@ build() {
     # to make rendering of the pages lightning fast still.
     cd "$ORIGPWD"
     cd js
-    node sync-site-base-css.js
+    node --experimental-modules sync-site-base-css.js
 
     cd "$ORIGPWD"
     cd hugo
@@ -55,5 +55,5 @@ build
 
 
 # Add static file
-git add hugo/data/manifest_css.json
-git add hugo/data/manifest_js.json
+#git add hugo/data/manifest_css.json
+#git add hugo/data/manifest_js.json

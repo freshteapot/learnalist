@@ -1,7 +1,10 @@
 <script>
-  import { link, location } from "svelte-spa-router";
-  import { loginHelper } from "../lib/helper.js";
+  import { link } from "svelte-spa-router";
 </script>
+
+<style>
+  @import "../../../all.css";
+</style>
 
 <header class="flex">
   <div class="w-25 pa3 mr2" />

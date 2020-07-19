@@ -1,173 +1,216 @@
-import { get as cacheGet, KeyUserAuthentication, KeySettingsServer } from './cache.js';
+import {
+  getConfiguration,
+  KeyUserAuthentication,
+  KeySettingsServer
+} from './configuration.js';
+import {
+  Configuration,
+  DefaultApi,
+  UserApi,
+  AListApi,
+  SpacedRepetitionApi,
+  HttpUserLoginRequestFromJSON,
+  AlistInputFromJSON,
+  AlistFromJSON,
+  SpacedRepetitionEntryViewedFromJSON
+} from "./openapi";
 
-function getAuth() {
-  const token = cacheGet(KeyUserAuthentication, null)
-  if (token === null) {
-    throw new Error('login.required');
-  }
-  return `Bearer ${token}`;
+const Services = {
+  Default: DefaultApi,
+  User: UserApi,
+  Alist: AListApi,
+  SpacedRepetition: SpacedRepetitionApi
 }
 
 function getServer() {
-  const server = cacheGet(KeySettingsServer, null)
+  const server = getConfiguration(KeySettingsServer, null)
   if (server === null) {
     throw new Error('settings.server.missing');
   }
   return server;
 }
 
-
-
-function getHeaders() {
-  return {
-    "Content-Type": "application/json",
-    Authorization: getAuth()
-  };
-}
-
-async function getVersion() {
-  const url = getServer() + "/api/v1/version";
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (res.ok) {
-    return data;
-  }
-  throw new Error("Failed to get learnalist server version information");
-}
-
-async function getListsByMe() {
-  const url = getServer() + "/api/v1/alist/by/me";
-  const res = await fetch(url, {
-    headers: getHeaders()
+// getApi service = One of the services based on Services
+function getApi(service) {
+  var config = new Configuration({
+    basePath: `${getServer()}/api/v1`,
+    accessToken: getConfiguration(KeyUserAuthentication, undefined),
   });
 
-  let manyLists = await res.json();
-  if (res.ok) {
-    return manyLists;
-  }
-  throw new Error("Failed to get lists by me");
+  return new service(config);
 }
 
 
-async function putList(aList) {
-  const response = {
-    status: 400,
-    data: {}
-  }
-
-  const url = getServer() + '/api/v1/alist/' + aList.uuid;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(aList)
-  });
-
-  const data = await res.json();
-  switch (res.status) {
-    case 200:
-    case 403:
-    case 400:
-      response.status = res.status
-      response.data = data
-      return response;
-      break;
-  }
-  throw new Error('Unexpected response from the server');
-}
-
-
-// Look at https://github.com/freshteapot/learnalist-api/blob/master/docs/api.user.login.md
 async function postLogin(username, password) {
+  const api = getApi(Services.User);
   const response = {
     status: 400,
     body: {}
   }
 
-  const input = {
-    username: username,
-    password: password
-  }
-
-  const url = getServer() + "/api/v1/user/login";
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(input)
-  });
-
-  const data = await res.json();
-  switch (res.status) {
-    case 200:
-    case 403:
-    case 400:
-      response.status = res.status
-      response.body = data
-      return response;
-      break;
-  }
-  throw new Error('Unexpected response from the server');
-}
-
-
-// postList title: string listType: string
-async function postList(title, listType) {
-  const input = {
-    data: [],
-    info: {
-      title: title,
-      type: listType,
-      labels: []
+  try {
+    const input = {
+      httpUserLoginRequest: HttpUserLoginRequestFromJSON({ username, password })
     }
-  }
 
-  const url = getServer() + '/api/v1/alist';
-  const res = await fetch(url, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify(input)
-  });
-
-  const data = await res.json();
-  // TODO double check we handle the codes we send from the server.
-  if (res.status === 400 || res.status === 201) {
-    return {
-      status: res.status,
-      body: data
-    };
+    const res = await api.loginWithUsernameAndPasswordRaw(input);
+    response.status = res.raw.status;
+    response.body = await res.value();
+    return response;
+  } catch (error) {
+    response.status = error.status;
+    response.body = await error.json();
+    return response;
   }
-  throw new Error('Unexpected response from the server when posting a list');
 }
 
-// deleteList uuid: string
+async function getListsByMe(filter) {
+  const api = getApi(Services.Alist);
+  if (!filter) {
+    filter = {};
+  }
+
+  try {
+    return await api.getListsByMe(filter);
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to get lists by me");
+  }
+}
+
+async function getPlanks() {
+  const api = getApi(Services.Alist);
+
+  try {
+    return await api.getListsByMe({ labels: "plank", listType: "v1" });
+  } catch (error) {
+    throw new Error({
+      message: "Failed to get lists by me",
+      error: error
+    });
+  }
+}
+
+async function addList(aList) {
+  try {
+    const api = getApi(Services.Alist);
+
+    const input = {
+      alistInput: AlistInputFromJSON(aList)
+    }
+    return await api.addList(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to save list");
+  }
+}
+
+async function updateList(aList) {
+  try {
+    const api = getApi(Services.Alist);
+
+    const input = {
+      uuid: aList.uuid,
+      alist: AlistFromJSON(aList)
+    }
+    return await api.updateListByUuid(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to update list");
+  }
+}
+
 async function deleteList(uuid) {
-  const url = getServer() + "/api/v1/alist/" + uuid;
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: getHeaders()
-  });
-
-  const data = await res.json();
-  // TODO double check we handle the codes we send from the server.
-  if (res.status === 400 || res.status === 200 || res.status === 404) {
-    return {
-      status: res.status,
-      body: data
-    };
+  try {
+    const api = getApi(Services.Alist);
+    const input = {
+      uuid: uuid,
+    }
+    return await api.deleteListByUuid(input);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete list");
   }
-  throw new Error('Unexpected response from the server when deleting a list');
 }
 
+
+async function getServerVersion() {
+  const api = getApi(Services.SpacedRepetition);
+  return await api.getServerVersion();
+}
+
+async function getSpacedRepetitionNext() {
+  const api = getApi(Services.SpacedRepetition);
+
+  const response = {
+    status: 404,
+    body: {}
+  }
+
+  try {
+    const res = await api.getNextSpacedRepetitionEntryRaw();
+    response.status = res.raw.status;
+    try {
+      response.body = await res.value();
+    } catch (error) {
+
+    }
+
+    return response;
+  } catch (error) {
+    throw (error);
+  }
+
+}
+
+
+async function addSpacedRepetitionEntry(entry) {
+  const response = {
+    status: 500,
+    body: {}
+  }
+
+  try {
+    const api = getApi(Services.SpacedRepetition);
+    const input = {
+      body: entry,
+    }
+    const res = await api.addSpacedRepetitionEntryRaw(input);
+    response.status = res.raw.status;
+    response.body = await res.value();
+    return response;
+  } catch (error) {
+    response.status = error.status;
+    response.body = await error.json();
+    return response;
+  }
+}
+
+async function updateSpacedRepetitionEntry(entry) {
+  try {
+    const api = getApi(Services.SpacedRepetition);
+
+    const input = {
+      spacedRepetitionEntryViewed: SpacedRepetitionEntryViewedFromJSON(entry)
+    }
+    return api.updateSpacedRepetitionEntry(input);
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to get lists by me");
+  }
+
+}
 
 export {
   getServer,
-  getHeaders,
-  getListsByMe,
-  getVersion,
   postLogin,
-  putList,
-  postList,
+  getListsByMe,
+  addList,
+  updateList,
   deleteList,
+  getPlanks,
+  getServerVersion,
+  getSpacedRepetitionNext,
+  addSpacedRepetitionEntry,
+  updateSpacedRepetitionEntry
 };

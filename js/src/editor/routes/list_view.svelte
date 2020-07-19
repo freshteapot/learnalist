@@ -1,12 +1,9 @@
 <script>
-  import cache from "../lib/cache.js";
-  import myLists from "../store/lists_by_me";
+  import store from "../../stores/lists_by_me.js";
   import ListView from "../components/list.view.svelte";
   export let params = {};
 
-  const aList = myLists.find(params.uuid);
-  console.log(aList);
-
+  const aList = store.find(params.uuid);
   $: show = aList && aList.info && aList.data;
 </script>
 

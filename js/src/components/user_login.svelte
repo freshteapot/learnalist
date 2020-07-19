@@ -1,17 +1,17 @@
 <script>
-  import { login, notify } from "../store.js";
+  import { login, notify, api } from "../shared.js";
+  import { loginHelper } from "../utils/login_helper.js";
   import {
-    save as cacheSave,
+    saveConfiguration,
     KeyUserUuid,
     KeyUserAuthentication
-  } from "../cache.js";
-  import { postLogin } from "../api.js";
+  } from "../configuration.js";
 
-  let isLoggedIn = false;
   let username = "";
   let password = "";
   let message;
 
+  // https://github.com/sveltejs/svelte/issues/2118#issuecomment-531586875
   async function handleSubmit() {
     if (username === "" || password === "") {
       message = "Please enter in a username and password";
@@ -19,16 +19,39 @@
       return;
     }
 
-    let response = await postLogin(username, password);
+    const response = await api.postLogin(username, password);
+
     if (response.status != 200) {
       notify("error", "Please try again");
       return;
     }
 
-    cacheSave(KeyUserUuid, response.body.user_uuid);
-    cacheSave(KeyUserAuthentication, response.body.token);
-    login("/welcome.html");
+    saveConfiguration(KeyUserUuid, response.body.user_uuid);
+    saveConfiguration(KeyUserAuthentication, response.body.token);
+
+    const querystring = window.location.search;
+    const searchParams = new URLSearchParams(querystring);
+
+    if (!searchParams.has("redirect")) {
+      login("/welcome.html");
+      return;
+    }
+
+    const suffix = searchParams.get("redirect").replace(/^\/+/, "");
+    const redirectUrl = addLoginRedirect(`${api.getServer()}/${suffix}`);
+
+    login(redirectUrl);
     return;
+  }
+
+  function addLoginRedirect(redirectUrl) {
+    const url = document.createElement("a");
+    url.href = redirectUrl;
+    const querystring = url.search;
+    const searchParams = new URLSearchParams(querystring);
+    searchParams.set("login_redirect", "true");
+    url.search = `?${searchParams.toString()}`;
+    return url.href.replace(url.origin, "");
   }
 </script>
 
@@ -38,7 +61,7 @@
 
 <svelte:options tag={null} />
 
-{#if !isLoggedIn}
+{#if !$loginHelper.loggedIn}
   <form class="measure center" on:submit|preventDefault={handleSubmit}>
     <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
       <div class="mt3">

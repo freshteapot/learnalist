@@ -26,6 +26,9 @@ hugo/resources/
 
 # js
 js/node_modules
+## Ignoring this as we generate it
+js/src/openapi/
+
 # Removing dev assets
 hugo/static/css/base.*
 hugo/static/css/editor.*
