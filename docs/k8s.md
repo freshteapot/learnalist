@@ -96,3 +96,4 @@ rsync -avvvzP \
 
 # Reference
 - [acme.sh](https://github.com/acmesh-official/acme.sh)
+- [cronjob to keep ssl updated](https://github.com/math-nao/certs)
