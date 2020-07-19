@@ -57,6 +57,11 @@ generate-openapi-js:
 	--additional-properties modelPropertyNaming=original \
 	--additional-properties enumPropertyNaming=original
 
+generate-openapi-dart:
+	rm -rf /tmp/openapi/dart && \
+	mkdir -p /tmp/openapi/dart && \
+	openapi-generator generate -i ./learnalist.yaml -g dart -o /tmp/openapi/dart \
+
 
 generate-docs-api-overview:
 	cd server && \
