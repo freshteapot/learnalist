@@ -17,13 +17,35 @@ acme.sh --issue -d learnalist.net  -d '*.learnalist.net'  --dns dns_namecom
 ```
 I did this as cert-manager just seemed a lot of overhead, once I add a cronjob to run regularly, this problem will be solved.
 
+## Using cronjob
+- didnt work... but the commands
+
+```sh
+cd ~/git/learn-acme.sh
+helm repo add certs https://math-nao.github.io/certs/charts
+helm fetch --untar certs/certs
+mkdir -p output
+helm template certs   --name certs   --values values.yaml   --output-dir=./output
+```
+
 ## How to create the secret used for tls
+- Didnt work via https://github.com/math-nao/certs, but maybe this was due to multiple domains.
+  It worked, it just didnt apply it to the server correcly.
+- Running it manually and replacing the file worked great
 
 ```sh
 kubectl create secret tls tls \
 --key /Users/tinkerbell/.acme.sh/learnalist.net/learnalist.net.key \
 --cert /Users/tinkerbell/.acme.sh/learnalist.net/fullchain.cer
 ```
+
+
+```sh
+kubectl create secret tls tls \
+--key /Users/tinkerbell/.acme.sh/learnalist.net/learnalist.net.key \
+--cert /Users/tinkerbell/.acme.sh/learnalist.net/fullchain.cer --dry-run -o yaml | kubectl apply -f -
+```
+
 
 # Setup Configmap
 -
