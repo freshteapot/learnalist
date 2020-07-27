@@ -26,5 +26,5 @@ http://localhost:1234/alist/5d4c9869-1d26-567d-82be-497c3521368a.html
 
 docker run --name lal-sample \
 -p 8080:80 \
--v $PWD/hugo/public-alist:/usr/share/nginx/html:ro \
+-v $PWD/hugo/public:/usr/share/nginx/html:ro \
 -P -d nginx:1.17-alpine

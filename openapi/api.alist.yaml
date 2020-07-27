@@ -1,0 +1,271 @@
+components:
+  examples:
+  schemas:
+    AlistInput:
+      type: object
+      required:
+        - info
+        - data
+      properties:
+        info:
+          $ref: "#/components/schemas/AlistInfo"
+        data:
+          $ref: "#/components/schemas/AnyType"
+          description: Data is based on the type. v1=AlistDataV1, v2=AlistDataV2 etc
+          example:
+            - $ref: "#/components/schemas/AlistDataV1"
+            - $ref: "#/components/schemas/AlistDataV2"
+
+    AlistInteract:
+      type: object
+      properties:
+        slideshow:
+          type: integer
+        totalrecall:
+          type: integer
+
+    AlistInfo:
+      type: object
+      required:
+        - title
+        - type
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        shared_with:
+          type: string
+        interact:
+          $ref: "#/components/schemas/AlistInteract"
+
+    AlistItemV1:
+      type: string
+
+    AlistDataV1:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlistItemV1"
+
+    AlistItemV2:
+      type: object
+      required:
+        - from
+        - to
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+
+    AlistDataV2:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlistItemV2"
+
+    Alist:
+      type: object
+      required:
+        - uuid
+      allOf:
+        - type: object
+          properties:
+            uuid:
+              type: string
+        - $ref: "#/components/schemas/AlistInput"
+
+paths:
+  /alist:
+    post:
+      tags:
+        - aList
+      operationId: addList
+      description: add a new list
+      requestBody:
+        description: A list object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlistInput"
+      responses:
+        "201":
+          description: List has been created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alist"
+        "400":
+          description: Bad request, something is wrong with the list object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /alist/{uuid}:
+    get:
+      tags:
+        - aList
+      description: Get a list
+      operationId: getListByUuid
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of list
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Return a list, data will depend on the list type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alist"
+        "404":
+          description: List is not in the system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: User making request does not have access to the list in question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+    put:
+      tags:
+        - aList
+      description: Update a list
+      operationId: updateListByUuid
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of list
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: List to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Alist"
+      responses:
+        "200":
+          description: Return a list, data will depend on the list type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alist"
+        "404":
+          description: List is not in the system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: User making request does not have access to the list in question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+    delete:
+      tags:
+        - aList
+      description: Delete a list
+      operationId: deleteListByUuid
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of list
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: list deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: List is not in the system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+        "403":
+          description: UUID does not match that of the logged in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+  /alist/by/me:
+    get:
+      tags:
+        - aList
+      description: Get lists by me
+      operationId: getListsByMe
+      parameters:
+        - in: query
+          name: labels
+          description: Filter your lists by one or many labels. "seperated by ,".
+          schema:
+            type: string
+        - in: query
+          name: list_type
+          description: Filter your lists by type v1, v2 etc
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Return an array of lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alist"

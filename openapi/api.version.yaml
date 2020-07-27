@@ -1,0 +1,26 @@
+components:
+  schemas:
+    Version:
+      type: object
+      properties:
+        gitHash:
+          type: string
+        gitDate:
+          type: string
+        version:
+          type: string
+        url:
+          type: string
+paths:
+  /version:
+    get:
+      operationId: getServerVersion
+      description: Get information about the server, linked to the git repo
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
