@@ -13,17 +13,14 @@ function ctrl_c() {
 	kill -9 $(lsof -ti tcp:1234) 2>/dev/null
 }
 
+# Make sure the ports are killed before we start and hopefully catch them on close
 kill -9 $(lsof -ti tcp:1313) 2>/dev/null
 kill -9 $(lsof -ti tcp:1234) 2>/dev/null
 
+# Config setup
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 HUGO_DIR="${CWD}/../hugo"
-
-#LAL_BIND="192.168.0.10"
 SERVER_CONFIG="../config.dev_external.yaml"
-#HUGO_ARGS_BASEURL="http://192.168.0.10:1313" HUGO_ARGS_BIND="192.168.0.10" make develop2
-
 DEFAULT_SERVER_CONFIG="${CWD}/../config/dev.config.yaml"
 _BIND="${LAL_BIND:-localhost}"
 _BASEURL="http://${_BIND}:1313"
@@ -48,15 +45,15 @@ rm -f $HUGO_CONFIG
 touch $HUGO_CONFIG
 yq w -i $HUGO_CONFIG baseURL  "${_BASEURL}"
 yq w -i $HUGO_CONFIG params.ApiServer "${_APISERVER}"
-#yq w -i "$HUGO_DIR/config/dev_external/config.yaml" params.apiServer2 "${_APISERVER}"
 
+# Clean up hugo output
 mkdir -p "$HUGO_DIR/public"
 rm -rf "$HUGO_DIR/public/"*
 ls -lah "$HUGO_DIR/public"
+# Start the server
 cd server && \
 go run --tags="json1" main.go --config=$SERVER_CONFIG server &
-
-
+# Start static site engine
 cd $HUGO_DIR && \
 hugo server \
 -w \
