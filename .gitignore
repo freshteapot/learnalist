@@ -2,12 +2,17 @@
 *.db
 *.DS_Store
 
+# Config setup for host development
+config/dev_external.config.yaml
+hugo/config/dev_external/
+
 # GO: Ignore all files in vendor
 server/vendor/
 server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
 server/c.out
+
 ## Ignoring this as we generate it
 server/pkg/openapi/
 

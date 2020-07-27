@@ -30,7 +30,14 @@ run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
+# Running development with hugo and golang ran outside of the javascript landscape
+# Enables the ability to expose the code to my ip address not just localhost
 develop:
+	scripts/run-hugo.sh && \
+	cd js && \
+	npm run dev:js:components
+
+develop-localhost:
 	cd js && \
 	npm run dev
 
@@ -41,31 +48,46 @@ run-e2e-tests:
 	cd server && \
 	./run-e2e.sh
 
-generate-openapi-go:
+generate-openapi-one:
+	rm -rf /tmp/openapi/one && \
+	mkdir -p /tmp/openapi/one && \
+	cp ./openapi/learnalist.yaml /tmp/openapi/one/ && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.version.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.user.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.alist.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \
+	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g openapi-yaml -o /tmp/openapi/one
+
+generate-openapi-markdown: generate-openapi-one
+	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g markdown -o /tmp/openapi/one
+
+generate-openapi-go: generate-openapi-one
 	rm -rf ./server/pkg/openapi && \
 	mkdir -p ./server/pkg/openapi && \
 	GO_POST_PROCESS_FILE="/usr/local/bin/gofmt -w" \
-	openapi-generator generate -i ./learnalist.yaml -g go -o ./server/pkg/openapi && \
+	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g go -o ./server/pkg/openapi && \
 	rm ./server/pkg/openapi/go.mod && \
 	rm ./server/pkg/openapi/go.sum
 
-generate-openapi-js:
+generate-openapi-js: generate-openapi-one
 	rm -rf ./js/src/openapi && \
 	mkdir -p ./js/src/openapi && \
-	openapi-generator generate -i ./learnalist.yaml -g typescript-fetch -o ./js/src/openapi \
+	openapi-generator generate -i /tmp/openapi/one/openapi/openapi.yaml -g typescript-fetch -o ./js/src/openapi \
 	--additional-properties typescriptThreePlus=true \
 	--additional-properties modelPropertyNaming=original \
 	--additional-properties enumPropertyNaming=original
 
-generate-openapi-dart:
+generate-openapi-dart: generate-openapi-one
 	rm -rf /tmp/openapi/dart && \
 	mkdir -p /tmp/openapi/dart && \
-	openapi-generator generate -i ./learnalist.yaml -g dart -o /tmp/openapi/dart \
+	DART_POST_PROCESS_FILE="/usr/local/bin/dartfmt -w" \
+	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g dart -o /tmp/openapi/dart \
+	--additional-properties ensureUniqueParams=false
 
 
-generate-docs-api-overview:
+generate-docs-api-overview: generate-openapi-one
 	cd server && \
-	yq r ../learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
+	yq r /tmp/openapi/one/learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 
 ###############################################################################
 #

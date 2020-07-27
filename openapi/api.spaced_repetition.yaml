@@ -1,0 +1,322 @@
+components:
+  examples:
+    SpacedRepetitionInputV1:
+      value:
+        show: Hello
+        kind: v1
+        data: Hello
+    SpacedRepetitionV1:
+      value:
+        show: Hello
+        kind: v1
+        data: Hello
+        settings:
+          level: "0"
+          show: "Hello"
+          when_next: "2020-08-08T15:29:43Z"
+        uuid: "90d31f693a34558d0ba3702cc42b62ba670bc010"
+    SpacedRepetitionInputV2:
+      value:
+        show: Hello
+        kind: v2
+        data:
+          from: hello
+          to: hi
+        settings:
+          show: from
+    SpacedRepetitionV2:
+      value:
+        show: Hello
+        kind: v2
+        data:
+          from: hello
+          to: hi
+        settings:
+          level: "0"
+          show: "from"
+          when_next: "2020-08-08T15:29:43Z"
+        uuid: "90d31f693a34558d0ba3702cc42b62ba670bc010"
+
+  schemas:
+    SpacedRepetitionEntryViewed:
+      type: object
+      required:
+        - uuid
+        - action
+      properties:
+        uuid:
+          type: string
+        action:
+          type: string
+    SpacedRepetitionNew:
+      type: object
+      #oneOf:
+      #  - $ref: "#/components/schemas/SpacedRepetitionV1New"
+      #  - $ref: "#/components/schemas/SpacedRepetitionV2New"
+      #discriminator:
+      #  propertyName: kind
+
+    SpacedRepetition:
+      type: object
+      #oneOf:
+      #  - $ref: "#/components/schemas/SpacedRepetitionV1"
+      #  - $ref: "#/components/schemas/SpacedRepetitionV2"
+      #discriminator:
+      #  propertyName: kind
+
+    SpacedRepetitionBaseNew:
+      type: object
+      required:
+        - show
+        - kind
+      properties:
+        show:
+          type: string
+        kind:
+          type: string
+
+    SpacedRepetitionBase:
+      required:
+        - uuid
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBaseNew"
+        - type: object
+          properties:
+            uuid:
+              type: string
+
+    SpacedRepetitionBaseSettings:
+      type: object
+      required:
+        - level
+        - when_next
+      properties:
+        level:
+          type: string
+        when_next:
+          type: string
+          format: date-time
+
+    SpacedRepetitionBaseSettingsShow:
+      type: object
+      required:
+        - show
+      properties:
+        show:
+          type: string
+
+    SpacedRepetitionV1:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionV1New"
+        - $ref: "#/components/schemas/SpacedRepetitionBase"
+
+    SpacedRepetitionV1New:
+      required:
+        - data
+        - settings
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBaseNew"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SpacedRepetitionDataV1"
+            settings:
+              $ref: "#/components/schemas/SpacedRepetitionSettingsV1"
+
+    SpacedRepetitionDataV1:
+      type: string
+
+    SpacedRepetitionSettingsV1:
+      $ref: "#/components/schemas/SpacedRepetitionBaseSettings"
+
+    SpacedRepetitionV2:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionV2New"
+        - $ref: "#/components/schemas/SpacedRepetitionBase"
+
+    SpacedRepetitionV2New:
+      required:
+        - data
+        - settings
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBaseNew"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SpacedRepetitionDataV2"
+            settings:
+              $ref: "#/components/schemas/SpacedRepetitionSettingsV2"
+
+    SpacedRepetitionDataV2:
+      type: object
+      required:
+        - from
+        - to
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+
+    SpacedRepetitionSettingsV2:
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionBaseSettingsShow"
+        - $ref: "#/components/schemas/SpacedRepetitionBaseSettings"
+paths:
+  /spaced-repetition/:
+    post:
+      tags:
+        - spacedRepetition
+      operationId: addSpacedRepetitionEntry
+      description: Add entry for spaced based learning
+      requestBody:
+        description: Entry to add for spaced based learning
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              v1:
+                $ref: "#/components/examples/SpacedRepetitionInputV1"
+              v2:
+                $ref: "#/components/examples/SpacedRepetitionInputV2"
+
+      responses:
+        "200":
+          description: Entry already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
+              examples:
+                v1:
+                  $ref: "#/components/examples/SpacedRepetitionV1"
+                v2:
+                  $ref: "#/components/examples/SpacedRepetitionV2"
+        "201":
+          description: Entry added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
+              examples:
+                v1:
+                  $ref: "#/components/examples/SpacedRepetitionV1"
+                v2:
+                  $ref: "#/components/examples/SpacedRepetitionV2"
+        "400":
+          description: Bad request, requires correct kind
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/{uuid}:
+    delete:
+      tags:
+        - spacedRepetition
+      description: Deletes a single entry based on the UUID
+      operationId: deleteSpacedRepetitionEntry
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: entry deleted
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+  /spaced-repetition/all:
+    get:
+      tags:
+        - spacedRepetition
+      description: Get all entries for spaced repetition learning
+      operationId: getSpacedRepetitionEntries
+      responses:
+        "200":
+          description: Return list of all entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpacedRepetition"
+
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/next:
+    get:
+      tags:
+        - spacedRepetition
+      description: Get next entry for spaced based learning
+      operationId: getNextSpacedRepetitionEntry
+      responses:
+        "200":
+          description: Return entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
+        "204":
+          description: User has entries, but time has not passed to show any
+        "404":
+          description: User has no entries.
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+  /spaced-repetition/viewed:
+    post:
+      tags:
+        - spacedRepetition
+      operationId: updateSpacedRepetitionEntry
+      description: Update spaced entry with feedback from the user
+      requestBody:
+        description: Tell the system if we should move forward or backwards with the learning
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpacedRepetitionEntryViewed"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetition"
+        "404":
+          description: Entry not found, no body
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

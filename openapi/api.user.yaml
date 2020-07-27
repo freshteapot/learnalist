@@ -1,0 +1,142 @@
+components:
+  examples:
+  schemas:
+    HttpUserRegisterInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    HttpUserRegisterResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        uuid:
+          type: string
+    HttpUserLoginRequest:
+      allOf:
+        - $ref: "#/components/schemas/HttpUserRegisterInput"
+    HttpUserLoginResponse:
+      type: object
+      required:
+        - token
+        - user_uuid
+      properties:
+        token:
+          type: string
+        user_uuid:
+          type: string
+
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      operationId: registerUserWithUsernameAndPassword
+      description: Register a new user with username and password
+      requestBody:
+        description: Username and password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpUserRegisterInput"
+      responses:
+        "200":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpUserRegisterResponse"
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpUserRegisterResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
+  /user/login:
+    post:
+      tags:
+        - user
+      operationId: loginWithUsernameAndPassword
+      description: Login with username and password. The token can be used in future api requests via bearerAuth
+      security: []
+      requestBody:
+        description: Username and password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpUserLoginRequest"
+      responses:
+        "200":
+          description: You now have a login session already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpUserLoginResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: Username and password did not match what was in the system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /user/{uuid}:
+    delete:
+      tags:
+        - user
+      description: Deletes a user and there lists
+      operationId: deleteUser
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: user deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: UUID does not match that of the logged in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

@@ -24,7 +24,7 @@ curl -XGET  -u'iamchris:test123' \
 
 
 # Add Entry for learning
-## V2
+## V1
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
 -u'iamchris:test123' \

@@ -35,7 +35,7 @@ Setup folder structure
 rm -rf /tmp/learnalist
 mkdir -p /tmp/learnalist/site-cache
 cp -r $(pwd)/alists/hugo /tmp/learnalist/hugo
-mkdir -p /tmp/learnalist/hugo/{public-alist,content/alists,data/lists}
+mkdir -p /tmp/learnalist/hugo/{public,content/alists,data/lists}
 ```
 
 Build the database

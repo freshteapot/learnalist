@@ -24,6 +24,7 @@
       const response = await viewed(data.uuid);
       await get();
     } catch (error) {
+      console.log("next", error);
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
@@ -62,11 +63,20 @@
       state = "loading";
       data = null;
     } catch (error) {
+      if (error.status) {
+        if (error.status == 404) {
+          state = "no-entries";
+          return;
+        }
+      }
+
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
         true
       );
+      state = "nothing-to-see";
+      return;
     }
   }
 
