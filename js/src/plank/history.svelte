@@ -126,10 +126,6 @@
   ];
 </script>
 
-<style>
-  @import "../../all.css";
-</style>
-
 <button class="br3" on:click={close}>Close History</button>
 
 <article class="pa3 w-100 center" data-name="slab-stat">

@@ -16,7 +16,7 @@
 </script>
 
 <style>
-  @import "../../all.css";
+
 </style>
 
 <button class="br3" on:click={close}>Close Settings</button>

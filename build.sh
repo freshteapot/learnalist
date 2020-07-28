@@ -49,6 +49,9 @@ build() {
     cd "$ORIGPWD"
 }
 
+# Dump a list of css classes into a hidden file so hugo adds the classes for postcss.
+node src/extract-used-css.js > ./hugo/layouts/design/from-svelte.html
+
 build_js
 build_assets
 build
