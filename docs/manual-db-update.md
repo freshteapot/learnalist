@@ -10,6 +10,9 @@
 ALTER TABLE spaced_repetition RENAME TO spaced_repetition_prev;
 ```
 
+# Create
+- take from db/202006271346-spaced-repetition.sql
+
 # Insert
 
 ```sql
@@ -21,3 +24,7 @@ FROM
   spaced_repetition_prev;
 ```
 
+
+```sql
+DROP TABLE spaced_repetition_prev;
+```
