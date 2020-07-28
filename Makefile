@@ -98,7 +98,7 @@ rebuild-static-site:
 	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
 
 build-site-assets:
-	./build.sh
+	./scripts/build-site-assets.sh
 
 sync-site-assets:
 	rsync -avzP \
