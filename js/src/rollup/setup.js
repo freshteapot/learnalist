@@ -55,6 +55,7 @@ export default (key, format) => {
                 preprocess: autoPreprocess({
                     postcss: true
                 }),
+                //emitCss: false,
                 css: css => {
                     // TODO how to have this cache friendly?
                     css.write(componentInfo.outputPathCSS);

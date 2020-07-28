@@ -18,18 +18,35 @@
     show = true;
   }
 
-  async function next() {
+  async function _viewed(uuid, action) {
     try {
       clearNotification();
-      const response = await viewed(data.uuid);
+      const response = await viewed(uuid, action);
       await get();
     } catch (error) {
+      console.log("next", error);
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
         true
       );
     }
+  }
+
+  async function later() {
+    await _viewed(data.uuid, "incr");
+  }
+
+  async function sooner() {
+    await _viewed(data.uuid, "decr");
+  }
+
+  function remind() {
+    notify(
+      "info",
+      "To be reminded sooner, click sooner. To be reminded later, click later",
+      true
+    );
   }
 
   async function get() {
@@ -62,11 +79,20 @@
       state = "loading";
       data = null;
     } catch (error) {
+      if (error.status) {
+        if (error.status == 404) {
+          state = "no-entries";
+          return;
+        }
+      }
+
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
         true
       );
+      state = "nothing-to-see";
+      return;
     }
   }
 
@@ -112,19 +138,34 @@
 <svelte:options tag={null} />
 
 {#if loggedIn() && state === 'show-entry'}
-  <article>
-    <header>
-      <button class="br3" on:click={flipIt}>Flip</button>
-      <button class="br3" on:click={next}>Next</button>
-    </header>
-    <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
-      {#if !show}
-        <h1>{data.show}</h1>
-      {/if}
+  <div class="flex flex-column">
 
-      {#if show}
-        <pre>{JSON.stringify(data, '', 2)}</pre>
-      {/if}
-    </blockquote>
-  </article>
+    <article>
+      <nav>
+        <button class="br3" on:click={flipIt}>Flip</button>
+      </nav>
+      <blockquote class="athelas ml0 mt4 pl4 black-90 bl bw2 b--black">
+        {#if !show}
+          <h1>{data.show}</h1>
+        {/if}
+
+        {#if show}
+          <pre>{JSON.stringify(data, '', 2)}</pre>
+        {/if}
+      </blockquote>
+
+      <nav class="flex justify-around">
+        <div class="w-25 pa3 mr2">
+          <button class="br3" on:click={sooner}>Sooner</button>
+        </div>
+        <div class="w-25 pa3 mr2">
+          <button class="br3" on:click={remind}>Remind</button>
+        </div>
+        <div class="w-25 pa3 mr2">
+          <button class="br3" on:click={later}>Later</button>
+        </div>
+
+      </nav>
+    </article>
+  </div>
 {/if}

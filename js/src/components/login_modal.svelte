@@ -21,8 +21,6 @@
 </script>
 
 <style>
-  @import "../../all.css";
-
   .modal-background {
     position: fixed;
     top: 0;

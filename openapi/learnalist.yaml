@@ -1,0 +1,44 @@
+openapi: "3.0.2"
+info:
+  title: Learnalist API
+  version: "1.0"
+servers:
+  - url: https://learnalist.net/api/v1
+  - url: http://localhost:1234/api/v1
+
+components:
+  schemas:
+    AnyType:
+      anyOf:
+        - type: string
+        - type: number
+        - type: integer
+        - type: boolean
+        - type: array
+          items: {}
+        - type: object
+
+    HttpResponseMessage:
+      type: object
+      properties:
+        message:
+          type: string
+    Kind:
+      type: object
+      properties:
+        kind:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    basicAuth:
+      type: http
+      scheme: basic
+
+#paths:
+
+security:
+  - bearerAuth: []
+  - basicAuth: []

@@ -4,10 +4,10 @@ async function getNext() {
     return await api.getSpacedRepetitionNext();
 }
 
-async function viewed(uuid) {
+async function viewed(uuid, action) {
     const input = {
-        uuid: uuid,
-        action: "incr"
+        uuid,
+        action
     }
     return await api.updateSpacedRepetitionEntry(input)
 }

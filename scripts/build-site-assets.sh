@@ -1,8 +1,8 @@
 #!/bin/bash
-ORIGPWD=$PWD
-
+CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_PWD="$CWD/.."
 build_assets() {
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
     cd hugo
     rm -rf ./hugo_stats.json
     rm -rf ./public/*
@@ -21,14 +21,14 @@ build_assets() {
     hugo --environment=lal01
 
     ls -lah public/css/base*
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
 }
 
 build_js() {
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
     cd js
     npm run build:js:components
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
 }
 
 build() {
@@ -36,19 +36,27 @@ build() {
     # store it in static and provide an entry in hugo/data/manifest_css.json.
     # This is used when we run hugo in production without node / npm / postcss
     # to make rendering of the pages lightning fast still.
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
     cd js
     node --experimental-modules sync-site-base-css.js
 
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
     cd hugo
     rm -rf ./public/*
     hugo --environment=lal01
 
     find static
-    cd "$ORIGPWD"
+    cd $ROOT_PWD
 }
 
+copy_css_classes_from_svelte() {
+    # Dump a list of css classes into a hidden file so hugo adds the classes for postcss.
+    cd $ROOT_PWD
+    echo $PWD
+    node ./js/extract-used-css.js > ./hugo/layouts/design/from-svelte.html
+}
+
+copy_css_classes_from_svelte
 build_js
 build_assets
 build

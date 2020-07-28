@@ -1,5 +1,4 @@
 let production = !process.env.ROLLUP_WATCH;
-production = true;
 const purgeCss = require("@fullhuman/postcss-purgecss")({
     content: ["./src/**/*.svelte"],
     css: ["**/*.css"],
