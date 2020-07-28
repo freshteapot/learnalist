@@ -42,6 +42,7 @@ type HttpRequestInputV2Item struct {
 type HttpRequestInputSettings struct {
 	Level    string `json:"level"`
 	WhenNext string `json:"when_next"`
+	Created  string `json:"created"`
 }
 type HttpRequestInputSettingsV2 struct {
 	HttpRequestInputSettings
@@ -53,6 +54,7 @@ type SpacedRepetitionEntry struct {
 	Body     string    `db:"body"`
 	UserUUID string    `db:"user_uuid"`
 	WhenNext time.Time `db:"when_next"`
+	Created  time.Time `db:"created"`
 }
 
 const (
@@ -79,7 +81,7 @@ const (
 	THRESHOLD_8 = time.Duration(TIME_DAY * 60)
 	THRESHOLD_9 = time.Duration(TIME_DAY * 120)
 
-	SQL_SAVE_ITEM              = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?)`
+	SQL_SAVE_ITEM              = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next, created) values(?, ?, ?, ?, ?)`
 	SQL_SAVE_ITEM_AUTO_UPDATED = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
 	SQL_DELETE_ITEM            = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
 	SQL_GET_ITEM               = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
@@ -214,6 +216,7 @@ type ItemInput interface {
 	UUID() string
 	String() string
 	WhenNext() time.Time
+	Created() time.Time
 	IncrThreshold()
 	DecrThreshold()
 }

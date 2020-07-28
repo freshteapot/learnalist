@@ -59,6 +59,7 @@ func (s service) SaveEntry(c echo.Context) error {
 		UUID:     entry.UUID(),
 		Body:     entry.String(),
 		WhenNext: entry.WhenNext(),
+		Created:  entry.Created(),
 	}
 
 	err := s.repo.SaveEntry(item)
