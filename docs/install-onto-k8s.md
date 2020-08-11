@@ -52,7 +52,7 @@ kubectl scale deployment/container-registry  --replicas=1
 ```sh
 PATCH=$(cat <<_EOF_
   {"spec":{"template":{"metadata":{"creationTimestamp":"$(date -u '+%FT%TZ')"}}}}
-  _EOF_
+_EOF_
 )
 kubectl patch deployment learnalist -p "${PATCH}"
 ```
@@ -128,6 +128,7 @@ kill -9 $(lsof -ti tcp:5000)
 ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
 ssh $SSH_SERVER -L 5000:127.0.0.1:5000 -N &
 ```
+
 ```sh
 ssh $SSH_SERVER
 sudo su -
@@ -154,7 +155,7 @@ Patch if only bumped latest version
 ```sh
 PATCH=$(cat <<_EOF_
   {"spec":{"template":{"metadata":{"creationTimestamp":"$(date -u '+%FT%TZ')"}}}}
-  _EOF_
+_EOF_
 )
 kubectl patch deployment learnalist -p "${PATCH}"
 ```
