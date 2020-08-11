@@ -21,7 +21,9 @@ func V2FromPOST(input []byte) ItemInputV2 {
 	item.entry.UUID = hash
 
 	item.entry.Settings.Level = Level_0
-	whenNext := time.Now().Add(time.Hour * 1).UTC()
+	now := time.Now().UTC()
+	whenNext := now.Add(THRESHOLD_0)
+	item.entry.Settings.Created = now.Format(time.RFC3339)
 	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 	return item
 }
@@ -45,6 +47,11 @@ func (item ItemInputV2) UUID() string {
 
 func (item ItemInputV2) WhenNext() time.Time {
 	t, _ := time.Parse(time.RFC3339, item.entry.Settings.WhenNext)
+	return t
+}
+
+func (item ItemInputV2) Created() time.Time {
+	t, _ := time.Parse(time.RFC3339, item.entry.Settings.Created)
 	return t
 }
 

@@ -78,7 +78,9 @@ func (r SqliteRepository) GetEntries(userUUID string) ([]interface{}, error) {
 }
 
 func (r SqliteRepository) SaveEntry(entry SpacedRepetitionEntry) error {
-	_, err := r.db.Exec(SQL_SAVE_ITEM, entry.UUID, entry.Body, entry.UserUUID, entry.WhenNext)
+	whenNext := entry.WhenNext.Format(time.RFC3339)
+	created := entry.Created.Format(time.RFC3339)
+	_, err := r.db.Exec(SQL_SAVE_ITEM, entry.UUID, entry.Body, entry.UserUUID, whenNext, created)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
 			return ErrSpacedRepetitionEntryExists
@@ -94,7 +96,8 @@ func (r SqliteRepository) DeleteEntry(userUUID string, UUID string) error {
 }
 
 func (r SqliteRepository) UpdateEntry(entry SpacedRepetitionEntry) error {
-	_, err := r.db.Exec(SQL_SAVE_ITEM_AUTO_UPDATED, entry.UUID, entry.Body, entry.UserUUID, entry.WhenNext, entry.Body, entry.WhenNext)
+	whenNext := entry.WhenNext.Format(time.RFC3339)
+	_, err := r.db.Exec(SQL_SAVE_ITEM_AUTO_UPDATED, entry.UUID, entry.Body, entry.UserUUID, whenNext, entry.Body, whenNext)
 	if err != nil {
 		return err
 	}

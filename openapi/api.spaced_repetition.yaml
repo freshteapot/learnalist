@@ -14,6 +14,7 @@ components:
           level: "0"
           show: "Hello"
           when_next: "2020-08-08T15:29:43Z"
+          created: "2020-08-08T14:29:43Z"
         uuid: "90d31f693a34558d0ba3702cc42b62ba670bc010"
     SpacedRepetitionInputV2:
       value:
@@ -35,6 +36,7 @@ components:
           level: "0"
           show: "from"
           when_next: "2020-08-08T15:29:43Z"
+          created: "2020-08-08T14:29:43Z"
         uuid: "90d31f693a34558d0ba3702cc42b62ba670bc010"
 
   schemas:
@@ -96,6 +98,11 @@ components:
         when_next:
           type: string
           format: date-time
+          description: Set to UTC
+        created:
+          type: string
+          format: date-time
+          description: Set to UTC
 
     SpacedRepetitionBaseSettingsShow:
       type: object
