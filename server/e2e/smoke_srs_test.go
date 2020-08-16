@@ -32,7 +32,7 @@ var _ = FDescribe("Testing openapi", func() {
 		})
 
 		client := openapi.NewAPIClient(config)
-		data, response, err := client.DefaultApi.GetNextSpacedRepetitionEntry(auth)
+		data, response, err := client.SpacedRepetitionApi.GetNextSpacedRepetitionEntry(auth)
 		Expect(err).Should(HaveOccurred())
 		Expect(response.StatusCode).To(Equal(http.StatusNotFound))
 		fmt.Println(data)
@@ -47,12 +47,12 @@ var _ = FDescribe("Testing openapi", func() {
 			Password: "test123",
 		}
 
-		data1, response, err := client.DefaultApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))
 
-		data2, response, err := client.DefaultApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		data2, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		Expect(data2.Username).To(Equal(input.Username))
@@ -63,7 +63,7 @@ var _ = FDescribe("Testing openapi", func() {
 			Password: input.Password,
 		})
 
-		data, response, err := client.DefaultApi.DeleteUser(auth, data1.Uuid)
+		data, response, err := client.UserApi.DeleteUser(auth, data1.Uuid)
 		fmt.Println(data, response, err)
 	})
 })

@@ -384,7 +384,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now public"}`))
+				CheckMessageResponse(rec, i18n.ApiShareListSuccessWithPublic)
 			})
 
 			It("Privately", func() {

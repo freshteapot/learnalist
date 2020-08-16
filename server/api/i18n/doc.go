@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	ValidationErrorList                     = "Failed to pass list info. %s"
+	ValidationErrorList                     = "Failed to pass list info. %s" // TODO maybe remove
 	ValidationErrorListV1                   = "Failed to pass list type v1."
 	ValidationErrorListV2                   = "Failed to pass list type v2."
 	ValidationErrorListV3                   = "Failed to pass list type v3."
@@ -29,6 +29,8 @@ const (
 	InternalServerErrorFunny                = "Sadly, our service has taken a nap."
 	InputDeleteAlistOperationOwnerOnly      = "Only the owner of the list can remove it."
 	InputSaveAlistOperationOwnerOnly        = "Only the owner of the list can modify it."
+	InputSaveAlistOperationFromRestriction  = "List not shareable due to restriction on the info.from.kind"
+	InputSaveAlistOperationFromModify       = "Unable to modify info.from"
 	PostUserLabelJSONFailure                = "Your input is invalid json."
 	InputAlistJSONFailure                   = "Your input is invalid json."
 	PostShareListJSONFailure                = "Your input is invalid json."

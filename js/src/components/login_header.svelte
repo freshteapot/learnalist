@@ -1,13 +1,27 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
   import { location } from "svelte-spa-router";
   import { loggedIn, api } from "../shared.js";
+  import { visibilityChange } from "../utils/visibilitychange.js";
   import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
 
   let poller;
-
   let hasSpacedRepetition = false;
   let dontLookup = false;
+
+  onMount(async () => {
+    document.addEventListener(visibilityChange, handleVisibilityChange, false);
+  });
+
+  onDestroy(async () => {
+    document.removeEventListener(
+      visibilityChange,
+      handleVisibilityChange,
+      false
+    );
+  });
+
   function preLogout() {
     clearConfiguration();
   }
@@ -51,6 +65,7 @@
   }
 
   async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
+    dontLookup = false;
     await checkForSpacedRepetition();
     poller = setInterval(function() {
       checkForSpacedRepetition();
@@ -67,9 +82,13 @@
         return;
       }
     }
-
-    dontLookup = false;
     checkForSpacedRepetitionStraightAwayThenPeriodically();
+  }
+
+  function handleVisibilityChange(event) {
+    if (event.target.visibilityState === "visible") {
+      checkForSpacedRepetitionStraightAwayThenPeriodically();
+    }
   }
 
   // Could also check when we come back to the page

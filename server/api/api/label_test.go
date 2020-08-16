@@ -21,15 +21,20 @@ var _ = Describe("Testing Label endpoints", func() {
 
 	When("/labels", func() {
 		Context("Posting", func() {
-			var datastore *mocks.Datastore
-			var acl *mocks.Acl
-			var user *uuid.User
-			var method string
-			var uri string
-			var e *echo.Echo
+			var (
+				datastore    *mocks.Datastore
+				acl          *mocks.Acl
+				labelStorage *mocks.LabelReadWriter
+				user         *uuid.User
+				method       string
+				uri          string
+				e            *echo.Echo
+			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
@@ -64,7 +69,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				c := e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
 
-				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusBadRequest, errors.New("Fail"))
+				labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusBadRequest, errors.New("Fail"))
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
@@ -81,7 +86,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				c := e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
 
-				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusInternalServerError, errors.New("Fail"))
+				labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusInternalServerError, errors.New("Fail"))
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
@@ -99,8 +104,8 @@ var _ = Describe("Testing Label endpoints", func() {
 					c := e.NewContext(req, rec)
 					c.Set("loggedInUser", *user)
 
-					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusCreated, nil)
-					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusCreated, nil)
+					labelStorage.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusCreated))
@@ -117,8 +122,8 @@ var _ = Describe("Testing Label endpoints", func() {
 					c := e.NewContext(req, rec)
 					c.Set("loggedInUser", *user)
 
-					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusOK, nil)
-					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusOK, nil)
+					labelStorage.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusOK))
@@ -128,19 +133,22 @@ var _ = Describe("Testing Label endpoints", func() {
 		})
 		Context("Get", func() {
 			var (
-				datastore *mocks.Datastore
-				acl       *mocks.Acl
-				user      *uuid.User
-				method    string
-				uri       string
-				req       *http.Request
-				rec       *httptest.ResponseRecorder
-				e         *echo.Echo
-				c         echo.Context
+				datastore    *mocks.Datastore
+				labelStorage *mocks.LabelReadWriter
+				acl          *mocks.Acl
+				user         *uuid.User
+				method       string
+				uri          string
+				req          *http.Request
+				rec          *httptest.ResponseRecorder
+				e            *echo.Echo
+				c            echo.Context
 			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
@@ -158,7 +166,7 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("User with no labels", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, nil)
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{}, nil)
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
@@ -166,7 +174,7 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("User with labels", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{
 					"wind",
 					"water",
 					"fire",
@@ -179,7 +187,7 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("Something went wrong getting the data from the storage", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
@@ -188,19 +196,22 @@ var _ = Describe("Testing Label endpoints", func() {
 
 		Context("DELETE", func() {
 			var (
-				datastore *mocks.Datastore
-				acl       *mocks.Acl
-				user      *uuid.User
-				method    string
-				uri       string
-				req       *http.Request
-				rec       *httptest.ResponseRecorder
-				e         *echo.Echo
-				c         echo.Context
+				datastore    *mocks.Datastore
+				labelStorage *mocks.LabelReadWriter
+				acl          *mocks.Acl
+				user         *uuid.User
+				method       string
+				uri          string
+				req          *http.Request
+				rec          *httptest.ResponseRecorder
+				e            *echo.Echo
+				c            echo.Context
 			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl

@@ -1,7 +1,6 @@
-package models
+package models_test
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -156,11 +155,11 @@ func (suite *ModelSuite) TestSaveAListEmptyList() {
 
 	aList, err := dal.SaveAlist(http.MethodPost, input)
 	suite.Equal(alist.Alist{}, aList)
-	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty.\nInvalid option for info.shared_with"), err.Error())
+	suite.Equal("Title cannot be empty.\nInvalid option for info.shared_with", err.Error())
 }
 
 func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {
-	err := dal.RemoveLabelsForAlist("")
+	err := dal.Labels().RemoveLabelsForAlist("")
 	suite.Equal(nil, err)
 }
 

@@ -1,6 +1,27 @@
 components:
   examples:
   schemas:
+    AlistFrom:
+      type: object
+      description: "Give context of where this list was imported / synced from, if it is quizlet, cram, brainscape it is not possible to make this list public"
+      required:
+        - kind
+        - ext_uuid
+        - ref_url
+      properties:
+        kind:
+          type: string
+          description: Context of where it came from, when coming from quizlet, cram, brainscape, it is not possible to make the list public.
+          enum:
+            - quizlet
+            - cram
+            - brainscape
+            - learnalist
+        ext_uuid:
+          type: string
+        ref_url:
+          type: string
+
     AlistInput:
       type: object
       required:
@@ -42,6 +63,8 @@ components:
           type: string
         interact:
           $ref: "#/components/schemas/AlistInteract"
+        from:
+          $ref: "#/components/schemas/AlistFrom"
 
     AlistItemV1:
       type: string

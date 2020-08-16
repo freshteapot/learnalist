@@ -11,23 +11,11 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/label"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/jmoiron/sqlx"
 )
-
-type AlistKV struct {
-	Uuid     string `db:"uuid"`
-	Body     string `db:"body"`
-	UserUuid string `db:"user_uuid"`
-	ListType string `db:"list_type"`
-}
-
-type GetListsByUserWithFiltersArgs struct {
-	Labels   []string `db:"labels"`
-	UserUuid string   `db:"user_uuid"`
-	ListType string   `db:"list_type"`
-}
 
 func (dal *DAL) GetPublicLists() []alist.ShortInfo {
 	query := `
@@ -151,8 +139,7 @@ func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType s
 func (dal *DAL) GetAlist(uuid string) (alist.Alist, error) {
 	var aList alist.Alist
 	row := AlistKV{}
-	query := "SELECT * FROM alist_kv WHERE uuid = ?"
-	err := dal.Db.Get(&row, query, uuid)
+	err := dal.Db.Get(&row, SQL_GET_ITEM_BY_UUID, uuid)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return aList, errors.New(i18n.SuccessAlistNotFound)
@@ -178,17 +165,8 @@ func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
 		return errors.New(i18n.InputDeleteAlistOperationOwnerOnly)
 	}
 
-	dal.RemoveLabelsForAlist(alist_uuid)
-	query := `
-DELETE
-FROM
-	alist_kv
-WHERE
-	uuid=?
-AND
-	user_uuid=?
-`
-	_, err = dal.Db.Exec(query, alist_uuid, user_uuid)
+	dal.Labels().RemoveLabelsForAlist(alist_uuid)
+	_, err = dal.Db.Exec(SQL_DELETE_ITEM_BY_USER_AND_UUID, alist_uuid, user_uuid)
 	if err != nil {
 		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "RemoveAlist"))
 		log.Println(err)
@@ -210,6 +188,9 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 	var emptyAlist alist.Alist
 	err = alist.Validate(aList)
 	if err != nil {
+		if err == alist.ErrorSharingNotAllowedWithFrom {
+			return emptyAlist, errors.New(i18n.InputSaveAlistOperationFromRestriction)
+		}
 		return emptyAlist, err
 	}
 
@@ -244,6 +225,10 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 			return emptyAlist, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
 		}
 
+		if aList.Info.From != current.Info.From {
+			return emptyAlist, errors.New(i18n.InputSaveAlistOperationFromModify)
+		}
+
 		// Check if what is about to be written is the same.
 		a, _ := json.Marshal(&aList)
 		b, _ := json.Marshal(current)
@@ -252,18 +237,16 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 		}
 	}
 
-	dal.RemoveLabelsForAlist(aList.Uuid)
+	dal.Labels().RemoveLabelsForAlist(aList.Uuid)
 	err = dal.SaveLabelsForAlist(aList)
 	if err != nil {
 		log.Println(err)
 	}
 
 	if method == http.MethodPost {
-		queryInsert := "INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)"
-		_, err = dal.Db.Exec(queryInsert, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
+		_, err = dal.Db.Exec(SQL_INSERT_LIST, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
-		queryUpdate := "UPDATE alist_kv SET list_type=?, body=?, user_uuid=? WHERE uuid=?"
-		_, err = dal.Db.Exec(queryUpdate, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
+		_, err = dal.Db.Exec(SQL_UPDATE_LIST, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
 	}
 
 	if err != nil {
@@ -292,16 +275,16 @@ func (dal *DAL) SaveLabelsForAlist(aList alist.Alist) error {
 	var statusCode int
 	var err error
 
-	for _, label := range aList.Info.Labels {
-		a := NewUserLabel(label, aList.User.Uuid)
-		b := NewAlistLabel(label, aList.User.Uuid, aList.Uuid)
+	for _, input := range aList.Info.Labels {
+		a := label.NewUserLabel(input, aList.User.Uuid)
+		b := label.NewAlistLabel(input, aList.User.Uuid, aList.Uuid)
 
-		statusCode, err = dal.PostUserLabel(a)
+		statusCode, err = dal.Labels().PostUserLabel(a)
 		if statusCode == http.StatusBadRequest {
 			return err
 		}
 
-		statusCode, err = dal.PostAlistLabel(b)
+		statusCode, err = dal.Labels().PostAlistLabel(b)
 		if statusCode == http.StatusBadRequest {
 			return err
 		}

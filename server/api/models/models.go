@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/freshteapot/learnalist-api/server/api/label"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -15,9 +16,10 @@ type DAL struct {
 	userFromIDP                 user.UserFromIDP
 	userWithUsernameAndPassword user.UserWithUsernameAndPassword
 	oauthHandler                oauth.OAuthReadWriter
+	labels                      label.LabelReadWriter
 }
 
-func NewDAL(db *sqlx.DB, acl acl.Acl, userSession user.Session, userFromIDP user.UserFromIDP, userWithUsernameAndPassword user.UserWithUsernameAndPassword, oauthHandler oauth.OAuthReadWriter) *DAL {
+func NewDAL(db *sqlx.DB, acl acl.Acl, labels label.LabelReadWriter, userSession user.Session, userFromIDP user.UserFromIDP, userWithUsernameAndPassword user.UserWithUsernameAndPassword, oauthHandler oauth.OAuthReadWriter) *DAL {
 	dal := &DAL{
 		Db:                          db,
 		Acl:                         acl,
@@ -25,6 +27,7 @@ func NewDAL(db *sqlx.DB, acl acl.Acl, userSession user.Session, userFromIDP user
 		userFromIDP:                 userFromIDP,
 		userWithUsernameAndPassword: userWithUsernameAndPassword,
 		oauthHandler:                oauthHandler,
+		labels:                      labels,
 	}
 	return dal
 }

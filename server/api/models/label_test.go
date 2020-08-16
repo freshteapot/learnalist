@@ -1,43 +1,44 @@
-package models
+package models_test
 
 import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/label"
 )
 
 func (suite *ModelSuite) TestPostUserLabel() {
 	var statusCode int
 	var err error
 
-	a := NewUserLabel("label1", "user2")
-	statusCode, _ = dal.PostUserLabel(a)
+	a := label.NewUserLabel("label1", "user2")
+	statusCode, _ = dal.Labels().PostUserLabel(a)
 	suite.Equal(http.StatusCreated, statusCode)
 	// Check duplicate entry returns 200.
-	statusCode, _ = dal.PostUserLabel(a)
+	statusCode, _ = dal.Labels().PostUserLabel(a)
 	suite.Equal(http.StatusOK, statusCode)
 
-	b := NewUserLabel("label_123456789_123456789_car_boat", "user2")
-	statusCode, err = dal.PostUserLabel(b)
+	b := label.NewUserLabel("label_123456789_123456789_car_boat", "user2")
+	statusCode, err = dal.Labels().PostUserLabel(b)
 	suite.Equal(http.StatusBadRequest, statusCode)
 	suite.Equal(i18n.ValidationWarningLabelToLong, err.Error())
 
-	c := NewUserLabel("", "user2")
-	statusCode, err = dal.PostUserLabel(c)
+	c := label.NewUserLabel("", "user2")
+	statusCode, err = dal.Labels().PostUserLabel(c)
 	suite.Equal(http.StatusBadRequest, statusCode)
 	suite.Equal(i18n.ValidationWarningLabelNotEmpty, err.Error())
 }
 
 func (suite *ModelSuite) TestPostAlistLabel() {
-	a := NewAlistLabel("label1", "u:123", "u:456")
-	statusCode, _ := dal.PostAlistLabel(a)
+	a := label.NewAlistLabel("label1", "u:123", "u:456")
+	statusCode, _ := dal.Labels().PostAlistLabel(a)
 	suite.Equal(http.StatusCreated, statusCode)
 
-	statusCode, _ = dal.PostAlistLabel(a)
+	statusCode, _ = dal.Labels().PostAlistLabel(a)
 	suite.Equal(http.StatusOK, statusCode)
 
-	b := NewAlistLabel("label_123456789_123456789_car_boat", "u:123", "u:456")
-	statusCode, err := dal.PostAlistLabel(b)
+	b := label.NewAlistLabel("label_123456789_123456789_car_boat", "u:123", "u:456")
+	statusCode, err := dal.Labels().PostAlistLabel(b)
 	suite.Equal(http.StatusBadRequest, statusCode)
 	suite.Equal(i18n.ValidationWarningLabelToLong, err.Error())
 }
@@ -52,21 +53,21 @@ INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data"
 
 	// Testing for an empty response
 	emptyList := make([]string, 0)
-	labels, _ := dal.GetUserLabels(user_uuid)
+	labels, _ := dal.Labels().GetUserLabels(user_uuid)
 	suite.Equal(emptyList, labels)
 
-	a := NewUserLabel("label1", user_uuid)
-	statusCode, _ := dal.PostUserLabel(a)
+	a := label.NewUserLabel("label1", user_uuid)
+	statusCode, _ := dal.Labels().PostUserLabel(a)
 	suite.Equal(http.StatusCreated, statusCode)
 
-	labels, _ = dal.GetUserLabels(user_uuid)
+	labels, _ = dal.Labels().GetUserLabels(user_uuid)
 
-	b := NewAlistLabel("label2", user_uuid, alist_uuid)
-	statusCode, _ = dal.PostAlistLabel(b)
+	b := label.NewAlistLabel("label2", user_uuid, alist_uuid)
+	statusCode, _ = dal.Labels().PostAlistLabel(b)
 	suite.Equal(http.StatusCreated, statusCode)
 	// We add the same one, just to make sure we only get 2 back.
-	statusCode, _ = dal.PostAlistLabel(b)
-	labels, _ = dal.GetUserLabels(user_uuid)
+	statusCode, _ = dal.Labels().PostAlistLabel(b)
+	labels, _ = dal.Labels().GetUserLabels(user_uuid)
 	suite.Equal(2, len(labels))
 }
 
@@ -112,13 +113,13 @@ INSERT INTO alist_labels VALUES('3c9394eb-7df1-5611-bce1-2bc3a198b2a6','c3d330fd
 	alist, _ := dal.GetAlist(alist_uuid)
 	suite.Equal(2, len(alist.Info.Labels))
 	// Confirm the data is correct with two items.
-	labels, _ := dal.GetUserLabels(user_uuid)
+	labels, _ := dal.Labels().GetUserLabels(user_uuid)
 	suite.Equal(2, len(labels))
 
 	err := dal.RemoveUserLabel(label_remove, user_uuid)
 	suite.NoError(err)
 	// Confirm the func returns the correct data.
-	labels, _ = dal.GetUserLabels(user_uuid)
+	labels, _ = dal.Labels().GetUserLabels(user_uuid)
 	suite.Equal(1, len(labels))
 	suite.Equal(label_find, labels[0])
 	// Confirm the list has been updated

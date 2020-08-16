@@ -3,7 +3,6 @@ package api_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -89,8 +88,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				user := &uuid.User{
 					Uuid: userUUID,
 				}
-				fmt.Println(user)
-				fmt.Println(userUUID)
+
 				req, rec := setupFakeEndpoint(method, uri, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)

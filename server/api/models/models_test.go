@@ -1,16 +1,18 @@
-package models
+package models_test
 
 import (
 	"testing"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
+	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
+	"github.com/freshteapot/learnalist-api/server/api/models"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/stretchr/testify/suite"
 )
 
-var dal *DAL
+var dal *models.DAL
 
 type ModelSuite struct {
 	suite.Suite
@@ -24,7 +26,8 @@ func (suite *ModelSuite) SetupSuite() {
 	userFromIDP := userStorage.NewUserFromIDP(db)
 	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
-	dal = NewDAL(db, acl, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+	labels := labelStorage.NewLabel(db)
+	dal = models.NewDAL(db, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

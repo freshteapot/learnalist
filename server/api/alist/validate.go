@@ -3,10 +3,13 @@ package alist
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/gookit/validate"
 )
 
 func Validate(aList Alist) error {
@@ -14,7 +17,7 @@ func Validate(aList Alist) error {
 
 	err = validateAListInfo(aList.Info)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
+		//err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
 		return err
 	}
 
@@ -72,5 +75,94 @@ func validateAListInfo(info AlistInfo) error {
 		err = errors.New(feedbackMessage)
 	}
 
+	if info.From != nil {
+		allowed := []string{"learnalist", "brainscape", "cram", "quizlet"}
+		if !utils.StringArrayContains(allowed, info.From.Kind) {
+			return ErrorListFromKind
+		}
+
+		v := validate.Struct(*info.From)
+
+		//v.StringRule("Kind", "required|in:cram,brainscape,quizlet,learnalist")
+		v.StringRule("RefUrl", "required")
+		v.StringRule("ExtUuid", "required")
+
+		if !v.Validate() {
+			return ErrorListFromValid
+		}
+
+		if !WithFromCheckFromDomain(*info.From) {
+			return ErrorListFromDomainMisMatch
+		}
+
+		if !WithFromCheckSharing(info) {
+			return ErrorSharingNotAllowedWithFrom
+		}
+	}
+
 	return err
+}
+
+func WithFromCanUpdate(want AlistInfo, current AlistInfo) bool {
+	if want.From != current.From {
+		return false
+	}
+
+	if current.From == nil {
+		return true
+	}
+
+	return WithFromCheckSharing(want)
+}
+
+func WithFromCheckSharing(info AlistInfo) bool {
+	// Defence, this shouldn't happen
+	if info.From == nil {
+		return true
+	}
+
+	if info.From.Kind == "learnalist" {
+		return true
+	}
+
+	if info.SharedWith == aclKeys.NotShared {
+		return true
+	}
+
+	return false
+}
+
+func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
+	allowed := map[string]string{
+		"cram":       "cram.com",
+		"brainscape": "brainscape.com",
+		"quizlet":    "quizlet.com",
+		"learnalist": "learnalist.net",
+	}
+
+	toTest := input.RefUrl
+	_, err := url.ParseRequestURI(toTest)
+	if err != nil {
+		return false
+	}
+
+	u, err := url.Parse(toTest)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+
+	switch input.Kind {
+	case "cram":
+		fallthrough
+	case "brainscape":
+		fallthrough
+	case "quizlet":
+		fallthrough
+	case "learnalist":
+		return u.Host == allowed[input.Kind]
+	case "localhost":
+		return true
+	default:
+		return false
+	}
 }
