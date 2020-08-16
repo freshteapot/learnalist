@@ -1,0 +1,20 @@
+{
+    "baseUrl": "https://learnalist.net",
+    "allowed": [
+        {
+            "origin": "https://quizlet.com",
+            "kind": "quizlet",
+            "script": "quizlet.js"
+        },
+        {
+            "origin": "https://www.cram.com",
+            "kind": "cram",
+            "script": "cram.js"
+        },
+        {
+            "origin": "https://www.brainscape.com",
+            "kind": "brainscape",
+            "script": "brainscape.js"
+        }
+    ]
+}

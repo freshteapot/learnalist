@@ -6,21 +6,36 @@
   import { tap } from "@sveltejs/gestures";
 
   // {DomElement}
-  export let listDataElement;
-  // {DomElement}
   export let playElement;
   // {DomElement}
-  export let listTitleElement;
+  export let listElement;
   // learnalist aList object
   export let aList;
+
+  playElement.style.display = "";
+  listElement.style.display = "none";
 
   let data;
   let state = "edit";
   let showKey = "from";
   let show = false;
 
+  function handleClose(event) {
+    playElement.style.display = "none";
+    push("/");
+  }
+
   function edit(event) {
-    data = event.detail.data;
+    // How did this work before?
+    const index = event.target
+      .closest("[data-index]")
+      .getAttribute("data-index");
+
+    if (!index) {
+      return;
+    }
+
+    data = aList.data[index];
     show = true;
   }
 
@@ -64,16 +79,32 @@
 
 <svelte:options tag={null} accessors={true} />
 
-<Modal
-  {aList}
-  {listDataElement}
-  {playElement}
-  {listTitleElement}
-  {show}
-  {state}
-  on:add={add}
-  on:edit={edit}
-  on:close={close}>
+<header>
+  <button class="br3" on:click={handleClose}>Close</button>
+  <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+  <h3>Click on the row you want to add</h3>
+</header>
+
+<div id="list-data">
+  <table class="w-100" cellspacing="0">
+    <thead>
+      <tr>
+        <th class="fw6 bb b--black-20 pb3 tl">From</th>
+        <th class="fw6 bb b--black-20 pb3 tl">To</th>
+      </tr>
+    </thead>
+    <tbody class="lh-copy">
+      {#each aList.data as item, index}
+        <tr data-index={index} on:click={edit}>
+          <td class="pv3 pr3 bb b--black-20">{item.from}</td>
+          <td class="pv3 pr3 bb b--black-20">{item.to}</td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+</div>
+
+<Modal {show} {state} on:add={add} on:close={close}>
   {#if state === 'edit'}
     <p>
       <span>Which to show?</span>
