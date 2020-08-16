@@ -23,8 +23,7 @@ const save = async (input) => {
 
     console.log(data === input);
     input.info.type = "v2";
-    // TODO this is not being saved, I suspect due to openapi
-    input.info.from = "https://quizlet.com/71954111/norwegian-flash-cards/";
+
 
     let aList = await api.addList(input);
     set(aList);

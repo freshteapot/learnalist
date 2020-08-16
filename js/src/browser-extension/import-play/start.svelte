@@ -14,12 +14,22 @@
     handle();
   });
 
+  function learnalistToAlist(input) {
+    const aList = input.detail;
+    if (aList.info.type !== "v2") {
+      throw "Not v2";
+    }
+    aList.info.from = input.metadata;
+    return aList;
+  }
+
   function brainscapeToAlist(input) {
     const data = input.detail;
     return {
       info: {
         title: data.title,
-        type: "v2"
+        type: "v2",
+        from: input.metadata
       },
       data: data.listData
     };
@@ -35,7 +45,8 @@
     return {
       info: {
         title: data.title,
-        type: "v2"
+        type: "v2",
+        from: input.metadata
       },
       data: listData
     };
@@ -52,7 +63,8 @@
     return {
       info: {
         title: data.title,
-        type: "v2"
+        type: "v2",
+        from: input.metadata
       },
       data: listData
     };
@@ -64,25 +76,33 @@
       sender,
       sendResponse
     ) {
-      if (request.kind == "quizlet") {
-        aList = quizletToAlist(request);
-      }
+      try {
+        if (request.kind == "quizlet") {
+          aList = quizletToAlist(request);
+        }
 
-      if (request.kind == "cram") {
-        aList = cramToAlist(request);
-      }
+        if (request.kind == "cram") {
+          aList = cramToAlist(request);
+        }
 
-      if (request.kind == "brainscape") {
-        aList = brainscapeToAlist(request);
-      }
+        if (request.kind == "brainscape") {
+          aList = brainscapeToAlist(request);
+        }
 
-      aList = aList;
+        if (request.kind == "learnalist") {
+          aList = learnalistToAlist(request);
+        }
 
-      document.querySelector("#play-data").innerHTML = JSON.stringify(aList);
+        aList = aList;
 
-      if (aList) {
-        store.load(aList);
-        push("/overview");
+        document.querySelector("#play-data").innerHTML = JSON.stringify(aList);
+
+        if (aList) {
+          store.load(aList);
+          push("/overview");
+        }
+      } catch (e) {
+        show = "not-supported";
       }
     });
 
@@ -90,7 +110,9 @@
       const load =
         tabs[0].url.includes("cram.com") ||
         tabs[0].url.includes("quizlet.com") ||
-        tabs[0].url.includes("brainscape.com");
+        tabs[0].url.includes("brainscape.com") ||
+        tabs[0].url.includes("learnalist.net") ||
+        tabs[0].url.includes("localhost:1234");
 
       if (!load) {
         show = "welcome";
@@ -101,29 +123,21 @@
       chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" });
     });
   }
-
-  $: console.log("show", show);
 </script>
 
-<style>
-  main {
-    text-align: center;
-    padding: 1em;
-    width: 500px;
-    margin: 0 auto;
-  }
-</style>
+<button class="br3" on:click={() => push('/settings')}>Settings</button>
 
 {#if show == 'welcome'}
-  <button class="br3" on:click={() => push('/settings')}>Settings</button>
-  <main>
-    <h1>Welcome!</h1>
-    <p>We will only try and load the list from</p>
-    <ul class="list">
-      <li>quizlet.com</li>
-      <li>cram.com</li>
-      <li>brainscape.com</li>
-    </ul>
+  <h1>Welcome!</h1>
+  <p>We will only try and load from</p>
+  <ul class="list">
+    <li>quizlet.com</li>
+    <li>cram.com</li>
+    <li>brainscape.com</li>
+    <li>learnalist.net</li>
+  </ul>
+{/if}
 
-  </main>
+{#if show == 'not-supported'}
+  <p>Content on the page not supported</p>
 {/if}

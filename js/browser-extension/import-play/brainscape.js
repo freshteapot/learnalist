@@ -3,6 +3,9 @@ var extensionId = el.dataset.id;
 var kind = el.dataset.kind;
 
 setTimeout(function () {
+    const extId = window.location.href.split("/").slice(-1)[0]
+
+
     const listData = Object.values(document.querySelectorAll("section.card")).map(el => {
         return {
             from: el.querySelector("h3.card-answer-text").innerText,
@@ -16,6 +19,11 @@ setTimeout(function () {
         detail: {
             title: title,
             listData: listData
+        },
+        metadata: {
+            kind: kind,
+            extId: extId,
+            refUrl: window.location.href
         }
     });
 }, 0);

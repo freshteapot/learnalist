@@ -49,13 +49,16 @@
     "quizlet.js",
     "cram.js",
     "brainscape.js",
+    "learnalist.js",
     "config.json"
   ],
   "externally_connectable": {
     "matches": [
       "https://quizlet.com/*",
       "https://www.cram.com/flashcards/*",
-      "https://www.brainscape.com/flashcards/*"
+      "https://www.brainscape.com/flashcards/*",
+      "https://learnalist.net/alist/*",
+      "http://localhost:1234/alist/*"
     ]
   }
 }

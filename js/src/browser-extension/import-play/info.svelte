@@ -1,5 +1,7 @@
 <script>
   // TODO do I care how often they hit save?
+  // TODO this is not being saved, I suspect due to openapi
+
   // Could store a list with the relationships
   // {"kind", "cram", "ext_uuid": "setID", "uuid": ""}
 
@@ -31,15 +33,6 @@
   }
 </script>
 
-<style>
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 50;
-  }
-</style>
-
 <button class="br3" on:click={() => push('/play/total_recall')}>
   Total Recall
 </button>
@@ -54,12 +47,18 @@
   <button class="br3" on:click={() => push('/interact/spaced_repetition/add')}>
     🧠 + 💪
   </button>
-  <button class="br3" on:click={handleSave}>Save to Learnalist</button>
+
+  {#if aList.info.from.kind != 'learnalist'}
+    <button class="br3" on:click={handleSave}>Save to Learnalist</button>
+  {/if}
 {/if}
 
 {#if show == 'overview'}
-  <h1 id="list-title">{aList.info.title}</h1>
-  <div id="list-data">
+  <header>
+    <h1 class="tc">{aList.info.title}</h1>
+  </header>
+
+  <div>
     <table class="w-100" cellspacing="0">
       <thead>
         <tr>
