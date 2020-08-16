@@ -1,7 +1,7 @@
 {
-  "name": "Quizlet -> Learnalist",
+  "name": "Import and Play",
   "version": "1.0",
-  "description": "Build an Extension!",
+  "description": "Use learnalist interactions with lists and flashcards on the internet",
   "permissions": [
     "tabs",
     "contextMenus",
@@ -24,7 +24,7 @@
       ],
       "js": [
         "shared.js",
-        "hello.js"
+        "cs.js"
       ]
     }
   ],
