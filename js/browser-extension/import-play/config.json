@@ -15,6 +15,16 @@
             "origin": "https://www.brainscape.com",
             "kind": "brainscape",
             "script": "brainscape.js"
+        },
+        {
+            "origin": "https://learnalist.net",
+            "kind": "learnalist",
+            "script": "learnalist.js"
+        },
+        {
+            "origin": "http://localhost:1234",
+            "kind": "learnalist",
+            "script": "learnalist.js"
         }
     ]
 }

@@ -8,6 +8,11 @@ setTimeout(function () {
         detail: {
             title: window.Quizlet.setPageData.set.title,
             listData: window.Quizlet
+        },
+        metadata: {
+            kind: kind,
+            extId: window.Quizlet.setPageData.set.id,
+            refUrl: window.location.href
         }
     });
 }, 0);
