@@ -1,5 +1,9 @@
 
-import { api } from '../../../shared.js';
+import { api } from '../shared.js';
+
+async function getEntries() {
+    return await api.getSpacedRepetitionEntries();
+}
 async function getNext() {
     return await api.getSpacedRepetitionNext();
 }
@@ -17,6 +21,7 @@ async function addEntry(input) {
 }
 
 export {
+    getEntries,
     getNext,
     viewed,
     addEntry,

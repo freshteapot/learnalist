@@ -1,6 +1,6 @@
 <script>
   import Modal from "./spaced_repetition_modal.svelte";
-  import { addEntry } from "./api.js";
+  import { addEntry } from "../../../spaced_repetition/api.js";
 
   import { push } from "svelte-spa-router";
   import { tap } from "@sveltejs/gestures";
