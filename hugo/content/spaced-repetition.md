@@ -8,13 +8,21 @@ css_include: ["main", "srs"]
 ---
 # Learn with Spaced Repetition
 
-<a href="/spaced-repetition.html#/add">Add now</a>
-
-## Add via a list
-Click on the list menu option <button class="br3">🧠 + 💪</button> to add an entry for spaced repetition learning.
-
 ## Learn
 When you see <button class="br3">🧠 + 💪</button> appear at the top, click on it to be reminded of an entry.
+
+## Add
+
+Add somehting  <a class="link underline" href="/spaced-repetition.html#/add">right now</a>
+
+### Add via a list
+Click on the list menu option <button class="br3">🧠 + 💪</button> to add an entry for spaced repetition learning.
+
+### Add via a browser extension
+Coming soon
+
+## Overview
+Look at <a class="link underline" href="/spaced-repetition.html#/overview">your entries and see some stats</a>.
 
 
 

@@ -61,7 +61,7 @@
 {/if}
 
 <button class="br3" on:click={add}>Add</button>
-<button class="br3" on:click={() => push('/view')}>cancel</button>
+<button class="br3" on:click={() => push('/overview')}>cancel</button>
 
 {#if showLoginNag}
   <LoginModal on:close={closeLoginModal}>
