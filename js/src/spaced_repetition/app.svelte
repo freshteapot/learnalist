@@ -2,12 +2,16 @@
   import Router from "svelte-spa-router";
   import { replace } from "svelte-spa-router";
 
-  import View from "../components/interact/spaced_repetition/view.svelte";
+  import Next from "./show_next.svelte";
   import Add from "./add.svelte";
+  import View from "./view.svelte";
+  import Intro from "./intro.svelte";
 
   const routes = {
     "/add": Add,
-    "*": View
+    "/next": Next,
+    "/view": View,
+    "*": Intro
   };
 </script>
 

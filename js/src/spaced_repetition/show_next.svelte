@@ -1,8 +1,11 @@
 <script>
+  import { push } from "svelte-spa-router";
   import { getNext, viewed } from "./api.js";
-  import { loggedIn, notify, clearNotification } from "../../../shared.js";
+  import { loggedIn, notify, clearNotification } from "../shared.js";
+  import { clearConfiguration } from "../configuration.js";
 
   let state = "loading";
+  let entries = [];
   let show;
   let data;
 
@@ -51,12 +54,13 @@
 
   async function get() {
     try {
-      if (!loggedIn()) {
-        state = "nothing-to-see";
+      const response = await getNext();
+
+      if (response.status == 403) {
+        clearConfiguration();
+        state = "not-logged-in";
         return;
       }
-
-      const response = await getNext();
 
       if (response.status == 200) {
         // show card
@@ -68,17 +72,19 @@
 
       if (response.status == 204) {
         state = "nothing-to-see";
+        push("/view");
         return;
       }
 
       if (response.status == 404) {
-        state = "no-entries";
+        push("/view");
         return;
       }
 
       state = "loading";
       data = null;
     } catch (error) {
+      console.log("error", error);
       if (error.status) {
         if (error.status == 404) {
           state = "no-entries";
@@ -103,19 +109,13 @@
       return;
     }
 
-    if (state === "show-entry") {
-      listElement.style.display = "none";
-      playElement.style.display = "";
-      return;
-    }
-
-    listElement.style.display = "";
-    playElement.style.display = "none";
+    listElement.style.display = "none";
+    playElement.style.display = "";
   }
 
   function showMessage(state) {
     if (state === "nothing-to-see") {
-      notify("info", "None of your entries are ready, add more?", true);
+      notify("info", "None of your entries are ready", true);
       return;
     }
 
@@ -132,12 +132,16 @@
 </script>
 
 <style>
-  @import "../../../../all.css";
+  @import "../../all.css";
 </style>
 
 <svelte:options tag={null} />
+<p>HI</p>
+{#if state === 'not-logged-in'}
+  <p>You need to be logged in</p>
+{/if}
 
-{#if loggedIn() && state === 'show-entry'}
+{#if state === 'show-entry'}
   <div class="flex flex-column">
 
     <article>
@@ -168,4 +172,23 @@
       </nav>
     </article>
   </div>
+{/if}
+
+{#if state === 'nothing-to-see'}
+  <h1>Learn with Spaced Repetition</h1>
+  <p>
+    <button
+      class="br3"
+      on:click={() => {
+        clearNotification();
+        push('/add');
+      }}>
+      Add more?
+    </button>
+  </p>
+  <p>Show list</p>
+{/if}
+
+{#if state === 'no-entries'}
+  <p>TODO: call to action to add an item</p>
 {/if}
