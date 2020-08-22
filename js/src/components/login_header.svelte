@@ -1,5 +1,5 @@
 <script>
-  import { location, push } from "svelte-spa-router";
+  import { location } from "svelte-spa-router";
   import { loggedIn, api } from "../shared.js";
   import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
