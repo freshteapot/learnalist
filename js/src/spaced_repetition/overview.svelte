@@ -1,7 +1,7 @@
 <script>
-  import { push } from "svelte-spa-router";
-  import { getEntries } from "./api.js";
+  import goto from "./goto.js";
   import { loggedIn, notify, clearNotification } from "../shared.js";
+  import { getEntries } from "./api.js";
   import { clearConfiguration } from "../configuration.js";
   import LoginModal from "../components/login_modal.svelte";
 
@@ -55,18 +55,15 @@
   const loginNagMessageDefault =
     "You need to be logged in so we can personalise your learning experience.";
   let loginNagMessage = loginNagMessageDefault;
+  let showLoginNag = false;
 
   function closeLoginModal() {
-    push("/");
+    goto.intro();
   }
 
   function checkShowLoginNag() {
-    console.log(loginNag && !loggedIn());
     return loginNag && !loggedIn();
   }
-  let showLoginNag = false;
-
-  // TODO handle when the dates are wrong or empty
 
   $: showLoginNag = loginNag && !loggedIn();
 
@@ -87,11 +84,11 @@
     class="br3"
     on:click={() => {
       clearNotification();
-      push('/add');
+      goto.add();
     }}>
     Add more?
   </button>
-  <button class="br3" on:click={() => push('/intro')}>Learn more</button>
+  <button class="br3" on:click={() => goto.intro()}>Learn more</button>
 </p>
 <ul>
   {#each entries as entry}

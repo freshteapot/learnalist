@@ -1,5 +1,6 @@
 <script>
-  import { location, push } from "svelte-spa-router";
+  import { location } from "svelte-spa-router";
+  import goto from "./goto.js";
   import { loggedIn } from "../shared.js";
 
   let listElement = document.querySelector("#list-info");
@@ -14,7 +15,7 @@
     playElement.style.display = "none";
   } else {
     if (loggedIn()) {
-      push("/view");
+      goto.overview();
     } else {
       listElement.style.display = "";
       playElement.style.display = "none";

@@ -1,5 +1,6 @@
 <script>
-  import { location, querystring, push } from "svelte-spa-router";
+  import { location, querystring } from "svelte-spa-router";
+  import goto from "./goto.js";
   import { loggedIn, notify } from "../shared.js";
   import LoginModal from "../components/login_modal.svelte";
   let listElement = document.querySelector("#list-info");
@@ -29,7 +30,7 @@
   let loginNagMessage = loginNagMessageDefault;
 
   function closeLoginModal() {
-    push("/");
+    goto.intro();
   }
 
   function checkShowLoginNag() {
@@ -61,7 +62,7 @@
 {/if}
 
 <button class="br3" on:click={add}>Add</button>
-<button class="br3" on:click={() => push('/overview')}>cancel</button>
+<button class="br3" on:click={() => goto.overview()}>cancel</button>
 
 {#if showLoginNag}
   <LoginModal on:close={closeLoginModal}>

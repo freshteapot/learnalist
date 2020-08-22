@@ -1,11 +1,11 @@
 <script>
   import { push } from "svelte-spa-router";
   import { getNext, viewed } from "./api.js";
+  import goto from "./goto.js";
   import { loggedIn, notify, clearNotification } from "../shared.js";
   import { clearConfiguration } from "../configuration.js";
 
   let state = "loading";
-  let entries = [];
   let show;
   let data;
 
@@ -24,7 +24,7 @@
   async function _viewed(uuid, action) {
     try {
       clearNotification();
-      const response = await viewed(uuid, action);
+      await viewed(uuid, action);
       await get();
     } catch (error) {
       console.log("next", error);
@@ -58,7 +58,12 @@
 
       if (response.status == 403) {
         clearConfiguration();
-        state = "not-logged-in";
+        goto.overview();
+        return;
+      }
+
+      if ([204, 404].includes(response.status)) {
+        goto.overview();
         return;
       }
 
@@ -70,39 +75,19 @@
         return;
       }
 
-      if (response.status == 204) {
-        state = "nothing-to-see";
-        push("/view");
-        return;
-      }
-
-      if (response.status == 404) {
-        push("/view");
-        return;
-      }
-
       state = "loading";
       data = null;
     } catch (error) {
       console.log("error", error);
-      if (error.status) {
-        if (error.status == 404) {
-          state = "no-entries";
-          return;
-        }
-      }
-
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
         true
       );
-      state = "nothing-to-see";
-      return;
     }
   }
 
-  function showInfo(state) {
+  function showEntry(state) {
     if (state === "loading") {
       listElement.style.display = "none";
       playElement.style.display = "none";
@@ -126,9 +111,7 @@
   }
 
   $: get();
-  $: showInfo(state);
-
-  $: showMessage(state);
+  $: showEntry(state);
 </script>
 
 <style>
@@ -136,10 +119,6 @@
 </style>
 
 <svelte:options tag={null} />
-<p>HI</p>
-{#if state === 'not-logged-in'}
-  <p>You need to be logged in</p>
-{/if}
 
 {#if state === 'show-entry'}
   <div class="flex flex-column">
@@ -172,23 +151,4 @@
       </nav>
     </article>
   </div>
-{/if}
-
-{#if state === 'nothing-to-see'}
-  <h1>Learn with Spaced Repetition</h1>
-  <p>
-    <button
-      class="br3"
-      on:click={() => {
-        clearNotification();
-        push('/add');
-      }}>
-      Add more?
-    </button>
-  </p>
-  <p>Show list</p>
-{/if}
-
-{#if state === 'no-entries'}
-  <p>TODO: call to action to add an item</p>
 {/if}

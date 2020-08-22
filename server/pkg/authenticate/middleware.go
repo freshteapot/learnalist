@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"strings"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
@@ -78,17 +79,30 @@ func Auth(config Config) echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			realm := defaultRealm
-			// Need to return `401` for browsers to pop-up login box.
-			c.Response().Header().Set(echo.HeaderWWWAuthenticate, what+" realm="+realm)
-			return echo.ErrUnauthorized
+			if what == "basic" {
+				realm := defaultRealm
+				// Need to return `401` for browsers to pop-up login box.
+				c.Response().Header().Set(echo.HeaderWWWAuthenticate, what+" realm="+realm)
+				return echo.ErrUnauthorized
+			}
+			return echo.ErrForbidden
 		}
 	}
+}
+
+func SendLogoutCookie(c echo.Context) {
+	cookie := NewLoginCookie("")
+	cookie.Expires = time.Now().Add(-100 * time.Hour)
+	cookie.MaxAge = -1
+	cookie.Value = ""
+
+	c.SetCookie(cookie)
 }
 
 func (config Config) validateBearer(c echo.Context, token string) (bool, error) {
 	userUUID, err := config.LookupBearer(token)
 	if err != nil {
+		SendLogoutCookie(c)
 		return false, nil
 	}
 
