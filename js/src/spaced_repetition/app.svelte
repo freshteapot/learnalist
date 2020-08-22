@@ -2,15 +2,15 @@
   import Router from "svelte-spa-router";
   import { replace } from "svelte-spa-router";
 
-  import Next from "./show_next.svelte";
+  import Remind from "./remind.svelte";
   import Add from "./add.svelte";
-  import View from "./view.svelte";
+  import Overview from "./overview.svelte";
   import Intro from "./intro.svelte";
 
   const routes = {
     "/add": Add,
-    "/next": Next,
-    "/view": View,
+    "/remind": Remind,
+    "/overview": Overview,
     "*": Intro
   };
 </script>
