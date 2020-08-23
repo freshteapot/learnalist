@@ -118,10 +118,11 @@ var _ = Describe("Middleware", func() {
 						return "", errors.New("yo")
 					},
 				}
+
 				middleware := authenticate.Auth(config)
 				result := middleware(next)(c).(*echo.HTTPError)
-				Expect(result.Code).To(Equal(http.StatusUnauthorized))
-				Expect(strings.HasPrefix(rec.Header().Get("WWW-Authenticate"), "bearer")).To(BeTrue())
+				Expect(result.Code).To(Equal(http.StatusForbidden))
+				Expect(strings.Contains(rec.Header().Get("Set-Cookie"), "x-authentication-bearer=;")).To(BeTrue())
 			})
 
 			It("success, user found and added to the context", func() {

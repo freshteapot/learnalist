@@ -49,6 +49,7 @@ yq w -i $HUGO_CONFIG params.ApiServer "${_APISERVER}"
 # Clean up hugo output
 mkdir -p "$HUGO_DIR/public"
 rm -rf "$HUGO_DIR/public/"*
+mkdir -p $HUGO_DIR/{public/alist,public/alistsbyuser}
 ls -lah "$HUGO_DIR/public"
 # Start the server
 cd server && \

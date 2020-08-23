@@ -9,7 +9,7 @@ import postcss from "rollup-plugin-postcss";
 import autoPreprocess from 'svelte-preprocess'
 
 const IS_PROD = !process.env.ROLLUP_WATCH;
-import { getComponentInfo, rollupPluginManifestSync } from "../utils/glue.js";
+import { getComponentInfo, rollupPluginManifestSync } from "../utils/glue.mjs";
 
 // External and replacement needs to be the full path :(
 export default (key, format) => {

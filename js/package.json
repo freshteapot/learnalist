@@ -4,7 +4,6 @@
   "license": "MIT",
   "description": "The website for learnalist",
   "author": "freshteapot (https://github.com/freshteapot)",
-  "type": "module",
   "scripts": {
     "dev:api-server": "cd ../ && make run-api-server",
     "dev:hugo": "cd ../hugo && hugo server -w --disableFastRender  --forceSyncStatic --renderToDisk --verbose --verboseLog --debug",

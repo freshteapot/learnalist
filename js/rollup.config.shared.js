@@ -7,7 +7,7 @@ import del from 'rollup-plugin-delete';
 
 const IS_PROD = !process.env.ROLLUP_WATCH;
 
-import { getComponentInfo, rollupPluginManifestSync } from "./src/utils/glue.js";
+import { getComponentInfo, rollupPluginManifestSync } from "./src/utils/glue.mjs";
 const componentKey = "shared";
 const componentInfo = getComponentInfo(componentKey, !IS_PROD);
 

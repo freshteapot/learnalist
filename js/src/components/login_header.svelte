@@ -24,11 +24,6 @@
 
     const response = await api.getSpacedRepetitionNext();
 
-    if (![200, 204, 404].includes(response.status)) {
-      clearInterval(poller);
-      return;
-    }
-
     switch (response.status) {
       case 200:
         clearInterval(poller);
@@ -36,10 +31,19 @@
         break;
       case 204:
         console.log("nothing to see");
+        dontLookup = true;
+        break;
+      case 401:
+      case 403:
+        clearConfiguration();
+        // Little hack to make sure the page reloads
+        window.location = window.location;
         break;
       case 404:
         dontLookup = true;
         break;
+      default:
+        clearInterval(poller);
     }
   }
 

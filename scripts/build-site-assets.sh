@@ -38,7 +38,7 @@ build() {
     # to make rendering of the pages lightning fast still.
     cd $ROOT_PWD
     cd js
-    node --experimental-modules sync-site-base-css.js
+    node --experimental-modules sync-site-base-css.mjs
 
     cd $ROOT_PWD
     cd hugo

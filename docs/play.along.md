@@ -1,4 +1,11 @@
 # Play along.
+
+```sh
+make clear-site
+make rebuild-db
+make develop
+```
+
 When the database is created, it is empty.
 
 ## You need a user first.

@@ -1,6 +1,5 @@
 <script>
   import { copyObject } from "../../utils/utils.js";
-  import { onMount } from "svelte";
 
   let labelElement;
 
