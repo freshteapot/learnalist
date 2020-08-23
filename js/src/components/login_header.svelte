@@ -1,5 +1,4 @@
 <script>
-  import { location } from "svelte-spa-router";
   import { loggedIn, api } from "../shared.js";
   import { clearConfiguration } from "../configuration.js";
   export let loginurl = "/login.html";
@@ -19,10 +18,8 @@
     }
 
     if (window.location.pathname.indexOf("/spaced-repetition") !== -1) {
-      if (window.location.hash.indexOf("/remind") !== -1) {
-        clearInterval(poller);
-        return;
-      }
+      clearInterval(poller);
+      return;
     }
 
     const response = await api.getSpacedRepetitionNext();
@@ -35,6 +32,12 @@
       case 204:
         console.log("nothing to see");
         dontLookup = true;
+        break;
+      case 401:
+      case 403:
+        clearConfiguration();
+        // Little hack to make sure the page reloads
+        window.location = window.location;
         break;
       case 401:
       case 403:
@@ -57,23 +60,7 @@
     }, 60 * 1000);
   }
 
-  // Based on the window href and the hash, we can watch when the page changes
-  function urlChange(href, spaLocation) {
-    if (href.indexOf("/spaced-repetition") !== -1) {
-      if (spaLocation === "/remind") {
-        clearInterval(poller);
-        // Hide as we are on the page
-        hasSpacedRepetition = false;
-        return;
-      }
-    }
-
-    dontLookup = false;
-    checkForSpacedRepetitionStraightAwayThenPeriodically();
-  }
-
-  // Could also check when we come back to the page
-  $: urlChange(window.location.href, $location);
+  checkForSpacedRepetitionStraightAwayThenPeriodically();
 </script>
 
 <style>
@@ -87,7 +74,7 @@
     {#if hasSpacedRepetition}
       <a
         title="You have something to learn."
-        href="/spaced-repetition.html#/remind"
+        href="/spaced-repetition.html"
         class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
         <button class="br3">🧠 + 💪</button>
       </a>
