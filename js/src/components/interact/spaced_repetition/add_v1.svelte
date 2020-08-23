@@ -25,7 +25,15 @@
   }
 
   function edit(event) {
-    data = event.detail.data;
+    const index = event.target
+      .closest("[data-index]")
+      .getAttribute("data-index");
+
+    if (!index) {
+      return;
+    }
+
+    data = aList.data[index];
     show = true;
   }
 
@@ -74,7 +82,9 @@
 <div id="list-data">
   <ul class="lh-copy ph0 list">
     {#each aList.data as item, index}
-      <li class="pv3 pr3 bb b--black-20" data-index={index}>{item}</li>
+      <li class="pv3 pr3 bb b--black-20" data-index={index} on:click={edit}>
+        {item}
+      </li>
     {/each}
   </ul>
 </div>
