@@ -1,13 +1,11 @@
 ---
-title: "Spaced Repetition"
+title: "Learn with Spaced Repetition"
 url: /spaced-repetition.html
 type: alist
 layout: spaced-repetition
 js_include: ["main", "srs"]
 css_include: ["main", "srs"]
 ---
-# Learn with Spaced Repetition
-
 ## Learn
 When you see <button class="br3">🧠 + 💪</button> appear at the top, click on it to be reminded of an entry.
 

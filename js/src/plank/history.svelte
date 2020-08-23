@@ -1,15 +1,21 @@
 <script>
   // TODO visualise with colour the daily, weekly, monthly
   // TODO visualise days in a row doing a plank
+  import dayjs from "dayjs";
+  import isBetween from "dayjs/plugin/isBetween";
+  import isToday from "dayjs/plugin/isToday";
+  import en from "dayjs/locale/en";
+
   import { createEventDispatcher } from "svelte";
   import store from "./store.js";
   import { loggedIn, notify } from "../shared.js";
   import { formatTime } from "./utils.js";
   import LoginModal from "../components/login_modal.svelte";
 
-  import dayjs from "dayjs";
-  import isBetween from "dayjs/plugin/isBetween";
-  import isToday from "dayjs/plugin/isToday";
+  dayjs.locale({
+    ...en,
+    weekStart: 1
+  });
   dayjs.extend(isBetween);
   dayjs.extend(isToday);
 
@@ -45,9 +51,7 @@
   }
 
   function weekTotals(entries) {
-    const startOf = dayjs()
-      .startOf("week")
-      .add(1, "day");
+    const startOf = dayjs().startOf("week");
     const endOf = dayjs().endOf("week");
 
     return entries.reduce((a, b) => {
@@ -60,9 +64,7 @@
   }
 
   function monthTotals(entries) {
-    const startOf = dayjs()
-      .startOf("month")
-      .add(1, "day");
+    const startOf = dayjs().startOf("month");
     const endOf = dayjs().endOf("month");
 
     return entries.reduce((a, b) => {
