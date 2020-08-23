@@ -21,9 +21,9 @@
         {{- end -}}
     </div>
 </article>
-
-<div id="play" style="display:none">
-    <script id="play-data" type="application/json">{{ $aList | jsonify | safeJS }}</script>
-    <div id="play-screen"></div>
-</div>
+{{- with $aList.info.interact -}}
+{{- if in $interactAllowed $aList.info.type -}}
+{{- partial (printf "alist/%s/play.html" $aList.info.type) $aList -}}
+{{- end -}}
+{{- end -}}
 {{ end }}
