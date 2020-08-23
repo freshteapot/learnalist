@@ -122,6 +122,7 @@ func (config Config) validateBasic(c echo.Context, basic string) (bool, error) {
 
 	parts := strings.SplitN(string(b), ":", 2)
 	if len(parts) != 2 {
+		SendLogoutCookie(c)
 		return false, nil
 	}
 
@@ -132,6 +133,7 @@ func (config Config) validateBasic(c echo.Context, basic string) (bool, error) {
 	// TODO this is ugly
 	userUUID, err := config.LookupBasic(username, hash)
 	if err != nil {
+		SendLogoutCookie(c)
 		return false, nil
 	}
 
