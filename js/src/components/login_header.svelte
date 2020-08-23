@@ -39,12 +39,6 @@
         // Little hack to make sure the page reloads
         window.location = window.location;
         break;
-      case 401:
-      case 403:
-        clearConfiguration();
-        // Little hack to make sure the page reloads
-        window.location = window.location;
-        break;
       case 404:
         dontLookup = true;
         break;
