@@ -1,6 +1,8 @@
 <script>
   import { location, querystring } from "svelte-spa-router";
   import goto from "./goto.js";
+  import { addEntry } from "./api.js";
+
   import { loggedIn, notify } from "../shared.js";
   import LoginModal from "../components/login_modal.svelte";
   let listElement = document.querySelector("#list-info");
@@ -11,12 +13,6 @@
 
   const qs = new URLSearchParams($querystring);
 
-  function add() {
-    console.log(item);
-    // if to is empty, save as v1
-    notify("info", "TODO Save");
-  }
-
   let toggleTo = false;
   const item = {
     from: "",
@@ -24,7 +20,54 @@
   };
   item.from = qs.has("c") ? qs.get("c") : "";
 
-  let loginNag = true;
+  async function add() {
+    item.from = item.from.trim();
+    item.to = item.to.trim();
+
+    const input = {
+      show: item.from
+    };
+
+    if (item.from === "") {
+      notify("error", "Entry can not be empty");
+      return;
+    }
+
+    if (item.to === "") {
+      input.data = item.from;
+      input.kind = "v1";
+    }
+
+    if (item.to !== "") {
+      input.data = item;
+      input.kind = "v2";
+      input.settings = {
+        show: "from"
+      };
+    }
+
+    const response = await addEntry(input);
+
+    switch (response.status) {
+      case 201:
+        notify("info", "Saved");
+        item.from = "";
+        item.to = "";
+        toggleTo = false;
+        break;
+      case 200:
+        notify("info", "Already in the system");
+        item.from = "";
+        item.to = "";
+        toggleTo = false;
+        break;
+      default:
+        console.log("failed to add for spaced learning");
+        console.log(response);
+        break;
+    }
+  }
+
   const loginNagMessageDefault =
     "You need to be logged in so we can personalise your learning experience.";
   let loginNagMessage = loginNagMessageDefault;
@@ -32,16 +75,6 @@
   function closeLoginModal() {
     goto.intro();
   }
-
-  function checkShowLoginNag() {
-    console.log(loginNag && !loggedIn());
-    return loginNag && !loggedIn();
-  }
-  let showLoginNag = false;
-
-  // TODO handle when the dates are wrong or empty
-
-  $: showLoginNag = loginNag && !loggedIn();
 </script>
 
 <article class="tc">
@@ -64,7 +97,7 @@
   <button class="br3" on:click={() => goto.overview()}>cancel</button>
 </article>
 
-{#if showLoginNag}
+{#if !loggedIn()}
   <LoginModal on:close={closeLoginModal}>
     <p>{loginNagMessage}</p>
   </LoginModal>
