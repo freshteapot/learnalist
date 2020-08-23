@@ -181,7 +181,6 @@
     const timeLeft = entry.settings.when_next;
 
     const duration = dayjs.duration(when.diff(now));
-    console.log(duration);
     if (duration.asMilliseconds() < 0) {
       return "now";
     }
