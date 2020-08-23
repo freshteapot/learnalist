@@ -1,40 +1,13 @@
 <script>
   import { loggedIn } from "../../../shared.js";
   import { push } from "svelte-spa-router";
-  import { createEventDispatcher, onMount, onDestroy } from "svelte";
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
   const close = () => dispatch("close");
 
-  export let aList;
-  export let listDataElement;
-  export let playElement;
-  export let listTitleElement;
   export let show;
   export let state;
-
-  onMount(() => {
-    listDataElement.addEventListener("click", handler);
-    playElement.style.display = "";
-    listTitleElement.innerHTML = "Click below to add";
-  });
-
-  onDestroy(() => {
-    listDataElement.removeEventListener("click", handler);
-    playElement.style.display = "none";
-    listTitleElement.innerHTML = "Data";
-  });
-
-  function handler(event) {
-    const index = event.target.getAttribute("data-index");
-    if (!index) {
-      return;
-    }
-
-    dispatch("edit", {
-      data: aList.data[index]
-    });
-  }
 
   function handleClose() {
     dispatch("close");

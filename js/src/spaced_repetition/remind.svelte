@@ -1,6 +1,9 @@
 <script>
+  import { push } from "svelte-spa-router";
   import { getNext, viewed } from "./api.js";
-  import { loggedIn, notify, clearNotification } from "../../../shared.js";
+  import goto from "./goto.js";
+  import { loggedIn, notify, clearNotification } from "../shared.js";
+  import { clearConfiguration } from "../configuration.js";
 
   let state = "loading";
   let show;
@@ -21,7 +24,7 @@
   async function _viewed(uuid, action) {
     try {
       clearNotification();
-      const response = await viewed(uuid, action);
+      await viewed(uuid, action);
       await get();
     } catch (error) {
       console.log("next", error);
@@ -51,12 +54,18 @@
 
   async function get() {
     try {
-      if (!loggedIn()) {
-        state = "nothing-to-see";
+      const response = await getNext();
+
+      if (response.status == 403) {
+        clearConfiguration();
+        goto.overview();
         return;
       }
 
-      const response = await getNext();
+      if ([204, 404].includes(response.status)) {
+        goto.overview();
+        return;
+      }
 
       if (response.status == 200) {
         // show card
@@ -66,56 +75,32 @@
         return;
       }
 
-      if (response.status == 204) {
-        state = "nothing-to-see";
-        return;
-      }
-
-      if (response.status == 404) {
-        state = "no-entries";
-        return;
-      }
-
       state = "loading";
       data = null;
     } catch (error) {
-      if (error.status) {
-        if (error.status == 404) {
-          state = "no-entries";
-          return;
-        }
-      }
-
+      console.log("error", error);
       notify(
         "error",
         "Something went wrong talking to the server, please refresh the page",
         true
       );
-      state = "nothing-to-see";
-      return;
     }
   }
 
-  function showInfo(state) {
+  function showEntry(state) {
     if (state === "loading") {
       listElement.style.display = "none";
       playElement.style.display = "none";
       return;
     }
 
-    if (state === "show-entry") {
-      listElement.style.display = "none";
-      playElement.style.display = "";
-      return;
-    }
-
-    listElement.style.display = "";
-    playElement.style.display = "none";
+    listElement.style.display = "none";
+    playElement.style.display = "";
   }
 
   function showMessage(state) {
     if (state === "nothing-to-see") {
-      notify("info", "None of your entries are ready, add more?", true);
+      notify("info", "None of your entries are ready", true);
       return;
     }
 
@@ -126,18 +111,16 @@
   }
 
   $: get();
-  $: showInfo(state);
-
-  $: showMessage(state);
+  $: showEntry(state);
 </script>
 
 <style>
-  @import "../../../../all.css";
+  @import "../../all.css";
 </style>
 
 <svelte:options tag={null} />
 
-{#if loggedIn() && state === 'show-entry'}
+{#if state === 'show-entry'}
   <div class="flex flex-column">
 
     <article>

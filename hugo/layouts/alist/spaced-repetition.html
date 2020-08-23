@@ -1,19 +1,14 @@
-<html lang="en">
+{{ define "header" }}
+{{- partial "title-header.html" . -}}
+{{ end }}
 
-{{- partial "head.html" $ -}}
-
-<body onload="measureCRP()">
-    {{- partial "header.html" $ -}}
-    <main class="w-100 bt b--black-10 bg-white">
-        <article id="list-info" class="mw9 mw6-ns center pt2">
-            {{.Content}}
-        </article>
-        <article id="play" class="mw9 mw6-ns center pt2"></article>
-    </main>
-    <script>
-        // Ugly hack to stop flickering
-        document.querySelector("#list-info").style.display = "none";
-    </script>
-</body>
-
-</html>
+{{ define "main" }}
+<article id="list-info">
+    {{.Content}}
+</article>
+<article id="play"></article>
+<script>
+    // Ugly hack to stop flickering
+    document.querySelector("#list-info").style.display = "none";
+</script>
+{{ end }}
