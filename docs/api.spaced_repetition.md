@@ -90,10 +90,3 @@ curl -XPOST -H "Content-Type: application/json" \
 }
 '
 ```
-
-
-# Development
-## Quickly reset all spaced repetitions
-```sh
-UPDATE spaced_repetition SET when_next=CURRENT_TIMESTAMP;
-```
