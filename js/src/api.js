@@ -133,19 +133,12 @@ async function deleteList(uuid) {
   }
 }
 
+
 async function getServerVersion() {
   const api = getApi(Services.SpacedRepetition);
   return await api.getServerVersion();
 }
 
-async function getSpacedRepetitionEntries() {
-  const api = getApi(Services.SpacedRepetition);
-  try {
-    return await api.getSpacedRepetitionEntries();
-  } catch (error) {
-    throw error;
-  }
-}
 async function getSpacedRepetitionNext() {
   const api = getApi(Services.SpacedRepetition);
 
@@ -157,14 +150,17 @@ async function getSpacedRepetitionNext() {
   try {
     const res = await api.getNextSpacedRepetitionEntryRaw();
     response.status = res.raw.status;
-    if (response.status === 200) {
+    try {
       response.body = await res.value();
+    } catch (error) {
+
     }
 
-  } catch (responseError) {
-    response.status = responseError.status;
+    return response;
+  } catch (error) {
+    throw (error);
   }
-  return response;
+
 }
 
 
@@ -214,7 +210,6 @@ export {
   deleteList,
   getPlanks,
   getServerVersion,
-  getSpacedRepetitionEntries,
   getSpacedRepetitionNext,
   addSpacedRepetitionEntry,
   updateSpacedRepetitionEntry
