@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Testing openapi", func() {
+var _ = Describe("Testing openapi", func() {
 
 	It("Get version", func() {
 		config := openapi.NewConfiguration()

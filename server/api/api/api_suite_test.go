@@ -33,7 +33,7 @@ var _ = BeforeSuite(func() {
 	labels := labelStorage.NewLabel(db)
 	dal = models.NewDAL(db, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 	hugoHelper := &mocks.HugoSiteBuilder{}
-	// TODO What todo here
+
 	m = api.Manager{
 		Datastore:  dal,
 		Acl:        acl,
