@@ -189,7 +189,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 	err = alist.Validate(aList)
 	if err != nil {
 		if err == alist.ErrorSharingNotAllowedWithFrom {
-			return emptyAlist, errors.New(i18n.InputSaveAlistOperationFromRestriction)
+			return emptyAlist, i18n.ErrorInputSaveAlistOperationFromRestriction
 		}
 		return emptyAlist, err
 	}

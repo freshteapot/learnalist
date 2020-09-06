@@ -68,7 +68,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		response := api.HttpResponseMessage{
 			Message: i18n.InputSaveAlistOperationFromRestriction,
 		}
-		return c.JSON(http.StatusForbidden, response)
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	if aList.Info.SharedWith == aclKeys.NotShared {

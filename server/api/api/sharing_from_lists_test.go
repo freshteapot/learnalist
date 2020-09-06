@@ -2,7 +2,6 @@ package api_test
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -90,7 +89,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 
 				m.V1ShareListReadAccess(c)
 
-				Expect(rec.Code).To(Equal(http.StatusForbidden))
+				Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
 				CheckMessageResponse(rec, i18n.InputSaveAlistOperationFromRestriction)
 			})
 		})
@@ -238,9 +237,9 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 
 			datastore.On("GetAlist", mock.Anything).Return(returnAlist, nil)
 			// TODO maybe we need some errors
-			datastore.On("SaveAlist", http.MethodPut, aList).Return(aList, errors.New(i18n.InputSaveAlistOperationFromRestriction))
+			datastore.On("SaveAlist", http.MethodPut, aList).Return(aList, i18n.ErrorInputSaveAlistOperationFromRestriction)
 			m.V1SaveAlist(c)
-			Expect(rec.Code).To(Equal(http.StatusForbidden))
+			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
 			CheckMessageResponse(rec, i18n.InputSaveAlistOperationFromRestriction)
 		})
 

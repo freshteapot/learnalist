@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
@@ -34,7 +35,7 @@ var _ = Describe("Testing List Info", func() {
 			{
 				Input: testutils.GetTestData(KindNotSupported),
 				ExpectError: func(err error) {
-					Expect(err).To(Equal(alist.ErrorListFromKind))
+					Expect(err).To(Equal(i18n.ErrorInputSaveAlistFromKindNotSupported))
 				},
 			},
 			{

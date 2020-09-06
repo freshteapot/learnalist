@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -78,7 +79,7 @@ func validateAListInfo(info AlistInfo) error {
 	if info.From != nil {
 		allowed := []string{"learnalist", "brainscape", "cram", "quizlet"}
 		if !utils.StringArrayContains(allowed, info.From.Kind) {
-			return ErrorListFromKind
+			return i18n.ErrorInputSaveAlistFromKindNotSupported
 		}
 
 		v := validate.Struct(*info.From)
