@@ -53,7 +53,7 @@ var _ = Describe("Testing List Info", func() {
 			{
 				Input: testutils.GetTestData(KindDomainNotMatch),
 				ExpectError: func(err error) {
-					Expect(err).To(Equal(alist.ErrorListFromDomainMisMatch))
+					Expect(err).To(Equal(i18n.ErrorAListFromDomainMisMatch))
 				},
 			},
 		}

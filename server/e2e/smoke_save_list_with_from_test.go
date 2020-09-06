@@ -3,7 +3,6 @@ package e2e_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -86,22 +85,21 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 			It("from kind is not allowed", func() {
 				resp, err := testutils.ToHttpResponse(e2eClient.RawPostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFromAndKindNotSupported)))
 				Expect(err).To(BeNil())
-				testutils.CheckMessageResponse(resp, i18n.InputSaveAlistOperationFromKindNotSupported)
 				Expect(resp.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+				testutils.CheckMessageResponse(resp, i18n.InputSaveAlistOperationFromKindNotSupported)
 			})
 		})
 
 		When("Updating a list", func() {
-			FIt("Make sure the from block cant be modified", func() {
+			It("Make sure the from block cant be modified", func() {
 				aList, err := e2eClient.PostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFrom))
 				Expect(err).To(BeNil())
 				aList.Info.From.Kind = "cram"
 				data, _ := json.Marshal(aList)
 				resp, err := testutils.ToHttpResponse(e2eClient.RawPutListV1(userInfoOwnerA, aList.Uuid, string(data)))
 				Expect(err).To(BeNil())
-				// {"message":"domain-mis-match"}
-				fmt.Println(string(resp.Body))
 				Expect(resp.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+				testutils.CheckMessageResponse(resp, i18n.ErrorAListFromDomainMisMatch.Error())
 			})
 
 			When("from not learnalist", func() {

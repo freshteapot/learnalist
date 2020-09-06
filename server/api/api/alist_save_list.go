@@ -68,6 +68,8 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		}
 
 		switch err {
+		case i18n.ErrorAListFromDomainMisMatch:
+			fallthrough
 		case i18n.ErrorInputSaveAlistOperationFromRestriction:
 			fallthrough
 		case i18n.ErrorInputSaveAlistFromKindNotSupported:

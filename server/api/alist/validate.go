@@ -93,7 +93,7 @@ func validateAListInfo(info AlistInfo) error {
 		}
 
 		if !WithFromCheckFromDomain(*info.From) {
-			return ErrorListFromDomainMisMatch
+			return i18n.ErrorAListFromDomainMisMatch
 		}
 
 		if !WithFromCheckSharing(info) {
