@@ -138,6 +138,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Input had no errors but was not valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
         "500":
           description: unexpected error
           content:
@@ -216,6 +222,12 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
         "403":
           description: User making request does not have access to the list in question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Input had no errors but was not valid
           content:
             application/json:
               schema:
