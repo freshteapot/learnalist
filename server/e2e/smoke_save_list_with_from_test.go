@@ -19,6 +19,7 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 		ListWithNoFrom                  = "./list-from-001.json"
 		ListWithFrom                    = "./list-from-with-from.json"
 		ListWithFromAndKindNotSupported = "./list-from-with-from-kind-not-supported.json"
+		ListWithFromAndKindIsLearnalist = "./list-from-with-from-kind-learnalist.json"
 	)
 
 	var (
@@ -67,7 +68,7 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 				aList, err := e2eClient.PostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFrom))
 				Expect(err).To(BeNil())
 				Expect(aList.Info.From.Kind).To(Equal("quizlet"))
-
+				By("Confirm handling when refurl doesnt match the kind")
 			})
 
 			Specify("fail when trying to save with shared set to anything but private", func() {
@@ -102,15 +103,28 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 				testutils.CheckMessageResponse(resp, i18n.ErrorAListFromDomainMisMatch.Error())
 			})
 
-			When("from not learnalist", func() {
+			When("from, not learnalist", func() {
 				It("Make sure shared is not modified", func() {
-
+					aList, err := e2eClient.PostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFrom))
+					Expect(err).To(BeNil())
+					aList.Info.SharedWith = keys.SharedWithFriends
+					data, _ := json.Marshal(aList)
+					resp, err := testutils.ToHttpResponse(e2eClient.RawPutListV1(userInfoOwnerA, aList.Uuid, string(data)))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+					testutils.CheckMessageResponse(resp, i18n.ErrorInputSaveAlistOperationFromRestriction.Error())
 				})
 			})
 
 			When("from learnalist", func() {
 				It("Shared can be changed", func() {
-
+					aList, err := e2eClient.PostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFromAndKindIsLearnalist))
+					Expect(err).To(BeNil())
+					aList.Info.SharedWith = keys.SharedWithFriends
+					data, _ := json.Marshal(aList)
+					resp, err := testutils.ToHttpResponse(e2eClient.RawPutListV1(userInfoOwnerA, aList.Uuid, string(data)))
+					Expect(err).To(BeNil())
+					Expect(resp.StatusCode).To(Equal(http.StatusOK))
 				})
 			})
 		})

@@ -117,6 +117,7 @@ INSERT INTO alist_labels VALUES('3c9394eb-7df1-5611-bce1-2bc3a198b2a6','c3d330fd
 	suite.Equal(2, len(labels))
 
 	err := dal.RemoveUserLabel(label_remove, user_uuid)
+
 	suite.NoError(err)
 	// Confirm the func returns the correct data.
 	labels, _ = dal.Labels().GetUserLabels(user_uuid)

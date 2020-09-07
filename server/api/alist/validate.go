@@ -105,7 +105,11 @@ func validateAListInfo(info AlistInfo) error {
 }
 
 func WithFromCanUpdate(want AlistInfo, current AlistInfo) bool {
-	if want.From != current.From {
+	if current.From == nil && want.From == nil {
+		return true
+	}
+
+	if *want.From != *current.From {
 		return false
 	}
 
@@ -117,6 +121,7 @@ func WithFromCanUpdate(want AlistInfo, current AlistInfo) bool {
 }
 
 func WithFromCheckSharing(info AlistInfo) bool {
+
 	// Defence, this shouldn't happen
 	if info.From == nil {
 		return true

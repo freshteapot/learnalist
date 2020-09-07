@@ -1,0 +1,15 @@
+{
+    "data": [
+        "chris"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1",
+        "shared_with": "private",
+        "from": {
+            "kind": "learnalist",
+            "ext_uuid": "fake-123",
+            "ref_url": "https://learnalist.net/alist/fake-123/"
+        }
+    }
+}

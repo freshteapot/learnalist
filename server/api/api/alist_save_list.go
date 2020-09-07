@@ -80,7 +80,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		switch err.Error() {
 		case i18n.SuccessAlistNotFound:
 			return c.JSON(http.StatusNotFound, response)
-		case i18n.InputSaveAlistOperationOwnerOnly:
+		case i18n.InputSaveAlistOperationOwnerOnly: // Maybe move this to 422
 			return c.JSON(http.StatusForbidden, response)
 		default:
 			return c.JSON(http.StatusBadRequest, response)

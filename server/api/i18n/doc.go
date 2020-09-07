@@ -64,5 +64,6 @@ var (
 	ErrorUserAlreadyExistsWrongPassword         = errors.New("user.already.exists.wrong.password")
 	ErrorInputSaveAlistFromKindNotSupported     = errors.New(InputSaveAlistOperationFromKindNotSupported)
 	ErrorInputSaveAlistOperationFromRestriction = errors.New(InputSaveAlistOperationFromRestriction)
+	ErrorInputSaveAlistOperationFromModify      = errors.New(InputSaveAlistOperationFromModify)
 	ErrorAListFromDomainMisMatch                = errors.New("In info.from, the domain doesnt match the kind")
 )

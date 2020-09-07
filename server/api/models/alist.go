@@ -225,8 +225,8 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 			return emptyAlist, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
 		}
 
-		if aList.Info.From != current.Info.From {
-			return emptyAlist, errors.New(i18n.InputSaveAlistOperationFromModify)
+		if !alist.WithFromCanUpdate(aList.Info, current.Info) {
+			return emptyAlist, i18n.ErrorInputSaveAlistOperationFromModify
 		}
 
 		// Check if what is about to be written is the same.
