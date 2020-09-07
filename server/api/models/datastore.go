@@ -17,7 +17,6 @@ type Datastore interface {
 	DatastoreLabels
 }
 
-// TODO I wonder if we need this
 type DatastoreOauth2 interface {
 	OAuthHandler() oauth.OAuthReadWriter
 }
