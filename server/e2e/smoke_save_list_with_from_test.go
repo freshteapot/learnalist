@@ -68,7 +68,14 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 				aList, err := e2eClient.PostListV1(userInfoOwnerA, testutils.GetTestDataAsJSONOneline(ListWithFrom))
 				Expect(err).To(BeNil())
 				Expect(aList.Info.From.Kind).To(Equal("quizlet"))
+
 				By("Confirm handling when refurl doesnt match the kind")
+				aList.Info.From.RefUrl = "https://notreal.com/xxx"
+				data, _ := json.Marshal(aList)
+				resp, err := testutils.ToHttpResponse(e2eClient.RawPostListV1(userInfoOwnerA, string(data)))
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+				testutils.CheckMessageResponse(resp, i18n.ErrorAListFromDomainMisMatch.Error())
 			})
 
 			Specify("fail when trying to save with shared set to anything but private", func() {
