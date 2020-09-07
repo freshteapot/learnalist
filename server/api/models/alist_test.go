@@ -1,5 +1,6 @@
 package models_test
 
+/*
 import (
 	"net/http"
 
@@ -216,3 +217,4 @@ INSERT INTO alist_labels VALUES('292a4fd3-8835-5435-9e68-7085ab901730','7540fe5f
 	suite.Equal(1, len(items))
 	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
 }
+*/

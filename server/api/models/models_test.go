@@ -3,6 +3,7 @@ package models_test
 import (
 	"testing"
 
+	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
@@ -27,7 +28,12 @@ func (suite *ModelSuite) SetupSuite() {
 	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
-	dal = models.NewDAL(db, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+	storageAlist := alistStorage.NewAlist(db)
+	dal = models.NewDAL(
+		db,
+		acl,
+		storageAlist,
+		labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

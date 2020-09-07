@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
+	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
@@ -91,7 +92,10 @@ var ServerCmd = &cobra.Command{
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		labels := labelStorage.NewLabel(db)
-		dal := models.NewDAL(db, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+		storageAlist := alistStorage.NewAlist(db)
+		dal := models.NewDAL(db, acl,
+			storageAlist,
+			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
 		server.InitApi(db, acl, dal, hugoHelper, oauthHandlers, logger)
 		server.InitAlists(acl, dal, hugoHelper)

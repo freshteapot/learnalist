@@ -1,19 +1,13 @@
 package models
 
-const (
-	SQL_INSERT_LIST                  = `INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)`
-	SQL_UPDATE_LIST                  = `UPDATE alist_kv SET list_type=?, body=?, user_uuid=? WHERE uuid=?`
-	SQL_GET_ITEM_BY_UUID             = `SELECT uuid, body, user_uuid, list_type FROM alist_kv WHERE uuid = ?`
-	SQL_DELETE_ITEM_BY_USER_AND_UUID = `
-DELETE
-FROM
-	alist_kv
-WHERE
-	uuid=?
-AND
-	user_uuid=?
-`
-)
+import "github.com/freshteapot/learnalist-api/server/api/alist"
+
+type Alist interface {
+	Insert(aList alist.Alist) error
+	Update(aList alist.Alist) error
+	Remove(alistUUID string, userUUID string) error
+	GetPublicLists() []alist.ShortInfo
+}
 
 type SimpleEvent struct {
 	What     string `db:"what"`

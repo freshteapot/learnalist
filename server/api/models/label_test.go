@@ -1,101 +1,52 @@
 package models_test
 
-// TODO remove once api/label/sqlite/label_test.go is complete
+/*
 import (
-	"net/http"
+	"errors"
+	"fmt"
 
-	"github.com/freshteapot/learnalist-api/server/api/label"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
+	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/mocks"
+	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+	"github.com/jmoiron/sqlx"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
-/*
-func (suite *ModelSuite) TestPostUserLabel() {
-	var statusCode int
-	var err error
+var _ = Describe("Testing Label", func() {
+	// Not done
+	// Possible issue with SaveList
+	// Could ignore and move that
+	var (
+		datastore *mocks.Datastore
+		dbCon     *sqlx.DB
+		mockSql   sqlmock.Sqlmock
+	)
+	BeforeEach(func() {
+		dbCon, mockSql, _ = helper.GetMockDB()
+		fmt.Println(mockSql)
+		acl := aclStorage.NewAcl(dbCon)
+		userSession := userStorage.NewUserSession(dbCon)
+		userFromIDP := userStorage.NewUserFromIDP(dbCon)
+		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(dbCon)
+		oauthHandler := oauthStorage.NewOAuthReadWriter(dbCon)
+		labels := labelStorage.NewLabel(dbCon)
+		dal = models.NewDAL(dbCon, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+	})
 
-	a := label.NewUserLabel("label1", "user2")
-	statusCode, _ = dal.Labels().PostUserLabel(a)
-	suite.Equal(http.StatusCreated, statusCode)
-	// Check duplicate entry returns 200.
-	statusCode, _ = dal.Labels().PostUserLabel(a)
-	suite.Equal(http.StatusOK, statusCode)
-
-	b := label.NewUserLabel("label_123456789_123456789_car_boat", "user2")
-	statusCode, err = dal.Labels().PostUserLabel(b)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	suite.Equal(i18n.ValidationWarningLabelToLong, err.Error())
-
-	c := label.NewUserLabel("", "user2")
-	statusCode, err = dal.Labels().PostUserLabel(c)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	suite.Equal(i18n.ErrorValidationWarningLabelNotEmpty, err)
-}
-
-func (suite *ModelSuite) TestPostAlistLabel() {
-	a := label.NewAlistLabel("label1", "u:123", "u:456")
-	statusCode, _ := dal.Labels().PostAlistLabel(a)
-	suite.Equal(http.StatusCreated, statusCode)
-
-	statusCode, _ = dal.Labels().PostAlistLabel(a)
-	suite.Equal(http.StatusOK, statusCode)
-
-	b := label.NewAlistLabel("label_123456789_123456789_car_boat", "u:123", "u:456")
-	statusCode, err := dal.Labels().PostAlistLabel(b)
-	suite.Equal(http.StatusBadRequest, statusCode)
-	suite.Equal(i18n.ValidationWarningLabelToLong, err.Error())
-}
-*/
-
-func (suite *ModelSuite) TestGetUserLabels() {
-	setup := `
-INSERT INTO alist_kv VALUES('ada41576-b710-593a-9603-946aaadcb22d','v1','{"data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"info":{"title":"Days of the Week","type":"v1","labels":[]},"uuid":"ada41576-b710-593a-9603-946aaadcb22d"}','7540fe5f-9847-5473-bdbd-2b20050da0c6');
-`
-	dal.Db.MustExec(setup)
-	alist_uuid := "ada41576-b710-593a-9603-946aaadcb22d"
-	user_uuid := "7540fe5f-9847-5473-bdbd-2b20050da0c6"
-
-	// Testing for an empty response
-	emptyList := make([]string, 0)
-	labels, _ := dal.Labels().GetUserLabels(user_uuid)
-	suite.Equal(emptyList, labels)
-
-	a := label.NewUserLabel("label1", user_uuid)
-	statusCode, _ := dal.Labels().PostUserLabel(a)
-	suite.Equal(http.StatusCreated, statusCode)
-
-	labels, _ = dal.Labels().GetUserLabels(user_uuid)
-
-	b := label.NewAlistLabel("label2", user_uuid, alist_uuid)
-	statusCode, _ = dal.Labels().PostAlistLabel(b)
-	suite.Equal(http.StatusCreated, statusCode)
-	// We add the same one, just to make sure we only get 2 back.
-	statusCode, _ = dal.Labels().PostAlistLabel(b)
-	labels, _ = dal.Labels().GetUserLabels(user_uuid)
-	suite.Equal(2, len(labels))
-}
-
-/*
-For setup data.
-
-curl -s -w "%{http_code}\n" -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
-{
-    "username":"iamchris",
-    "password":"test123"
-}
-'
-
-curl -s -w "%{http_code}\n" -XPOST  http://127.0.0.1:1234/api/v1/alist -u'test1:test' -d'
-{
-    "data": [],
-    "info": {
-        "title": "Days of the Week",
-        "type": "v1",
-        "labels": [
-          "label a",
-          "label b"
-        ]
-    }
-}'
-
+	It("", func() {
+		datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.InputSaveAlistOperationOwnerOnly))
+		Expect("").To(Equal(""))
+	})
+})
 */
 func (suite *ModelSuite) TestRemoveLabelsFromExistingLists() {
 	setup := `
