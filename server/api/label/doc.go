@@ -46,7 +46,7 @@ func NewAlistLabel(label string, user string, alist string) AlistLabel {
 
 func ValidateLabel(label string) error {
 	if label == "" {
-		return errors.New(i18n.ValidationWarningLabelNotEmpty)
+		return i18n.ErrorValidationWarningLabelNotEmpty
 	}
 
 	if len(label) > 20 {

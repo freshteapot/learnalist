@@ -85,6 +85,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		assert.Equal(aListB.Info.SharedWith, aclKeys.SharedWithFriends)
 		assert.Equal(aList, aListB)
 	})
+
 	It("label crud", func() {
 
 		var labels []string

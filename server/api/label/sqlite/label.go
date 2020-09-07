@@ -17,7 +17,8 @@ const (
 	SQL_LABEL_DELETE_BY_LIST   = `DELETE FROM alist_labels WHERE alist_uuid=?`
 	SQL_LABEL_USER_DELETE_USER = `DELETE FROM user_labels WHERE user_uuid=? AND label=?`
 	SQL_LABEL_USER_DELETE_LIST = `DELETE FROM alist_labels WHERE user_uuid=? AND label=?`
-	SQL_INSERT_LIST_LABEL      = "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (?, ?, ?);"
+	SqlInserListLabel          = "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (?, ?, ?);"
+	SqlInserUserLabel          = `INSERT INTO user_labels(label, user_uuid) VALUES (?, ?);`
 )
 
 func NewLabel(db *sqlx.DB) label.LabelReadWriter {
@@ -33,9 +34,7 @@ func (store *store) PostUserLabel(input label.UserLabel) (int, error) {
 		return statusCode, err
 	}
 
-	query := "INSERT INTO user_labels(label, user_uuid) VALUES (?, ?);"
-
-	_, err = store.db.Exec(query, input.Label, input.UserUuid)
+	_, err = store.db.Exec(SqlInserUserLabel, input.Label, input.UserUuid)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
 			return http.StatusOK, nil
@@ -52,15 +51,14 @@ func (store *store) PostAlistLabel(input label.AlistLabel) (int, error) {
 		return statusCode, err
 	}
 
-	_, err = store.db.Exec(SQL_INSERT_LIST_LABEL, input.Label, input.UserUuid, input.AlistUuid)
-	statusCode = http.StatusCreated
+	_, err = store.db.Exec(SqlInserListLabel, input.Label, input.UserUuid, input.AlistUuid)
 	if err != nil {
-		statusCode = http.StatusBadRequest
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
-			statusCode = http.StatusOK
+			return http.StatusOK, nil
 		}
+		return http.StatusInternalServerError, err
 	}
-	return statusCode, err
+	return http.StatusCreated, nil
 }
 
 func (store *store) GetUniqueListsByUserAndLabel(label string, user string) ([]string, error) {

@@ -11,7 +11,6 @@ const (
 	ValidationErrorListV3                       = "Failed to pass list type v3."
 	ValidationErrorListV4                       = "Failed to pass list type v4."
 	ValidationWarningLabelToLong                = "The label cannot be longer than 20 characters."
-	ValidationWarningLabelNotEmpty              = "The label cannot be empty."
 	ValidationUUIDMismatch                      = "The list uuid in the uri doesnt match that in the payload"
 	ValidationAlists                            = "Please refer to the documentation on lists"
 	ValidationAlistTypeV1                       = "Please refer to the documentation on list type v1"
@@ -66,4 +65,5 @@ var (
 	ErrorInputSaveAlistOperationFromRestriction = errors.New(InputSaveAlistOperationFromRestriction)
 	ErrorInputSaveAlistOperationFromModify      = errors.New(InputSaveAlistOperationFromModify)
 	ErrorAListFromDomainMisMatch                = errors.New("In info.from, the domain doesnt match the kind")
+	ErrorValidationWarningLabelNotEmpty         = errors.New("The label cannot be empty.")
 )
