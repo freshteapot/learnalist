@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -64,7 +65,8 @@ var deleteUserCmd = &cobra.Command{
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		labels := labelStorage.NewLabel(db)
 		storageAlist := alistStorage.NewAlist(db)
-		dal := models.NewDAL(db, acl, storageAlist, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+		storageApiUser := apiUserStorage.NewUser(db)
+		dal := models.NewDAL(acl, storageApiUser, storageAlist, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
 		userManagement := user.NewManagement(
 			userStorage.NewSqliteManagementStorage(db),

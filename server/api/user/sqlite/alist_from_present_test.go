@@ -1,40 +1,49 @@
-package models_test
+package sqlite_test
 
+/*
 import (
+	"encoding/json"
 	"net/http"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing from present", func() {
+var _ = Describe("Testing Models with sqlmock", func() {
 	var (
-		dal            *models.DAL
-		userUUID       string
-		user           *uuid.User
-		labels         *mocks.LabelReadWriter
-		acl            *mocks.Acl
-		aListStorage   *mocks.DatastoreAlists
-		apiUserStorage *mocks.DatastoreUsers
+		dal      *models.DAL
+		dbCon    *sqlx.DB
+		mockSql  sqlmock.Sqlmock
+		userUUID string
+		user     *uuid.User
+		labels   *mocks.LabelReadWriter
+		acl      *mocks.Acl
 	)
 
 	BeforeEach(func() {
+		dbCon, mockSql, _ = helper.GetMockDB()
 		acl = &mocks.Acl{}
 		userSession := &mocks.Session{}
 		userFromIDP := &mocks.UserFromIDP{}
 		userWithUsernameAndPassword := &mocks.UserWithUsernameAndPassword{}
 		oauthHandler := &mocks.OAuthReadWriter{}
 		labels = &mocks.LabelReadWriter{}
-		aListStorage = &mocks.DatastoreAlists{}
-		apiUserStorage = &mocks.DatastoreUsers{}
-		dal = models.NewDAL(acl, apiUserStorage, aListStorage, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+		dal = models.NewDAL(dbCon, acl, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+	})
+
+	AfterEach(func() {
+		dbCon.Close()
 	})
 
 	When("Testing info.from is present", func() {
@@ -61,7 +70,20 @@ var _ = Describe("Testing from present", func() {
 			currentAlist.Info.From.RefUrl = "https://quizlet.com/xxx"
 			currentAlist.Info.From.ExtUuid = ""
 
-			aListStorage.On("GetAlist", aList.Uuid).Return(currentAlist, nil)
+			b, _ := json.Marshal(currentAlist)
+
+			rs := sqlmock.NewRows([]string{"uuid", "body", "user_uuid", "list_type"}).
+				AddRow(
+					aList.Uuid,
+					string(b),
+					aList.User.Uuid,
+					aList.Info.ListType,
+				)
+
+			mockSql.ExpectQuery(alistStorage.SQL_GET_ITEM_BY_UUID).
+				WithArgs(aList.Uuid).
+				WillReturnRows(rs)
+
 			_, err := dal.SaveAlist(http.MethodPut, aList)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(i18n.ErrorInputSaveAlistOperationFromModify))
@@ -85,8 +107,26 @@ var _ = Describe("Testing from present", func() {
 
 			currentAlist := aList
 			currentAlist.Info.SharedWith = aclKeys.NotShared
-			aListStorage.On("GetAlist", aList.Uuid).Return(currentAlist, nil)
-			aListStorage.On("SaveAlist", http.MethodPut, aList).Return(currentAlist, nil)
+
+			bNew, _ := json.Marshal(aList)
+			b, _ := json.Marshal(currentAlist)
+
+			rs := sqlmock.NewRows([]string{"uuid", "body", "user_uuid", "list_type"}).
+				AddRow(
+					aList.Uuid,
+					string(b),
+					aList.User.Uuid,
+					aList.Info.ListType,
+				)
+
+			mockSql.ExpectQuery(alistStorage.SQL_GET_ITEM_BY_UUID).
+				WithArgs(aList.Uuid).
+				WillReturnRows(rs)
+
+			mockSql.ExpectExec(alistStorage.SQL_UPDATE_LIST).
+				WithArgs(aList.Info.ListType, string(bNew), aList.User.Uuid, aList.Uuid).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+
 			labels.On("RemoveLabelsForAlist", aList.Uuid).Return(nil)
 			acl.On("ShareListWithFriends", aList.Uuid).Return(nil)
 			_, err := dal.SaveAlist(http.MethodPut, aList)
@@ -94,3 +134,4 @@ var _ = Describe("Testing from present", func() {
 		})
 	})
 })
+*/

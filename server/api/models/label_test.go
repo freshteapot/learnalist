@@ -48,6 +48,8 @@ var _ = Describe("Testing Label", func() {
 	})
 })
 */
+
+/*
 func (suite *ModelSuite) TestRemoveLabelsFromExistingLists() {
 	setup := `
 INSERT INTO user VALUES('c3d330fd-73b9-5d3c-840e-3bb59367b5ed','4187246584872952904','test1');
@@ -81,3 +83,4 @@ INSERT INTO alist_labels VALUES('3c9394eb-7df1-5611-bce1-2bc3a198b2a6','c3d330fd
 	suite.Equal(1, len(alist.Info.Labels))
 	suite.Equal(label_find, alist.Info.Labels[0])
 }
+*/

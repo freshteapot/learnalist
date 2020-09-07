@@ -14,7 +14,7 @@ import (
 )
 
 func emptyDatabase() {
-	database.EmptyDatabase(dal.Db)
+	database.EmptyDatabase(db)
 }
 
 func createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {

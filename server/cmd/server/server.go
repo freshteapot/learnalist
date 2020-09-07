@@ -13,6 +13,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
@@ -93,7 +94,10 @@ var ServerCmd = &cobra.Command{
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		labels := labelStorage.NewLabel(db)
 		storageAlist := alistStorage.NewAlist(db)
-		dal := models.NewDAL(db, acl,
+		storageApiUser := apiUserStorage.NewUser(db)
+		dal := models.NewDAL(
+			acl,
+			storageApiUser,
 			storageAlist,
 			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 

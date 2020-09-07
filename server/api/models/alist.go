@@ -34,7 +34,7 @@ func (dal *DAL) GetListsByUserWithFilters(uuid string, labels string, listType s
 
 // GetAlist Get alist
 func (dal *DAL) GetAlist(uuid string) (alist.Alist, error) {
-	return dal.Alist().GetAlist(uuid)
+	return dal.alist.GetAlist(uuid)
 }
 
 func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
@@ -49,7 +49,7 @@ func (dal *DAL) RemoveAlist(alist_uuid string, user_uuid string) error {
 	}
 
 	dal.Labels().RemoveLabelsForAlist(alist_uuid)
-	err = dal.Alist().RemoveAlist(alist_uuid, user_uuid)
+	err = dal.alist.RemoveAlist(alist_uuid, user_uuid)
 
 	if err != nil {
 		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "RemoveAlist"))
@@ -96,7 +96,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 	}
 
 	if method == http.MethodPut {
-		current, _ := dal.Alist().GetAlist(aList.Uuid)
+		current, _ := dal.alist.GetAlist(aList.Uuid)
 		if current.Uuid == "" {
 			return emptyAlist, errors.New(i18n.SuccessAlistNotFound)
 		}
@@ -124,7 +124,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 	}
 
 	// This is the only part that would need handling
-	_, err = dal.Alist().SaveAlist(method, aList)
+	_, err = dal.alist.SaveAlist(method, aList)
 
 	if err != nil {
 		return emptyAlist, err

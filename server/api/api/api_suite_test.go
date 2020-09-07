@@ -11,6 +11,7 @@ import (
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -20,11 +21,14 @@ func TestPackage(t *testing.T) {
 	RunSpecs(t, "Api Test Suite")
 }
 
-var dal *models.DAL
-var m api.Manager
+var (
+	dal *models.DAL
+	m   api.Manager
+	db  *sqlx.DB
+)
 
 var _ = BeforeSuite(func() {
-	db := database.NewTestDB()
+	db = database.NewTestDB()
 	acl := aclStorage.NewAcl(db)
 	userSession := userStorage.NewUserSession(db)
 	userFromIDP := userStorage.NewUserFromIDP(db)
@@ -32,7 +36,8 @@ var _ = BeforeSuite(func() {
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
 	aListStorage := &mocks.DatastoreAlists{}
-	dal = models.NewDAL(db, acl, aListStorage, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+	apiUserStorage := &mocks.DatastoreUsers{}
+	dal = models.NewDAL(acl, apiUserStorage, aListStorage, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 	hugoHelper := &mocks.HugoSiteBuilder{}
 
 	m = api.Manager{
