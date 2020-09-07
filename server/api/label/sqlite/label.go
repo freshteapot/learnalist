@@ -1,7 +1,6 @@
 package sqlite
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,11 +13,36 @@ type store struct {
 }
 
 const (
-	SQL_LABEL_DELETE_BY_LIST   = `DELETE FROM alist_labels WHERE alist_uuid=?`
-	SQL_LABEL_USER_DELETE_USER = `DELETE FROM user_labels WHERE user_uuid=? AND label=?`
-	SQL_LABEL_USER_DELETE_LIST = `DELETE FROM alist_labels WHERE user_uuid=? AND label=?`
-	SqlInserListLabel          = "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (?, ?, ?);"
-	SqlInserUserLabel          = `INSERT INTO user_labels(label, user_uuid) VALUES (?, ?);`
+	SqlDeleteLabelByList         = `DELETE FROM alist_labels WHERE alist_uuid=?`
+	SqlDeleteLabelByUser         = `DELETE FROM user_labels WHERE user_uuid=? AND label=?`
+	SqlDeleteLabelByUserFromList = `DELETE FROM alist_labels WHERE user_uuid=? AND label=?`
+	SqlInserListLabel            = "INSERT INTO alist_labels(label, user_uuid, alist_uuid) VALUES (?, ?, ?);"
+	SqlInserUserLabel            = `INSERT INTO user_labels(label, user_uuid) VALUES (?, ?);`
+	SqlGetListsByUserAndLabel    = `
+SELECT
+	DISTINCT(alist_uuid)
+FROM
+	alist_labels
+WHERE
+	user_uuid=?
+AND
+	label=?
+`
+	SqlGetUserLabels = `
+SELECT
+	label
+FROM
+	user_labels
+WHERE
+	user_uuid=?
+UNION
+SELECT
+	label
+FROM
+	alist_labels
+WHERE
+	user_uuid=?
+`
 )
 
 func NewLabel(db *sqlx.DB) label.LabelReadWriter {
@@ -62,19 +86,9 @@ func (store *store) PostAlistLabel(input label.AlistLabel) (int, error) {
 }
 
 func (store *store) GetUniqueListsByUserAndLabel(label string, user string) ([]string, error) {
-	queryForUuids := `
-SELECT
-	DISTINCT(alist_uuid)
-FROM
-	alist_labels
-WHERE
-	user_uuid=?
-AND
-	label=?
-`
-	fmt.Println("GetUniqueListsByUserAndLabel", label, user)
+
 	var uuids = []string{}
-	err := store.db.Select(&uuids, queryForUuids, user, label)
+	err := store.db.Select(&uuids, SqlGetListsByUserAndLabel, user, label)
 	if err != nil {
 		return uuids, err
 	}
@@ -84,16 +98,7 @@ AND
 func (store *store) GetUserLabels(uuid string) ([]string, error) {
 	var labels = []string{}
 
-	query := `
-SELECT label
-FROM user_labels
-WHERE user_uuid=?
-UNION
-SELECT label
-FROM alist_labels
-WHERE user_uuid=?
-`
-	err := store.db.Select(&labels, query, uuid, uuid)
+	err := store.db.Select(&labels, SqlGetUserLabels, uuid, uuid)
 	if err != nil {
 		return labels, err
 	}
@@ -105,8 +110,8 @@ func (store *store) RemoveUserLabel(label string, user string) error {
 	// Update each of them by removin the label in question.
 	// TODO MustExec will crash the server
 	tx := store.db.MustBegin()
-	tx.MustExec(SQL_LABEL_USER_DELETE_USER, user, label)
-	tx.MustExec(SQL_LABEL_USER_DELETE_LIST, user, label)
+	tx.MustExec(SqlDeleteLabelByUser, user, label)
+	tx.MustExec(SqlDeleteLabelByUserFromList, user, label)
 	return tx.Commit()
 }
 
@@ -116,7 +121,7 @@ func (store *store) RemoveLabelsForAlist(uuid string) error {
 	}
 
 	tx := store.db.MustBegin()
-	tx.MustExec(SQL_LABEL_DELETE_BY_LIST, uuid)
+	tx.MustExec(SqlDeleteLabelByList, uuid)
 	err := tx.Commit()
 	return err
 }
