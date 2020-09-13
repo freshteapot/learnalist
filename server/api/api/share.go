@@ -44,7 +44,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 
 	aList, err := m.Datastore.GetAlist(input.AlistUUID)
 	if err != nil {
-		if err.Error() == i18n.SuccessAlistNotFound {
+		if err == i18n.ErrorListNotFound {
 			response := api.HttpResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
@@ -133,6 +133,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
 	if aList.Uuid == "" {
+		// TODO this could be a db issue
 		response := api.HttpResponseMessage{
 			Message: i18n.SuccessAlistNotFound,
 		}

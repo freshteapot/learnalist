@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/label"
 	apiUser "github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
@@ -57,6 +58,14 @@ func (dal *DAL) RemoveUserLabel(label string, user string) error {
 
 	for _, uuid := range uuids {
 		aList, err = dal.alist.GetAlist(uuid)
+		if err != nil {
+			if err == i18n.ErrorListNotFound {
+				continue
+			}
+			// TODO this is not ideal
+			panic(err)
+		}
+
 		found := utils.StringArrayIndexOf(aList.Info.Labels, label)
 		if found != -1 {
 			cleaned := []string{}

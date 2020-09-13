@@ -317,6 +317,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 		json.Unmarshal(data, &raw)
 		assert.Equal(raw["message"].(string), i18n.SuccessAlistNotFound)
 	})
+
 	It("only owner of the list can alter it", func() {
 
 		var raw map[string]interface{}

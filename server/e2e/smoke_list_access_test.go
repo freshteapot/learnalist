@@ -44,7 +44,8 @@ var _ = Describe("Smoke list access", func() {
 		assert.Equal(httpResponse.StatusCode, http.StatusOK)
 		assert.True(strings.Contains(string(httpResponse.Body), "Please refresh"))
 		fmt.Println(">> A human wait, should have contents")
-		time.Sleep(1000 * time.Millisecond)
+		// TODO I wonder how to make this more reliable
+		time.Sleep(2000 * time.Millisecond)
 
 		httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
 		assert.NoError(err)

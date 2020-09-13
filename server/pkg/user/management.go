@@ -34,11 +34,12 @@ func (m management) DeleteUser(userUUID string) error {
 
 	// Remove from the site
 	for _, listUUID := range lists {
-		fmt.Printf("Remove list %s from static site\n", listUUID)
+		// fmt.Printf("Remove list %s from static site\n", listUUID)
 		m.site.DeleteList(listUUID)
-		fmt.Printf("Remove list %sfrom db \n", listUUID)
+		// fmt.Printf("Remove list %s from db\n", listUUID)
 		err = m.storage.DeleteList(listUUID)
 		if err != nil {
+			fmt.Println("DeleteUser", err)
 			return err
 		}
 	}
