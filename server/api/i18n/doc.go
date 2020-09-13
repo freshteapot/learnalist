@@ -66,4 +66,5 @@ var (
 	ErrorInputSaveAlistOperationFromModify      = errors.New(InputSaveAlistOperationFromModify)
 	ErrorAListFromDomainMisMatch                = errors.New("In info.from, the domain doesnt match the kind")
 	ErrorValidationWarningLabelNotEmpty         = errors.New("The label cannot be empty.")
+	ErrorListNotFound                           = errors.New("list.not.found")
 )

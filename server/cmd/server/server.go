@@ -93,7 +93,7 @@ var ServerCmd = &cobra.Command{
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		labels := labelStorage.NewLabel(db)
-		storageAlist := alistStorage.NewAlist(db)
+		storageAlist := alistStorage.NewAlist(db, logger)
 		storageApiUser := apiUserStorage.NewUser(db)
 		dal := models.NewDAL(
 			acl,

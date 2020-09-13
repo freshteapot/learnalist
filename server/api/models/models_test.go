@@ -12,6 +12,7 @@ import (
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -26,6 +27,7 @@ type ModelSuite struct {
 }
 
 func (suite *ModelSuite) SetupSuite() {
+	logger, _ := test.NewNullLogger()
 	db = database.NewTestDB()
 	acl := aclStorage.NewAcl(db)
 	userSession := userStorage.NewUserSession(db)
@@ -33,7 +35,7 @@ func (suite *ModelSuite) SetupSuite() {
 	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
-	storageAlist := alistStorage.NewAlist(db)
+	storageAlist := alistStorage.NewAlist(db, logger)
 	storageApiUser := apiUserStorage.NewUser(db)
 	dal = models.NewDAL(
 		acl,

@@ -3,13 +3,12 @@ package sqlite
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/sirupsen/logrus"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/jmoiron/sqlx"
@@ -30,13 +29,22 @@ type GetListsByUserWithFiltersArgs struct {
 }
 
 type store struct {
-	db *sqlx.DB
+	db  *sqlx.DB
+	log logrus.FieldLogger
 }
 
 const (
-	SqlInsertList              = `INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)`
-	SqlUpdateList              = `UPDATE alist_kv SET list_type=?, body=?, user_uuid=? WHERE uuid=?`
-	SqlGetItemByUUID           = `SELECT uuid, body, user_uuid, list_type FROM alist_kv WHERE uuid = ?`
+	SqlInsertList        = `INSERT INTO alist_kv(uuid, list_type, body, user_uuid) values(?, ?, ?, ?)`
+	SqlUpdateList        = `UPDATE alist_kv SET list_type=?, body=?, user_uuid=? WHERE uuid=?`
+	SqlGetItemByUUID     = `SELECT uuid, body, user_uuid, list_type FROM alist_kv WHERE uuid = ?`
+	SqlGetAllListsByUser = `
+SELECT
+	json_extract(body, '$.info.title') AS title,
+	uuid
+FROM
+	alist_kv
+WHERE
+	user_uuid=?`
 	SqlDeleteItemByUserAndUUID = `
 DELETE
 FROM
@@ -63,9 +71,10 @@ WHERE
 	`
 )
 
-func NewAlist(db *sqlx.DB) alist.DatastoreAlists {
+func NewAlist(db *sqlx.DB, log logrus.FieldLogger) alist.DatastoreAlists {
 	return &store{
-		db: db,
+		db:  db,
+		log: log,
 	}
 }
 
@@ -121,8 +130,10 @@ func (store *store) GetListsByUserWithFilters(uuid string, labels string, listTy
 	query = store.db.Rebind(query)
 	rows, err := store.db.Queryx(query, args...)
 	if err != nil {
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserWithFilters"))
-		log.Println(err)
+		store.log.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "GetListsByUserWithFilters",
+		}).Error(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserWithFilters"))
 	}
 
 	for rows.Next() {
@@ -140,11 +151,13 @@ func (store *store) GetAlist(uuid string) (alist.Alist, error) {
 	err := store.db.Get(&row, SqlGetItemByUUID, uuid)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return aList, errors.New(i18n.SuccessAlistNotFound)
+			return aList, i18n.ErrorListNotFound
 		}
+		store.log.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "GetAlist",
+		}).Error(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetListsByUserWithFilters"))
 
-		log.Println(fmt.Sprintf(i18n.InternalServerErrorTalkingToDatabase, "GetAlist"))
-		log.Println(err)
 		return aList, err
 	}
 
@@ -154,16 +167,7 @@ func (store *store) GetAlist(uuid string) (alist.Alist, error) {
 
 func (store *store) GetAllListsByUser(userUUID string) []alist.ShortInfo {
 	lists := make([]alist.ShortInfo, 0)
-	query := `
-SELECT
-	json_extract(body, '$.info.title') AS title,
-	uuid
-FROM
-	alist_kv
-WHERE
-	user_uuid=?`
-
-	err := store.db.Select(&lists, query, userUUID)
+	err := store.db.Select(&lists, SqlGetAllListsByUser, userUUID)
 	if err != nil {
 		fmt.Println(err)
 		panic("...")
@@ -191,11 +195,16 @@ func (store *store) SaveAlist(method string, aList alist.Alist) (alist.Alist, er
 	jsonAlist := string(jsonBytes)
 
 	if method == http.MethodPost {
-		// dal.Alist().Insert(aList)
 		_, err = store.db.Exec(SqlInsertList, aList.Uuid, aList.Info.ListType, jsonAlist, aList.User.Uuid)
 	} else {
 		_, err = store.db.Exec(SqlUpdateList, aList.Info.ListType, jsonAlist, aList.User.Uuid, aList.Uuid)
 	}
+
+	if err != nil {
+		fmt.Println(err)
+		panic("Failed to save list")
+	}
+
 	return aList, nil
 }
 
