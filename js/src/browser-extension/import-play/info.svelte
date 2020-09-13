@@ -1,10 +1,5 @@
 <script>
   // TODO do I care how often they hit save?
-  // TODO this is not being saved, I suspect due to openapi
-
-  // Could store a list with the relationships
-  // {"kind", "cram", "ext_uuid": "setID", "uuid": ""}
-
   import { push } from "svelte-spa-router";
   import LoginModal from "../../components/login_modal.svelte";
   import { loggedIn, notify } from "../../shared.js";
