@@ -77,7 +77,3 @@ func getValidUserRegisterInput(which string) string {
 
 	return `{"username":"iamusera", "password":"test123"}`
 }
-
-func cleanEchoResponse(rec *httptest.ResponseRecorder) string {
-	return strings.TrimSuffix(string(rec.Body.Bytes()), "\n")
-}

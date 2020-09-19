@@ -61,7 +61,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 			m.V1GetListsByMe(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoResponse(rec)).To(Equal(`[]`))
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`[]`))
 		})
 	})
 
@@ -81,7 +81,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 			m.V1GetListByUUID(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"The uuid is missing."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "The uuid is missing.")
 		})
 
 		When("Request is valid", func() {
@@ -142,7 +142,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 				datastore.On("GetAlist", alistUUID).Return(aList, nil)
 				m.V1GetListByUUID(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`{"data":[],"info":{"title":"","type":"v1","labels":[],"interact":{"slideshow":0,"totalrecall":0},"shared_with":"private"},"uuid":"fake-list-123"}`))
 			})
 		})
 	})

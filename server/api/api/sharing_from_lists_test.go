@@ -115,7 +115,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			response := cleanEchoResponse(rec)
+			response := testutils.CleanEchoResponseFromResponseRecorder(rec)
 			Expect(response).To(Equal(input))
 		})
 	})

@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 
@@ -68,21 +69,21 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(i18n.ErrorListNotFound)
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List not found.")
 		})
 
 		It("Only the owner of the list can remove it", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New(i18n.InputDeleteAlistOperationOwnerOnly))
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Only the owner of the list can remove it."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Only the owner of the list can remove it.")
 		})
 
 		It("An error occurred whilst trying to remove the list", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New("Fail"))
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"We have failed to remove your list."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "We have failed to remove your list.")
 		})
 
 		It("Successfully removed a list", func() {
@@ -91,7 +92,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List fake-list-123 was removed."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List fake-list-123 was removed.")
 		})
 	})
 })

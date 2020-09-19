@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/gomega"
@@ -24,6 +25,14 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 	return &http.Client{
 		Transport: RoundTripFunc(fn),
 	}
+}
+
+func CleanEchoResponseFromResponseRecorder(rec *httptest.ResponseRecorder) string {
+	return strings.TrimSuffix(string(rec.Body.Bytes()), "\n")
+}
+
+func CleanEchoResponseFromByte(data []byte) string {
+	return strings.TrimSuffix(string(data), "\n")
 }
 
 func CheckMessageResponse(response api.HttpResponse, expect string) {

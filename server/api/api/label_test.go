@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -56,7 +57,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Your input is invalid json.")
 			})
 
 			It("Valid json, invalid input", func() {
@@ -73,7 +74,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on label(s)"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Please refer to the documentation on label(s)")
 			})
 
 			It("Valid input, failed to save", func() {
@@ -90,7 +91,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 
 			Context("Success, label saved", func() {
@@ -109,7 +110,7 @@ var _ = Describe("Testing Label endpoints", func() {
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusCreated))
-					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["I am a label"]`))
 				})
 
 				It("Its already in the system", func() {
@@ -127,7 +128,7 @@ var _ = Describe("Testing Label endpoints", func() {
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusOK))
-					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["I am a label"]`))
 				})
 			})
 		})
@@ -170,7 +171,7 @@ var _ = Describe("Testing Label endpoints", func() {
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`[]`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`[]`))
 			})
 
 			It("User with labels", func() {
@@ -183,14 +184,14 @@ var _ = Describe("Testing Label endpoints", func() {
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`["wind","water","fire","earth"]`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["wind","water","fire","earth"]`))
 			})
 
 			It("Something went wrong getting the data from the storage", func() {
 				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 		})
 
@@ -237,7 +238,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(errors.New("Failed"))
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 
 			It("Successfully removed a label", func() {
@@ -254,7 +255,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(nil)
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Label test was removed."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Label test was removed.")
 			})
 		})
 	})
