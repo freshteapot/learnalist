@@ -28,7 +28,7 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 }
 
 func CleanEchoResponseFromResponseRecorder(rec *httptest.ResponseRecorder) string {
-	return strings.TrimSuffix(string(rec.Body.Bytes()), "\n")
+	return CleanEchoResponseFromByte(rec.Body.Bytes())
 }
 
 func CleanEchoResponseFromByte(data []byte) string {
