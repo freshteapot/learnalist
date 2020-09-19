@@ -22,7 +22,7 @@ nmap XXX.XXX.XXX.XXX
 - dont install traefik, we are going to use nginx-ingress
 
 ```sh
-curl -sLS https://get.k3s.io | INSTALL_K3S_EXEC='server --tls-san 127.0.0.1 --no-deploy servicelb --no-deploy traefik' sh -
+curl -sLS https://get.k3s.io | INSTALL_K3S_EXEC='server --bind-address 127.0.0.1 --tls-san 127.0.0.1 --no-deploy servicelb --no-deploy traefik' sh -
 ```
 
 ## Add server ip as path to registry.devbox in /etc/hosts
