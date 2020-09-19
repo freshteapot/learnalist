@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -126,7 +127,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 
 			It("PUT, fail, due to list uuid not being found", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],
@@ -154,7 +155,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 
 			It("PUT, fail, due to list uuid not being found", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],
@@ -178,12 +179,12 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusNotFound))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ErrorListNotFound.Error())
 			})
 
 			It("PUT, fail, due to uuid in uri not matching in the list", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],

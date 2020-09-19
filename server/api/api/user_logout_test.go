@@ -8,6 +8,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -36,7 +37,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 			c := e.NewContext(req, rec)
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			CheckMessageResponse(rec, i18n.ApiUserLogoutError)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiUserLogoutError)
 		})
 
 		It("Validating the input paths", func() {
@@ -74,7 +75,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 				c := e.NewContext(req, rec)
 				m.V1PostLogout(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				CheckMessageResponse(rec, i18n.ApiUserLogoutError)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiUserLogoutError)
 			}
 		})
 	})
@@ -109,7 +110,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			CheckMessageResponse(rec, "Session fake-token-123, is now logged out")
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Session fake-token-123, is now logged out")
 		})
 
 		It("Remove all sessions for a user", func() {
@@ -131,7 +132,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			CheckMessageResponse(rec, "All sessions have been logged out for user fake-user-123")
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "All sessions have been logged out for user fake-user-123")
 		})
 
 		It("Token doesnt exist", func() {
@@ -151,7 +152,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			CheckMessageResponse(rec, i18n.AclHttpAccessDeny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.AclHttpAccessDeny)
 		})
 
 		It("Token lookup failed due to the database possibly", func() {
@@ -171,7 +172,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			CheckMessageResponse(rec, i18n.InternalServerErrorFunny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
 
 		It("User linked to the token is not the one in the payload", func() {
@@ -191,7 +192,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			CheckMessageResponse(rec, i18n.AclHttpAccessDeny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.AclHttpAccessDeny)
 		})
 
 		It("Database issued when removing the sessions", func() {
@@ -213,7 +214,8 @@ var _ = Describe("Testing user logout endpoint", func() {
 
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			CheckMessageResponse(rec, i18n.InternalServerErrorFunny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+
 		})
 	})
 

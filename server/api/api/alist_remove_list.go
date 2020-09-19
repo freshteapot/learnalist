@@ -17,6 +17,7 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 
 	err := m.Datastore.RemoveAlist(alistUUID, user.Uuid)
 	if err != nil {
+		fmt.Println(err)
 		if err == i18n.ErrorListNotFound {
 			response := api.HttpResponseMessage{
 				Message: i18n.SuccessAlistNotFound,

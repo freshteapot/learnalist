@@ -8,7 +8,6 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
-	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/gomega"
 )
@@ -81,10 +80,4 @@ func getValidUserRegisterInput(which string) string {
 
 func cleanEchoResponse(rec *httptest.ResponseRecorder) string {
 	return strings.TrimSuffix(string(rec.Body.Bytes()), "\n")
-}
-
-func CheckMessageResponse(rec *httptest.ResponseRecorder, expect string) {
-	var response api.HttpResponseMessage
-	json.Unmarshal(rec.Body.Bytes(), &response)
-	Expect(response.Message).To(Equal(expect))
 }

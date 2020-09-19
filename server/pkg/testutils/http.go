@@ -1,9 +1,12 @@
 package testutils
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	. "github.com/onsi/gomega"
@@ -27,6 +30,20 @@ func CheckMessageResponse(response api.HttpResponse, expect string) {
 	var obj api.HttpResponseMessage
 	json.Unmarshal(response.Body, &obj)
 	Expect(obj.Message).To(Equal(expect))
+}
+
+func CheckMessageResponseFromReader(body io.Reader, expect string) {
+	data, err := ioutil.ReadAll(body)
+	Expect(err).To(BeNil())
+
+	var response api.HttpResponseMessage
+	json.Unmarshal(data, &response)
+	Expect(response.Message).To(Equal(expect))
+}
+
+func CheckMessageResponseFromResponseRecorder(rec *httptest.ResponseRecorder, expect string) {
+	reader := bytes.NewReader(rec.Body.Bytes())
+	CheckMessageResponseFromReader(reader, expect)
 }
 
 func ToHttpResponse(response *http.Response, err error) (api.HttpResponse, error) {

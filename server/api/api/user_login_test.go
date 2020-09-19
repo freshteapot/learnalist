@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 
 	"github.com/labstack/echo/v4"
@@ -38,7 +39,7 @@ var _ = Describe("Testing user login endpoint", func() {
 			c := e.NewContext(req, rec)
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			CheckMessageResponse(rec, i18n.ApiUserLoginError)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiUserLoginError)
 		})
 
 		It("Invalid password", func() {
@@ -49,7 +50,7 @@ var _ = Describe("Testing user login endpoint", func() {
 
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			CheckMessageResponse(rec, i18n.ApiUserLoginError)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiUserLoginError)
 		})
 
 		It("Invalid username", func() {
@@ -64,7 +65,7 @@ var _ = Describe("Testing user login endpoint", func() {
 				c := e.NewContext(req, rec)
 				m.V1PostLogin(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				CheckMessageResponse(rec, i18n.ApiUserLoginError)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiUserLoginError)
 			}
 		})
 	})
@@ -113,7 +114,7 @@ var _ = Describe("Testing user login endpoint", func() {
 
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			CheckMessageResponse(rec, i18n.AclHttpAccessDeny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.AclHttpAccessDeny)
 		})
 
 		It("Failed to create a user session", func() {
@@ -130,7 +131,7 @@ var _ = Describe("Testing user login endpoint", func() {
 
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			CheckMessageResponse(rec, i18n.InternalServerErrorFunny)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
 	})
 

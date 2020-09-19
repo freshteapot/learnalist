@@ -98,7 +98,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 	if method == http.MethodPut {
 		current, _ := dal.alist.GetAlist(aList.Uuid)
 		if current.Uuid == "" {
-			return emptyAlist, errors.New(i18n.SuccessAlistNotFound)
+			return emptyAlist, i18n.ErrorListNotFound
 		}
 
 		if current.User.Uuid != aList.User.Uuid {

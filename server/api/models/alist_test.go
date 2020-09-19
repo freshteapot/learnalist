@@ -146,7 +146,7 @@ func (suite *ModelSuite) TestSaveAListViaPutWithNotFoundUuid() {
 	aList.UnmarshalJSON([]byte(a))
 	aList.User.Uuid = userUUID
 	aList, err := dal.SaveAlist(http.MethodPut, aList)
-	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
+	suite.Equal(i18n.ErrorListNotFound, err)
 }
 
 func (suite *ModelSuite) TestSaveAListEmptyList() {
@@ -186,7 +186,7 @@ INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f
 	err = dal.RemoveAlist(alistUUID, userUUID)
 	suite.Nil(err)
 	_, err = dal.GetAlist(alistUUID)
-	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
+	suite.Equal(i18n.ErrorListNotFound, err)
 }
 
 func (suite *ModelSuite) TestGetListsByUserWithFilters() {

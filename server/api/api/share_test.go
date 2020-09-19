@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -117,7 +118,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 
 			m.V1ShareListReadAccess(c)
 
@@ -323,7 +324,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 
 			m.V1ShareAlist(c)
 
@@ -384,7 +385,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				CheckMessageResponse(rec, i18n.ApiShareListSuccessWithPublic)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiShareListSuccessWithPublic)
 			})
 
 			It("Privately", func() {

@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 
@@ -108,14 +109,14 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 				acl.On("HasUserListReadAccess", alistUUID, user.Uuid).Return(false, errors.New("Error"))
 				m.V1GetListByUUID(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				CheckMessageResponse(rec, i18n.InternalServerErrorAclLookup)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorAclLookup)
 			})
 
 			It("You do not have access to the list", func() {
 				acl.On("HasUserListReadAccess", alistUUID, user.Uuid).Return(false, nil)
 				m.V1GetListByUUID(c)
 				Expect(rec.Code).To(Equal(http.StatusForbidden))
-				CheckMessageResponse(rec, i18n.AclHttpAccessDeny)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.AclHttpAccessDeny)
 			})
 
 			// With the look up of access before, this one doesnt fully make sense anymore.
@@ -124,7 +125,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 				datastore.On("GetAlist", alistUUID).Return(alist.Alist{}, errors.New("Trigger"))
 				m.V1GetListByUUID(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				CheckMessageResponse(rec, i18n.InternalServerErrorFunny)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 			})
 
 			It("Has access via acl, but list not found", func() {
@@ -132,7 +133,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 				datastore.On("GetAlist", alistUUID).Return(alist.Alist{}, i18n.ErrorListNotFound)
 				m.V1GetListByUUID(c)
 				Expect(rec.Code).To(Equal(http.StatusNotFound))
-				CheckMessageResponse(rec, fmt.Sprintf(i18n.ApiAlistNotFound, alistUUID))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, fmt.Sprintf(i18n.ApiAlistNotFound, alistUUID))
 				Expect(hook.LastEntry().Data["event"]).To(Equal("broken-state"))
 			})
 

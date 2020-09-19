@@ -11,6 +11,7 @@ import (
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -90,7 +91,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 				m.V1ShareListReadAccess(c)
 
 				Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
-				CheckMessageResponse(rec, i18n.InputSaveAlistOperationFromRestriction)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InputSaveAlistOperationFromRestriction)
 			})
 		})
 
@@ -157,7 +158,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusForbidden))
-				CheckMessageResponse(rec, i18n.InputSaveAlistOperationFromRestriction)
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InputSaveAlistOperationFromRestriction)
 			})
 		})
 
@@ -193,7 +194,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			CheckMessageResponse(rec, i18n.ApiShareListSuccessWithPublic)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiShareListSuccessWithPublic)
 		})
 	})
 
@@ -240,7 +241,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			datastore.On("SaveAlist", http.MethodPut, aList).Return(aList, i18n.ErrorInputSaveAlistOperationFromRestriction)
 			m.V1SaveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
-			CheckMessageResponse(rec, i18n.InputSaveAlistOperationFromRestriction)
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InputSaveAlistOperationFromRestriction)
 		})
 
 		// TODO when is learnalist

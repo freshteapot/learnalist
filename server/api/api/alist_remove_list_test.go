@@ -65,7 +65,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 
 	When("Remove a list", func() {
 		It("List being removed is not found", func() {
-			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(i18n.ErrorListNotFound)
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
 			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
