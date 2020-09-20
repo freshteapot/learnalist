@@ -9,9 +9,11 @@
 
   let aList;
   let show = "";
+  let assumeFailedToFindList = null;
 
   onMount(async () => {
-    handle();
+    listenForMessagesFromBrowser();
+    checkForLists();
   });
 
   function learnalistToAlist(input) {
@@ -70,13 +72,15 @@
     };
   }
 
-  function handle(event) {
+  function listenForMessagesFromBrowser() {
     chrome.runtime.onMessageExternal.addListener(function(
       request,
       sender,
       sendResponse
     ) {
       try {
+        clearTimeout(assumeFailedToFindList);
+        assumeFailedToFindList = null;
         if (request.kind == "quizlet") {
           aList = quizletToAlist(request);
         }
@@ -96,7 +100,6 @@
         aList = aList;
 
         document.querySelector("#play-data").innerHTML = JSON.stringify(aList);
-
         if (aList) {
           store.load(aList);
           push("/overview");
@@ -105,7 +108,9 @@
         show = "not-supported";
       }
     });
+  }
 
+  function checkForLists() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       const load =
         tabs[0].url.includes("cram.com") ||
@@ -121,23 +126,36 @@
 
       show = "";
       chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" });
+      assumeFailedToFindList = setTimeout(() => {
+        show = "welcome";
+      }, 100);
     });
   }
 </script>
 
-<button class="br3" on:click={() => push('/settings')}>Settings</button>
-
 {#if show == 'welcome'}
+  <button class="br3" on:click={() => push('/settings')}>Settings</button>
+
   <h1>Welcome!</h1>
-  <p>We will only try and load from</p>
+  <p>We will only try and load lists from</p>
   <ul class="list">
-    <li>quizlet.com</li>
-    <li>cram.com</li>
-    <li>brainscape.com</li>
-    <li>learnalist.net</li>
+    <li>
+      <a href="https://quizlet.com" target="_blank">quizlet.com</a>
+    </li>
+    <li>
+      <a href="https://cram.com" target="_blank">cram.com</a>
+    </li>
+    <li>
+      <a href="https://brainscape.com" target="_blank">brainscape.com</a>
+    </li>
+    <li>
+      <a href="https://learnalist.net" target="_blank">learnalist.net</a>
+    </li>
   </ul>
 {/if}
 
 {#if show == 'not-supported'}
-  <p>Content on the page not supported</p>
+  <button class="br3" on:click={() => push('/settings')}>Settings</button>
+  <p>We were unable to find a list on this page.</p>
+  <p>Do you think this is a bug? Let us know</p>
 {/if}

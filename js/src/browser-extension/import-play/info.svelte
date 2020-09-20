@@ -49,7 +49,7 @@
 {/if}
 
 {#if show == 'overview'}
-  <header>
+  <header class="w-100">
     <h1 class="tc">{aList.info.title}</h1>
   </header>
 
