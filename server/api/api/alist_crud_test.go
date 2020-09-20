@@ -102,7 +102,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 			})
 
 			It("Post, fail, due to ownership", func() {
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.InputSaveAlistOperationOwnerOnly))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, i18n.ErrorInputSaveAlistOperationOwnerOnly)
 				input := `
       {
       	"data": ["car"],

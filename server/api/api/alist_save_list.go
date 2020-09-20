@@ -71,20 +71,14 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		case i18n.ErrorListNotFound:
 			response.Message = i18n.SuccessAlistNotFound
 			return c.JSON(http.StatusNotFound, response)
-		case i18n.ErrorInputSaveAlistOperationOwnerOnly: // Maybe move this to 422
-			fallthrough
+		case i18n.ErrorInputSaveAlistOperationOwnerOnly:
+			return c.JSON(http.StatusForbidden, response)
 		case i18n.ErrorAListFromDomainMisMatch:
 			fallthrough
 		case i18n.ErrorInputSaveAlistOperationFromRestriction:
 			fallthrough
 		case i18n.ErrorInputSaveAlistFromKindNotSupported:
 			return c.JSON(http.StatusUnprocessableEntity, response)
-		}
-
-		// This is a little ugly
-		switch err.Error() {
-		case i18n.InputSaveAlistOperationOwnerOnly: // Maybe move this to 422
-			return c.JSON(http.StatusForbidden, response)
 		default:
 			return c.JSON(http.StatusBadRequest, response)
 		}
