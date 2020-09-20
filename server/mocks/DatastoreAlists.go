@@ -81,13 +81,13 @@ func (_m *DatastoreAlists) GetPublicLists() []alist.ShortInfo {
 	return r0
 }
 
-// RemoveAlist provides a mock function with given fields: alist_uuid, user_uuid
-func (_m *DatastoreAlists) RemoveAlist(alist_uuid string, user_uuid string) error {
-	ret := _m.Called(alist_uuid, user_uuid)
+// RemoveAlist provides a mock function with given fields: alistUUID, userUUID
+func (_m *DatastoreAlists) RemoveAlist(alistUUID string, userUUID string) error {
+	ret := _m.Called(alistUUID, userUUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(alist_uuid, user_uuid)
+		r0 = rf(alistUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}
