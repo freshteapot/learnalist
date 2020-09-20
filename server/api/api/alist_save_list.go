@@ -71,6 +71,8 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		case i18n.ErrorListNotFound:
 			response.Message = i18n.SuccessAlistNotFound
 			return c.JSON(http.StatusNotFound, response)
+		case i18n.ErrorInputSaveAlistOperationOwnerOnly: // Maybe move this to 422
+			fallthrough
 		case i18n.ErrorAListFromDomainMisMatch:
 			fallthrough
 		case i18n.ErrorInputSaveAlistOperationFromRestriction:
