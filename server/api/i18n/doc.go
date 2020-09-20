@@ -64,6 +64,7 @@ var (
 	ErrorInputSaveAlistFromKindNotSupported     = errors.New(InputSaveAlistOperationFromKindNotSupported)
 	ErrorInputSaveAlistOperationFromRestriction = errors.New(InputSaveAlistOperationFromRestriction)
 	ErrorInputSaveAlistOperationFromModify      = errors.New(InputSaveAlistOperationFromModify)
+	ErrorInputSaveAlistOperationOwnerOnly       = errors.New(InputSaveAlistOperationOwnerOnly)
 	ErrorAListFromDomainMisMatch                = errors.New("In info.from, the domain doesnt match the kind")
 	ErrorValidationWarningLabelNotEmpty         = errors.New("The label cannot be empty.")
 	ErrorListNotFound                           = errors.New("list.not.found")

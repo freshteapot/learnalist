@@ -311,39 +311,29 @@ var _ = Describe("Testing with Ginkgo", func() {
 	})
 
 	It("only owner of the list can alter it", func() {
-
-		var raw map[string]interface{}
-		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)
 		userInfoOwner := learnalistClient.Register(usernameOwner, password)
 		userInfoReader := learnalistClient.Register(usernameReader, password)
 
 		aList, err := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-		assert.NoError(err)
-		assert.NotEmpty(aList.Uuid)
+		Expect(err).To(BeNil())
+		Expect(aList.Uuid).To(Not(BeEmpty()))
 
 		b, _ := json.Marshal(aList)
 		resp, err := learnalistClient.RawPutListV1(userInfoOwner, aList.Uuid, string(b))
-		assert.NoError(err)
-		assert.Equal(resp.StatusCode, http.StatusOK)
+		Expect(err).To(BeNil())
+		Expect(resp.StatusCode, http.StatusOK)
 
 		resp, err = learnalistClient.RawPutListV1(userInfoReader, aList.Uuid, string(b))
-		assert.NoError(err)
-		assert.Equal(resp.StatusCode, http.StatusForbidden)
-
 		defer resp.Body.Close()
-		data, err := ioutil.ReadAll(resp.Body)
-		assert.NoError(err)
-		json.Unmarshal(data, &raw)
-		assert.Equal(raw["message"].(string), i18n.InputSaveAlistOperationOwnerOnly)
+		Expect(err).To(BeNil())
+		Expect(resp.StatusCode, http.StatusForbidden)
+		testutils.CheckMessageResponseFromReader(resp.Body, i18n.InputSaveAlistOperationOwnerOnly)
 
 		resp, err = learnalistClient.RawDeleteListV1(userInfoReader, aList.Uuid)
-		assert.NoError(err)
-		assert.Equal(resp.StatusCode, http.StatusForbidden)
 		defer resp.Body.Close()
-		data, err = ioutil.ReadAll(resp.Body)
-		assert.NoError(err)
-		json.Unmarshal(data, &raw)
-		assert.Equal(raw["message"].(string), i18n.InputDeleteAlistOperationOwnerOnly)
+		Expect(err).To(BeNil())
+		Expect(resp.StatusCode, http.StatusForbidden)
+		testutils.CheckMessageResponseFromReader(resp.Body, i18n.InputDeleteAlistOperationOwnerOnly)
 	})
 })

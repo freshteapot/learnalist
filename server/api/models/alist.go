@@ -102,7 +102,7 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 		}
 
 		if current.User.Uuid != aList.User.Uuid {
-			return emptyAlist, errors.New(i18n.InputSaveAlistOperationOwnerOnly)
+			return emptyAlist, i18n.ErrorInputSaveAlistOperationOwnerOnly
 		}
 
 		if !alist.WithFromCanUpdate(aList.Info, current.Info) {
