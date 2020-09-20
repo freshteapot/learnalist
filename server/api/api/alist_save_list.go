@@ -69,6 +69,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 		switch err {
 		case i18n.ErrorListNotFound:
+			response.Message = i18n.SuccessAlistNotFound
 			return c.JSON(http.StatusNotFound, response)
 		case i18n.ErrorAListFromDomainMisMatch:
 			fallthrough

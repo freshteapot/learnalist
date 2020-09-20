@@ -179,7 +179,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusNotFound))
-				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ErrorListNotFound.Error())
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.SuccessAlistNotFound)
 			})
 
 			It("PUT, fail, due to uuid in uri not matching in the list", func() {
