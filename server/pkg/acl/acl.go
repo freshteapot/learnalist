@@ -4,8 +4,11 @@ type Acl interface {
 	AclWriter
 	AclReader
 }
-
 type AclWriter interface {
+	AclWriterList
+}
+
+type AclWriterList interface {
 	// Grant a user access to write to a list
 	GrantUserListWriteAccess(alistUUID string, userUUID string) error
 	// Revoke access for a user to write to a list
