@@ -100,10 +100,11 @@
         aList = aList;
 
         document.querySelector("#play-data").innerHTML = JSON.stringify(aList);
-        if (aList) {
-          store.load(aList);
-          push("/overview");
+        if (!aList) {
+          throw "list.not.found";
         }
+        store.load(aList);
+        push("/overview");
       } catch (e) {
         show = "not-supported";
       }
@@ -133,29 +134,37 @@
   }
 </script>
 
-{#if show == 'welcome'}
-  <button class="br3" on:click={() => push('/settings')}>Settings</button>
+{#if show != ''}
+  <div class="flex flex-column">
+    <div class=" w-100 pa3 mr2">
+      <button class="br3" on:click={() => push('/settings')}>Settings</button>
+    </div>
+    {#if show == 'welcome'}
+      <div class=" w-100 pa3 mr2">
+        <h1>Welcome!</h1>
+        <p>We will only try and load lists from</p>
+        <ul class="list">
+          <li>
+            <a href="https://quizlet.com" target="_blank">quizlet.com</a>
+          </li>
+          <li>
+            <a href="https://cram.com" target="_blank">cram.com</a>
+          </li>
+          <li>
+            <a href="https://brainscape.com" target="_blank">brainscape.com</a>
+          </li>
+          <li>
+            <a href="https://learnalist.net" target="_blank">learnalist.net</a>
+          </li>
+        </ul>
+      </div>
+    {/if}
 
-  <h1>Welcome!</h1>
-  <p>We will only try and load lists from</p>
-  <ul class="list">
-    <li>
-      <a href="https://quizlet.com" target="_blank">quizlet.com</a>
-    </li>
-    <li>
-      <a href="https://cram.com" target="_blank">cram.com</a>
-    </li>
-    <li>
-      <a href="https://brainscape.com" target="_blank">brainscape.com</a>
-    </li>
-    <li>
-      <a href="https://learnalist.net" target="_blank">learnalist.net</a>
-    </li>
-  </ul>
-{/if}
-
-{#if show == 'not-supported'}
-  <button class="br3" on:click={() => push('/settings')}>Settings</button>
-  <p>We were unable to find a list on this page.</p>
-  <p>Do you think this is a bug? Let us know</p>
+    {#if show == 'not-supported'}
+      <div class=" w-100 pa3 mr2">
+        <p>We were unable to find a list on this page.</p>
+        <p>Do you think this is a bug? Let us know</p>
+      </div>
+    {/if}
+  </div>
 {/if}

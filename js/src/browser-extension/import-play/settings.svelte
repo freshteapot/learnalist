@@ -23,23 +23,27 @@
   }
 </script>
 
-<button class="br3" on:click={() => push('/start')}>Close</button>
+<div class="flex flex-column">
+  <div class=" w-100 pa3 mr2">
+    <button class="br3" on:click={() => push('/start')}>Close</button>
+  </div>
 
-<div>
-  <h1>Change server</h1>
-  <p>
-    You only need to change this if you are running your own learnalist server
-    or developing the chrome extension
-  </p>
-  <p>
-    <input bind:value={baseUrl} />
-  </p>
-  <button class="br3" on:click|preventDefault={handleSubmit}>Submit</button>
-</div>
+  <div class="w-100 pa3 mr2">
+    <h2>Change server</h2>
+    <p>
+      You only need to change this if you are running your own learnalist server
+      or developing the chrome extension
+    </p>
+    <p>
+      <input class="w-100 pa3 mr2" bind:value={baseUrl} />
+    </p>
+    <button class="br3" on:click|preventDefault={handleSubmit}>Submit</button>
+  </div>
 
-<div>
-  <h1>Reset to default settings</h1>
-  <p>
-    <button class="br3" on:click|preventDefault={handleReset}>Reset</button>
-  </p>
+  <div class=" w-100 pa3 mr2">
+    <h2>Reset to default settings</h2>
+    <p>
+      <button class="br3" on:click|preventDefault={handleReset}>Reset</button>
+    </p>
+  </div>
 </div>
