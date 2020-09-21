@@ -14,7 +14,7 @@
   async function findLearnalist(windows) {
     const config = await getConfig();
     const baseUrl = config.baseUrl;
-    console.log("in findLearnalist", baseUrl);
+
     const learnalistTab = windows[0].tabs.find(tab => {
       return tab.url.includes(baseUrl);
     });
@@ -28,7 +28,7 @@
     if (url.origin != baseUrl) {
       return;
     }
-    console.log("learnalistTab", learnalistTab);
+
     chrome.tabs.sendMessage(learnalistTab.id, { kind: "lookup-login-info" });
     /*
     // This does not load the data from the page
@@ -49,8 +49,6 @@
 
     const config = await getConfig();
     const baseUrl = config.baseUrl;
-    console.log(msg);
-    console.log(baseUrl);
 
     if (msg.kind == "learnalist-login-info") {
       if (sender.id != chrome.runtime.id) {
