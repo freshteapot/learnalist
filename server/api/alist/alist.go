@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 const (
@@ -33,12 +34,12 @@ type ShortInfo struct {
 
 // AlistInfo info about the list. Generic to all lists.
 type AlistInfo struct {
-	Title      string    `json:"title"`
-	ListType   string    `json:"type"`
-	Labels     []string  `json:"labels"`
-	From       string    `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
-	Interact   *Interact `json:"interact,omitempty"`
-	SharedWith string    `json:"shared_with"`
+	Title      string             `json:"title"`
+	ListType   string             `json:"type"`
+	Labels     []string           `json:"labels"`
+	From       *openapi.AlistFrom `json:"from,omitempty"` // If from is set, we return it, so the 3rd party has context.
+	Interact   *Interact          `json:"interact,omitempty"`
+	SharedWith string             `json:"shared_with"`
 }
 
 type Interact struct {
@@ -67,6 +68,13 @@ type AlistTypeMarshalJSON interface {
 
 // MarshalJSON convert alist into json
 func (a Alist) MarshalJSON() ([]byte, error) {
+	// Ugly logic to make sure we dont include empty from block if not in user
+	if a.Info.From != nil {
+		if a.Info.From.Kind == "" {
+			a.Info.From = nil
+		}
+	}
+
 	return json.Marshal(map[string]interface{}{
 		"uuid": a.Uuid,
 		"info": a.Info,
@@ -101,7 +109,7 @@ func (aList *Alist) UnmarshalJSON(data []byte) error {
 	}
 
 	jsonBytes, _ = json.Marshal(raw["info"])
-	aList.Info, err = parseAlistInfo(jsonBytes)
+	aList.Info, err = ParseAlistInfo(jsonBytes)
 	if err != nil {
 		err = errors.New("Failed to pass list. Something wrong with info object.")
 		return err

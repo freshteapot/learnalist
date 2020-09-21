@@ -78,31 +78,34 @@
 
 <svelte:options tag={null} accessors={true} />
 
-<header>
-  <button class="br3" on:click={handleClose}>Close</button>
-  <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
-  <h3>Click on the row you want to add</h3>
-</header>
+<div class="flex flex-column">
+  <div class=" w-100 pa3 mr2">
+    <header>
+      <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+      <button class="br3" on:click={handleClose}>Close</button>
+      <h3>Click on the row you want to add</h3>
+    </header>
+  </div>
 
-<div id="list-data">
-  <table class="w-100" cellspacing="0">
-    <thead>
-      <tr>
-        <th class="fw6 bb b--black-20 pb3 tl">From</th>
-        <th class="fw6 bb b--black-20 pb3 tl">To</th>
-      </tr>
-    </thead>
-    <tbody class="lh-copy">
-      {#each aList.data as item, index}
-        <tr data-index={index} on:click={edit}>
-          <td class="pv3 pr3 bb b--black-20">{item.from}</td>
-          <td class="pv3 pr3 bb b--black-20">{item.to}</td>
+  <div id="list-data" class=" w-100 pa3 mr2">
+    <table class="w-100" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="fw6 bb b--black-20 pb3 tl">From</th>
+          <th class="fw6 bb b--black-20 pb3 tl">To</th>
         </tr>
-      {/each}
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="lh-copy">
+        {#each aList.data as item, index}
+          <tr data-index={index} on:click={edit}>
+            <td class="pv3 pr3 bb b--black-20">{item.from}</td>
+            <td class="pv3 pr3 bb b--black-20">{item.to}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
 </div>
-
 <Modal {show} {state} on:add={add} on:close={close}>
   {#if state === 'edit'}
     <p>

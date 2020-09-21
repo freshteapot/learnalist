@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -21,15 +22,20 @@ var _ = Describe("Testing Label endpoints", func() {
 
 	When("/labels", func() {
 		Context("Posting", func() {
-			var datastore *mocks.Datastore
-			var acl *mocks.Acl
-			var user *uuid.User
-			var method string
-			var uri string
-			var e *echo.Echo
+			var (
+				datastore    *mocks.Datastore
+				acl          *mocks.Acl
+				labelStorage *mocks.LabelReadWriter
+				user         *uuid.User
+				method       string
+				uri          string
+				e            *echo.Echo
+			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
@@ -51,7 +57,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Your input is invalid json.")
 			})
 
 			It("Valid json, invalid input", func() {
@@ -64,11 +70,11 @@ var _ = Describe("Testing Label endpoints", func() {
 				c := e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
 
-				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusBadRequest, errors.New("Fail"))
+				labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusBadRequest, errors.New("Fail"))
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on label(s)"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Please refer to the documentation on label(s)")
 			})
 
 			It("Valid input, failed to save", func() {
@@ -81,11 +87,11 @@ var _ = Describe("Testing Label endpoints", func() {
 				c := e.NewContext(req, rec)
 				c.Set("loggedInUser", *user)
 
-				datastore.On("PostUserLabel", mock.Anything).Return(http.StatusInternalServerError, errors.New("Fail"))
+				labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusInternalServerError, errors.New("Fail"))
 				m.V1PostUserLabel(c)
 
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 
 			Context("Success, label saved", func() {
@@ -99,12 +105,12 @@ var _ = Describe("Testing Label endpoints", func() {
 					c := e.NewContext(req, rec)
 					c.Set("loggedInUser", *user)
 
-					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusCreated, nil)
-					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusCreated, nil)
+					labelStorage.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusCreated))
-					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["I am a label"]`))
 				})
 
 				It("Its already in the system", func() {
@@ -117,30 +123,33 @@ var _ = Describe("Testing Label endpoints", func() {
 					c := e.NewContext(req, rec)
 					c.Set("loggedInUser", *user)
 
-					datastore.On("PostUserLabel", mock.Anything).Return(http.StatusOK, nil)
-					datastore.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
+					labelStorage.On("PostUserLabel", mock.Anything).Return(http.StatusOK, nil)
+					labelStorage.On("GetUserLabels", mock.Anything).Return([]string{input.Label}, nil)
 					m.V1PostUserLabel(c)
 
 					Expect(rec.Code).To(Equal(http.StatusOK))
-					Expect(cleanEchoResponse(rec)).To(Equal(`["I am a label"]`))
+					Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["I am a label"]`))
 				})
 			})
 		})
 		Context("Get", func() {
 			var (
-				datastore *mocks.Datastore
-				acl       *mocks.Acl
-				user      *uuid.User
-				method    string
-				uri       string
-				req       *http.Request
-				rec       *httptest.ResponseRecorder
-				e         *echo.Echo
-				c         echo.Context
+				datastore    *mocks.Datastore
+				labelStorage *mocks.LabelReadWriter
+				acl          *mocks.Acl
+				user         *uuid.User
+				method       string
+				uri          string
+				req          *http.Request
+				rec          *httptest.ResponseRecorder
+				e            *echo.Echo
+				c            echo.Context
 			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
@@ -158,15 +167,15 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("User with no labels", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, nil)
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{}, nil)
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`[]`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`[]`))
 			})
 
 			It("User with labels", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{
 					"wind",
 					"water",
 					"fire",
@@ -175,32 +184,35 @@ var _ = Describe("Testing Label endpoints", func() {
 
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`["wind","water","fire","earth"]`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`["wind","water","fire","earth"]`))
 			})
 
 			It("Something went wrong getting the data from the storage", func() {
-				datastore.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
+				labelStorage.On("GetUserLabels", mock.Anything).Return([]string{}, errors.New("Failed"))
 				m.V1GetUserLabels(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 		})
 
 		Context("DELETE", func() {
 			var (
-				datastore *mocks.Datastore
-				acl       *mocks.Acl
-				user      *uuid.User
-				method    string
-				uri       string
-				req       *http.Request
-				rec       *httptest.ResponseRecorder
-				e         *echo.Echo
-				c         echo.Context
+				datastore    *mocks.Datastore
+				labelStorage *mocks.LabelReadWriter
+				acl          *mocks.Acl
+				user         *uuid.User
+				method       string
+				uri          string
+				req          *http.Request
+				rec          *httptest.ResponseRecorder
+				e            *echo.Echo
+				c            echo.Context
 			)
 
 			BeforeEach(func() {
+				labelStorage = &mocks.LabelReadWriter{}
 				datastore = &mocks.Datastore{}
+				datastore.On("Labels").Return(labelStorage)
 				acl = &mocks.Acl{}
 				m.Datastore = datastore
 				m.Acl = acl
@@ -226,7 +238,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(errors.New("Failed"))
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 			})
 
 			It("Successfully removed a label", func() {
@@ -243,7 +255,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				datastore.On("RemoveUserLabel", "test", user.Uuid).Return(nil)
 				m.V1RemoveUserLabel(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Label test was removed."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Label test was removed.")
 			})
 		})
 	})

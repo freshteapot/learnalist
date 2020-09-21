@@ -14,10 +14,10 @@ type Insights interface {
 }
 
 type insight struct {
-	logger *logrus.Logger
+	logger logrus.FieldLogger
 }
 
-func NewInsights(logger *logrus.Logger) insight {
+func NewInsights(logger logrus.FieldLogger) insight {
 	return insight{logger: logger}
 }
 

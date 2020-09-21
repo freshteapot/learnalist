@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -50,12 +51,23 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 
 	alist, err := m.Datastore.GetAlist(uuid)
 	if err != nil {
-		// With the look up of access before, this one doesnt fully make sense anymore.
-		message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
-		response := api.HttpResponseMessage{
-			Message: message,
+		if err == i18n.ErrorListNotFound {
+			m.logger.WithFields(logrus.Fields{
+				"event":      "broken-state",
+				"alist_uuid": uuid,
+			}).Error("List not found, but has acl access")
+
+			message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
+			response := api.HttpResponseMessage{
+				Message: message,
+			}
+			return c.JSON(http.StatusNotFound, response)
 		}
-		return c.JSON(http.StatusNotFound, response)
+		// When the db fails to lookup, maybe we should actually be crashing.
+		response := api.HttpResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
 	}
 
 	return c.JSON(http.StatusOK, alist)

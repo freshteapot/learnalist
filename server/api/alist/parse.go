@@ -6,7 +6,7 @@ import (
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 )
 
-func parseAlistInfo(jsonBytes []byte) (AlistInfo, error) {
+func ParseAlistInfo(jsonBytes []byte) (AlistInfo, error) {
 	listInfo := new(AlistInfo)
 	err := json.Unmarshal(jsonBytes, &listInfo)
 	if listInfo.Labels == nil {

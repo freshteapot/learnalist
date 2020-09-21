@@ -1,6 +1,27 @@
 components:
   examples:
   schemas:
+    AlistFrom:
+      type: object
+      description: "Give context of where this list was imported / synced from, if it is quizlet, cram, brainscape it is not possible to make this list public"
+      required:
+        - kind
+        - ext_uuid
+        - ref_url
+      properties:
+        kind:
+          type: string
+          description: Context of where it came from, when coming from quizlet, cram, brainscape, it is not possible to make the list public.
+          enum:
+            - quizlet
+            - cram
+            - brainscape
+            - learnalist
+        ext_uuid:
+          type: string
+        ref_url:
+          type: string
+
     AlistInput:
       type: object
       required:
@@ -42,6 +63,8 @@ components:
           type: string
         interact:
           $ref: "#/components/schemas/AlistInteract"
+        from:
+          $ref: "#/components/schemas/AlistFrom"
 
     AlistItemV1:
       type: string
@@ -111,6 +134,12 @@ paths:
                 $ref: "#/components/schemas/Alist"
         "400":
           description: Bad request, something is wrong with the list object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Input had no errors but was not valid
           content:
             application/json:
               schema:
@@ -193,6 +222,12 @@ paths:
                 $ref: "#/components/schemas/HttpResponseMessage"
         "403":
           description: User making request does not have access to the list in question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Input had no errors but was not valid
           content:
             application/json:
               schema:

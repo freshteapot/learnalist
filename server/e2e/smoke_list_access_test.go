@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/e2e"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 )
@@ -44,7 +45,8 @@ var _ = Describe("Smoke list access", func() {
 		assert.Equal(httpResponse.StatusCode, http.StatusOK)
 		assert.True(strings.Contains(string(httpResponse.Body), "Please refresh"))
 		fmt.Println(">> A human wait, should have contents")
-		time.Sleep(1000 * time.Millisecond)
+		// TODO I wonder how to make this more reliable
+		time.Sleep(2000 * time.Millisecond)
 
 		httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
 		assert.NoError(err)
@@ -63,7 +65,7 @@ var _ = Describe("Smoke list access", func() {
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>A list: access denied for this list</title>"))
 		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, aList.Uuid)
 		assert.Equal(httpResponse.StatusCode, http.StatusForbidden)
-		assert.Equal(cleanEchoResponse(httpResponse.Body), `{"message":"Access Denied"}`)
+		assert.Equal(testutils.CleanEchoResponseFromByte(httpResponse.Body), `{"message":"Access Denied"}`)
 
 		fmt.Println("> Set the other user to be able to read the list")
 		httpResponse, err = learnalistClient.ShareReadAcessV1(userInfoOwner, aList.Uuid, userInfoReader.Uuid, aclKeys.ActionGrant)

@@ -81,36 +81,13 @@ func (_m *DatastoreAlists) GetPublicLists() []alist.ShortInfo {
 	return r0
 }
 
-// GetUserLabels provides a mock function with given fields: uuid
-func (_m *DatastoreAlists) GetUserLabels(uuid string) ([]string, error) {
-	ret := _m.Called(uuid)
-
-	var r0 []string
-	if rf, ok := ret.Get(0).(func(string) []string); ok {
-		r0 = rf(uuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]string)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(uuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RemoveAlist provides a mock function with given fields: alist_uuid, user_uuid
-func (_m *DatastoreAlists) RemoveAlist(alist_uuid string, user_uuid string) error {
-	ret := _m.Called(alist_uuid, user_uuid)
+// RemoveAlist provides a mock function with given fields: alistUUID, userUUID
+func (_m *DatastoreAlists) RemoveAlist(alistUUID string, userUUID string) error {
+	ret := _m.Called(alistUUID, userUUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(alist_uuid, user_uuid)
+		r0 = rf(alistUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
@@ -12,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// TODO CHECK this function for "from too"
 func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	// TODO maybe we support an array
@@ -42,7 +44,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 
 	aList, err := m.Datastore.GetAlist(input.AlistUUID)
 	if err != nil {
-		if err.Error() == i18n.SuccessAlistNotFound {
+		if err == i18n.ErrorListNotFound {
 			response := api.HttpResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
@@ -60,6 +62,13 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
+	}
+
+	if !alist.WithFromCheckSharing(aList.Info) {
+		response := api.HttpResponseMessage{
+			Message: i18n.InputSaveAlistOperationFromRestriction,
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	if aList.Info.SharedWith == aclKeys.NotShared {
@@ -92,6 +101,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 	return c.JSON(http.StatusOK, input)
 }
 
+// TODO CHECK this function for "from too"
 func (m *Manager) V1ShareAlist(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	var input = &api.HttpShareListInput{}
@@ -123,6 +133,7 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 
 	aList, _ := m.Datastore.GetAlist(input.AlistUUID)
 	if aList.Uuid == "" {
+		// TODO this could be a db issue
 		response := api.HttpResponseMessage{
 			Message: i18n.SuccessAlistNotFound,
 		}
@@ -136,12 +147,24 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	// start: Check FromSharing
+	checkInfo := aList.Info
+	checkInfo.SharedWith = input.Action
+	if !alist.WithFromCheckSharing(checkInfo) {
+		response := api.HttpResponseMessage{
+			Message: i18n.InputSaveAlistOperationFromRestriction,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+	// end: Check FromSharing
+
 	if aList.Info.SharedWith == input.Action {
 		return c.JSON(http.StatusOK, api.HttpResponseMessage{
 			Message: i18n.ApiShareNoChange,
 		})
 	}
 
+	// Checks passed, now we update the value
 	aList.Info.SharedWith = input.Action
 	m.Datastore.SaveAlist(http.MethodPut, aList)
 	// Save to hugo

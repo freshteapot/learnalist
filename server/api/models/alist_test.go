@@ -1,7 +1,7 @@
-package models
+package models_test
 
+/*
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -146,7 +146,7 @@ func (suite *ModelSuite) TestSaveAListViaPutWithNotFoundUuid() {
 	aList.UnmarshalJSON([]byte(a))
 	aList.User.Uuid = userUUID
 	aList, err := dal.SaveAlist(http.MethodPut, aList)
-	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
+	suite.Equal(i18n.ErrorListNotFound, err)
 }
 
 func (suite *ModelSuite) TestSaveAListEmptyList() {
@@ -156,11 +156,11 @@ func (suite *ModelSuite) TestSaveAListEmptyList() {
 
 	aList, err := dal.SaveAlist(http.MethodPost, input)
 	suite.Equal(alist.Alist{}, aList)
-	suite.Equal(fmt.Sprintf(i18n.ValidationErrorList, "Title cannot be empty.\nInvalid option for info.shared_with"), err.Error())
+	suite.Equal("Title cannot be empty.\nInvalid option for info.shared_with", err.Error())
 }
 
 func (suite *ModelSuite) TestRemoveLabelsForAlistEmptyUuid() {
-	err := dal.RemoveLabelsForAlist("")
+	err := dal.Labels().RemoveLabelsForAlist("")
 	suite.Equal(nil, err)
 }
 
@@ -186,7 +186,7 @@ INSERT INTO alist_labels VALUES('ada41576-b710-593a-9603-946aaadcb22d','7540fe5f
 	err = dal.RemoveAlist(alistUUID, userUUID)
 	suite.Nil(err)
 	_, err = dal.GetAlist(alistUUID)
-	suite.Equal(i18n.SuccessAlistNotFound, err.Error())
+	suite.Equal(i18n.ErrorListNotFound, err)
 }
 
 func (suite *ModelSuite) TestGetListsByUserWithFilters() {
@@ -217,3 +217,4 @@ INSERT INTO alist_labels VALUES('292a4fd3-8835-5435-9e68-7085ab901730','7540fe5f
 	suite.Equal(1, len(items))
 	suite.Equal("292a4fd3-8835-5435-9e68-7085ab901730", items[0].Uuid)
 }
+*/

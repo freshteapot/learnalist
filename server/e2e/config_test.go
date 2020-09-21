@@ -142,10 +142,6 @@ func generateUsername() string {
 	return usernameOwner + "-" + str
 }
 
-func cleanEchoResponse(data []byte) string {
-	return strings.TrimSuffix(string(data), "\n")
-}
-
 func convertResponseToString(data interface{}) string {
 	b, _ := json.Marshal(data)
 	return strings.TrimSuffix(string(b), "\n")

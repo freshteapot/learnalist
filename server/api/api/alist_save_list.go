@@ -63,21 +63,23 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 	aList, err = m.Datastore.SaveAlist(method, aList)
 	if err != nil {
-		switch err.Error() {
-		case i18n.SuccessAlistNotFound:
-			response := api.HttpResponseMessage{
-				Message: i18n.SuccessAlistNotFound,
-			}
+		response := api.HttpResponseMessage{
+			Message: err.Error(),
+		}
+
+		switch err {
+		case i18n.ErrorListNotFound:
+			response.Message = i18n.SuccessAlistNotFound
 			return c.JSON(http.StatusNotFound, response)
-		case i18n.InputSaveAlistOperationOwnerOnly:
-			response := api.HttpResponseMessage{
-				Message: i18n.InputSaveAlistOperationOwnerOnly,
-			}
+		case i18n.ErrorInputSaveAlistOperationOwnerOnly:
 			return c.JSON(http.StatusForbidden, response)
+		case i18n.ErrorAListFromDomainMisMatch:
+			fallthrough
+		case i18n.ErrorInputSaveAlistOperationFromRestriction:
+			fallthrough
+		case i18n.ErrorInputSaveAlistFromKindNotSupported:
+			return c.JSON(http.StatusUnprocessableEntity, response)
 		default:
-			response := api.HttpResponseMessage{
-				Message: err.Error(),
-			}
 			return c.JSON(http.StatusBadRequest, response)
 		}
 	}

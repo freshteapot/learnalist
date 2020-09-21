@@ -4,9 +4,9 @@ package mocks
 
 import (
 	alist "github.com/freshteapot/learnalist-api/server/api/alist"
-	mock "github.com/stretchr/testify/mock"
+	label "github.com/freshteapot/learnalist-api/server/api/label"
 
-	models "github.com/freshteapot/learnalist-api/server/api/models"
+	mock "github.com/stretchr/testify/mock"
 
 	oauth "github.com/freshteapot/learnalist-api/server/pkg/oauth"
 
@@ -87,27 +87,20 @@ func (_m *Datastore) GetPublicLists() []alist.ShortInfo {
 	return r0
 }
 
-// GetUserLabels provides a mock function with given fields: uuid
-func (_m *Datastore) GetUserLabels(uuid string) ([]string, error) {
-	ret := _m.Called(uuid)
+// Labels provides a mock function with given fields:
+func (_m *Datastore) Labels() label.LabelReadWriter {
+	ret := _m.Called()
 
-	var r0 []string
-	if rf, ok := ret.Get(0).(func(string) []string); ok {
-		r0 = rf(uuid)
+	var r0 label.LabelReadWriter
+	if rf, ok := ret.Get(0).(func() label.LabelReadWriter); ok {
+		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]string)
+			r0 = ret.Get(0).(label.LabelReadWriter)
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(uuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // OAuthHandler provides a mock function with given fields:
@@ -126,55 +119,13 @@ func (_m *Datastore) OAuthHandler() oauth.OAuthReadWriter {
 	return r0
 }
 
-// PostAlistLabel provides a mock function with given fields: label
-func (_m *Datastore) PostAlistLabel(label *models.AlistLabel) (int, error) {
-	ret := _m.Called(label)
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func(*models.AlistLabel) int); ok {
-		r0 = rf(label)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*models.AlistLabel) error); ok {
-		r1 = rf(label)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PostUserLabel provides a mock function with given fields: label
-func (_m *Datastore) PostUserLabel(label *models.UserLabel) (int, error) {
-	ret := _m.Called(label)
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func(*models.UserLabel) int); ok {
-		r0 = rf(label)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*models.UserLabel) error); ok {
-		r1 = rf(label)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RemoveAlist provides a mock function with given fields: alist_uuid, user_uuid
-func (_m *Datastore) RemoveAlist(alist_uuid string, user_uuid string) error {
-	ret := _m.Called(alist_uuid, user_uuid)
+// RemoveAlist provides a mock function with given fields: alistUUID, userUUID
+func (_m *Datastore) RemoveAlist(alistUUID string, userUUID string) error {
+	ret := _m.Called(alistUUID, userUUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(alist_uuid, user_uuid)
+		r0 = rf(alistUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -182,13 +133,13 @@ func (_m *Datastore) RemoveAlist(alist_uuid string, user_uuid string) error {
 	return r0
 }
 
-// RemoveUserLabel provides a mock function with given fields: label, uuid
-func (_m *Datastore) RemoveUserLabel(label string, uuid string) error {
-	ret := _m.Called(label, uuid)
+// RemoveUserLabel provides a mock function with given fields: _a0, uuid
+func (_m *Datastore) RemoveUserLabel(_a0 string, uuid string) error {
+	ret := _m.Called(_a0, uuid)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(label, uuid)
+		r0 = rf(_a0, uuid)
 	} else {
 		r0 = ret.Error(0)
 	}

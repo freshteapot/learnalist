@@ -73,6 +73,13 @@
 
   function tapHandler(event) {
     event.preventDefault();
+
+    // Some sort of horrible when running in the chrome extension :(
+    let elem = document.elementFromPoint(event.detail.x, event.detail.y);
+    if (elem && elem.nodeName === "BUTTON") {
+      return false;
+    }
+
     const margin = 150;
     const width = event.target.innerWidth; // window
     const pageX = event.detail.x; // event.pageX when touchstart

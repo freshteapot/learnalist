@@ -1,0 +1,15 @@
+{
+    "data": [
+        "chris"
+    ],
+    "info": {
+        "title": "Days of the Week",
+        "type": "v1",
+        "shared_with": "private",
+        "from": {
+            "kind": "quizlet",
+            "ext_uuid": "test-123",
+            "ref_url": "https://quizlet.com/test-123/norwegian/"
+        }
+    }
+}

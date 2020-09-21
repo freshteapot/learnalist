@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -81,7 +82,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 			userManagement.On("DeleteUser", userUUID).Return(want)
 			manager.V1DeleteUser(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 		})
 
 		It("Successfully deleted user", func() {
@@ -94,7 +95,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 			manager.V1DeleteUser(c)
 
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"User has been removed"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "User has been removed")
 		})
 	})
 })

@@ -34,6 +34,10 @@ js/node_modules
 ## Ignoring this as we generate it
 js/src/openapi/
 
+## Browser extension
+js/browser-extension/import-play/bundle.js*
+js/browser-extension/import-play/bundle.css*
+
 # Removing dev assets
 hugo/static/css/base.*
 hugo/static/css/editor.*

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	models "github.com/freshteapot/learnalist-api/server/api/models"
+	label "github.com/freshteapot/learnalist-api/server/api/label"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -12,55 +12,29 @@ type DatastoreLabels struct {
 	mock.Mock
 }
 
-// PostAlistLabel provides a mock function with given fields: label
-func (_m *DatastoreLabels) PostAlistLabel(label *models.AlistLabel) (int, error) {
-	ret := _m.Called(label)
+// Labels provides a mock function with given fields:
+func (_m *DatastoreLabels) Labels() label.LabelReadWriter {
+	ret := _m.Called()
 
-	var r0 int
-	if rf, ok := ret.Get(0).(func(*models.AlistLabel) int); ok {
-		r0 = rf(label)
+	var r0 label.LabelReadWriter
+	if rf, ok := ret.Get(0).(func() label.LabelReadWriter); ok {
+		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(int)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(label.LabelReadWriter)
+		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*models.AlistLabel) error); ok {
-		r1 = rf(label)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
-// PostUserLabel provides a mock function with given fields: label
-func (_m *DatastoreLabels) PostUserLabel(label *models.UserLabel) (int, error) {
-	ret := _m.Called(label)
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func(*models.UserLabel) int); ok {
-		r0 = rf(label)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*models.UserLabel) error); ok {
-		r1 = rf(label)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RemoveUserLabel provides a mock function with given fields: label, uuid
-func (_m *DatastoreLabels) RemoveUserLabel(label string, uuid string) error {
-	ret := _m.Called(label, uuid)
+// RemoveUserLabel provides a mock function with given fields: _a0, uuid
+func (_m *DatastoreLabels) RemoveUserLabel(_a0 string, uuid string) error {
+	ret := _m.Called(_a0, uuid)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(label, uuid)
+		r0 = rf(_a0, uuid)
 	} else {
 		r0 = ret.Error(0)
 	}

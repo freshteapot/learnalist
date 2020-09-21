@@ -3,6 +3,7 @@ package api_test
 import (
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +21,6 @@ var _ = Describe("Testing Root endpoint", func() {
 
 		m.V1GetRoot(c)
 		Expect(rec.Code).To(Equal(http.StatusOK))
-		Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"1, 2, 3. Lets go!"}`))
+		testutils.CheckMessageResponseFromResponseRecorder(rec, "1, 2, 3. Lets go!")
 	})
 })

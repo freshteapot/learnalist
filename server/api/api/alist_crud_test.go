@@ -3,13 +3,13 @@ package api_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -57,7 +57,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"This method is not supported."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "This method is not supported.")
 			})
 
 			It("Get, is not accepted", func() {
@@ -68,7 +68,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Your input is invalid json.")
 			})
 
 			It("Post, success", func() {
@@ -89,8 +89,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				user := &uuid.User{
 					Uuid: userUUID,
 				}
-				fmt.Println(user)
-				fmt.Println(userUUID)
+
 				req, rec := setupFakeEndpoint(method, uri, input)
 				e := echo.New()
 				c := e.NewContext(req, rec)
@@ -99,11 +98,11 @@ var _ = Describe("Testing Alist endpoints", func() {
 				Expect(rec.Code).To(Equal(http.StatusCreated))
 				b, _ := json.Marshal(savedList)
 
-				Expect(cleanEchoResponse(rec)).To(Equal(string(b)))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
 			})
 
 			It("Post, fail, due to ownership", func() {
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.InputSaveAlistOperationOwnerOnly))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, i18n.ErrorInputSaveAlistOperationOwnerOnly)
 				input := `
       {
       	"data": ["car"],
@@ -123,12 +122,12 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusForbidden))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Only the owner of the list can modify it."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Only the owner of the list can modify it.")
 			})
 
 			It("PUT, fail, due to list uuid not being found", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],
@@ -151,12 +150,12 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on lists"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Please refer to the documentation on lists")
 			})
 
 			It("PUT, fail, due to list uuid not being found", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],
@@ -180,12 +179,12 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusNotFound))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.SuccessAlistNotFound)
 			})
 
 			It("PUT, fail, due to uuid in uri not matching in the list", func() {
 				method := http.MethodPut
-				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, errors.New(i18n.SuccessAlistNotFound))
+				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(nil, i18n.ErrorListNotFound)
 				input := `
       {
       	"data": ["car"],
@@ -210,7 +209,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.SetParamValues("1234")
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"The list uuid in the uri doesnt match that in the payload"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "The list uuid in the uri doesnt match that in the payload")
 			})
 
 			It("Post, fail, due to internal issues", func() {
@@ -234,7 +233,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				c.Set("loggedInUser", *user)
 				m.V1SaveAlist(c)
 				Expect(rec.Code).To(Equal(http.StatusBadRequest))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Failed"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "Failed")
 			})
 		})
 

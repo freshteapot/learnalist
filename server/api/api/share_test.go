@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -63,7 +64,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Your input is invalid json.")
 		})
 
 		It("Valid json input, invalid action", func() {
@@ -80,7 +81,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Please refer to the documentation on sharing a list")
 		})
 
 		It("Server error: failed to store in storage", func() {
@@ -101,7 +102,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Sadly, our service has taken a nap."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Sadly, our service has taken a nap.")
 		})
 
 		It("List not found", func() {
@@ -117,12 +118,12 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List not found.")
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
@@ -145,7 +146,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Access Denied")
 		})
 
 		It("List found, you cant share with yourself", func() {
@@ -169,7 +170,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Today, we dont let you share with yourself"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Today, we dont let you share with yourself")
 		})
 
 		It("List found, the user you want to share with doesnt exist", func() {
@@ -194,7 +195,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"User not found."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "User not found.")
 		})
 
 		Context("Success, we will share", func() {
@@ -221,7 +222,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareListReadAccess(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"grant"}`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"grant"}`))
 			})
 
 			It("Revoke user read access", func() {
@@ -247,7 +248,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareListReadAccess(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
 			})
 		})
 	})
@@ -293,7 +294,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Your input is invalid json."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Your input is invalid json.")
 		})
 
 		It("Valid json input, invalid action", func() {
@@ -309,7 +310,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Please refer to the documentation on sharing a list"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Please refer to the documentation on sharing a list")
 		})
 
 		It("List not found", func() {
@@ -323,12 +324,12 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			c := e.NewContext(req, rec)
 			c.Set("loggedInUser", *userA)
 
-			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, errors.New(i18n.SuccessAlistNotFound))
+			datastore.On("GetAlist", mock.Anything).Return(alist.Alist{}, i18n.ErrorListNotFound)
 
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List not found."}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List not found.")
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
@@ -350,7 +351,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			m.V1ShareAlist(c)
 
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
-			Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"Access Denied"}`))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Access Denied")
 		})
 
 		Context("Success, we will share the list", func() {
@@ -384,7 +385,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now public"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.ApiShareListSuccessWithPublic)
 			})
 
 			It("Privately", func() {
@@ -416,7 +417,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now private to the owner"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "List is now private to the owner")
 			})
 
 			It("With friends", func() {
@@ -448,7 +449,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"List is now private to the owner and those granted access"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "List is now private to the owner and those granted access")
 			})
 
 			It("With friends when already set", func() {
@@ -480,7 +481,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"message":"No change made"}`))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, "No change made")
 			})
 		})
 		/*
@@ -507,7 +508,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				m.V1ShareAlist(c)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				Expect(cleanEchoResponse(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
+				Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`{"user_uuid":"fake-456","alist_uuid":"fakeList","action":"revoke"}`))
 			})
 		*/
 	})

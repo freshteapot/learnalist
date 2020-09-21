@@ -153,10 +153,9 @@ func (c Client) PostListV1(userInfo RegisterResponse, input string) (alist.Alist
 	}
 	defer resp.Body.Close()
 
-	fmt.Println(resp.StatusCode)
 	data, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(data, &response)
-	return response, nil
+	return response, err
 }
 
 func (c Client) PutListV1(userInfo RegisterResponse, uuid string, input string) (alist.Alist, error) {

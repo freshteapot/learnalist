@@ -19,7 +19,7 @@ type Manager struct {
 	DatabaseName   string
 	HugoHelper     hugo.HugoSiteBuilder
 	OauthHandlers  oauth.Handlers
-	logger         *logrus.Logger
+	logger         logrus.FieldLogger
 	insights       event.Insights
 }
 
@@ -30,7 +30,7 @@ func NewManager(
 	databaseName string,
 	hugoHelper hugo.HugoSiteBuilder,
 	oauthHandlers oauth.Handlers,
-	logger *logrus.Logger,
+	logger logrus.FieldLogger,
 ) *Manager {
 	return &Manager{
 		Datastore:      datastore,
@@ -42,4 +42,9 @@ func NewManager(
 		logger:         logger,
 		insights:       event.NewInsights(logger),
 	}
+}
+
+// HACK remove once I have tamed this madness
+func (m *Manager) SetLogger(logger logrus.FieldLogger) {
+	m.logger = logger
 }
