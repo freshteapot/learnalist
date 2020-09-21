@@ -82,7 +82,7 @@ var _ = Describe("Testing openapi", func() {
 			Password: input.Password,
 		})
 
-		user, _, err := client.DefaultApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		user, _, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
 		Expect(err).To(BeNil())
 
 		uploadFile, _ := os.Open("./testdata/sample.png")
@@ -94,7 +94,7 @@ var _ = Describe("Testing openapi", func() {
 		Expect(asset.Href).ToNot(BeEmpty())
 		Expect(asset.Href).To(ContainSubstring(user.Uuid))
 
-		_, _, err = client.DefaultApi.DeleteUser(auth, user.Uuid)
+		_, _, err = client.UserApi.DeleteUser(auth, user.Uuid)
 		Expect(err).To(BeNil())
 	})
 })
