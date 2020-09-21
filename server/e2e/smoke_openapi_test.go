@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/antihax/optional"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -88,7 +89,10 @@ var _ = Describe("Testing openapi", func() {
 		uploadFile, _ := os.Open("./testdata/sample.png")
 		defer uploadFile.Close()
 
-		asset, response, err := client.AssetApi.AddUserAsset(auth, uploadFile)
+		opts := openapi.AddUserAssetOpts{
+			SharedWith: optional.NewString("public"),
+		}
+		asset, response, err := client.AssetApi.AddUserAsset(auth, uploadFile, &opts)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(asset.Href).ToNot(BeEmpty())
@@ -96,5 +100,7 @@ var _ = Describe("Testing openapi", func() {
 
 		_, _, err = client.UserApi.DeleteUser(auth, user.Uuid)
 		Expect(err).To(BeNil())
+
+		// TODO Add share test as well
 	})
 })
