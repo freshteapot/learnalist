@@ -1,3 +1,4 @@
 html, body {
+	position: relative;
 	width: 600px;
 }
