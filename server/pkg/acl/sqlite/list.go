@@ -9,22 +9,18 @@ import (
 )
 
 func (store *Sqlite) GrantUserListWriteAccess(alistUUID string, userUUID string) error {
-	access := fmt.Sprintf(keys.ListWriteAccessForUser, alistUUID, userUUID)
-	return store.insert(alistUUID, userUUID, access)
+	return store.GrantUserKindWriteAccess("list", alistUUID, userUUID)
 }
 
 func (store *Sqlite) RevokeUserListWriteAccess(alistUUID string, userUUID string) error {
-	access := fmt.Sprintf(keys.ListWriteAccessForUser, alistUUID, userUUID)
-	return store.deleteViaAccess(access)
+	return store.RevokeUserKindWriteAccess("list", alistUUID, userUUID)
 }
 
 func (store *Sqlite) GrantUserListReadAccess(alistUUID string, userUUID string) error {
-	access := fmt.Sprintf(keys.ListReadAccessForUser, alistUUID, userUUID)
-	return store.insert(alistUUID, userUUID, access)
+	return store.GrantUserKindReadAccess("list", alistUUID, userUUID)
 }
 func (store *Sqlite) RevokeUserListReadAccess(alistUUID string, userUUID string) error {
-	access := fmt.Sprintf(keys.ListReadAccessForUser, alistUUID, userUUID)
-	return store.deleteViaAccess(access)
+	return store.RevokeUserKindReadAccess("list", alistUUID, userUUID)
 }
 
 func (store *Sqlite) ShareListWithPublic(alistUUID string) error {

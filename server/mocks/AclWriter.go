@@ -9,6 +9,20 @@ type AclWriter struct {
 	mock.Mock
 }
 
+// DeleteByExtUUID provides a mock function with given fields: extUUID
+func (_m *AclWriter) DeleteByExtUUID(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteList provides a mock function with given fields: alistUUID
 func (_m *AclWriter) DeleteList(alistUUID string) error {
 	ret := _m.Called(alistUUID)

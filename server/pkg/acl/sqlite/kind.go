@@ -6,6 +6,26 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 )
 
+func (store *Sqlite) GrantUserKindWriteAccess(kind string, extUUID string, userUUID string) error {
+	access := fmt.Sprintf(keys.KindWriteAccessForUser, kind, extUUID, userUUID)
+	return store.insert(extUUID, userUUID, access)
+}
+
+func (store *Sqlite) RevokeUserKindWriteAccess(kind string, extUUID string, userUUID string) error {
+	access := fmt.Sprintf(keys.KindWriteAccessForUser, kind, extUUID, userUUID)
+	return store.deleteViaAccess(access)
+}
+
+func (store *Sqlite) GrantUserKindReadAccess(kind string, extUUID string, userUUID string) error {
+	access := fmt.Sprintf(keys.KindReadAccessForUser, kind, extUUID, userUUID)
+	return store.insert(extUUID, userUUID, access)
+}
+
+func (store *Sqlite) RevokeUserKindReadAccess(kind string, extUUID string, userUUID string) error {
+	access := fmt.Sprintf(keys.KindReadAccessForUser, kind, extUUID, userUUID)
+	return store.deleteViaAccess(access)
+}
+
 func (store *Sqlite) ShareKindWithPublic(kind string, extUUID string) error {
 	accessPrivate := fmt.Sprintf(keys.KindSharePrivate, kind, extUUID)
 	accessFriends := fmt.Sprintf(keys.KindShareFriends, kind, extUUID)

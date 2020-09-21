@@ -9,6 +9,20 @@ type Acl struct {
 	mock.Mock
 }
 
+// DeleteByExtUUID provides a mock function with given fields: extUUID
+func (_m *Acl) DeleteByExtUUID(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteList provides a mock function with given fields: alistUUID
 func (_m *Acl) DeleteList(alistUUID string) error {
 	ret := _m.Called(alistUUID)
@@ -51,6 +65,27 @@ func (_m *Acl) GrantUserListWriteAccess(alistUUID string, userUUID string) error
 	return r0
 }
 
+// HasUserKindReadAccess provides a mock function with given fields: kind, extUUID, userUUID
+func (_m *Acl) HasUserKindReadAccess(kind string, extUUID string, userUUID string) (bool, error) {
+	ret := _m.Called(kind, extUUID, userUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string, string) bool); ok {
+		r0 = rf(kind, extUUID, userUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+		r1 = rf(kind, extUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // HasUserListReadAccess provides a mock function with given fields: alistUUID, userUUID
 func (_m *Acl) HasUserListReadAccess(alistUUID string, userUUID string) (bool, error) {
 	ret := _m.Called(alistUUID, userUUID)
@@ -86,6 +121,69 @@ func (_m *Acl) HasUserListWriteAccess(alistUUID string, userUUID string) (bool, 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string, string) error); ok {
 		r1 = rf(alistUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IsKindAvailableToFriends provides a mock function with given fields: kind, extUUID
+func (_m *Acl) IsKindAvailableToFriends(kind string, extUUID string) (bool, error) {
+	ret := _m.Called(kind, extUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(kind, extUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(kind, extUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IsKindPrivate provides a mock function with given fields: kind, extUUID
+func (_m *Acl) IsKindPrivate(kind string, extUUID string) (bool, error) {
+	ret := _m.Called(kind, extUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(kind, extUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(kind, extUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IsKindPublic provides a mock function with given fields: kind, extUUID
+func (_m *Acl) IsKindPublic(kind string, extUUID string) (bool, error) {
+	ret := _m.Called(kind, extUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(kind, extUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(kind, extUUID)
 	} else {
 		r1 = ret.Error(1)
 	}
