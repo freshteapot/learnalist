@@ -18,6 +18,8 @@ components:
 paths:
   /assets/upload:
     post:
+      tags:
+        - asset
       operationId: addUserAsset
       description: Upload asset and link it to the user logged in
       requestBody:

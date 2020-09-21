@@ -88,7 +88,7 @@ var _ = Describe("Testing openapi", func() {
 		uploadFile, _ := os.Open("./testdata/sample.png")
 		defer uploadFile.Close()
 
-		asset, response, err := client.DefaultApi.AddUserAsset(auth, uploadFile)
+		asset, response, err := client.AssetApi.AddUserAsset(auth, uploadFile)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(asset.Href).ToNot(BeEmpty())
