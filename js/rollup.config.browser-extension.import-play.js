@@ -3,6 +3,8 @@ import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+import postcss from "rollup-plugin-postcss";
+import autoPreprocess from 'svelte-preprocess'
 
 
 const production = !process.env.ROLLUP_WATCH;
@@ -17,9 +19,15 @@ export default {
 	},
 	plugins: [
 		typescript(),
+		postcss({
+			extract: true,
+		}),
 		svelte({
 			// enable run-time checks when not in production
 			dev: !production,
+			preprocess: autoPreprocess({
+				postcss: true
+			}),
 			// we'll extract any component CSS out into
 			// a separate file - better for performance
 			css: css => {
