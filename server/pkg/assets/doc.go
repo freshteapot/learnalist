@@ -1,9 +1,15 @@
 package assets
 
 import (
+	"errors"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/sirupsen/logrus"
+)
+
+var (
+	ErrNotFound = errors.New("not.found")
 )
 
 type AssetEntry struct {
@@ -14,6 +20,7 @@ type AssetEntry struct {
 }
 
 type AssetService struct {
+	acl       acl.AclAsset
 	directory string
 	logEntry  *logrus.Entry
 	repo      Repository
@@ -21,6 +28,7 @@ type AssetService struct {
 
 type Repository interface {
 	SaveEntry(entry AssetEntry) error
+	GetEntry(UUID string) (AssetEntry, error)
 }
 
 // HttpUploadResponse Response when asset uploaded

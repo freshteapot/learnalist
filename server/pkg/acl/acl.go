@@ -6,6 +6,28 @@ type Acl interface {
 }
 type AclWriter interface {
 	AclWriterList
+	AclWriterAsset
+}
+
+type AclAsset interface {
+	AclReaderAsset
+	AclWriterAsset
+}
+type AclReaderAsset interface {
+	HasUserAssetReadAccess(extUUID string, userUUID string) (bool, error)
+	IsListPublic(extUUID string) (bool, error)
+	IsListPrivate(extUUID string) (bool, error)
+}
+
+type AclWriterAsset interface {
+	// Grant a user access to read an asset
+	GrantUserAssetReadAccess(extUUID string, userUUID string) error
+	// Revoke a users access to read an asset
+	RevokeUserAssetReadAccess(extUUID string, userUUID string) error
+	ShareAssetWithPublic(extUUID string) error
+	// Share an asset only with yourself, this should remove any previous access rules
+	MakeAssetPrivate(extUUID string, userUUID string) error
+	DeleteAsset(extUUID string) error // TODO rename
 }
 
 type AclWriterList interface {
@@ -30,14 +52,6 @@ type AclWriterList interface {
 	DeleteByExtUUID(extUUID string) error // TODO rename
 }
 
-type AclReaderKind interface {
-	HasUserKindReadAccess(kind string, extUUID string, userUUID string) (bool, error)
-	IsKindPublic(kind string, extUUID string) (bool, error)
-	IsKindPrivate(kind string, extUUID string) (bool, error)
-	IsKindAvailableToFriends(kind string, extUUID string) (bool, error)
-	//HasUserKindReadAccess(alistUUID string, userUUID string) (bool, error)
-}
-
 type AclReaderList interface {
 	HasUserListReadAccess(alistUUID string, userUUID string) (bool, error)
 	HasUserListWriteAccess(alistUUID string, userUUID string) (bool, error)
@@ -48,6 +62,6 @@ type AclReaderList interface {
 }
 
 type AclReader interface {
-	AclReaderKind
 	AclReaderList
+	AclReaderAsset
 }

@@ -1,23 +1,30 @@
 package assets
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
-func NewService(directory string, repo Repository, logEntry *logrus.Entry) AssetService {
+func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *logrus.Entry) AssetService {
 	directory = strings.TrimSuffix(directory, "/")
 	return AssetService{
+		acl:       acl,
 		directory: directory,
 		logEntry:  logEntry,
 		repo:      repo,
@@ -58,6 +65,59 @@ func (s *AssetService) InitCheck() {
 	logEntry.Info("✔ assets service check")
 }
 
+func (s *AssetService) Share(c echo.Context) error {
+	response := api.HttpResponseMessage{
+		Message: "",
+	}
+
+	user := c.Get("loggedInUser").(uuid.User)
+	userUUID := user.Uuid
+	var input openapi.HttpAssetShareRequestBody
+
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	err := json.Unmarshal(jsonBytes, &input)
+	if err != nil {
+		response.Message = "TODO bad input"
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	sharedWith := input.Action
+
+	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
+	if !utils.StringArrayContains(allowed, sharedWith) {
+		response := api.HttpResponseMessage{
+			Message: "Check the documentation",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	// Loook up asset
+	asset, _ := s.repo.GetEntry(input.Uuid)
+	if asset.UserUUID != userUUID {
+		response := api.HttpResponseMessage{
+			Message: "Access denied",
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	// Update who it is shared with
+	switch sharedWith {
+	case aclKeys.SharedWithPublic:
+		err = s.acl.ShareAssetWithPublic(asset.UUID)
+	case aclKeys.NotShared:
+		err = s.acl.MakeAssetPrivate(asset.UUID, userUUID)
+	}
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	response.Message = "Updated"
+	return c.JSON(http.StatusOK, response)
+}
+
 func (s *AssetService) GetAsset(c echo.Context) error {
 	asset := strings.TrimPrefix(c.Request().URL.Path, "/assets/")
 	// This might do nothing, due to echo routing
@@ -72,9 +132,38 @@ func (s *AssetService) GetAsset(c echo.Context) error {
 		return c.NoContent(http.StatusNotFound)
 	}
 
+	// TODO Check access to asset
+	user := c.Get("loggedInUser")
+	userUUID := ""
+	if user != nil {
+		userUUID = user.(uuid.User).Uuid
+	}
+
+	extUUID := ""
+	parts := strings.Split(asset, "/")
+	if len(parts) == 2 {
+		// Ugly code
+		extUUID = parts[1]
+		parts = strings.Split(extUUID, ".")
+		extUUID = parts[0]
+	}
+
+	allow, err := s.acl.HasUserAssetReadAccess(extUUID, userUUID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	if !allow {
+		response := api.HttpResponseMessage{
+			Message: "Access denied",
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
 	return c.File(path)
 }
 
+// TODO add privacy option private, public
 // ln -s /tmp/learnalist/assets /Users/tinkerbell/git/learnalist-api/hugo/public/assets
 // https://echo.labstack.com/cookbook/file-upload
 func (s *AssetService) Upload(c echo.Context) error {
@@ -88,6 +177,19 @@ func (s *AssetService) Upload(c echo.Context) error {
 		"user_uuid":  userUUID,
 		"directory":  directory,
 	})
+
+	sharedWith := c.FormValue("shared_with")
+	if sharedWith == "" {
+		sharedWith = aclKeys.NotShared
+	}
+
+	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
+	if !utils.StringArrayContains(allowed, sharedWith) {
+		response := api.HttpResponseMessage{
+			Message: "Check the documentation",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
 	err := os.MkdirAll(directory, 0744)
 	if err != nil {
@@ -169,6 +271,8 @@ func (s *AssetService) Upload(c echo.Context) error {
 		"action": "uploaded",
 	}).Info("asset upload")
 
+	// TODO add privacy settings private,public
+	logEntry.WithField("shared_with", sharedWith).Warn("TODO")
 	// write to db
 	err = s.repo.SaveEntry(AssetEntry{
 		UUID:      assetUUID.String(),
@@ -184,6 +288,22 @@ func (s *AssetService) Upload(c echo.Context) error {
 		}).Error("asset upload")
 		// Try to clean up
 		os.Remove(path)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	// Save access
+	switch sharedWith {
+	case aclKeys.SharedWithPublic:
+		err = s.acl.ShareAssetWithPublic(assetUUID.String())
+	case aclKeys.NotShared:
+		err = s.acl.MakeAssetPrivate(assetUUID.String(), userUUID)
+	}
+
+	if err != nil {
+		logEntry.WithFields(logrus.Fields{
+			"error":  err,
+			"action": "failed_to_set_shared_with_to_db",
+		}).Error("asset upload")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 

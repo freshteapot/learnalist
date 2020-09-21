@@ -16,6 +16,12 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 		Skip:         authenticateApi.Skip,
 	}
 
+	assetAuthConfig := authenticate.Config{
+		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
+		LookupBearer: apiManager.Datastore.UserSession().GetUserUUIDByToken,
+		Skip:         assets.SkipAuth,
+	}
+
 	v1 := server.Group("/api/v1")
 
 	v1.Use(authenticate.Auth(authConfig))
@@ -47,8 +53,9 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	v1.DELETE("/labels/:label", apiManager.V1RemoveUserLabel)
 
 	// Assets
-	server.GET("/assets/*", assetService.GetAsset)
+	server.GET("/assets/*", assetService.GetAsset, authenticate.Auth(assetAuthConfig))
 	v1.POST("/assets/upload", assetService.Upload)
+	v1.PUT("/assets/share", assetService.Share)
 
 	// Oauth
 	v1.GET("/oauth/google/redirect", apiManager.V1OauthGoogleRedirect)

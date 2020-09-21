@@ -1,10 +1,28 @@
 components:
   schemas:
+    HttpAssetShareRequestBody:
+      type: object
+      required:
+        - uuid
+        - action
+      properties:
+        uuid:
+          type: string
+        action:
+          type: string
+          enum:
+            - private
+            - public
     HttpAssetUploadRequestBody:
       type: object
       required:
         - file
       properties:
+        shared_with:
+          type: string
+          enum:
+            - private
+            - public
         file:
           type: string
           format: binary
@@ -16,6 +34,44 @@ components:
         href:
           type: string
 paths:
+  /assets/share:
+    put:
+      tags:
+        - asset
+      operationId: shareAsset
+      description: Set asset for public or private access
+      requestBody:
+        description: Share with...
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/HttpAssetShareRequestBody"
+      responses:
+        "200":
+          description: Asset updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: Access denied, due to not being owner of asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "400":
+          description: Most likely the wrong action
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
   /assets/upload:
     post:
       tags:

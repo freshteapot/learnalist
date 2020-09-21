@@ -118,7 +118,7 @@ var ServerCmd = &cobra.Command{
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionService := spaced_repetition.NewService(db)
 
-		assetService := assets.NewService(assetsDirectory, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
+		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
 		server.InitApi(apiManager, assetService, spacedRepetitionService)
