@@ -28,3 +28,7 @@ curl -XPUT -I -H"Authorization: Bearer ${token}" 'localhost:1234/api/v1/assets/s
     "action": "private"
 }'
 ```
+
+```sh
+curl -XDELETE -I -H"Authorization: Bearer ${token}" 'localhost:1234/api/v1/assets/6804625c-ff19-4cb8-aff8-faf7fc28582b'
+```

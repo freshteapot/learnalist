@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	SQL_SAVE_ITEM = `INSERT INTO user_assets(uuid, user_uuid, extension) values(?, ?, ?)`
-	SQL_GET_ITEM  = `SELECT * FROM user_assets WHERE uuid=?`
+	SQL_SAVE_ITEM   = `INSERT INTO user_assets(uuid, user_uuid, extension) values(?, ?, ?)`
+	SQL_GET_ITEM    = `SELECT * FROM user_assets WHERE uuid=?`
+	SQL_DELETE_ITEM = `DELETE FROM user_assets WHERE uuid=? AND user_uuid=?`
 )
 
 type SqliteRepository struct {
@@ -19,6 +20,11 @@ func NewSqliteRepository(db *sqlx.DB) Repository {
 	return SqliteRepository{
 		db: db,
 	}
+}
+
+func (r SqliteRepository) DeleteEntry(userUUID string, UUID string) error {
+	_, err := r.db.Exec(SQL_DELETE_ITEM, UUID, userUUID)
+	return err
 }
 
 func (r SqliteRepository) GetEntry(UUID string) (AssetEntry, error) {

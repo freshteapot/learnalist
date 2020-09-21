@@ -65,6 +65,31 @@ func (s *AssetService) InitCheck() {
 	logEntry.Info("✔ assets service check")
 }
 
+// DeleteEntry Deletes a single entry based on the UUID
+func (s *AssetService) DeleteEntry(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	UUID := c.Param("uuid")
+
+	if UUID == "" {
+		response := api.HttpResponseMessage{
+			Message: "TODO",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+	// TODO check exists?
+	// TODO remove acl
+	err := s.acl.DeleteAsset(UUID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	err = s.repo.DeleteEntry(user.Uuid, UUID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func (s *AssetService) Share(c echo.Context) error {
 	response := api.HttpResponseMessage{
 		Message: "",

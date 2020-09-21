@@ -56,6 +56,7 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	server.GET("/assets/*", assetService.GetAsset, authenticate.Auth(assetAuthConfig))
 	v1.POST("/assets/upload", assetService.Upload)
 	v1.PUT("/assets/share", assetService.Share)
+	v1.DELETE("/assets/:uuid", assetService.DeleteEntry)
 
 	// Oauth
 	v1.GET("/oauth/google/redirect", apiManager.V1OauthGoogleRedirect)

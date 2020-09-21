@@ -98,3 +98,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+  /assets/{uuid}:
+    delete:
+      tags:
+        - asset
+      description: Deletes a single entry based on the UUID
+      operationId: deleteAssetEntry
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: entry deleted
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

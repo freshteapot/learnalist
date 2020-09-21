@@ -29,6 +29,7 @@ type AssetService struct {
 type Repository interface {
 	SaveEntry(entry AssetEntry) error
 	GetEntry(UUID string) (AssetEntry, error)
+	DeleteEntry(userUUID string, UUID string) error
 }
 
 // HttpUploadResponse Response when asset uploaded
