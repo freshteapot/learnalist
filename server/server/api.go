@@ -47,6 +47,7 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	v1.DELETE("/labels/:label", apiManager.V1RemoveUserLabel)
 
 	// Assets
+	server.GET("/assets/*", assetService.GetAsset)
 	v1.POST("/assets/upload", assetService.Upload)
 
 	// Oauth

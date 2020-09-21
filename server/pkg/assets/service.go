@@ -58,6 +58,23 @@ func (s *AssetService) InitCheck() {
 	logEntry.Info("✔ assets service check")
 }
 
+func (s *AssetService) GetAsset(c echo.Context) error {
+	asset := strings.TrimPrefix(c.Request().URL.Path, "/assets/")
+	// This might do nothing, due to echo routing
+	if strings.Contains(asset, "../") {
+		return c.NoContent(http.StatusTeapot)
+	}
+
+	path := fmt.Sprintf("%s/%s", s.directory, asset)
+	_, err := os.Stat(path)
+
+	if err != nil {
+		return c.NoContent(http.StatusNotFound)
+	}
+
+	return c.File(path)
+}
+
 // ln -s /tmp/learnalist/assets /Users/tinkerbell/git/learnalist-api/hugo/public/assets
 // https://echo.labstack.com/cookbook/file-upload
 func (s *AssetService) Upload(c echo.Context) error {
@@ -88,7 +105,10 @@ func (s *AssetService) Upload(c echo.Context) error {
 			"error":  err,
 			"action": "form_file",
 		}).Error("asset upload")
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+		response := api.HttpResponseMessage{
+			Message: "Check the documentation",
+		}
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	src, err := file.Open()
@@ -119,11 +139,13 @@ func (s *AssetService) Upload(c echo.Context) error {
 			"error":  err,
 			"action": "reading_mimetype_from_file",
 		}).Error("asset upload")
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	extension := mimeTypes[0]
 
 	path := fmt.Sprintf("%s/%s%s", directory, assetUUID.String(), extension)
 
+	logEntry = logEntry.WithField("path", path)
 	dst, err := os.Create(path)
 	if err != nil {
 		logEntry.WithFields(logrus.Fields{
@@ -160,6 +182,9 @@ func (s *AssetService) Upload(c echo.Context) error {
 			"mime_type": extension,
 			"action":    "failed_to_save_db",
 		}).Error("asset upload")
+		// Try to clean up
+		os.Remove(path)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	return c.JSON(http.StatusCreated, HttpUploadResponse{

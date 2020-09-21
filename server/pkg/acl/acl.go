@@ -23,14 +23,28 @@ type AclWriter interface {
 	// Share with friends
 	ShareListWithFriends(alistUUID string) error
 
-	DeleteList(alistUUID string) error
+	DeleteList(alistUUID string) error    // TODO rename
+	DeleteByExtUUID(extUUID string) error // TODO rename
 }
 
-type AclReader interface {
+type AclReaderKind interface {
+	HasUserKindReadAccess(kind string, extUUID string, userUUID string) (bool, error)
+	IsKindPublic(kind string, extUUID string) (bool, error)
+	IsKindPrivate(kind string, extUUID string) (bool, error)
+	IsKindAvailableToFriends(kind string, extUUID string) (bool, error)
+	//HasUserKindReadAccess(alistUUID string, userUUID string) (bool, error)
+}
+
+type AclReaderList interface {
 	HasUserListReadAccess(alistUUID string, userUUID string) (bool, error)
 	HasUserListWriteAccess(alistUUID string, userUUID string) (bool, error)
 	IsListPublic(alistUUID string) (bool, error)
 	IsListPrivate(alistUUID string) (bool, error)
 	IsListAvailableToFriends(alistUUID string) (bool, error)
 	ListIsSharedWith(alistUUID string) (string, error)
+}
+
+type AclReader interface {
+	AclReaderKind
+	AclReaderList
 }
