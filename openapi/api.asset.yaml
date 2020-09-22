@@ -54,14 +54,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
-        "403":
-          description: Access denied, due to not being owner of asset
+        "400":
+          description: Most likely the wrong action
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
-        "400":
-          description: Most likely the wrong action
+        "403":
+          description: Access denied, due to not being owner of asset
           content:
             application/json:
               schema:
@@ -92,6 +92,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpAssetUploadResponse"
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
         "500":
           description: unexpected error
           content:
@@ -116,6 +122,18 @@ paths:
           description: entry deleted
         "400":
           description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: Access denied, due to not being owner of asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Asset is not in the system
           content:
             application/json:
               schema:

@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	SQL_SAVE_ITEM   = `INSERT INTO user_assets(uuid, user_uuid, extension) values(?, ?, ?)`
-	SQL_GET_ITEM    = `SELECT * FROM user_assets WHERE uuid=?`
-	SQL_DELETE_ITEM = `DELETE FROM user_assets WHERE uuid=? AND user_uuid=?`
+	SqlSaveEntry   = `INSERT INTO user_assets(uuid, user_uuid, extension) values(?, ?, ?)`
+	SqlGetEntry    = `SELECT * FROM user_assets WHERE uuid=?`
+	SqlDeleteEntry = `DELETE FROM user_assets WHERE uuid=? AND user_uuid=?`
 )
 
 type SqliteRepository struct {
@@ -23,13 +23,13 @@ func NewSqliteRepository(db *sqlx.DB) Repository {
 }
 
 func (r SqliteRepository) DeleteEntry(userUUID string, UUID string) error {
-	_, err := r.db.Exec(SQL_DELETE_ITEM, UUID, userUUID)
+	_, err := r.db.Exec(SqlDeleteEntry, UUID, userUUID)
 	return err
 }
 
 func (r SqliteRepository) GetEntry(UUID string) (AssetEntry, error) {
 	item := AssetEntry{}
-	err := r.db.Get(&item, SQL_GET_ITEM, UUID)
+	err := r.db.Get(&item, SqlGetEntry, UUID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -42,7 +42,7 @@ func (r SqliteRepository) GetEntry(UUID string) (AssetEntry, error) {
 }
 
 func (r SqliteRepository) SaveEntry(entry AssetEntry) error {
-	_, err := r.db.Exec(SQL_SAVE_ITEM, entry.UUID, entry.UserUUID, entry.Extension)
+	_, err := r.db.Exec(SqlSaveEntry, entry.UUID, entry.UserUUID, entry.Extension)
 	if err != nil {
 		return err
 	}

@@ -68,22 +68,41 @@ func (s *AssetService) InitCheck() {
 // DeleteEntry Deletes a single entry based on the UUID
 func (s *AssetService) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
+	userUUID := user.Uuid
 	UUID := c.Param("uuid")
 
 	if UUID == "" {
 		response := api.HttpResponseMessage{
-			Message: "TODO",
+			Message: "Missing asset uuid",
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-	// TODO check exists?
-	// TODO remove acl
-	err := s.acl.DeleteAsset(UUID)
+
+	// Loook up asset
+	asset, err := s.repo.GetEntry(UUID)
+	if err != nil {
+		if err == ErrNotFound {
+			response := api.HttpResponseMessage{
+				Message: "Asset not found",
+			}
+			return c.JSON(http.StatusNotFound, response)
+		}
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	if asset.UserUUID != userUUID {
+		response := api.HttpResponseMessage{
+			Message: "Access denied",
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	err = s.acl.DeleteAsset(UUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	err = s.repo.DeleteEntry(user.Uuid, UUID)
+	err = s.repo.DeleteEntry(userUUID, UUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
@@ -104,7 +123,7 @@ func (s *AssetService) Share(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response.Message = "TODO bad input"
+		response.Message = "Check the documentation"
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
@@ -112,9 +131,7 @@ func (s *AssetService) Share(c echo.Context) error {
 
 	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
 	if !utils.StringArrayContains(allowed, sharedWith) {
-		response := api.HttpResponseMessage{
-			Message: "Check the documentation",
-		}
+		response.Message = "Check the documentation"
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
@@ -197,6 +214,7 @@ func (s *AssetService) Upload(c echo.Context) error {
 	userUUID := user.Uuid
 	assetUUID := guuid.New()
 	directory := fmt.Sprintf("%s/%s", s.directory, userUUID)
+
 	logEntry = logEntry.WithFields(logrus.Fields{
 		"asset_uuid": assetUUID.String(),
 		"user_uuid":  userUUID,
