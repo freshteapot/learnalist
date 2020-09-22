@@ -9,6 +9,11 @@ type AclWriter interface {
 	AclWriterAsset
 }
 
+type AclList interface {
+	AclWriterList
+	AclReaderList
+}
+
 type AclAsset interface {
 	AclReaderAsset
 	AclWriterAsset
