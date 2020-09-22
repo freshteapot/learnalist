@@ -18,6 +18,12 @@ sudo apt-get install nmap lsof rsync jq
 nmap XXX.XXX.XXX.XXX
 ```
 
+## Lock access to kubernetes 6443
+```sh
+sudo /sbin/iptables -A INPUT -i eth0 -p tcp --destination-port 6443 -j DROP
+iptables-save
+```
+
 ## Install k3s
 - dont install traefik, we are going to use nginx-ingress
 
