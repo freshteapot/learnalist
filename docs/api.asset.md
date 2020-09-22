@@ -8,7 +8,7 @@
 ```sh
 curl -i -XPOST \
 -H"Authorization: Bearer ${token}" \
--F "file=@../server/e2e/testdata/sample.png" \
+-F "file=@./server/e2e/testdata/sample.png" \
 -F "shared_with=public" \
 "http://localhost:1234/api/v1/assets/upload"
 ```
@@ -30,7 +30,7 @@ curl -XGET -I -H"Authorization: Bearer ${token}" \
 ```sh
 curl -XPUT -H"Authorization: Bearer ${token}" \
 'http://localhost:1234/api/v1/assets/share' -d'{
-    "uuid": "78593152-037d-4732-a46b-8059273a2f27",
+    "uuid": "509387be-ba8a-4b0f-991a-ef835ddd5c5d",
     "action": "private"
 }'
 ```

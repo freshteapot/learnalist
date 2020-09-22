@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/antihax/optional"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -98,9 +100,22 @@ var _ = Describe("Testing openapi", func() {
 		Expect(asset.Href).ToNot(BeEmpty())
 		Expect(asset.Href).To(ContainSubstring(user.Uuid))
 
+		// Test public and private list
+		// Not sure how I feel about this
+		assetConfig := openapi.NewConfiguration()
+		assetConfig.BasePath = "http://localhost:1234"
+		assetClient := openapi.NewAPIClient(assetConfig)
+		assetUUID := strings.TrimPrefix(asset.Href, "/assets/")
+		response, _ = assetClient.AssetApi.GetAsset(context.Background(), assetUUID)
+		Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+		_, response, _ = client.AssetApi.ShareAsset(auth, openapi.HttpAssetShareRequestBody{Uuid: asset.Uuid, Action: aclKeys.NotShared})
+		Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+		response, _ = assetClient.AssetApi.GetAsset(context.Background(), assetUUID)
+		Expect(response.StatusCode).To(Equal(http.StatusForbidden))
+
 		_, _, err = client.UserApi.DeleteUser(auth, user.Uuid)
 		Expect(err).To(BeNil())
-
-		// TODO Add share test as well
 	})
 })

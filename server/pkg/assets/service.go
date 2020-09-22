@@ -371,7 +371,9 @@ func (s *AssetService) Upload(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	return c.JSON(http.StatusCreated, HttpUploadResponse{
+	return c.JSON(http.StatusCreated, openapi.HttpAssetUploadResponse{
 		Href: fmt.Sprintf("/assets/%s/%s%s", userUUID, assetUUID.String(), extension),
+		Uuid: assetUUID.String(),
+		Ext:  extension,
 	})
 }
