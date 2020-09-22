@@ -15,6 +15,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -23,12 +24,32 @@ import (
 
 func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *logrus.Entry) AssetService {
 	directory = strings.TrimSuffix(directory, "/")
-	return AssetService{
+	s := AssetService{
 		acl:       acl,
 		directory: directory,
 		logEntry:  logEntry,
 		repo:      repo,
 	}
+
+	//
+	event.GetBus().Subscribe(event.ApiUserDelete, func(userUUID string) {
+		s.DeleteUserAssets(userUUID)
+	})
+	return s
+}
+
+func (s *AssetService) DeleteUserAssets(userUUID string) {
+	if userUUID == "" {
+		return
+	}
+
+	directory := fmt.Sprintf("%s/%s", s.directory, userUUID)
+	s.logEntry.WithFields(logrus.Fields{
+		"user_uuid": userUUID,
+		"directory": directory,
+		"action":    "rm_user_assets",
+	}).Info("removing assets")
+	os.RemoveAll(directory)
 }
 
 func (s *AssetService) InitCheck() {
