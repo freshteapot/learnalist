@@ -15,7 +15,11 @@ curl -i -XPOST \
 
 ### Response
 ```sh
-{"href":"/assets/affb846a-b02b-4d6e-a74b-afc19943dbf2/262fae17-b744-4987-b2dd-641ea1c7551a.png"}
+{
+    "href":"/assets/affb846a-b02b-4d6e-a74b-afc19943dbf2/262fae17-b744-4987-b2dd-641ea1c7551a.png"
+    "uuid": "262fae17-b744-4987-b2dd-641ea1c7551a",
+    "ext": "png"
+}
 ```
 
 ## Get asset
