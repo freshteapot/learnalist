@@ -195,7 +195,6 @@ func (s *AssetService) GetAsset(c echo.Context) error {
 		return c.NoContent(http.StatusNotFound)
 	}
 
-	// TODO Check access to asset
 	user := c.Get("loggedInUser")
 	userUUID := ""
 	if user != nil {
@@ -335,8 +334,6 @@ func (s *AssetService) Upload(c echo.Context) error {
 		"action": "uploaded",
 	}).Info("asset upload")
 
-	// TODO add privacy settings private,public
-	logEntry.WithField("shared_with", sharedWith).Warn("TODO")
 	// write to db
 	err = s.repo.SaveEntry(AssetEntry{
 		UUID:      assetUUID.String(),
