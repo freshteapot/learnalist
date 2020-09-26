@@ -7,16 +7,17 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/antihax/optional v1.0.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
-	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gookit/goutil v0.2.7 // indirect
 	github.com/gookit/validate v1.2.0
 	github.com/itchyny/gojq v0.10.4
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo/v4 v4.1.17
-	github.com/lib/pq v1.2.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
+	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
+	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
+	github.com/nats-io/stan.go v0.7.0
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
 	github.com/pelletier/go-toml v1.8.0 // indirect

@@ -19,6 +19,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,8 +32,10 @@ func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *l
 		repo:      repo,
 	}
 
-	//
-	event.GetBus().Subscribe(event.ApiUserDelete, func(userUUID string) {
+	event.GetBus().Subscribe(event.ApiUserDelete, func(msg *stan.Msg) {
+		fmt.Printf("Listening to %s\n", event.ApiUserDelete)
+		userUUID := string(msg.Data)
+		fmt.Println("event.ApiUserDelete", userUUID)
 		s.DeleteUserAssets(userUUID)
 	})
 	return s

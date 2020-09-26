@@ -76,6 +76,12 @@ var ServerCmd = &cobra.Command{
 			"settings": viper.AllSettings(),
 		}).Info("server startup")
 
+		//event.SetBus(event.NewMemoryBus())
+
+		natsServer := "test-cluster"
+		natsClientID := "chris"
+		event.SetBus(event.NewNatBus(natsServer, natsClientID))
+
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,

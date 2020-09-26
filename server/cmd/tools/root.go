@@ -20,4 +20,5 @@ func init() {
 	RootCmd.AddCommand(user.RootCmd)
 	RootCmd.AddCommand(api.RootCmd)
 	RootCmd.AddCommand(docs.RootCmd)
+	RootCmd.AddCommand(eventReaderCMD)
 }
