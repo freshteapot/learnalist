@@ -53,6 +53,7 @@ generate-openapi-one:
 	mkdir -p /tmp/openapi/one && \
 	cp ./openapi/learnalist.yaml /tmp/openapi/one/ && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.version.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.asset.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.user.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.alist.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \

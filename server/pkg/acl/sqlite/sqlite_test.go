@@ -16,6 +16,7 @@ var _ = Describe("Testing Acl", func() {
 	var doorKeeper acl.Acl
 	BeforeEach(func() {
 		db = database.NewTestDB()
+
 	})
 
 	AfterEach(func() {

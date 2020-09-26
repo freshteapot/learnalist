@@ -109,7 +109,7 @@ func (m sqliteManagement) DeleteList(listUUID string) error {
 	db := m.db
 	queries := []string{
 		"DELETE FROM alist_labels WHERE alist_uuid=?",
-		"DELETE FROM acl_simple WHERE alist_uuid=?",
+		"DELETE FROM acl_simple WHERE ext_uuid=?",
 		"DELETE FROM alist_kv WHERE uuid=?"}
 
 	tx, err := db.Beginx()

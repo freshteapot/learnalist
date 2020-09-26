@@ -2,11 +2,14 @@
 
 | Method | Uri | Description | Status Codes |
 | --- | --- | --- | --- |
-| post | /alist | add a new list | 201,400,500 |
+| post | /alist | add a new list | 201,400,422,500 |
 | get | /alist/by/me | Get lists by me | 200 |
 | delete | /alist/{uuid} | Delete a list | 200,403,404,500 |
 | get | /alist/{uuid} | Get a list | 200,403,404,500 |
-| put | /alist/{uuid} | Update a list | 200,403,404,500 |
+| put | /alist/{uuid} | Update a list | 200,403,404,422,500 |
+| put | /assets/share | Set asset for public or private access | 200,400,403,500 |
+| post | /assets/upload | Upload asset and link it to the user logged in | 201,400,500 |
+| delete | /assets/{uuid} | Deletes a single entry based on the UUID | 204,400,403,404,500 |
 | post | /spaced-repetition/ | Add entry for spaced based learning | 200,201,400,500 |
 | get | /spaced-repetition/all | Get all entries for spaced repetition learning | 200,500 |
 | get | /spaced-repetition/next | Get next entry for spaced based learning | 200,204,404,500 |

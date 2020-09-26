@@ -9,6 +9,34 @@ type Acl struct {
 	mock.Mock
 }
 
+// DeleteAsset provides a mock function with given fields: extUUID
+func (_m *Acl) DeleteAsset(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteByExtUUID provides a mock function with given fields: extUUID
+func (_m *Acl) DeleteByExtUUID(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteList provides a mock function with given fields: alistUUID
 func (_m *Acl) DeleteList(alistUUID string) error {
 	ret := _m.Called(alistUUID)
@@ -16,6 +44,20 @@ func (_m *Acl) DeleteList(alistUUID string) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string) error); ok {
 		r0 = rf(alistUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// GrantUserAssetReadAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *Acl) GrantUserAssetReadAccess(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -49,6 +91,27 @@ func (_m *Acl) GrantUserListWriteAccess(alistUUID string, userUUID string) error
 	}
 
 	return r0
+}
+
+// HasUserAssetReadAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *Acl) HasUserAssetReadAccess(extUUID string, userUUID string) (bool, error) {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(extUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // HasUserListReadAccess provides a mock function with given fields: alistUUID, userUUID
@@ -114,20 +177,20 @@ func (_m *Acl) IsListAvailableToFriends(alistUUID string) (bool, error) {
 	return r0, r1
 }
 
-// IsListPrivate provides a mock function with given fields: alistUUID
-func (_m *Acl) IsListPrivate(alistUUID string) (bool, error) {
-	ret := _m.Called(alistUUID)
+// IsListPrivate provides a mock function with given fields: extUUID
+func (_m *Acl) IsListPrivate(extUUID string) (bool, error) {
+	ret := _m.Called(extUUID)
 
 	var r0 bool
 	if rf, ok := ret.Get(0).(func(string) bool); ok {
-		r0 = rf(alistUUID)
+		r0 = rf(extUUID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(alistUUID)
+		r1 = rf(extUUID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -135,20 +198,20 @@ func (_m *Acl) IsListPrivate(alistUUID string) (bool, error) {
 	return r0, r1
 }
 
-// IsListPublic provides a mock function with given fields: alistUUID
-func (_m *Acl) IsListPublic(alistUUID string) (bool, error) {
-	ret := _m.Called(alistUUID)
+// IsListPublic provides a mock function with given fields: extUUID
+func (_m *Acl) IsListPublic(extUUID string) (bool, error) {
+	ret := _m.Called(extUUID)
 
 	var r0 bool
 	if rf, ok := ret.Get(0).(func(string) bool); ok {
-		r0 = rf(alistUUID)
+		r0 = rf(extUUID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(alistUUID)
+		r1 = rf(extUUID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -177,6 +240,20 @@ func (_m *Acl) ListIsSharedWith(alistUUID string) (string, error) {
 	return r0, r1
 }
 
+// MakeAssetPrivate provides a mock function with given fields: extUUID, userUUID
+func (_m *Acl) MakeAssetPrivate(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // MakeListPrivate provides a mock function with given fields: alistUUID, userUUID
 func (_m *Acl) MakeListPrivate(alistUUID string, userUUID string) error {
 	ret := _m.Called(alistUUID, userUUID)
@@ -184,6 +261,20 @@ func (_m *Acl) MakeListPrivate(alistUUID string, userUUID string) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
 		r0 = rf(alistUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RevokeUserAssetReadAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *Acl) RevokeUserAssetReadAccess(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -212,6 +303,20 @@ func (_m *Acl) RevokeUserListWriteAccess(alistUUID string, userUUID string) erro
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
 		r0 = rf(alistUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ShareAssetWithPublic provides a mock function with given fields: extUUID
+func (_m *Acl) ShareAssetWithPublic(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
 	} else {
 		r0 = ret.Error(0)
 	}

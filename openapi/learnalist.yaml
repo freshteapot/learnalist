@@ -20,11 +20,15 @@ components:
 
     HttpResponseMessage:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
     Kind:
       type: object
+      required:
+        - kind
       properties:
         kind:
           type: string

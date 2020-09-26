@@ -198,7 +198,7 @@ var decrThresholds = []struct {
 	},
 }
 
-type service struct {
+type SpacedRepetitionService struct {
 	db   *sqlx.DB
 	repo Repository
 }

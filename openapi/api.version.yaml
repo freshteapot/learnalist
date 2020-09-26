@@ -2,6 +2,11 @@ components:
   schemas:
     Version:
       type: object
+      required:
+        - gitHash
+        - gitDate
+        - version
+        - url
       properties:
         gitHash:
           type: string

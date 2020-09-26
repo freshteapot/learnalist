@@ -1,0 +1,174 @@
+components:
+  schemas:
+    HttpAssetShareRequestBody:
+      type: object
+      required:
+        - uuid
+        - action
+      properties:
+        uuid:
+          type: string
+        action:
+          type: string
+          enum:
+            - private
+            - public
+    HttpAssetUploadRequestBody:
+      type: object
+      required:
+        - file
+      properties:
+        shared_with:
+          type: string
+          enum:
+            - private
+            - public
+        file:
+          type: string
+          format: binary
+    HttpAssetUploadResponse:
+      type: object
+      required:
+        - href
+        - uuid
+        - ext
+      properties:
+        href:
+          type: string
+        uuid:
+          type: string
+        ext:
+          type: string
+paths:
+  /assets/share:
+    put:
+      tags:
+        - asset
+      operationId: shareAsset
+      description: Set asset for public or private access
+      requestBody:
+        description: Share with...
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpAssetShareRequestBody"
+      responses:
+        "200":
+          description: Asset updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "400":
+          description: Most likely the wrong action
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: Access denied, due to not being owner of asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /assets/upload:
+    post:
+      tags:
+        - asset
+      operationId: addUserAsset
+      description: Upload asset and link it to the user logged in
+      requestBody:
+        description: File to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/HttpAssetUploadRequestBody"
+      responses:
+        "201":
+          description: Asset uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpAssetUploadResponse"
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /assets/{uuid}:
+    get:
+      tags:
+        - asset
+      servers:
+        - url: https://learnalist.net/
+        - url: http://localhost:1234/
+      operationId: getAsset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The asset.
+          content:
+            "*":
+              schema:
+                type: string
+                format: binary
+    delete:
+      tags:
+        - asset
+      description: Deletes a single asset based on the UUID
+      operationId: deleteAsset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of asset
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: asset deleted
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: Access denied, due to not being owner of asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Asset is not in the system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

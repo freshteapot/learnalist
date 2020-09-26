@@ -2,7 +2,10 @@ hugo:
   directory: "/srv/learnalist/hugo"
   environment: "lal01"
   external: "false"
+
 server:
+  assets:
+    directory: "/srv/learnalist/assets"
   sqlite:
     database: /srv/learnalist/server.db
   port: "1234"
@@ -16,6 +19,7 @@ server:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "https://learnalist.net"
+
 tools:
   integrationTests:
     username: ""
