@@ -33,11 +33,6 @@ var (
 	bus       messagebus.MessageBus
 )
 
-// TODO maybe skip the whole messageBus and just use nats?
-func NewMemoryBus() messagebus.MessageBus {
-	return messagebus.New(queueSize)
-}
-
 func GetBus() messagebus.MessageBus {
 	return bus
 }

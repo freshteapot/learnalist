@@ -77,10 +77,16 @@ var ServerCmd = &cobra.Command{
 		}).Info("server startup")
 
 		//event.SetBus(event.NewMemoryBus())
+		eventsVia := "memory"
+		if eventsVia == "memory" {
+			event.SetBus(event.NewMemoryBus())
+		}
 
-		natsServer := "test-cluster"
-		natsClientID := "chris"
-		event.SetBus(event.NewNatBus(natsServer, natsClientID))
+		if eventsVia == "nats" {
+			natsServer := "test-cluster"
+			natsClientID := "chris"
+			event.SetBus(event.NewNatBus(natsServer, natsClientID))
+		}
 
 		serverConfig := server.Config{
 			Port:             port,
