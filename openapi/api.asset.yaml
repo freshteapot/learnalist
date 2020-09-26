@@ -127,7 +127,7 @@ paths:
             type: string
       responses:
         "200":
-          description: entry deleted
+          description: The asset.
           content:
             "*":
               schema:
@@ -136,18 +136,18 @@ paths:
     delete:
       tags:
         - asset
-      description: Deletes a single entry based on the UUID
-      operationId: deleteAssetEntry
+      description: Deletes a single asset based on the UUID
+      operationId: deleteAsset
       parameters:
         - name: uuid
           in: path
-          description: UUID of entry
+          description: UUID of asset
           required: true
           schema:
             type: string
       responses:
         "204":
-          description: entry deleted
+          description: asset deleted
         "400":
           description: Bad request, missing uuid
           content:
