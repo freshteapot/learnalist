@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/nats-io/stan.go"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -37,19 +37,29 @@ var eventReaderCMD = &cobra.Command{
 	},
 }
 
-func readEventLog(stanMsg *stan.Msg) {
-	var entry event.Eventlog
-	err := json.Unmarshal(stanMsg.Data, &entry)
-	if err != nil {
-		return
-	}
-
+func readEventLog(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserLogin:
-		userUUID := string(entry.Data)
-		fmt.Printf("User %s logged in", userUUID)
+		logger := logging.GetLogger()
+
+		userUUID := entry.Data.(string)
+		logger.WithFields(logrus.Fields{
+			"user_uuid": userUUID,
+			"kind":      entry.Kind,
+		}).Info(entry.Kind)
+
+		fmt.Printf("%s: user %s logged in\n", entry.Kind, userUUID)
+	case event.ApiUserDelete:
+		logger := logging.GetLogger()
+
+		userUUID := entry.Data.(string)
+		logger.WithFields(logrus.Fields{
+			"user_uuid": userUUID,
+			"kind":      entry.Kind,
+		}).Info(entry.Kind)
+		fmt.Printf("%s: user %s should be deleted\n", entry.Kind, userUUID)
 	default:
-		fmt.Println(entry.Kind)
-		fmt.Println(string(entry.Data))
+		b, _ := json.Marshal(entry)
+		fmt.Println(string(b))
 	}
 }

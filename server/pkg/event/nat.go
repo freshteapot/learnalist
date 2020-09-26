@@ -1,6 +1,7 @@
 package event
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -46,9 +47,15 @@ func (b *natBus) Subscribe(topic string, fn interface{}) error {
 	durableName := "TODO"
 	_, err := b.sc.Subscribe(topic,
 		func(stanMsg *stan.Msg) {
-			type HandlerType func(msg *stan.Msg)
-			if f, ok := fn.(func(msg *stan.Msg)); ok {
-				HandlerType(f)(stanMsg)
+			var entryLog Eventlog
+			err := json.Unmarshal(stanMsg.Data, &entryLog)
+			if err != nil {
+				return
+			}
+
+			type HandlerType func(entry Eventlog)
+			if f, ok := fn.(func(entry Eventlog)); ok {
+				HandlerType(f)(entryLog)
 			}
 		},
 		stan.DurableName(durableName))

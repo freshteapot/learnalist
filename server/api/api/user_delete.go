@@ -32,7 +32,10 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.ApiUserDelete, []byte(userUUID))
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: event.ApiUserDelete,
+		Data: userUUID,
+	}))
 
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 	response.Message = "User has been removed"

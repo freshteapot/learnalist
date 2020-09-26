@@ -9,6 +9,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	guuid "github.com/google/uuid"
@@ -98,6 +99,14 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			}).Error("Failed to register new user via idp")
 			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
+
+		event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+			Kind: event.ApiUserRegister,
+			Data: event.EventUserRegister{
+				UUID: userUUID,
+				Kind: event.KindUserRegisterIDPGoogle,
+			},
+		}))
 
 		// Write an empty list
 		m.HugoHelper.WriteListsByUser(userUUID, m.Datastore.GetAllListsByUser(userUUID))

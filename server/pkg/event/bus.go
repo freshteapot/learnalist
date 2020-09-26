@@ -7,14 +7,25 @@ import (
 )
 
 const (
-	ApiUserDelete = "api.user.delete"
-	ApiUserLogin  = "api.user.login"
-	TopicMonolog  = "lal.monolog"
+	ApiUserDelete             = "api.user.delete"
+	ApiUserLogin              = "api.user.login"
+	ApiUserRegister           = "api.user.register"
+	TopicMonolog              = "lal.monolog"
+	KindUserRegisterUsername  = "username"
+	KindUserRegisterIDPGoogle = "idp:google"
 )
 
 type Eventlog struct {
-	Kind string
-	Data []byte
+	Kind string `json:"kind"`
+	//Data []byte `json:"data"`
+	Data interface{} `json:"data"`
+	// TODO maybe add when
+	//When int64 / time.Time
+}
+
+type EventUserRegister struct {
+	UUID string `json:"uuid"`
+	Kind string `json:"kind"`
 }
 
 var (
@@ -22,6 +33,7 @@ var (
 	bus       messagebus.MessageBus
 )
 
+// TODO maybe skip the whole messageBus and just use nats?
 func NewMemoryBus() messagebus.MessageBus {
 	return messagebus.New(queueSize)
 }
