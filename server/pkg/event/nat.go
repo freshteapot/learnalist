@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 	messagebus "github.com/vardius/message-bus"
 )
@@ -13,8 +14,8 @@ type natBus struct {
 	sc stan.Conn
 }
 
-func NewNatBus(server string, clientID string) messagebus.MessageBus {
-	sc, err := stan.Connect(server, clientID)
+func NewNatBus(server string, clientID string, nc *nats.Conn) messagebus.MessageBus {
+	sc, err := stan.Connect(server, clientID, stan.NatsConn(nc))
 	fmt.Println(err)
 	return &natBus{
 		sc: sc,

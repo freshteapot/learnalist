@@ -17,6 +17,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
 	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
+	github.com/nats-io/nats.go v1.10.0
 	github.com/nats-io/stan.go v0.7.0
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1

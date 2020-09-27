@@ -29,6 +29,10 @@ spec:
           env:
             - name: HUGO_EXTERNAL
               value: "true"
+            - name: EVENTS_VIA
+              value: "memory"
+            - name: EVENTS_NATS_SERVER
+              value: "nats.default.svc.cluster.local"
 
           volumeMounts:
             - name: config-volume

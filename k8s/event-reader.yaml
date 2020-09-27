@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-reader
+  labels:
+    app: event-reader
+spec:
+  selector:
+    matchLabels:
+      app: event-reader
+  template:
+    metadata:
+      labels:
+        app: event-reader
+    spec:
+      containers:
+        - name: event-reader
+          image: registry.devbox/learnalist:latest
+          args:
+            [
+              "server",
+              "--config=/etc/learnalist/config.yaml",
+              "tools",
+              "event-reader",
+              "echo",
+            ]
+          env:
+            - name: HUGO_EXTERNAL
+              value: "true"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
+
+            - name: srv-learnalist-volume
+              mountPath: "/srv/learnalist/"
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learnalist-config
+
+        - name: srv-learnalist-volume
+          persistentVolumeClaim:
+            claimName: srv-learnalist-pvc-01

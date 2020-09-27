@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -85,7 +86,11 @@ var ServerCmd = &cobra.Command{
 		if eventsVia == "nats" {
 			natsServer := viper.GetString("server.events.nats.server")
 			natsClientID := viper.GetString("server.events.nats.clientID")
-			event.SetBus(event.NewNatBus(natsServer, natsClientID))
+			nats, err := nats.Connect(natsServer)
+			if err != nil {
+				panic(err)
+			}
+			event.SetBus(event.NewNatBus(natsServer, natsClientID, nats))
 		}
 
 		serverConfig := server.Config{
