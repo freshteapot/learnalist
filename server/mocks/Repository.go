@@ -12,6 +12,20 @@ type Repository struct {
 	mock.Mock
 }
 
+// DeleteEntry provides a mock function with given fields: userUUID, UUID
+func (_m *Repository) DeleteEntry(userUUID string, UUID string) error {
+	ret := _m.Called(userUUID, UUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userUUID, UUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetEntry provides a mock function with given fields: UUID
 func (_m *Repository) GetEntry(UUID string) (assets.AssetEntry, error) {
 	ret := _m.Called(UUID)

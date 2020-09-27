@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 
@@ -97,6 +98,10 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				userWithUsernameAndPassword.On("Register", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 					Return(userInfo, nil)
+
+				eventMessageBus := &mocks.MessageBus{}
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+				event.SetBus(eventMessageBus)
 
 				m.V1PostRegister(c)
 				Expect(rec.Code).To(Equal(http.StatusCreated))

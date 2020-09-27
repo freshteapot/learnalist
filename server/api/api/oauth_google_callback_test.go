@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -202,6 +203,10 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				userSession.On("Activate", mock.Anything).Return(nil)
 				oauthReadWriter.On("GetTokenInfo", userUUID).Return(nil, errors.New("not found"))
 				oauthReadWriter.On("WriteTokenInfo", userUUID, mock.Anything).Return(nil)
+
+				eventMessageBus := &mocks.MessageBus{}
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+				event.SetBus(eventMessageBus)
 
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 				req, rec := setupFakeEndpoint(method, uri, "")
