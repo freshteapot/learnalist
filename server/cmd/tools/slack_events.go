@@ -88,14 +88,14 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		msg.Text = fmt.Sprintf("%s: user %s should be deleted\n", entry.Kind, userUUID)
 	case event.ApiListSaved:
 		b, _ := json.Marshal(entry.Data)
-		var listEvent event.EventList
-		json.Unmarshal(b, &listEvent)
-		msg.Text = fmt.Sprintf(`list:%s (%s) %s by user:%s`, listEvent.UUID, listEvent.Data.Info.SharedWith, listEvent.Action, listEvent.UserUUID)
+		var moment event.EventList
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf(`list:%s (%s) %s by user:%s`, moment.UUID, moment.Data.Info.SharedWith, moment.Action, moment.UserUUID)
 	case event.ApiListDelete:
 		b, _ := json.Marshal(entry.Data)
-		var listEvent event.EventList
-		json.Unmarshal(b, &listEvent)
-		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", listEvent.UUID, listEvent.UserUUID)
+		var moment event.EventList
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
 
 	case spaced_repetition.EventApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
