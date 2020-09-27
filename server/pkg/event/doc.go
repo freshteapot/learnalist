@@ -11,6 +11,7 @@ const (
 	ApiUserRegister           = "api.user.register"
 	ApiListSaved              = "api.list.saved"
 	ApiListDelete             = "api.list.delete"
+	ApiSpacedRepetition       = "api.spacedrepetition"
 	TopicMonolog              = "lal.monolog"
 	KindUserRegisterUsername  = "username"
 	KindUserRegisterIDPGoogle = "idp:google"

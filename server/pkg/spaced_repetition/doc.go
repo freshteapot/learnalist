@@ -226,3 +226,17 @@ var (
 	ErrFoundNotTime                = errors.New("found.not.time")
 	ErrSpacedRepetitionEntryExists = errors.New("item.exists")
 )
+
+// Event specific
+var (
+	EventApiSpacedRepetition = "api.spacedrepetition"
+	EventKindNew             = "new"
+	EventKindViewed          = "viewed"
+	EventKindDeleted         = "deleted"
+)
+
+type EventSpacedRepetition struct {
+	Kind   string                `json:"kind"`
+	Action string                `json:"action,omitempty"`
+	Data   SpacedRepetitionEntry `json:"data"`
+}

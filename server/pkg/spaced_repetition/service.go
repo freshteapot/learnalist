@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
@@ -67,6 +68,17 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	if statusCode == http.StatusCreated {
+		event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+			Kind: EventApiSpacedRepetition,
+			Data: EventSpacedRepetition{
+				Kind: EventKindNew,
+				Data: item,
+			},
+		}))
+	}
+
 	return c.JSON(statusCode, current)
 }
 
@@ -82,10 +94,24 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
+	// TODO check if entry exsits
 	err := s.repo.DeleteEntry(user.Uuid, UUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	// This event fires, even if the entry doesnt exist
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: EventApiSpacedRepetition,
+		Data: EventSpacedRepetition{
+			Kind: EventKindDeleted,
+			Data: SpacedRepetitionEntry{
+				UUID:     UUID,
+				UserUUID: user.Uuid,
+			},
+		},
+	}))
+
 	return c.NoContent(http.StatusNoContent)
 }
 
@@ -157,8 +183,11 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		entry = V2FromDB(item.Body)
 	}
 
+	// TODO we do not protect actions
+
 	// increment level
 	// increment threshold
+	// TODO change to const
 	if input.Action == "incr" {
 		entry.IncrThreshold()
 	}
@@ -175,6 +204,15 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: EventApiSpacedRepetition,
+		Data: EventSpacedRepetition{
+			Kind:   EventKindViewed,
+			Action: input.Action,
+			Data:   item,
+		},
+	}))
 
 	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
 	if err != nil {

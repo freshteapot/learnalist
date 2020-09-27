@@ -14,6 +14,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
 var slackEventsCMD = &cobra.Command{
@@ -95,6 +96,31 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var listEvent event.EventList
 		json.Unmarshal(b, &listEvent)
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", listEvent.UUID, listEvent.UserUUID)
+
+	case spaced_repetition.EventApiSpacedRepetition:
+		b, _ := json.Marshal(entry.Data)
+		var moment spaced_repetition.EventSpacedRepetition
+		json.Unmarshal(b, &moment)
+
+		if moment.Kind == spaced_repetition.EventKindNew {
+			msg.Text = fmt.Sprintf("User:%s added a new entry for spaced based learning", moment.Data.UserUUID)
+		}
+
+		if moment.Kind == spaced_repetition.EventKindViewed {
+			when := "na"
+			if moment.Action == "incr" {
+				when = "later"
+			}
+
+			if moment.Action == "decr" {
+				when = "sooner"
+			}
+			msg.Text = fmt.Sprintf("User:%s will be reminded %s of entry:%s", moment.Data.UserUUID, when, moment.Data.UUID)
+		}
+
+		if moment.Kind == spaced_repetition.EventKindDeleted {
+			msg.Text = fmt.Sprintf("User:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
+		}
 
 	default:
 		b, _ := json.Marshal(entry)
