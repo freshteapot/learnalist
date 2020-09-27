@@ -83,8 +83,8 @@ var ServerCmd = &cobra.Command{
 		}
 
 		if eventsVia == "nats" {
-			natsServer := "test-cluster"
-			natsClientID := "chris"
+			natsServer := viper.GetString("server.events.nats.server")
+			natsClientID := viper.GetString("server.events.nats.clientID")
 			event.SetBus(event.NewNatBus(natsServer, natsClientID))
 		}
 
@@ -147,6 +147,11 @@ func init() {
 	// If the events are not complicated, then this should work for memory or nats
 	viper.SetDefault("server.events.via", "memory")
 	viper.BindEnv("server.events.via", "EVENTS_VIA")
+
+	viper.SetDefault("server.events.nats.server", "nats")
+	viper.SetDefault("server.events.nats.clientID", "lal-01")
+	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
+	viper.BindEnv("server.events.nats.clientID", "EVENTS_NATS_CLIENTID")
 
 	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }
