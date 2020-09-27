@@ -1,6 +1,28 @@
 package event
 
-import messagebus "github.com/vardius/message-bus"
+import (
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	messagebus "github.com/vardius/message-bus"
+)
+
+const (
+	ApiUserDelete             = "api.user.delete"
+	ApiUserLogin              = "api.user.login"
+	ApiUserRegister           = "api.user.register"
+	ApiListSaved              = "api.list.saved"
+	ApiListDelete             = "api.list.delete"
+	TopicMonolog              = "lal.monolog"
+	KindUserRegisterUsername  = "username"
+	KindUserRegisterIDPGoogle = "idp:google"
+	ActionListCreated         = "created"
+	ActionListUpsert          = "updated"
+	ActionListDeleted         = "deleted"
+)
+
+var (
+	queueSize = 100
+	bus       messagebus.MessageBus
+)
 
 // Taken from https://github.com/vardius/message-bus
 // So I can create a mock
@@ -29,7 +51,9 @@ type EventUserRegister struct {
 	Kind string `json:"kind"`
 }
 
-var (
-	queueSize = 100
-	bus       messagebus.MessageBus
-)
+type EventList struct {
+	UUID     string       `json:"uuid"`
+	UserUUID string       `json:"user_uuid"`
+	Action   string       `json:"action,omitempty"`
+	Data     *alist.Alist `json:"data,omitempty"`
+}

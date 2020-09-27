@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 )
 
@@ -91,8 +92,22 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	statusCode := http.StatusOK
+	action := "udpated"
 	if method == http.MethodPost {
 		statusCode = http.StatusCreated
+		action = "created"
 	}
+
+	// This will break if the list is too large (size of nats 1mb)
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: event.ApiListSaved,
+		Data: event.EventList{
+			UUID:     aList.Uuid,
+			UserUUID: user.Uuid,
+			Action:   action,
+			Data:     &aList,
+		},
+	}))
+
 	return c.JSON(statusCode, aList)
 }

@@ -6,15 +6,6 @@ import (
 	messagebus "github.com/vardius/message-bus"
 )
 
-const (
-	ApiUserDelete             = "api.user.delete"
-	ApiUserLogin              = "api.user.login"
-	ApiUserRegister           = "api.user.register"
-	TopicMonolog              = "lal.monolog"
-	KindUserRegisterUsername  = "username"
-	KindUserRegisterIDPGoogle = "idp:google"
-)
-
 func GetBus() messagebus.MessageBus {
 	return bus
 }

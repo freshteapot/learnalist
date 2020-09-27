@@ -156,7 +156,8 @@ func init() {
 
 	viper.SetDefault("server.events.nats.server", "nats")
 	viper.SetDefault("server.events.stan.clusterID", "stan")
-	viper.SetDefault("server.events.stan.clientID", "lal-01")
+	viper.SetDefault("server.events.stan.clientID", "")
+
 	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
 	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
 	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")

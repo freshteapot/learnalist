@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,6 +33,14 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 		response.Message = i18n.InternalServerErrorDeleteAlist
 		return c.JSON(http.StatusInternalServerError, response)
 	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: event.ApiListDelete,
+		Data: event.EventList{
+			UUID:     alistUUID,
+			UserUUID: user.Uuid,
+		},
+	}))
 
 	// Remove from cache
 	m.HugoHelper.DeleteList(alistUUID)
