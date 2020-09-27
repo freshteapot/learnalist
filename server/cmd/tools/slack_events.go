@@ -70,22 +70,19 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 	var msg slack.WebhookMessage
 
 	switch entry.Kind {
+	case event.ApiUserRegister:
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventUserRegister
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("%s: user %s registered via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogin:
-
-		userUUID := entry.Data.(string)
-		s.logContext.WithFields(logrus.Fields{
-			"user_uuid": userUUID,
-			"kind":      entry.Kind,
-		}).Info(entry.Kind)
-
-		msg.Text = fmt.Sprintf("%s: user %s logged in\n", entry.Kind, userUUID)
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventUserLogin
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("%s: user %s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserDelete:
 		userUUID := entry.Data.(string)
-		s.logContext.WithFields(logrus.Fields{
-			"user_uuid": userUUID,
-			"kind":      entry.Kind,
-		}).Info(entry.Kind)
-		msg.Text = fmt.Sprintf("%s: user %s should be deleted\n", entry.Kind, userUUID)
+		msg.Text = fmt.Sprintf("%s: user %s should be deleted", entry.Kind, userUUID)
 	case event.ApiListSaved:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList
@@ -96,7 +93,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var moment event.EventList
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
-
 	case spaced_repetition.EventApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
