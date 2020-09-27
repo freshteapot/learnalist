@@ -76,8 +76,8 @@ var ServerCmd = &cobra.Command{
 			"settings": viper.AllSettings(),
 		}).Info("server startup")
 
-		//event.SetBus(event.NewMemoryBus())
-		eventsVia := "memory"
+		// This now works for the "application"
+		eventsVia := viper.GetString("server.events.via")
 		if eventsVia == "memory" {
 			event.SetBus(event.NewMemoryBus())
 		}
@@ -143,5 +143,10 @@ func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
+
+	// If the events are not complicated, then this should work for memory or nats
+	viper.SetDefault("server.events.via", "memory")
+	viper.BindEnv("server.events.via", "EVENTS_VIA")
+
 	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }

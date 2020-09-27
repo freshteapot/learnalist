@@ -31,7 +31,6 @@ func (b *lalMessageBus) Close(topic string) {
 }
 
 func (b *lalMessageBus) Subscribe(topic string, fn interface{}) error {
-
 	return b.bus.Subscribe(topic, fn)
 }
 

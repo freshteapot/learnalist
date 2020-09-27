@@ -9,18 +9,6 @@ import (
 	messagebus "github.com/vardius/message-bus"
 )
 
-type MessageBus interface {
-	// Publish publishes arguments to the given topic subscribers
-	// Publish block only when the buffer of one of the subscribers is full.
-	Publish(topic string, args ...interface{})
-	// Close unsubscribe all handlers from given topic
-	Close(topic string)
-	// Subscribe subscribes to the given topic
-	Subscribe(topic string, fn interface{}) error
-	// Unsubscribe unsubscribe handler from the given topic
-	Unsubscribe(topic string, fn interface{}) error
-}
-
 type natBus struct {
 	sc stan.Conn
 }
