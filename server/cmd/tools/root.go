@@ -21,4 +21,5 @@ func init() {
 	RootCmd.AddCommand(api.RootCmd)
 	RootCmd.AddCommand(docs.RootCmd)
 	RootCmd.AddCommand(eventReaderCMD)
+	RootCmd.AddCommand(slackEventsCMD)
 }

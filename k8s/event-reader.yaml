@@ -34,14 +34,7 @@ spec:
               subPath: config.yaml
               readOnly: true
 
-            - name: srv-learnalist-volume
-              mountPath: "/srv/learnalist/"
-
       volumes:
         - name: config-volume
           configMap:
             name: learnalist-config
-
-        - name: srv-learnalist-volume
-          persistentVolumeClaim:
-            claimName: srv-learnalist-pvc-01
