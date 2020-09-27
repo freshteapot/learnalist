@@ -85,12 +85,13 @@ var ServerCmd = &cobra.Command{
 
 		if eventsVia == "nats" {
 			natsServer := viper.GetString("server.events.nats.server")
-			natsClientID := viper.GetString("server.events.nats.clientID")
+			stanClusterID := viper.GetString("server.events.stan.clusterID")
+			stanClientID := viper.GetString("server.events.stan.clientID")
 			nats, err := nats.Connect(natsServer)
 			if err != nil {
 				panic(err)
 			}
-			event.SetBus(event.NewNatBus(natsServer, natsClientID, nats))
+			event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
 		}
 
 		serverConfig := server.Config{
@@ -154,9 +155,11 @@ func init() {
 	viper.BindEnv("server.events.via", "EVENTS_VIA")
 
 	viper.SetDefault("server.events.nats.server", "nats")
-	viper.SetDefault("server.events.nats.clientID", "lal-01")
+	viper.SetDefault("server.events.stan.clusterID", "stan")
+	viper.SetDefault("server.events.stan.clientID", "lal-01")
 	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-	viper.BindEnv("server.events.nats.clientID", "EVENTS_NATS_CLIENTID")
+	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
+	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
 
 	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }

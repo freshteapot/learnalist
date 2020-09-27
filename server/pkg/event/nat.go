@@ -14,8 +14,15 @@ type natBus struct {
 	sc stan.Conn
 }
 
-func NewNatBus(server string, clientID string, nc *nats.Conn) messagebus.MessageBus {
-	sc, err := stan.Connect(server, clientID, stan.NatsConn(nc))
+func NewNatBus(clusterID string, clientID string, nc *nats.Conn) messagebus.MessageBus {
+	sc, err := stan.Connect(clusterID, clientID,
+		stan.NatsConn(nc),
+		stan.Pings(10, 5),
+		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
+			log.Fatalf("Connection lost, reason: %v", reason)
+		}),
+	)
+
 	fmt.Println(err)
 	return &natBus{
 		sc: sc,
