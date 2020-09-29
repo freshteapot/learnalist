@@ -2,7 +2,6 @@ package event
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/nats-io/nats.go"
@@ -15,7 +14,7 @@ type natBus struct {
 }
 
 func NewNatBus(clusterID string, clientID string, nc *nats.Conn) messagebus.MessageBus {
-	sc, err := stan.Connect(clusterID, clientID,
+	sc, _ := stan.Connect(clusterID, clientID,
 		stan.NatsConn(nc),
 		stan.Pings(10, 5),
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
@@ -23,7 +22,6 @@ func NewNatBus(clusterID string, clientID string, nc *nats.Conn) messagebus.Mess
 		}),
 	)
 
-	fmt.Println(err)
 	return &natBus{
 		sc: sc,
 	}
@@ -40,7 +38,7 @@ func (b *natBus) Close(topic string) {
 }
 
 func (b *natBus) Subscribe(topic string, fn interface{}) error {
-	durableName := "TODO"
+	durableName := "internal-system"
 	_, err := b.sc.Subscribe(topic,
 		func(stanMsg *stan.Msg) {
 			var entryLog Eventlog
