@@ -44,3 +44,7 @@ curl -XPUT -H"Authorization: Bearer ${token}" \
 curl -XDELETE -I -H"Authorization: Bearer ${token}" \
 'http://localhost:1234/api/v1/assets/78593152-037d-4732-a46b-8059273a2f27'
 ```
+
+
+# Reference
+- [gist on how to do this](https://gist.github.com/freshteapot/2eeae4c5d6f63e0e32b9bf784f38bd4e)

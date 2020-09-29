@@ -115,6 +115,8 @@ kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].
 
 # Install
 ```sh
+make generate-openapi-js
+make generate-openapi-go
 make build-site-assets
 make build-image-base
 make build-image
