@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 
@@ -97,6 +98,9 @@ var _ = Describe("Testing user login endpoint", func() {
 			datastore.On("UserSession").Return(userSession)
 			userSession.On("NewSession", session.UserUUID).
 				Return(session, nil)
+			eventMessageBus := &mocks.MessageBus{}
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+			event.SetBus(eventMessageBus)
 
 			m.V1PostLogin(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))

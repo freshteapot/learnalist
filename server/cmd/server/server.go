@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -76,6 +77,23 @@ var ServerCmd = &cobra.Command{
 			"settings": viper.AllSettings(),
 		}).Info("server startup")
 
+		// This now works for the "application"
+		eventsVia := viper.GetString("server.events.via")
+		if eventsVia == "memory" {
+			event.SetBus(event.NewMemoryBus())
+		}
+
+		if eventsVia == "nats" {
+			natsServer := viper.GetString("server.events.nats.server")
+			stanClusterID := viper.GetString("server.events.stan.clusterID")
+			stanClientID := viper.GetString("server.events.stan.clientID")
+			nats, err := nats.Connect(natsServer)
+			if err != nil {
+				panic(err)
+			}
+			event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
+		}
+
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
@@ -131,5 +149,18 @@ func init() {
 	viper.BindEnv("server.loginWith.google.clientID", "LOGIN_WITH_GOOGLE_ID")
 	viper.BindEnv("server.loginWith.google.clientSecret", "LOGIN_WITH_GOOGLE_SECRET")
 	viper.BindEnv("server.loginWith.google.server", "LOGIN_WITH_GOOGLE_SERVER")
+
+	// If the events are not complicated, then this should work for memory or nats
+	viper.SetDefault("server.events.via", "memory")
+	viper.BindEnv("server.events.via", "EVENTS_VIA")
+
+	viper.SetDefault("server.events.nats.server", "nats")
+	viper.SetDefault("server.events.stan.clusterID", "stan")
+	viper.SetDefault("server.events.stan.clientID", "")
+
+	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
+	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
+	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+
 	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }

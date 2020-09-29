@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 )
 
@@ -62,6 +63,14 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		// TODO Log this
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: event.ApiUserRegister,
+		Data: event.EventUser{
+			UUID: aUser.UserUUID,
+			Kind: event.KindUserRegisterUsername,
+		},
+	}))
 
 	response := api.HttpUserRegisterResponse{
 		Uuid:     aUser.UserUUID,

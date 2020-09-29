@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -24,19 +25,20 @@ import (
 
 var _ = Describe("Testing user delete endpoint", func() {
 	var (
-		logger         *logrus.Logger
-		userUUID       string
-		endpoint       string
-		datastore      *mocks.Datastore
-		userManagement *mocks.Management
-		hugoHelper     *mocks.HugoSiteBuilder
-		session        user.UserSession
-		user           *uuid.User
-		manager        *api.Manager
-		req            *http.Request
-		rec            *httptest.ResponseRecorder
-		e              *echo.Echo
-		c              echo.Context
+		logger          *logrus.Logger
+		userUUID        string
+		endpoint        string
+		datastore       *mocks.Datastore
+		userManagement  *mocks.Management
+		hugoHelper      *mocks.HugoSiteBuilder
+		eventMessageBus *mocks.MessageBus
+		session         user.UserSession
+		user            *uuid.User
+		manager         *api.Manager
+		req             *http.Request
+		rec             *httptest.ResponseRecorder
+		e               *echo.Echo
+		c               echo.Context
 	)
 
 	AfterEach(emptyDatabase)
@@ -48,6 +50,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 		acl := &mocks.Acl{}
 		oauthHandlers := oauth.Handlers{}
 		hugoHelper = &mocks.HugoSiteBuilder{}
+		eventMessageBus = &mocks.MessageBus{}
 
 		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
 
@@ -91,6 +94,8 @@ var _ = Describe("Testing user delete endpoint", func() {
 			userManagement.On("DeleteUser", userUUID).Return(nil)
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			hugoHelper.On("WritePublicLists", mock.Anything)
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+			event.SetBus(eventMessageBus)
 
 			manager.V1DeleteUser(c)
 

@@ -31,9 +31,19 @@ func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *l
 		repo:      repo,
 	}
 
-	//
-	event.GetBus().Subscribe(event.ApiUserDelete, func(userUUID string) {
-		s.DeleteUserAssets(userUUID)
+	event.GetBus().Subscribe(event.TopicMonolog, func(entry event.Eventlog) {
+		if entry.Kind != event.ApiUserDelete {
+			return
+		}
+
+		b, err := json.Marshal(entry.Data)
+		if err != nil {
+			return
+		}
+
+		var moment event.EventUser
+		json.Unmarshal(b, &moment)
+		s.DeleteUserAssets(moment.UUID)
 	})
 	return s
 }

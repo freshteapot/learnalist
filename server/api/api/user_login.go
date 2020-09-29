@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 )
 
@@ -52,6 +53,14 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
+
+	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		Kind: event.ApiUserLogin,
+		Data: event.EventUser{
+			UUID: userUUID,
+			Kind: event.KindUserLoginUsername,
+		},
+	}))
 
 	return c.JSON(http.StatusOK, &api.HttpLoginResponse{
 		Token:    session.Token,

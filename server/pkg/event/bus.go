@@ -1,22 +1,20 @@
 package event
 
 import (
+	"encoding/json"
+
 	messagebus "github.com/vardius/message-bus"
 )
 
-const (
-	ApiUserDelete = "api.user.delete"
-)
-
-var (
-	queueSize = 100
-	bus       messagebus.MessageBus
-)
-
-func init() {
-	bus = messagebus.New(queueSize)
-}
-
 func GetBus() messagebus.MessageBus {
 	return bus
+}
+
+func SetBus(newBus messagebus.MessageBus) {
+	bus = newBus
+}
+
+func EventLogToBytes(e Eventlog) []byte {
+	b, _ := json.Marshal(e)
+	return b
 }

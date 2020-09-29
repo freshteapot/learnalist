@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slack-events
+  labels:
+    app: slack-events
+spec:
+  selector:
+    matchLabels:
+      app: slack-events
+  template:
+    metadata:
+      labels:
+        app: slack-events
+    spec:
+      containers:
+        - name: slack-events
+          image: registry.devbox/learnalist:latest
+          args:
+            ["--config=/etc/learnalist/config.yaml", "tools", "slack-events"]
+          env:
+            - name: EVENTS_NATS_SERVER
+              value: "nats.default.svc.cluster.local"
+            - name: EVENTS_STAN_CLIENTID
+              value: "lal-slack-events"
+            - name: EVENTS_SLACK_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: slack
+                  key: webhook_learnalist_events
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learnalist-config
