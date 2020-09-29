@@ -17,9 +17,6 @@ const (
 	KindUserRegisterIDPGoogle = "idp:google"
 	KindUserLoginIDPGoogle    = "idp:google"
 	KindUserLoginUsername     = "username"
-	ActionListCreated         = "created"
-	ActionListUpsert          = "updated"
-	ActionListDeleted         = "deleted"
 )
 
 var (
@@ -49,12 +46,7 @@ type Eventlog struct {
 	//When int64 / time.Time
 }
 
-type EventUserLogin struct {
-	UUID string `json:"uuid"`
-	Kind string `json:"kind"`
-}
-
-type EventUserRegister struct {
+type EventUser struct {
 	UUID string `json:"uuid"`
 	Kind string `json:"kind"`
 }

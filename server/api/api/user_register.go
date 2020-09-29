@@ -66,7 +66,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
 		Kind: event.ApiUserRegister,
-		Data: event.EventUserRegister{
+		Data: event.EventUser{
 			UUID: aUser.UserUUID,
 			Kind: event.KindUserRegisterUsername,
 		},

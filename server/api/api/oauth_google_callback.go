@@ -102,7 +102,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 		event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
 			Kind: event.ApiUserRegister,
-			Data: event.EventUserRegister{
+			Data: event.EventUser{
 				UUID: userUUID,
 				Kind: event.KindUserRegisterIDPGoogle,
 			},
@@ -131,7 +131,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
 		Kind: event.ApiUserLogin,
-		Data: event.EventUserLogin{
+		Data: event.EventUser{
 			UUID: userUUID,
 			Kind: event.KindUserLoginIDPGoogle,
 		},

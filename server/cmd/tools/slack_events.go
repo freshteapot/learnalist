@@ -72,17 +72,19 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserRegister:
 		b, _ := json.Marshal(entry.Data)
-		var moment event.EventUserRegister
+		var moment event.EventUser
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user %s registered via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogin:
 		b, _ := json.Marshal(entry.Data)
-		var moment event.EventUserLogin
+		var moment event.EventUser
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user %s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserDelete:
-		userUUID := entry.Data.(string)
-		msg.Text = fmt.Sprintf("%s: user %s should be deleted", entry.Kind, userUUID)
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventUser
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("%s: user %s should be deleted", entry.Kind, moment.UUID)
 	case event.ApiListSaved:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList

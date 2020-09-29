@@ -56,7 +56,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
 		Kind: event.ApiUserLogin,
-		Data: event.EventUserLogin{
+		Data: event.EventUser{
 			UUID: userUUID,
 			Kind: event.KindUserLoginUsername,
 		},
