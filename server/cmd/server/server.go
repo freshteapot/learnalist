@@ -27,6 +27,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -124,10 +125,11 @@ var ServerCmd = &cobra.Command{
 
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionService := spaced_repetition.NewService(db)
+		plankService := plank.NewService(db, logger.WithField("context", "plank-service"))
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
-		server.InitApi(apiManager, assetService, spacedRepetitionService)
+		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

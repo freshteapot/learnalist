@@ -16,6 +16,7 @@ type Config struct {
 }
 
 var server *echo.Echo
+var Server *echo.Echo
 var _cron *cron.Cron
 var config Config
 
@@ -27,7 +28,7 @@ func Init(_config Config) {
 	// This might not be great todo, as it is a little confusing.
 	config = _config
 	server = echo.New()
-
+	Server = server
 	server.HideBanner = true
 	// Middleware
 	server.Use(middleware.Recover())

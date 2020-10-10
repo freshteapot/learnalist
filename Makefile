@@ -33,9 +33,7 @@ run-api-server:
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
 develop:
-	scripts/run-hugo.sh && \
-	cd js && \
-	npm run dev:js:components
+	scripts/run-hugo.sh
 
 develop-localhost:
 	cd js && \
@@ -54,6 +52,7 @@ generate-openapi-one:
 	cp ./openapi/learnalist.yaml /tmp/openapi/one/ && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.version.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.asset.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.plank.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.user.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.alist.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \

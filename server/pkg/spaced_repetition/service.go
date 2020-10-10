@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -77,6 +78,22 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 				Data: item,
 			},
 		})
+
+		// Baked the challenge system into the service
+		// VS
+		// UI needs more complexity
+		challengeUUID := c.Request().Header.Get("challenge")
+		if challengeUUID != "" {
+			event.GetBus().Publish(event.Eventlog{
+				Kind: challenge.EventChallengeDone,
+				Data: challenge.EventChallengeDoneEntry{
+					UUID:     challengeUUID,
+					UserUUID: item.UserUUID,
+					Data:     item.Body,
+					Kind:     challenge.EventKindSpacedRepetition,
+				},
+			})
+		}
 	}
 
 	return c.JSON(statusCode, current)

@@ -8,18 +8,21 @@ import {
   DefaultApi,
   UserApi,
   AListApi,
+  PlankApi,
   SpacedRepetitionApi,
   HttpUserLoginRequestFromJSON,
   AlistInputFromJSON,
   AlistFromJSON,
-  SpacedRepetitionEntryViewedFromJSON
+  SpacedRepetitionEntryViewedFromJSON,
+  PlankFromJSON
 } from "./openapi";
 
 const Services = {
   Default: DefaultApi,
   User: UserApi,
   Alist: AListApi,
-  SpacedRepetition: SpacedRepetitionApi
+  SpacedRepetition: SpacedRepetitionApi,
+  Plank: PlankApi
 }
 
 function getServer() {
@@ -75,19 +78,6 @@ async function getListsByMe(filter) {
   } catch (error) {
     console.log("error", error);
     throw new Error("Failed to get lists by me");
-  }
-}
-
-async function getPlanks() {
-  const api = getApi(Services.Alist);
-
-  try {
-    return await api.getListsByMe({ labels: "plank", listType: "v1" });
-  } catch (error) {
-    throw new Error({
-      message: "Failed to get lists by me",
-      error: error
-    });
   }
 }
 
@@ -202,7 +192,45 @@ async function updateSpacedRepetitionEntry(entry) {
     console.log("error", error);
     throw new Error("Failed to get lists by me");
   }
+}
 
+
+async function getPlankHistoryByUser() {
+  const api = getApi(Services.Plank);
+  try {
+    return await api.getPlankHistoryByUser();
+  } catch (error) {
+    throw new Error({
+      message: "Failed to get planks",
+      error: error
+    });
+  }
+}
+
+async function addPlankEntry(entry) {
+  try {
+    const api = getApi(Services.Plank);
+    const input = {
+      plank: PlankFromJSON(entry),
+    }
+    return api.addPlankEntry(input);
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to save plank");
+  }
+}
+
+async function deletePlankEntry(uuid) {
+  try {
+    const api = getApi(Services.Plank);
+    const input = {
+      uuid: uuid,
+    }
+    return api.deletePlankEntry(input);
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to delete plank");
+  }
 }
 
 export {
@@ -212,7 +240,9 @@ export {
   addList,
   updateList,
   deleteList,
-  getPlanks,
+  getPlankHistoryByUser,
+  addPlankEntry,
+  deletePlankEntry,
   getServerVersion,
   getSpacedRepetitionEntries,
   getSpacedRepetitionNext,

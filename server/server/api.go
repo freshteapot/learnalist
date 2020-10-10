@@ -5,10 +5,11 @@ import (
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
-func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRepetitionService spaced_repetition.SpacedRepetitionService) {
+func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRepetitionService spaced_repetition.SpacedRepetitionService, plankService plank.PlankService) {
 
 	authConfig := authenticate.Config{
 		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
@@ -70,4 +71,11 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	srs.DELETE("/:uuid", spacedRepetitionService.DeleteEntry)
 	srs.POST("/", spacedRepetitionService.SaveEntry)
 	srs.POST("/viewed", spacedRepetitionService.EntryViewed)
+
+	// Plank
+	plank := server.Group("/api/v1/plank")
+	plank.Use(authenticate.Auth(authConfig))
+	plank.GET("/history", plankService.History)
+	plank.DELETE("/:uuid", plankService.DeletePlankRecord)
+	plank.POST("/", plankService.RecordPlank)
 }
