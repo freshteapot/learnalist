@@ -162,6 +162,8 @@ PATCH=$(cat <<_EOF_
 _EOF_
 )
 kubectl patch deployment learnalist -p "${PATCH}"
+kubectl patch deployment event-reader -p "${PATCH}"
+kubectl patch deployment slack-events -p "${PATCH}"
 ```
 
 ```sh

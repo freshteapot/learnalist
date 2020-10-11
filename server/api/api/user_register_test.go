@@ -100,7 +100,11 @@ var _ = Describe("Testing Register user endpoint", func() {
 					Return(userInfo, nil)
 
 				eventMessageBus := &mocks.EventlogPubSub{}
-				eventMessageBus.On("Publish", mock.Anything)
+				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+					Expect(moment.Kind).To(Equal(event.ApiUserRegister))
+					Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterUsername))
+					return true
+				}))
 				event.SetBus(eventMessageBus)
 
 				m.V1PostRegister(c)

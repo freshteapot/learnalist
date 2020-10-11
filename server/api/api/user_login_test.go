@@ -99,7 +99,12 @@ var _ = Describe("Testing user login endpoint", func() {
 			userSession.On("NewSession", session.UserUUID).
 				Return(session, nil)
 			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Publish", mock.Anything)
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiUserLogin))
+				Expect(moment.Data.(event.EventUser).UUID).To(Equal(session.UserUUID))
+				Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLoginUsername))
+				return true
+			}))
 			event.SetBus(eventMessageBus)
 
 			m.V1PostLogin(c)
