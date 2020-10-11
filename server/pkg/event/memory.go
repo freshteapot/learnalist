@@ -7,11 +7,12 @@ import (
 )
 
 type lalMessageBus struct {
-	bus messagebus.MessageBus
+	bus       messagebus.MessageBus
+	listeners []interface{}
 }
 
 // TODO maybe skip the whole messageBus and just use nats?
-func NewMemoryBus() messagebus.MessageBus {
+func NewMemoryBus() MessageBusWithListeners {
 	return &lalMessageBus{
 		bus: messagebus.New(queueSize),
 	}
@@ -31,9 +32,14 @@ func (b *lalMessageBus) Close(topic string) {
 }
 
 func (b *lalMessageBus) Subscribe(topic string, fn interface{}) error {
+	// TODO add listeners
 	return b.bus.Subscribe(topic, fn)
 }
 
 func (b *lalMessageBus) Unsubscribe(topic string, fn interface{}) error {
 	return b.bus.Unsubscribe(topic, fn)
+}
+
+func (b *lalMessageBus) Listen(fn interface{}) {
+	b.listeners = append(b.listeners, fn)
 }

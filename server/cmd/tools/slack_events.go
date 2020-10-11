@@ -24,6 +24,14 @@ var slackEventsCMD = &cobra.Command{
 		logger := logging.GetLogger()
 		logger.Info("Read events")
 
+		viper.SetDefault("server.events.nats.server", "nats")
+		viper.SetDefault("server.events.stan.clusterID", "stan")
+		viper.SetDefault("server.events.stan.clientID", "")
+
+		viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
+		viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
+		viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+
 		webhook := viper.GetString("server.events.slack.webhook")
 		if webhook == "" {
 			panic("Webhook shouldnt be empty")
@@ -133,15 +141,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 }
 
 func init() {
-	viper.SetDefault("server.events.nats.server", "nats")
-	viper.SetDefault("server.events.stan.clusterID", "stan")
-	viper.SetDefault("server.events.stan.clientID", "")
-
-	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
-	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
-
 	viper.SetDefault("server.events.slack.webhook", "")
 	viper.BindEnv("server.events.slack.webhook", "EVENTS_SLACK_WEBHOOK")
-
 }

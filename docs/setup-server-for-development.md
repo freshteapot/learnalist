@@ -46,3 +46,30 @@ docker run --rm --name learnalist \
 -e HUGO_EXTERNAL=false \
 learnalist:latest --config=/srv/learnalist/config/docker.config.yaml server
 ```
+
+# Develop with nats
+## Run nats + stan
+```sh
+docker run \
+-p 4222:4222 \
+-p 8222:8222 \
+-v /tmp/nats-store/:/tmp/nats-store/ nats-streaming:alpine3.12 \
+--max_age 10s \
+--store=FILE \
+--dir=/tmp/nats-store \
+--file_auto_sync=1ms \
+--stan_debug=true \
+--debug=true \
+--http_port 8222
+```
+
+## Run development
+```sh
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTERID="test-cluster" \
+EVENTS_STAN_CLIENTID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make develop
+```

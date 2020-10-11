@@ -2,15 +2,13 @@ package event
 
 import (
 	"encoding/json"
-
-	messagebus "github.com/vardius/message-bus"
 )
 
-func GetBus() messagebus.MessageBus {
+func GetBus() MessageBusWithListeners {
 	return bus
 }
 
-func SetBus(newBus messagebus.MessageBus) {
+func SetBus(newBus MessageBusWithListeners) {
 	bus = newBus
 }
 

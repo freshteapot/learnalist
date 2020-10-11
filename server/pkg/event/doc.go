@@ -2,7 +2,6 @@ package event
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	messagebus "github.com/vardius/message-bus"
 )
 
 const (
@@ -21,7 +20,7 @@ const (
 
 var (
 	queueSize = 100
-	bus       messagebus.MessageBus
+	bus       MessageBusWithListeners
 )
 
 // Taken from https://github.com/vardius/message-bus
@@ -36,6 +35,11 @@ type MessageBus interface {
 	Subscribe(topic string, fn interface{}) error
 	// Unsubscribe unsubscribe handler from the given topic
 	Unsubscribe(topic string, fn interface{}) error
+}
+
+type MessageBusWithListeners interface {
+	MessageBus
+	Listen(fn interface{})
 }
 
 type Eventlog struct {

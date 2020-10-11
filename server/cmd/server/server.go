@@ -1,8 +1,12 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
@@ -24,6 +28,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -36,6 +41,14 @@ var ServerCmd = &cobra.Command{
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		viper.SetDefault("server.events.nats.server", "nats")
+		viper.SetDefault("server.events.stan.clusterID", "stan")
+		viper.SetDefault("server.events.stan.clientID", "")
+
+		viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
+		viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSTERID")
+		viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
 			Secret: viper.GetString("server.loginWith.google.clientSecret"),
@@ -84,14 +97,23 @@ var ServerCmd = &cobra.Command{
 		}
 
 		if eventsVia == "nats" {
+			fmt.Println(os.Getenv("EVENTS_STAN_CLUSTERID"))
+			fmt.Println("aaa", viper.GetString("server.events.stan.clusterID"))
 			natsServer := viper.GetString("server.events.nats.server")
 			stanClusterID := viper.GetString("server.events.stan.clusterID")
 			stanClientID := viper.GetString("server.events.stan.clientID")
-			nats, err := nats.Connect(natsServer)
+			opts := []nats.Option{nats.Name("lal-go-server")}
+			nc, err := nats.Connect(natsServer, opts...)
+
 			if err != nil {
 				panic(err)
 			}
-			event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
+			defer nc.Close()
+
+			bus := event.NewNatBus(stanClusterID, stanClientID, nc)
+			bus.Subscribe(event.TopicMonolog, func() {
+			})
+			event.SetBus(bus)
 		}
 
 		serverConfig := server.Config{
@@ -136,12 +158,36 @@ var ServerCmd = &cobra.Command{
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionService := spaced_repetition.NewService(db)
 
+		plankService := plank.NewService(db)
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
-		server.InitApi(apiManager, assetService, spacedRepetitionService)
+		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService)
 		server.InitAlists(acl, dal, hugoHelper)
-		server.Run()
+
+		fmt.Println("does this run after?")
+
+		//server.Run()
+		go func() {
+			server.Run()
+		}()
+
+		ctx, cancel := context.WithCancel(context.Background())
+		sigterm := make(chan os.Signal, 1)
+		signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
+		select {
+		case <-ctx.Done():
+			log.Println("terminating: context cancelled")
+		case <-sigterm:
+			log.Println("terminating: via signal")
+		}
+
+		event.GetBus().Close(event.TopicMonolog)
+		cancel()
+		// TODO I dont think this is needed
+		//time.Sleep(2 * time.Second)
+		fmt.Println("done")
 	},
 }
 
@@ -153,14 +199,6 @@ func init() {
 	// If the events are not complicated, then this should work for memory or nats
 	viper.SetDefault("server.events.via", "memory")
 	viper.BindEnv("server.events.via", "EVENTS_VIA")
-
-	viper.SetDefault("server.events.nats.server", "nats")
-	viper.SetDefault("server.events.stan.clusterID", "stan")
-	viper.SetDefault("server.events.stan.clientID", "")
-
-	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
-	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
 
 	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
 }

@@ -2,29 +2,42 @@ package event
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
-	messagebus "github.com/vardius/message-bus"
 )
 
 type natBus struct {
-	sc stan.Conn
+	sc        stan.Conn
+	sub       stan.Subscription
+	listeners []interface{}
 }
 
-func NewNatBus(clusterID string, clientID string, nc *nats.Conn) messagebus.MessageBus {
-	sc, _ := stan.Connect(clusterID, clientID,
+func NewNatBus(clusterID string, clientID string, nc *nats.Conn) *natBus {
+	fmt.Println("clientID", clientID)
+	fmt.Println("clusterID", clusterID)
+	sc, err := stan.Connect(clusterID, clientID,
 		stan.NatsConn(nc),
-		stan.Pings(10, 5),
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
 			log.Fatalf("Connection lost, reason: %v", reason)
 		}),
+		stan.Pings(10, 5),
 	)
 
+	if err != nil {
+		log.Fatalf("Can't connect: %v.\nMake sure a NATS Streaming Server is running at: %s", err, nc.Opts.Url)
+	}
+
+	log.Printf("Connected to %s clusterID: [%s] clientID: [%s]\n", nc.Opts.Servers, clusterID, clientID)
 	return &natBus{
 		sc: sc,
 	}
+}
+
+func (b *natBus) GetStan() stan.Conn {
+	return b.sc
 }
 
 func (b *natBus) Publish(topic string, args ...interface{}) {
@@ -34,15 +47,37 @@ func (b *natBus) Publish(topic string, args ...interface{}) {
 }
 
 func (b *natBus) Close(topic string) {
-	b.sc.Close()
+	err := b.sub.Close()
+	if err != nil {
+		fmt.Printf("error closing stan sub: %v\n", err)
+	}
+
+	err = b.sc.Close()
+	if err != nil {
+		fmt.Printf("error closing stan: %v\n", err)
+	}
+}
+
+func (b *natBus) Listen(fn interface{}) {
+	b.listeners = append(b.listeners, fn)
 }
 
 func (b *natBus) Subscribe(topic string, fn interface{}) error {
-	durableName := "internal-system"
-	_, err := b.sc.Subscribe(topic,
-		func(stanMsg *stan.Msg) {
+	if b.sub != nil {
+		fmt.Println("TODO fix this")
+		return nil
+	}
+
+	var err error
+	/*
+		fmt.Println("How many times")
+		var err error
+		durable := "internal-system"
+		startOpt := stan.StartWithLastReceived()
+		qgroup := ""
+		mcb := func(msg *stan.Msg) {
 			var entryLog Eventlog
-			err := json.Unmarshal(stanMsg.Data, &entryLog)
+			err := json.Unmarshal(msg.Data, &entryLog)
 			if err != nil {
 				return
 			}
@@ -51,9 +86,32 @@ func (b *natBus) Subscribe(topic string, fn interface{}) error {
 			if f, ok := fn.(func(entry Eventlog)); ok {
 				HandlerType(f)(entryLog)
 			}
-		},
-		stan.DurableName(durableName))
+		}
+
+		b.sub, err = b.sc.QueueSubscribe(topic, qgroup, mcb, startOpt, stan.DurableName(durable))
+	*/
+	// TODO do something with fn
+	mcb := func(msg *stan.Msg) {
+		var entryLog Eventlog
+		err := json.Unmarshal(msg.Data, &entryLog)
+		if err != nil {
+			return
+		}
+
+		// TODO change to channel
+		for _, listener := range b.listeners {
+			type HandlerType func(entry Eventlog)
+			if f, ok := listener.(func(entry Eventlog)); ok {
+				HandlerType(f)(entryLog)
+			}
+		}
+	}
+
+	durableName := "internal-system"
+	b.sub, err = b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
+
 	if err != nil {
+		b.sc.Close()
 		log.Fatalf("Failed to start subscription on '%s': %v", topic, err)
 	}
 
@@ -61,5 +119,5 @@ func (b *natBus) Subscribe(topic string, fn interface{}) error {
 }
 
 func (b *natBus) Unsubscribe(topic string, fn interface{}) error {
-	return nil
+	return b.sub.Unsubscribe()
 }

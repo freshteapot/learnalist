@@ -31,7 +31,8 @@ func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *l
 		repo:      repo,
 	}
 
-	event.GetBus().Subscribe(event.TopicMonolog, func(entry event.Eventlog) {
+	//event.GetBus().Subscribe(event.TopicMonolog, func(entry event.Eventlog) {
+	event.GetBus().Listen(func(entry event.Eventlog) {
 		if entry.Kind != event.ApiUserDelete {
 			return
 		}
