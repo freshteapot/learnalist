@@ -40,13 +40,7 @@ var ServerCmd = &cobra.Command{
 	Short: "Run the server {api,backend}",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		viper.SetDefault("server.events.nats.server", "nats")
-		viper.SetDefault("server.events.stan.clusterID", "stan")
-		viper.SetDefault("server.events.stan.clientID", "")
-
-		viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-		viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSTERID")
-		viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+		event.SetDefaultSettingsForCMD()
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
@@ -96,8 +90,6 @@ var ServerCmd = &cobra.Command{
 		}
 
 		if eventsVia == "nats" {
-			fmt.Println(os.Getenv("EVENTS_STAN_CLUSTERID"))
-			fmt.Println("aaa", viper.GetString("server.events.stan.clusterID"))
 			natsServer := viper.GetString("server.events.nats.server")
 			stanClusterID := viper.GetString("server.events.stan.clusterID")
 			stanClientID := viper.GetString("server.events.stan.clientID")
@@ -109,7 +101,7 @@ var ServerCmd = &cobra.Command{
 			}
 			defer nc.Close()
 
-			bus := event.NewNatsBus(stanClusterID, stanClientID, nc)
+			bus := event.NewNatsBus(stanClusterID, stanClientID, nc, logger)
 			bus.Subscribe(event.TopicMonolog, func() {
 			})
 			event.SetBus(bus)

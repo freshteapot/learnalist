@@ -20,14 +20,7 @@ var eventReaderCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		logger.Info("Read events")
-
-		viper.SetDefault("server.events.nats.server", "nats")
-		viper.SetDefault("server.events.stan.clusterID", "stan")
-		viper.SetDefault("server.events.stan.clientID", "lal-events-reader")
-
-		viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-		viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSTERID")
-		viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+		event.SetDefaultSettingsForCMD()
 
 		natsServer := viper.GetString("server.events.nats.server")
 		stanClusterID := viper.GetString("server.events.stan.clusterID")
@@ -37,7 +30,7 @@ var eventReaderCMD = &cobra.Command{
 			panic(err)
 		}
 
-		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats))
+		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats, logger))
 		event.GetBus().Start()
 		event.GetBus().Subscribe("read-event", readEventLog)
 

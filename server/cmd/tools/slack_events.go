@@ -23,14 +23,7 @@ var slackEventsCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		logger.Info("Read events")
-
-		viper.SetDefault("server.events.nats.server", "nats")
-		viper.SetDefault("server.events.stan.clusterID", "stan")
-		viper.SetDefault("server.events.stan.clientID", "")
-
-		viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-		viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
-		viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
+		event.SetDefaultSettingsForCMD()
 
 		webhook := viper.GetString("server.events.slack.webhook")
 		if webhook == "" {
@@ -46,7 +39,7 @@ var slackEventsCMD = &cobra.Command{
 			panic(err)
 		}
 
-		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats))
+		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats, logger))
 
 		reader := NewSlackEvents(webhook, logger.WithField("context", "slack-events"))
 		event.GetBus().Subscribe("slack-listener", reader.Read)
