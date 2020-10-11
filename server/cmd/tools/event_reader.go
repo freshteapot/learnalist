@@ -6,9 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
@@ -21,17 +19,7 @@ var eventReaderCMD = &cobra.Command{
 		logger := logging.GetLogger()
 		logger.Info("Read events")
 		event.SetDefaultSettingsForCMD()
-
-		natsServer := viper.GetString("server.events.nats.server")
-		stanClusterID := viper.GetString("server.events.stan.clusterID")
-		stanClientID := viper.GetString("server.events.stan.clientID")
-		nats, err := nats.Connect(natsServer)
-		if err != nil {
-			panic(err)
-		}
-
-		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats, logger))
-		event.GetBus().Start()
+		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 		event.GetBus().Subscribe("read-event", readEventLog)
 
 		signals := make(chan os.Signal, 1)
@@ -40,7 +28,6 @@ var eventReaderCMD = &cobra.Command{
 		select {
 		case <-signals:
 		}
-		// Not great
 		event.GetBus().Close()
 	},
 }

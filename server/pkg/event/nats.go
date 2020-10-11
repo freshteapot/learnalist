@@ -55,10 +55,13 @@ func (b *natsBus) Close() {
 		fmt.Printf("error closing stan sub: %v\n", err)
 	}
 
+	nc := b.sc.NatsConn()
 	err = b.sc.Close()
 	if err != nil {
 		fmt.Printf("error closing stan: %v\n", err)
 	}
+
+	nc.Close()
 }
 
 func (b *natsBus) Subscribe(key string, fn interface{}) {

@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -83,30 +82,7 @@ var ServerCmd = &cobra.Command{
 			"settings": viper.AllSettings(),
 		}).Info("server startup")
 
-		// This now works for the "application"
-		eventsVia := viper.GetString("server.events.via")
-		if eventsVia == "memory" {
-			event.SetBus(event.NewMemoryBus())
-		}
-
-		if eventsVia == "nats" {
-			natsServer := viper.GetString("server.events.nats.server")
-			stanClusterID := viper.GetString("server.events.stan.clusterID")
-			stanClientID := viper.GetString("server.events.stan.clientID")
-			opts := []nats.Option{nats.Name("lal-go-server")}
-			nc, err := nats.Connect(natsServer, opts...)
-
-			if err != nil {
-				panic(err)
-			}
-			defer nc.Close()
-
-			bus := event.NewNatsBus(stanClusterID, stanClientID, nc, logger)
-			bus.Subscribe(event.TopicMonolog, func() {
-			})
-			event.SetBus(bus)
-		}
-		event.GetBus().Start()
+		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
 		serverConfig := server.Config{
 			Port:             port,
@@ -119,7 +95,6 @@ var ServerCmd = &cobra.Command{
 		masterCron := cron.NewCron()
 		server.SetCron(masterCron)
 
-		// databaseName = "root:mysecretpassword@/learnalistapi"
 		db := database.NewDB(databaseName)
 		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 		hugoHelper.RegisterCronJob()
@@ -172,9 +147,6 @@ var ServerCmd = &cobra.Command{
 
 		event.GetBus().Close()
 		cancel()
-		// TODO I dont think this is needed
-		//time.Sleep(2 * time.Second)
-		fmt.Println("done")
 	},
 }
 

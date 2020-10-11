@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 	"github.com/spf13/cobra"
@@ -30,16 +29,7 @@ var slackEventsCMD = &cobra.Command{
 			panic("Webhook shouldnt be empty")
 		}
 
-		natsServer := viper.GetString("server.events.nats.server")
-		stanClusterID := viper.GetString("server.events.stan.clusterID")
-		stanClientID := viper.GetString("server.events.stan.clientID")
-		fmt.Println(stanClientID)
-		nats, err := nats.Connect(natsServer)
-		if err != nil {
-			panic(err)
-		}
-
-		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats, logger))
+		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
 		reader := NewSlackEvents(webhook, logger.WithField("context", "slack-events"))
 		event.GetBus().Subscribe("slack-listener", reader.Read)
@@ -50,7 +40,6 @@ var slackEventsCMD = &cobra.Command{
 		select {
 		case <-signals:
 		}
-		// Not great
 		event.GetBus().Close()
 	},
 }
