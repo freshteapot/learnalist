@@ -70,6 +70,22 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user %s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
+	case event.ApiUserLogout:
+	case event.BrowserUserLogout:
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventUser
+		json.Unmarshal(b, &moment)
+		via := "api"
+		if entry.Kind == event.BrowserUserLogout {
+			via = "browser"
+		}
+
+		clearing := "current session"
+		if moment.Kind == event.KindUserLogoutSessions {
+			clearing = "all sessions"
+		}
+
+		msg.Text = fmt.Sprintf("%s: user %s logged out via %s, clearing %s", entry.Kind, moment.UUID, via, clearing)
 	case event.ApiUserDelete:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser

@@ -7,6 +7,8 @@ import (
 const (
 	ApiUserDelete             = "api.user.delete"
 	ApiUserLogin              = "api.user.login"
+	ApiUserLogout             = "api.user.logout"
+	BrowserUserLogout         = "browser.user.logout"
 	ApiUserRegister           = "api.user.register"
 	ApiListSaved              = "api.list.saved"
 	ApiListDelete             = "api.list.delete"
@@ -16,6 +18,8 @@ const (
 	KindUserRegisterIDPGoogle = "idp:google"
 	KindUserLoginIDPGoogle    = "idp:google"
 	KindUserLoginUsername     = "username"
+	KindUserLogoutSession     = "logout.session"
+	KindUserLogoutSessions    = "logout.sessions"
 )
 
 var (
