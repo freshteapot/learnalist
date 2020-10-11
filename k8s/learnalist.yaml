@@ -34,7 +34,7 @@ spec:
             - name: EVENTS_NATS_SERVER
               value: "nats.default.svc.cluster.local"
             - name: EVENTS_STAN_CLIENT_ID
-              value: "lal-01"
+              value: "lal-02"
 
           volumeMounts:
             - name: config-volume

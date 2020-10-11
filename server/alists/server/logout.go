@@ -31,10 +31,8 @@ func (m *Manager) Logout(c echo.Context) error {
 
 	switch all {
 	case "1":
-		fmt.Println("Clear all sessions")
 		session.RemoveSessionsForUser(userUUID)
 	default:
-		fmt.Println("Clear the sesion based on the token")
 		session.RemoveSessionForUser(userUUID, token)
 	}
 

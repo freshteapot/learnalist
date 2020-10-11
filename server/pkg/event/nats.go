@@ -83,8 +83,6 @@ func (b *natsBus) Start() {
 			return
 		}
 
-		fmt.Println(entryLog)
-		// TODO change to channel
 		for _, listener := range b.listeners {
 			type HandlerType func(entry Eventlog)
 			if f, ok := listener.fn.(func(entry Eventlog)); ok {

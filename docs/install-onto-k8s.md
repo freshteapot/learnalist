@@ -151,6 +151,8 @@ make sync-site-assets
 Make sure k8s file is uptodate
 ```sh
 kubectl apply -f k8s/learnalist.yaml
+kubectl apply -f k8s/slack-events.yaml
+kubectl apply -f k8s/event-reader.yaml
 ```
 
 Patch if only bumped latest version
