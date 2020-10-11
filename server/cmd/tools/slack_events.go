@@ -46,10 +46,10 @@ var slackEventsCMD = &cobra.Command{
 			panic(err)
 		}
 
-		event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
+		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats))
 
 		reader := NewSlackEvents(webhook, logger.WithField("context", "slack-events"))
-		event.GetBus().Subscribe(event.TopicMonolog, reader.Read)
+		event.GetBus().Subscribe("slack-listener", reader.Read)
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
@@ -58,7 +58,7 @@ var slackEventsCMD = &cobra.Command{
 		case <-signals:
 		}
 		// Not great
-		event.GetBus().Close(event.TopicMonolog)
+		event.GetBus().Close()
 	},
 }
 

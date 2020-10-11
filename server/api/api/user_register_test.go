@@ -99,8 +99,8 @@ var _ = Describe("Testing Register user endpoint", func() {
 				userWithUsernameAndPassword.On("Register", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 					Return(userInfo, nil)
 
-				eventMessageBus := &mocks.MessageBus{}
-				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+				eventMessageBus := &mocks.EventlogPubSub{}
+				eventMessageBus.On("Publish", mock.Anything)
 				event.SetBus(eventMessageBus)
 
 				m.V1PostRegister(c)

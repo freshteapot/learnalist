@@ -99,7 +99,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	}
 
 	// This will break if the list is too large (size of nats 1mb)
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiListSaved,
 		Data: event.EventList{
 			UUID:     aList.Uuid,
@@ -107,7 +107,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 			Action:   action,
 			Data:     &aList,
 		},
-	}))
+	})
 
 	return c.JSON(statusCode, aList)
 }

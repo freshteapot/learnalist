@@ -64,13 +64,13 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserRegister,
 		Data: event.EventUser{
 			UUID: aUser.UserUUID,
 			Kind: event.KindUserRegisterUsername,
 		},
-	}))
+	})
 
 	response := api.HttpUserRegisterResponse{
 		Uuid:     aUser.UserUUID,

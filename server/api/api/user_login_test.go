@@ -98,8 +98,8 @@ var _ = Describe("Testing user login endpoint", func() {
 			datastore.On("UserSession").Return(userSession)
 			userSession.On("NewSession", session.UserUUID).
 				Return(session, nil)
-			eventMessageBus := &mocks.MessageBus{}
-			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+			eventMessageBus := &mocks.EventlogPubSub{}
+			eventMessageBus.On("Publish", mock.Anything)
 			event.SetBus(eventMessageBus)
 
 			m.V1PostLogin(c)

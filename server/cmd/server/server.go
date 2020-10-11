@@ -28,7 +28,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
-	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -110,11 +109,12 @@ var ServerCmd = &cobra.Command{
 			}
 			defer nc.Close()
 
-			bus := event.NewNatBus(stanClusterID, stanClientID, nc)
+			bus := event.NewNatsBus(stanClusterID, stanClientID, nc)
 			bus.Subscribe(event.TopicMonolog, func() {
 			})
 			event.SetBus(bus)
 		}
+		event.GetBus().Start()
 
 		serverConfig := server.Config{
 			Port:             port,
@@ -157,17 +157,12 @@ var ServerCmd = &cobra.Command{
 
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionService := spaced_repetition.NewService(db)
-
-		plankService := plank.NewService(db)
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
-		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService)
+		server.InitApi(apiManager, assetService, spacedRepetitionService)
 		server.InitAlists(acl, dal, hugoHelper)
 
-		fmt.Println("does this run after?")
-
-		//server.Run()
 		go func() {
 			server.Run()
 		}()
@@ -183,7 +178,7 @@ var ServerCmd = &cobra.Command{
 			log.Println("terminating: via signal")
 		}
 
-		event.GetBus().Close(event.TopicMonolog)
+		event.GetBus().Close()
 		cancel()
 		// TODO I dont think this is needed
 		//time.Sleep(2 * time.Second)

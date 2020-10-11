@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 )
 
-func GetBus() MessageBusWithListeners {
+func GetBus() EventlogPubSub {
 	return bus
 }
 
-func SetBus(newBus MessageBusWithListeners) {
+func SetBus(newBus EventlogPubSub) {
 	bus = newBus
 }
 

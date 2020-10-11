@@ -37,9 +37,9 @@ var eventReaderCMD = &cobra.Command{
 			panic(err)
 		}
 
-		event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
-		event.GetBus().Subscribe(event.TopicMonolog, readEventLog)
-		event.GetBus().Listen(readEventLog)
+		event.SetBus(event.NewNatsBus(stanClusterID, stanClientID, nats))
+		event.GetBus().Start()
+		event.GetBus().Subscribe("read-event", readEventLog)
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
@@ -48,7 +48,7 @@ var eventReaderCMD = &cobra.Command{
 		case <-signals:
 		}
 		// Not great
-		event.GetBus().Close(event.TopicMonolog)
+		event.GetBus().Close()
 	},
 }
 

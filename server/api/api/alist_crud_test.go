@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -73,6 +74,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 
 			It("Post, success", func() {
 				savedList := alist.NewTypeV1()
+				savedList.Uuid = "fake-list-123"
 				datastore.On("SaveAlist", mock.Anything, mock.Anything).Return(savedList, nil)
 				datastore.On("GetAllListsByUser", user.Uuid).Return([]alist.ShortInfo{}, nil)
 				datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
@@ -89,6 +91,15 @@ var _ = Describe("Testing Alist endpoints", func() {
 				user := &uuid.User{
 					Uuid: userUUID,
 				}
+
+				eventMessageBus := &mocks.EventlogPubSub{}
+				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+					Expect(moment.Kind).To(Equal(event.ApiListSaved))
+					Expect(moment.Data.(event.EventList).UUID).To(Equal(savedList.Uuid))
+					Expect(moment.Data.(event.EventList).Action).To(Equal("created"))
+					return true
+				}))
+				event.SetBus(eventMessageBus)
 
 				req, rec := setupFakeEndpoint(method, uri, input)
 				e := echo.New()

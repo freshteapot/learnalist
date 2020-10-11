@@ -54,13 +54,13 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
 			Kind: event.KindUserLoginUsername,
 		},
-	}))
+	})
 
 	return c.JSON(http.StatusOK, &api.HttpLoginResponse{
 		Token:    session.Token,

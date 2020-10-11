@@ -70,13 +70,13 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	}
 
 	if statusCode == http.StatusCreated {
-		event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+		event.GetBus().Publish(event.Eventlog{
 			Kind: EventApiSpacedRepetition,
 			Data: EventSpacedRepetition{
 				Kind: EventKindNew,
 				Data: item,
 			},
-		}))
+		})
 	}
 
 	return c.JSON(statusCode, current)
@@ -101,7 +101,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	}
 
 	// This event fires, even if the entry doesnt exist
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: EventApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind: EventKindDeleted,
@@ -110,7 +110,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 				UserUUID: user.Uuid,
 			},
 		},
-	}))
+	})
 
 	return c.NoContent(http.StatusNoContent)
 }
@@ -205,14 +205,14 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: EventApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind:   EventKindViewed,
 			Action: input.Action,
 			Data:   item,
 		},
-	}))
+	})
 
 	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
 	if err != nil {

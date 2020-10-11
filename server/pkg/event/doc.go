@@ -19,35 +19,24 @@ const (
 )
 
 var (
-	queueSize = 100
-	bus       MessageBusWithListeners
+	bus EventlogPubSub
 )
 
-// Taken from https://github.com/vardius/message-bus
-// So I can create a mock
-type MessageBus interface {
-	// Publish publishes arguments to the given topic subscribers
-	// Publish block only when the buffer of one of the subscribers is full.
-	Publish(topic string, args ...interface{})
-	// Close unsubscribe all handlers from given topic
-	Close(topic string)
-	// Subscribe subscribes to the given topic
-	Subscribe(topic string, fn interface{}) error
-	// Unsubscribe unsubscribe handler from the given topic
-	Unsubscribe(topic string, fn interface{}) error
+type eventlogPubSubListener struct {
+	key string
+	fn  interface{}
 }
-
-type MessageBusWithListeners interface {
-	MessageBus
-	Listen(fn interface{})
+type EventlogPubSub interface {
+	Start()
+	Close()
+	Publish(moment Eventlog)
+	Subscribe(key string, fn interface{})
+	Unsubscribe(key string)
 }
 
 type Eventlog struct {
-	Kind string `json:"kind"`
-	//Data []byte `json:"data"`
+	Kind string      `json:"kind"`
 	Data interface{} `json:"data"`
-	// TODO maybe add when
-	//When int64 / time.Time
 }
 
 type EventUser struct {

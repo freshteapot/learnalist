@@ -204,8 +204,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				oauthReadWriter.On("GetTokenInfo", userUUID).Return(nil, errors.New("not found"))
 				oauthReadWriter.On("WriteTokenInfo", userUUID, mock.Anything).Return(nil)
 
-				eventMessageBus := &mocks.MessageBus{}
-				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+				eventMessageBus := &mocks.EventlogPubSub{}
+				eventMessageBus.On("Publish", mock.Anything)
 				event.SetBus(eventMessageBus)
 
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")

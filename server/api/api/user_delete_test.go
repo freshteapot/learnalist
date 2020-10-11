@@ -31,7 +31,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 		datastore       *mocks.Datastore
 		userManagement  *mocks.Management
 		hugoHelper      *mocks.HugoSiteBuilder
-		eventMessageBus *mocks.MessageBus
+		eventMessageBus *mocks.EventlogPubSub
 		session         user.UserSession
 		user            *uuid.User
 		manager         *api.Manager
@@ -50,7 +50,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 		acl := &mocks.Acl{}
 		oauthHandlers := oauth.Handlers{}
 		hugoHelper = &mocks.HugoSiteBuilder{}
-		eventMessageBus = &mocks.MessageBus{}
+		eventMessageBus = &mocks.EventlogPubSub{}
 
 		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
 
@@ -94,7 +94,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 			userManagement.On("DeleteUser", userUUID).Return(nil)
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			hugoHelper.On("WritePublicLists", mock.Anything)
-			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+			eventMessageBus.On("Publish", mock.Anything)
 			event.SetBus(eventMessageBus)
 
 			manager.V1DeleteUser(c)
