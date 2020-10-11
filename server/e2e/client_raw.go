@@ -89,7 +89,7 @@ func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.R
 
 func (c Client) RawPostLabelV1(userInfo RegisterResponse, label string) (*http.Response, error) {
 	fmt.Println("Posting a list via RawPostLabelV1")
-	input := api.HttpLabelInput{
+	input := api.HTTPLabelInput{
 		Label: label,
 	}
 	var response *http.Response

@@ -66,14 +66,14 @@ func (_m *LearnalistAPI) GetAlist(uuid string) (int, alist.Alist, error) {
 }
 
 // GetRoot provides a mock function with given fields:
-func (_m *LearnalistAPI) GetRoot() (api.HttpResponseMessage, error) {
+func (_m *LearnalistAPI) GetRoot() (api.HTTPResponseMessage, error) {
 	ret := _m.Called()
 
-	var r0 api.HttpResponseMessage
-	if rf, ok := ret.Get(0).(func() api.HttpResponseMessage); ok {
+	var r0 api.HTTPResponseMessage
+	if rf, ok := ret.Get(0).(func() api.HTTPResponseMessage); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(api.HttpResponseMessage)
+		r0 = ret.Get(0).(api.HTTPResponseMessage)
 	}
 
 	var r1 error
@@ -87,14 +87,14 @@ func (_m *LearnalistAPI) GetRoot() (api.HttpResponseMessage, error) {
 }
 
 // GetVersion provides a mock function with given fields:
-func (_m *LearnalistAPI) GetVersion() (api.HttpGetVersionResponse, error) {
+func (_m *LearnalistAPI) GetVersion() (api.HTTPGetVersionResponse, error) {
 	ret := _m.Called()
 
-	var r0 api.HttpGetVersionResponse
-	if rf, ok := ret.Get(0).(func() api.HttpGetVersionResponse); ok {
+	var r0 api.HTTPGetVersionResponse
+	if rf, ok := ret.Get(0).(func() api.HTTPGetVersionResponse); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(api.HttpGetVersionResponse)
+		r0 = ret.Get(0).(api.HTTPGetVersionResponse)
 	}
 
 	var r1 error

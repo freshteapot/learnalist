@@ -15,14 +15,14 @@ import (
 
 func (m *Manager) V1PostUserLabel(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	var input = &api.HttpLabelInput{}
+	var input = &api.HTTPLabelInput{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, input)
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.PostUserLabelJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -36,14 +36,14 @@ func (m *Manager) V1PostUserLabel(c echo.Context) error {
 	case http.StatusCreated:
 		break
 	case http.StatusBadRequest:
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.ValidationLabel,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	case http.StatusInternalServerError:
 		fallthrough
 	default:
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
@@ -58,7 +58,7 @@ func (m *Manager) V1GetUserLabels(c echo.Context) error {
 	labels, err := m.Datastore.Labels().GetUserLabels(user.Uuid)
 	if err != nil {
 		// TODO log this
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
@@ -71,10 +71,10 @@ func (m *Manager) V1RemoveUserLabel(c echo.Context) error {
 	label := c.Param("label")
 
 	err := m.Datastore.RemoveUserLabel(label, user.Uuid)
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 	if err != nil {
 		// TODO log this
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)

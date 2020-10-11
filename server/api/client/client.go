@@ -44,16 +44,16 @@ func (clientApi *Client) getHttpClient() *http.Client {
 }
 
 type LearnalistAPI interface {
-	GetRoot() (api.HttpResponseMessage, error)
-	GetVersion() (api.HttpGetVersionResponse, error)
+	GetRoot() (api.HTTPResponseMessage, error)
+	GetVersion() (api.HTTPGetVersionResponse, error)
 	GetAlist(uuid string) (statusCode int, aList alist.Alist, error error)
 	PostAlist(body io.Reader) (statusCode int, aList alist.Alist, error error)
 	PutAlist(uuid string, body io.Reader) (statusCode int, aList alist.Alist, error error)
 	DeleteAlist(uuid string) (statusCode int, error error)
 }
 
-func (clientApi *Client) GetRoot() (api.HttpResponseMessage, error) {
-	var httpResponse api.HttpResponseMessage
+func (clientApi *Client) GetRoot() (api.HTTPResponseMessage, error) {
+	var httpResponse api.HTTPResponseMessage
 	netClient := clientApi.getHttpClient()
 	url := fmt.Sprintf("%s/", clientApi.getServerPath())
 
@@ -72,8 +72,8 @@ func (clientApi *Client) GetRoot() (api.HttpResponseMessage, error) {
 	return httpResponse, nil
 }
 
-func (clientApi *Client) GetVersion() (api.HttpGetVersionResponse, error) {
-	var httpResponse api.HttpGetVersionResponse
+func (clientApi *Client) GetVersion() (api.HTTPGetVersionResponse, error) {
+	var httpResponse api.HTTPGetVersionResponse
 	netClient := clientApi.getHttpClient()
 	url := fmt.Sprintf("%s/version", clientApi.getServerPath())
 	response, err := netClient.Get(url)

@@ -30,8 +30,8 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 		uri         string
 		e           *echo.Echo
 		input       string
-		inputGrant  api.HttpShareListWithUserInput
-		inputObject api.HttpShareListInput
+		inputGrant  api.HTTPShareListWithUserInput
+		inputObject api.HTTPShareListInput
 	)
 
 	BeforeEach(func() {
@@ -54,7 +54,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			Uuid: "fake-456",
 		}
 
-		inputGrant = api.HttpShareListWithUserInput{
+		inputGrant = api.HTTPShareListWithUserInput{
 			UserUUID:  userB.Uuid,
 			AlistUUID: "fakeList",
 			Action:    aclKeys.ActionGrant,
@@ -126,7 +126,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			uri = "/api/v1/share/alist"
 			e = echo.New()
 
-			inputObject = api.HttpShareListInput{
+			inputObject = api.HTTPShareListInput{
 				AlistUUID: "fakeList",
 				Action:    aclKeys.SharedWithPublic,
 			}
@@ -204,7 +204,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 			uri = "/api/v1/alist/1234"
 			e = echo.New()
 
-			inputObject = api.HttpShareListInput{
+			inputObject = api.HTTPShareListInput{
 				AlistUUID: "fakeList",
 				Action:    aclKeys.SharedWithPublic,
 			}

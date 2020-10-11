@@ -12,7 +12,7 @@ import (
 
 func (m *Manager) V1DeleteUser(c echo.Context) error {
 	logger := m.logger
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
 

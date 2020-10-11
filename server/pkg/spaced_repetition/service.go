@@ -31,7 +31,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	json.NewDecoder(c.Request().Body).Decode(&temp)
 	raw, _ := json.Marshal(temp)
 
-	var what HttpRequestInputKind
+	var what HTTPRequestInputKind
 	json.Unmarshal(raw, &what)
 	if !utils.StringArrayContains([]string{"v1", "v2"}, what.Kind) {
 		return c.NoContent(http.StatusBadRequest)
@@ -88,7 +88,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	UUID := c.Param("uuid")
 
 	if UUID == "" {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InputMissingListUuid,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -154,7 +154,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	// Lookup uuid
 	defer c.Request().Body.Close()
 
-	var input HttpRequestViewed
+	var input HTTPRequestViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
 	item := SpacedRepetitionEntry{}
@@ -171,7 +171,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	// TODO could get this via the json_XXX functions in sqlite
 	// hmm maybe add kind to the table
 
-	var what HttpRequestInputKind
+	var what HTTPRequestInputKind
 	json.Unmarshal([]byte(item.Body), &what)
 
 	var entry ItemInput

@@ -71,7 +71,7 @@ var _ = Describe("Testing openapi", func() {
 	})
 
 	// go clean -testcache && go test --tags="json1" -ginkgo.v -ginkgo.progress -ginkgo.focus="Testing openapi Upload asset" -test.v .
-	FIt("Upload asset", func() {
+	It("Upload asset", func() {
 		config := openapi.NewConfiguration()
 		config.BasePath = "http://localhost:1234/api/v1"
 		client := openapi.NewAPIClient(config)

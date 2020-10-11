@@ -29,7 +29,7 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	uuid := c.Param("uuid")
 	if uuid == "" {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InputMissingListUuid,
 		}
 		return c.JSON(http.StatusNotFound, response)
@@ -37,13 +37,13 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 
 	allow, err := m.Acl.HasUserListReadAccess(uuid, user.Uuid)
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorAclLookup,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 	if !allow {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
 		}
 		return c.JSON(http.StatusForbidden, response)
@@ -58,13 +58,13 @@ func (m *Manager) V1GetListByUUID(c echo.Context) error {
 			}).Error("List not found, but has acl access")
 
 			message := fmt.Sprintf(i18n.ApiAlistNotFound, uuid)
-			response := api.HttpResponseMessage{
+			response := api.HTTPResponseMessage{
 				Message: message,
 			}
 			return c.JSON(http.StatusNotFound, response)
 		}
 		// When the db fails to lookup, maybe we should actually be crashing.
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)

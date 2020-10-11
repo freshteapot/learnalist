@@ -13,7 +13,7 @@ import (
 var _ = Describe("Testing Smoke test 2", func() {
 	It("share public2", func() {
 
-		var messageResponse api.HttpResponseMessage
+		var messageResponse api.HTTPResponseMessage
 
 		assert := assert.New(GinkgoT())
 		username := generateUsername()

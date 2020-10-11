@@ -8,7 +8,7 @@ import (
 )
 
 type ItemInputV2 struct {
-	entry *HttpRequestInputV2
+	entry *HTTPRequestInputV2
 }
 
 func V2FromPOST(input []byte) ItemInputV2 {

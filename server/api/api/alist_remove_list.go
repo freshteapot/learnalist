@@ -14,12 +14,12 @@ import (
 func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	alistUUID := c.Param("uuid")
 	user := c.Get("loggedInUser").(uuid.User)
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 
 	err := m.Datastore.RemoveAlist(alistUUID, user.Uuid)
 	if err != nil {
 		if err == i18n.ErrorListNotFound {
-			response := api.HttpResponseMessage{
+			response := api.HTTPResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
 			return c.JSON(http.StatusNotFound, response)

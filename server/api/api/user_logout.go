@@ -17,7 +17,7 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 	var err error
 	var input api.HTTPLogoutRequest
 	defer c.Request().Body.Close()
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err = json.Unmarshal(jsonBytes, &input)

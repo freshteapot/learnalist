@@ -14,8 +14,8 @@ import (
 var _ = Describe("Testing Smoke test 1", func() {
 	It("share public", func() {
 
-		var httpResponse api.HttpResponse
-		var messageResponse api.HttpResponseMessage
+		var httpResponse api.HTTPResponse
+		var messageResponse api.HTTPResponseMessage
 
 		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)
@@ -49,7 +49,7 @@ var _ = Describe("Testing Smoke test 1", func() {
 	})
 	It("share private", func() {
 
-		var httpResponse api.HttpResponse
+		var httpResponse api.HTTPResponse
 		assert := assert.New(GinkgoT())
 		learnalistClient := e2e.NewClient(server)
 

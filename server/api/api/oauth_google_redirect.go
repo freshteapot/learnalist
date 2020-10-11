@@ -17,7 +17,7 @@ func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
 
 	challenge, err := m.Datastore.UserSession().CreateWithChallenge()
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)

@@ -7,45 +7,45 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type HttpRequestInputKind struct {
+type HTTPRequestInputKind struct {
 	Kind string `json:"kind"`
 }
 
-type HttpRequestViewed struct {
+type HTTPRequestViewed struct {
 	UUID   string `json:"uuid"`
 	Action string `json:"action"`
 }
 
-type HttpRequestInput struct {
+type HTTPRequestInput struct {
 	Show string `json:"show"`
 	Kind string `json:"kind"`
 	UUID string `json:"uuid"`
 }
 
-type HttpRequestInputV1 struct {
-	HttpRequestInput
+type HTTPRequestInputV1 struct {
+	HTTPRequestInput
 	Data     string                   `json:"data"`
-	Settings HttpRequestInputSettings `json:"settings"`
+	Settings HTTPRequestInputSettings `json:"settings"`
 }
 
-type HttpRequestInputV2 struct {
-	HttpRequestInput
-	Data     HttpRequestInputV2Item     `json:"data"`
-	Settings HttpRequestInputSettingsV2 `json:"settings"`
+type HTTPRequestInputV2 struct {
+	HTTPRequestInput
+	Data     HTTPRequestInputV2Item     `json:"data"`
+	Settings HTTPRequestInputSettingsV2 `json:"settings"`
 }
 
-type HttpRequestInputV2Item struct {
+type HTTPRequestInputV2Item struct {
 	From string `json:"from"`
 	To   string `json:"to"`
 }
 
-type HttpRequestInputSettings struct {
+type HTTPRequestInputSettings struct {
 	Level    string `json:"level"`
 	WhenNext string `json:"when_next"`
 	Created  string `json:"created"`
 }
-type HttpRequestInputSettingsV2 struct {
-	HttpRequestInputSettings
+type HTTPRequestInputSettingsV2 struct {
+	HTTPRequestInputSettings
 	Show string `json:"show"`
 }
 

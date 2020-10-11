@@ -20,19 +20,19 @@ When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
 */
 func (m *Manager) V1PostRegister(c echo.Context) error {
-	var input api.HttpUserRegisterInput
+	var input api.HTTPUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	cleanedUser := api.HttpUserRegisterInput{
+	cleanedUser := api.HTTPUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,
 	}
@@ -40,7 +40,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
 
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -51,7 +51,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	userWithUsernameAndPassword := m.Datastore.UserWithUsernameAndPassword()
 	userUUID, err := userWithUsernameAndPassword.Lookup(cleanedUser.Username, hash)
 	if err == nil {
-		response := api.HttpUserRegisterResponse{
+		response := api.HTTPUserRegisterResponse{
 			Uuid:     userUUID,
 			Username: cleanedUser.Username,
 		}
@@ -72,7 +72,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		},
 	})
 
-	response := api.HttpUserRegisterResponse{
+	response := api.HTTPUserRegisterResponse{
 		Uuid:     aUser.UserUUID,
 		Username: aUser.Username,
 	}

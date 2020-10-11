@@ -23,7 +23,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	case http.MethodPut:
 		break
 	default:
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.ApiMethodNotSupported,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -35,7 +35,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	var aList alist.Alist
 	err := aList.UnmarshalJSON(jsonBytes)
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: i18n.InputAlistJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -45,7 +45,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	if method == http.MethodPut {
 		inputUuid = c.Param("uuid")
 		if inputUuid == "" {
-			response := api.HttpResponseMessage{
+			response := api.HTTPResponseMessage{
 				Message: i18n.ValidationAlists,
 			}
 			return c.JSON(http.StatusBadRequest, response)
@@ -53,7 +53,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 		if aList.Uuid != "" {
 			if inputUuid != aList.Uuid {
-				response := api.HttpResponseMessage{
+				response := api.HTTPResponseMessage{
 					Message: i18n.ValidationUUIDMismatch,
 				}
 				return c.JSON(http.StatusBadRequest, response)
@@ -64,7 +64,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 
 	aList, err = m.Datastore.SaveAlist(method, aList)
 	if err != nil {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: err.Error(),
 		}
 

@@ -2,53 +2,53 @@ package api
 
 import "github.com/freshteapot/learnalist-api/server/api/i18n"
 
-type HttpResponse struct {
+type HTTPResponse struct {
 	StatusCode int
 	Body       []byte
 }
 
-type HttpUserRegisterInput struct {
+type HTTPUserRegisterInput struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type HttpUserRegisterResponse struct {
+type HTTPUserRegisterResponse struct {
 	Uuid     string `json:"uuid"`
 	Username string `json:"username"`
 }
 
-type HttpResponseMessage struct {
+type HTTPResponseMessage struct {
 	Message string `json:"message"`
 }
 
-type HttpLabelInput struct {
+type HTTPLabelInput struct {
 	Label string `json:"label"`
 }
 
-type HttpGetVersionResponse struct {
+type HTTPGetVersionResponse struct {
 	GitHash string `json:"gitHash"`
 	GitDate string `json:"gitDate"`
 	Version string `json:"version"`
 	Url     string `json:"url"`
 }
 
-type HttpShareListInput struct {
+type HTTPShareListInput struct {
 	AlistUUID string `json:"alist_uuid"`
 	Action    string `json:"action"`
 }
 
-type HttpShareListWithUserInput struct {
+type HTTPShareListWithUserInput struct {
 	UserUUID  string `json:"user_uuid"`
 	AlistUUID string `json:"alist_uuid"`
 	Action    string `json:"action"`
 }
 
-type HttpLoginResponse struct {
+type HTTPLoginResponse struct {
 	Token    string `json:"token"`
 	UserUUID string `json:"user_uuid"`
 }
 
-type HttpLoginRequest HttpUserRegisterInput
+type HTTPLoginRequest HTTPUserRegisterInput
 
 type HTTPLogoutRequest struct {
 	Kind     string `json:"kind"`
@@ -57,7 +57,7 @@ type HTTPLogoutRequest struct {
 }
 
 var (
-	HTTPErrorResponse = HttpResponseMessage{
+	HTTPErrorResponse = HTTPResponseMessage{
 		Message: i18n.InternalServerErrorFunny,
 	}
 )
