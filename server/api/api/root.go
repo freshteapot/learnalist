@@ -9,7 +9,7 @@ import (
 
 func (m *Manager) V1GetRoot(c echo.Context) error {
 	message := "1, 2, 3. Lets go!"
-	response := api.HttpResponseMessage{
+	response := api.HTTPResponseMessage{
 		Message: message,
 	}
 

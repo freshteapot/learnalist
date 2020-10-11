@@ -9,20 +9,15 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
 )
 
-type HTTPLogoutRequest struct {
-	Kind     string `json:"kind"`
-	UserUUID string `json:"user_uuid"`
-	Token    string `json:"token"`
-}
-
 func (m *Manager) V1PostLogout(c echo.Context) error {
 	var err error
-	var input HTTPLogoutRequest
+	var input api.HTTPLogoutRequest
 	defer c.Request().Body.Close()
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
 	err = json.Unmarshal(jsonBytes, &input)
@@ -69,19 +64,30 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	eventKind := ""
 	switch input.Kind {
 	case "token":
-		err = userSession.RemoveSessionForUser(input.UserUUID, input.Token)
+		eventKind = event.KindUserLogoutSession
+		err = userSession.RemoveSessionForUser(userUUID, input.Token)
 		response.Message = fmt.Sprintf("Session %s, is now logged out", input.Token)
 	case "user":
-		err = userSession.RemoveSessionsForUser(input.UserUUID)
-		response.Message = fmt.Sprintf("All sessions have been logged out for user %s", input.UserUUID)
+		eventKind = event.KindUserLogoutSessions
+		err = userSession.RemoveSessionsForUser(userUUID)
+		response.Message = fmt.Sprintf("All sessions have been logged out for user %s", userUUID)
 	}
 
 	if err != nil {
 		response.Message = i18n.InternalServerErrorFunny
 		return c.JSON(http.StatusInternalServerError, response)
 	}
+
+	event.GetBus().Publish(event.Eventlog{
+		Kind: event.ApiUserLogout,
+		Data: event.EventUser{
+			UUID: userUUID,
+			Kind: eventKind,
+		},
+	})
 
 	return c.JSON(http.StatusOK, response)
 }

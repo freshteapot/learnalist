@@ -14,12 +14,12 @@ import (
 func (m *Manager) V1RemoveAlist(c echo.Context) error {
 	alistUUID := c.Param("uuid")
 	user := c.Get("loggedInUser").(uuid.User)
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 
 	err := m.Datastore.RemoveAlist(alistUUID, user.Uuid)
 	if err != nil {
 		if err == i18n.ErrorListNotFound {
-			response := api.HttpResponseMessage{
+			response := api.HTTPResponseMessage{
 				Message: i18n.SuccessAlistNotFound,
 			}
 			return c.JSON(http.StatusNotFound, response)
@@ -34,13 +34,13 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiListDelete,
 		Data: event.EventList{
 			UUID:     alistUUID,
 			UserUUID: user.Uuid,
 		},
-	}))
+	})
 
 	// Remove from cache
 	m.HugoHelper.DeleteList(alistUUID)

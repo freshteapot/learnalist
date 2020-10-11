@@ -35,8 +35,8 @@ func CleanEchoResponseFromByte(data []byte) string {
 	return strings.TrimSuffix(string(data), "\n")
 }
 
-func CheckMessageResponse(response api.HttpResponse, expect string) {
-	var obj api.HttpResponseMessage
+func CheckMessageResponse(response api.HTTPResponse, expect string) {
+	var obj api.HTTPResponseMessage
 	json.Unmarshal(response.Body, &obj)
 	Expect(obj.Message).To(Equal(expect))
 }
@@ -45,7 +45,7 @@ func CheckMessageResponseFromReader(body io.Reader, expect string) {
 	data, err := ioutil.ReadAll(body)
 	Expect(err).To(BeNil())
 
-	var response api.HttpResponseMessage
+	var response api.HTTPResponseMessage
 	json.Unmarshal(data, &response)
 	Expect(response.Message).To(Equal(expect))
 }
@@ -55,9 +55,9 @@ func CheckMessageResponseFromResponseRecorder(rec *httptest.ResponseRecorder, ex
 	CheckMessageResponseFromReader(reader, expect)
 }
 
-func ToHttpResponse(response *http.Response, err error) (api.HttpResponse, error) {
+func ToHttpResponse(response *http.Response, err error) (api.HTTPResponse, error) {
 	// TODO what todo with err
-	var obj api.HttpResponse
+	var obj api.HTTPResponse
 	defer response.Body.Close()
 	obj.StatusCode = response.StatusCode
 	buf, _ := ioutil.ReadAll(response.Body)

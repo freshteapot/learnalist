@@ -8,6 +8,9 @@ spec:
   selector:
     matchLabels:
       app: event-reader
+  replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -17,16 +20,13 @@ spec:
         - name: event-reader
           image: registry.devbox/learnalist:latest
           args:
-            [
-              "--config=/etc/learnalist/config.yaml",
-              "tools",
-              "event-reader",
-              "echo",
-            ]
+            ["--config=/etc/learnalist/config.yaml", "tools", "event-reader"]
           env:
+            - name: EVENTS_VIA
+              value: "nats"
             - name: EVENTS_NATS_SERVER
               value: "nats.default.svc.cluster.local"
-            - name: EVENTS_STAN_CLIENTID
+            - name: EVENTS_STAN_CLIENT_ID
               value: "lal-event-reader"
           volumeMounts:
             - name: config-volume

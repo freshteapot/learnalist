@@ -10,8 +10,8 @@ import (
 var _ = Describe("Testing user login endpoint", func() {
 	var (
 		err         error
-		cleanedUser api.HttpUserRegisterInput
-		input       api.HttpUserRegisterInput
+		cleanedUser api.HTTPUserRegisterInput
+		input       api.HTTPUserRegisterInput
 	)
 
 	It("Test cases", func() {
@@ -49,7 +49,7 @@ var _ = Describe("Testing user login endpoint", func() {
 		}
 
 		for _, test := range tests {
-			input = api.HttpUserRegisterInput{
+			input = api.HTTPUserRegisterInput{
 				Username: test.Username,
 				Password: test.Password,
 			}

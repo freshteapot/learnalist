@@ -61,7 +61,7 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("Valid json, invalid input", func() {
-				input := api.HttpLabelInput{
+				input := api.HTTPLabelInput{
 					Label: "",
 				}
 				b, _ := json.Marshal(input)
@@ -78,7 +78,7 @@ var _ = Describe("Testing Label endpoints", func() {
 			})
 
 			It("Valid input, failed to save", func() {
-				input := api.HttpLabelInput{
+				input := api.HTTPLabelInput{
 					Label: "I am a label",
 				}
 				b, _ := json.Marshal(input)
@@ -96,7 +96,7 @@ var _ = Describe("Testing Label endpoints", func() {
 
 			Context("Success, label saved", func() {
 				It("Its new", func() {
-					input := api.HttpLabelInput{
+					input := api.HTTPLabelInput{
 						Label: "I am a label",
 					}
 					b, _ := json.Marshal(input)
@@ -114,7 +114,7 @@ var _ = Describe("Testing Label endpoints", func() {
 				})
 
 				It("Its already in the system", func() {
-					input := api.HttpLabelInput{
+					input := api.HTTPLabelInput{
 						Label: "I am a label",
 					}
 					b, _ := json.Marshal(input)

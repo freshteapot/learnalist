@@ -204,8 +204,26 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				oauthReadWriter.On("GetTokenInfo", userUUID).Return(nil, errors.New("not found"))
 				oauthReadWriter.On("WriteTokenInfo", userUUID, mock.Anything).Return(nil)
 
-				eventMessageBus := &mocks.MessageBus{}
-				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+				// I bet there is a better way
+				try := 0
+				eventMessageBus := &mocks.EventlogPubSub{}
+				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+					if try == 0 {
+						Expect(moment.Kind).To(Equal(event.ApiUserRegister))
+						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPGoogle))
+						try = 1
+						return true
+					}
+
+					if try == 1 {
+						Expect(moment.Kind).To(Equal(event.ApiUserLogin))
+						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLoginIDPGoogle))
+						return true
+					}
+
+					return true
+				}))
+
 				event.SetBus(eventMessageBus)
 
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")

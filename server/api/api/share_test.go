@@ -68,7 +68,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("Valid json input, invalid action", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userB.Uuid,
 				AlistUUID: "fakeList",
 				Action:    "keys-to-the-castle",
@@ -85,7 +85,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("Server error: failed to store in storage", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userB.Uuid,
 				AlistUUID: "fakeList",
 				Action:    aclKeys.ActionGrant,
@@ -106,7 +106,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List not found", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userB.Uuid,
 				AlistUUID: "fakeList",
 				Action:    aclKeys.ActionGrant,
@@ -127,7 +127,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userB.Uuid,
 				AlistUUID: "fakeList",
 				Action:    aclKeys.ActionGrant,
@@ -150,7 +150,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List found, you cant share with yourself", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userA.Uuid,
 				AlistUUID: "fakeList",
 				Action:    aclKeys.ActionGrant,
@@ -174,7 +174,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List found, the user you want to share with doesnt exist", func() {
-			inputGrant := &api.HttpShareListWithUserInput{
+			inputGrant := &api.HTTPShareListWithUserInput{
 				UserUUID:  userB.Uuid,
 				AlistUUID: "fakeList",
 				Action:    aclKeys.ActionGrant,
@@ -200,7 +200,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 		Context("Success, we will share", func() {
 			It("Grant user read access", func() {
-				inputGrant := &api.HttpShareListWithUserInput{
+				inputGrant := &api.HTTPShareListWithUserInput{
 					UserUUID:  userB.Uuid,
 					AlistUUID: "fakeList",
 					Action:    aclKeys.ActionGrant,
@@ -226,7 +226,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			})
 
 			It("Revoke user read access", func() {
-				inputRevoke := &api.HttpShareListWithUserInput{
+				inputRevoke := &api.HTTPShareListWithUserInput{
 					UserUUID:  userB.Uuid,
 					AlistUUID: "fakeList",
 					Action:    aclKeys.ActionRevoke,
@@ -298,7 +298,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("Valid json input, invalid action", func() {
-			inputBadAction := &api.HttpShareListInput{
+			inputBadAction := &api.HTTPShareListInput{
 				AlistUUID: "fakeList",
 				Action:    "keys-to-the-castle",
 			}
@@ -314,7 +314,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List not found", func() {
-			a, _ := json.Marshal(&api.HttpShareListInput{
+			a, _ := json.Marshal(&api.HTTPShareListInput{
 				AlistUUID: "fakeList",
 				Action:    aclKeys.SharedWithPublic,
 			})
@@ -333,7 +333,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		})
 
 		It("List found, but the user setting the share is not the owner of the list", func() {
-			a, _ := json.Marshal(&api.HttpShareListInput{
+			a, _ := json.Marshal(&api.HTTPShareListInput{
 				AlistUUID: "fakeList",
 				Action:    aclKeys.SharedWithPublic,
 			})
@@ -356,7 +356,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 
 		Context("Success, we will share the list", func() {
 			It("With the public", func() {
-				inputObject := &api.HttpShareListInput{
+				inputObject := &api.HTTPShareListInput{
 					AlistUUID: "fakeList",
 					Action:    aclKeys.SharedWithPublic,
 				}
@@ -389,7 +389,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			})
 
 			It("Privately", func() {
-				inputObject := &api.HttpShareListInput{
+				inputObject := &api.HTTPShareListInput{
 					AlistUUID: "fakeList",
 					Action:    aclKeys.NotShared,
 				}
@@ -421,7 +421,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			})
 
 			It("With friends", func() {
-				inputObject := &api.HttpShareListInput{
+				inputObject := &api.HTTPShareListInput{
 					AlistUUID: "fakeList",
 					Action:    aclKeys.SharedWithFriends,
 				}
@@ -453,7 +453,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			})
 
 			It("With friends when already set", func() {
-				inputObject := &api.HttpShareListInput{
+				inputObject := &api.HTTPShareListInput{
 					AlistUUID: "fakeList",
 					Action:    aclKeys.SharedWithFriends,
 				}
@@ -487,7 +487,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 		/*
 			It("", func() {
 
-				inputRevoke := &api.HttpShareListWithUserInput{
+				inputRevoke := &api.HTTPShareListWithUserInput{
 					UserUUID:  userB.Uuid,
 					AlistUUID: "fakeList",
 					Action:    aclKeys.ActionRevoke,

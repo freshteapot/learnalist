@@ -151,6 +151,8 @@ make sync-site-assets
 Make sure k8s file is uptodate
 ```sh
 kubectl apply -f k8s/learnalist.yaml
+kubectl apply -f k8s/slack-events.yaml
+kubectl apply -f k8s/event-reader.yaml
 ```
 
 Patch if only bumped latest version
@@ -160,6 +162,8 @@ PATCH=$(cat <<_EOF_
 _EOF_
 )
 kubectl patch deployment learnalist -p "${PATCH}"
+kubectl patch deployment event-reader -p "${PATCH}"
+kubectl patch deployment slack-events -p "${PATCH}"
 ```
 
 ```sh

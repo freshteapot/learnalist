@@ -54,8 +54,5 @@ UNION
 SELECT 1 FROM user_from_idp WHERE user_uuid=?
 `
 	store.db.Get(&id, query, userUUID, userUUID)
-	if id != 1 {
-		return false
-	}
-	return true
+	return id == 1
 }

@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 	"github.com/spf13/cobra"
@@ -23,25 +22,17 @@ var slackEventsCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		logger.Info("Read events")
+		event.SetDefaultSettingsForCMD()
 
 		webhook := viper.GetString("server.events.slack.webhook")
 		if webhook == "" {
 			panic("Webhook shouldnt be empty")
 		}
 
-		natsServer := viper.GetString("server.events.nats.server")
-		stanClusterID := viper.GetString("server.events.stan.clusterID")
-		stanClientID := viper.GetString("server.events.stan.clientID")
-		fmt.Println(stanClientID)
-		nats, err := nats.Connect(natsServer)
-		if err != nil {
-			panic(err)
-		}
-
-		event.SetBus(event.NewNatBus(stanClusterID, stanClientID, nats))
+		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
 		reader := NewSlackEvents(webhook, logger.WithField("context", "slack-events"))
-		event.GetBus().Subscribe(event.TopicMonolog, reader.Read)
+		event.GetBus().Subscribe("slack-listener", reader.Read)
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
@@ -49,8 +40,7 @@ var slackEventsCMD = &cobra.Command{
 		select {
 		case <-signals:
 		}
-		// Not great
-		event.GetBus().Close(event.TopicMonolog)
+		event.GetBus().Close()
 	},
 }
 
@@ -80,6 +70,22 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user %s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
+	case event.ApiUserLogout:
+	case event.BrowserUserLogout:
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventUser
+		json.Unmarshal(b, &moment)
+		via := "api"
+		if entry.Kind == event.BrowserUserLogout {
+			via = "browser"
+		}
+
+		clearing := "current session"
+		if moment.Kind == event.KindUserLogoutSessions {
+			clearing = "all sessions"
+		}
+
+		msg.Text = fmt.Sprintf("%s: user %s logged out via %s, clearing %s", entry.Kind, moment.UUID, via, clearing)
 	case event.ApiUserDelete:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
@@ -133,15 +139,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 }
 
 func init() {
-	viper.SetDefault("server.events.nats.server", "nats")
-	viper.SetDefault("server.events.stan.clusterID", "stan")
-	viper.SetDefault("server.events.stan.clientID", "")
-
-	viper.BindEnv("server.events.nats.server", "EVENTS_NATS_SERVER")
-	viper.BindEnv("server.events.stan.clusterID", "EVENTS_STAN_CLUSERTID")
-	viper.BindEnv("server.events.stan.clientID", "EVENTS_STAN_CLIENTID")
-
 	viper.SetDefault("server.events.slack.webhook", "")
 	viper.BindEnv("server.events.slack.webhook", "EVENTS_SLACK_WEBHOOK")
-
 }

@@ -31,7 +31,7 @@ func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *l
 		repo:      repo,
 	}
 
-	event.GetBus().Subscribe(event.TopicMonolog, func(entry event.Eventlog) {
+	event.GetBus().Subscribe("assets", func(entry event.Eventlog) {
 		if entry.Kind != event.ApiUserDelete {
 			return
 		}
@@ -103,7 +103,7 @@ func (s *AssetService) DeleteEntry(c echo.Context) error {
 	UUID := c.Param("uuid")
 
 	if UUID == "" {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Missing asset uuid",
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -113,7 +113,7 @@ func (s *AssetService) DeleteEntry(c echo.Context) error {
 	asset, err := s.repo.GetEntry(UUID)
 	if err != nil {
 		if err == ErrNotFound {
-			response := api.HttpResponseMessage{
+			response := api.HTTPResponseMessage{
 				Message: "Asset not found",
 			}
 			return c.JSON(http.StatusNotFound, response)
@@ -122,7 +122,7 @@ func (s *AssetService) DeleteEntry(c echo.Context) error {
 	}
 
 	if asset.UserUUID != userUUID {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Access denied",
 		}
 		return c.JSON(http.StatusForbidden, response)
@@ -141,7 +141,7 @@ func (s *AssetService) DeleteEntry(c echo.Context) error {
 }
 
 func (s *AssetService) Share(c echo.Context) error {
-	response := api.HttpResponseMessage{
+	response := api.HTTPResponseMessage{
 		Message: "",
 	}
 
@@ -169,7 +169,7 @@ func (s *AssetService) Share(c echo.Context) error {
 	// Loook up asset
 	asset, _ := s.repo.GetEntry(input.Uuid)
 	if asset.UserUUID != userUUID {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Access denied",
 		}
 		return c.JSON(http.StatusForbidden, response)
@@ -226,7 +226,7 @@ func (s *AssetService) GetAsset(c echo.Context) error {
 	}
 
 	if !allow {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Access denied",
 		}
 		return c.JSON(http.StatusForbidden, response)
@@ -258,7 +258,7 @@ func (s *AssetService) Upload(c echo.Context) error {
 
 	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
 	if !utils.StringArrayContains(allowed, sharedWith) {
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Check the documentation",
 		}
 		return c.JSON(http.StatusBadRequest, response)
@@ -280,7 +280,7 @@ func (s *AssetService) Upload(c echo.Context) error {
 			"error":  err,
 			"action": "form_file",
 		}).Error("asset upload")
-		response := api.HttpResponseMessage{
+		response := api.HTTPResponseMessage{
 			Message: "Check the documentation",
 		}
 		return c.JSON(http.StatusBadRequest, response)

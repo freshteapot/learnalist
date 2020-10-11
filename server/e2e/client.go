@@ -57,8 +57,8 @@ func (c Client) getServerURL() string {
 	return c.server
 }
 
-func (c Client) doRequest(req *http.Request, dest interface{}, want ...int) (int, api.HttpResponseMessage) {
-	var errorMessage api.HttpResponseMessage
+func (c Client) doRequest(req *http.Request, dest interface{}, want ...int) (int, api.HTTPResponseMessage) {
+	var errorMessage api.HTTPResponseMessage
 	resp, _ := c.httpClient.Do(req)
 
 	defer resp.Body.Close()
@@ -107,7 +107,7 @@ func (c Client) Register(username string, password string) RegisterResponse {
 	return response
 }
 
-func (c Client) Login(credentials api.HttpLoginRequest) (statusCode int, response api.HttpLoginResponse) {
+func (c Client) Login(credentials api.HTTPLoginRequest) (statusCode int, response api.HTTPLoginResponse) {
 	url := fmt.Sprintf("%s/api/v1/user/login", c.getServerURL())
 
 	b, _ := json.Marshal(credentials)
@@ -125,7 +125,7 @@ func (c Client) Login(credentials api.HttpLoginRequest) (statusCode int, respons
 	return statusCode, response
 }
 
-func (c Client) DeleteUser(credentials api.HttpLoginResponse) (statusCode int, response api.HttpResponseMessage) {
+func (c Client) DeleteUser(credentials api.HTTPLoginResponse) (statusCode int, response api.HTTPResponseMessage) {
 	url := fmt.Sprintf("%s/api/v1/user/%s", c.getServerURL(), credentials.UserUUID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	req = req.WithContext(context.Background())
@@ -174,7 +174,7 @@ func (c Client) PutListV1(userInfo RegisterResponse, uuid string, input string) 
 	return response, nil
 }
 
-func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, action string) api.HttpResponseMessage {
+func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, action string) api.HTTPResponseMessage {
 	body := strings.NewReader(fmt.Sprintf(`{
   "alist_uuid": "%s",
   "action": "%s"
@@ -196,7 +196,7 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 		panic(err)
 	}
 	defer resp.Body.Close()
-	var response api.HttpResponseMessage
+	var response api.HTTPResponseMessage
 	data, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(data, &response)
 	if err != nil {
@@ -206,7 +206,7 @@ func (c Client) SetListShareV1(userInfo RegisterResponse, alistUUID string, acti
 	return response
 }
 
-func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) api.HttpResponse {
+func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) api.HTTPResponse {
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -226,7 +226,7 @@ func (c Client) GetListByUUIDV1(userInfo RegisterResponse, uuid string) api.Http
 
 	defer resp.Body.Close()
 
-	var response api.HttpResponse
+	var response api.HTTPResponse
 	response.StatusCode = resp.StatusCode
 	data, err := ioutil.ReadAll(resp.Body)
 	response.Body = data
@@ -291,8 +291,8 @@ func (c Client) GetListsByMe(userInfo RegisterResponse, labels string, listType 
 	return response, nil
 }
 
-func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (api.HttpResponse, error) {
-	var response api.HttpResponse
+func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (api.HTTPResponse, error) {
+	var response api.HTTPResponse
 	var err error
 	url := fmt.Sprintf("%s/alist/%s.html", c.getServerURL(), uuid)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -318,12 +318,12 @@ func (c Client) GetAlistHtml(userInfo RegisterResponse, uuid string) (api.HttpRe
 	return response, err
 }
 
-func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, userUUID string, action string) (api.HttpResponse, error) {
-	var response api.HttpResponse
+func (c Client) ShareReadAcessV1(userInfo RegisterResponse, alistUUID string, userUUID string, action string) (api.HTTPResponse, error) {
+	var response api.HTTPResponse
 	var err error
 	url := fmt.Sprintf("%s/api/v1/share/readaccess", c.getServerURL())
 
-	inputAccess := &api.HttpShareListWithUserInput{
+	inputAccess := &api.HTTPShareListWithUserInput{
 		UserUUID:  userUUID,
 		AlistUUID: alistUUID,
 		Action:    action,

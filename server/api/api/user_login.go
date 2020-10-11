@@ -14,8 +14,8 @@ import (
 )
 
 func (m *Manager) V1PostLogin(c echo.Context) error {
-	var input api.HttpUserRegisterInput
-	response := api.HttpResponseMessage{}
+	var input api.HTTPUserRegisterInput
+	response := api.HTTPResponseMessage{}
 
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -26,7 +26,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	cleanedUser := api.HttpUserRegisterInput{
+	cleanedUser := api.HTTPUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,
 	}
@@ -54,15 +54,15 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
 			Kind: event.KindUserLoginUsername,
 		},
-	}))
+	})
 
-	return c.JSON(http.StatusOK, &api.HttpLoginResponse{
+	return c.JSON(http.StatusOK, &api.HTTPLoginResponse{
 		Token:    session.Token,
 		UserUUID: userUUID,
 	})

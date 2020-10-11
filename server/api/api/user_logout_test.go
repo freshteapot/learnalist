@@ -8,7 +8,9 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
@@ -108,6 +110,15 @@ var _ = Describe("Testing user logout endpoint", func() {
 			userSession.On("RemoveSessionForUser", userUUID, token).
 				Return(nil)
 
+			eventMessageBus := &mocks.EventlogPubSub{}
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiUserLogout))
+				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
+				Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLogoutSession))
+				return true
+			}))
+			event.SetBus(eventMessageBus)
+
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, "Session fake-token-123, is now logged out")
@@ -130,6 +141,14 @@ var _ = Describe("Testing user logout endpoint", func() {
 			userSession.On("RemoveSessionsForUser", userUUID).
 				Return(nil)
 
+			eventMessageBus := &mocks.EventlogPubSub{}
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiUserLogout))
+				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
+				Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLogoutSessions))
+				return true
+			}))
+			event.SetBus(eventMessageBus)
 			m.V1PostLogout(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, "All sessions have been logged out for user fake-user-123")

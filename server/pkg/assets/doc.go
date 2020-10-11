@@ -33,6 +33,6 @@ type Repository interface {
 }
 
 // HttpUploadResponse Response when asset uploaded
-type HttpUploadResponse struct {
+type HTTPUploadResponse struct {
 	Href string `json:"href"`
 }

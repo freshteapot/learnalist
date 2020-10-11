@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
@@ -90,6 +91,14 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("RemoveAlist", alistUUID, user.Uuid).Return(nil)
 			datastore.On("GetAllListsByUser", user.Uuid).Return([]alist.ShortInfo{}, nil)
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
+			eventMessageBus := &mocks.EventlogPubSub{}
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiListDelete))
+				Expect(moment.Data.(event.EventList).UUID).To(Equal(alistUUID))
+				return true
+			}))
+			event.SetBus(eventMessageBus)
+
 			m.V1RemoveAlist(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, "List fake-list-123 was removed.")

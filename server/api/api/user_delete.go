@@ -12,7 +12,7 @@ import (
 
 func (m *Manager) V1DeleteUser(c echo.Context) error {
 	logger := m.logger
-	response := api.HttpResponseMessage{}
+	response := api.HTTPResponseMessage{}
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
 
@@ -32,12 +32,12 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.TopicMonolog, event.EventLogToBytes(event.Eventlog{
+	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserDelete,
 		Data: event.EventUser{
 			UUID: userUUID,
 		},
-	}))
+	})
 
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 	response.Message = "User has been removed"

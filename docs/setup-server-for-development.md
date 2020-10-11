@@ -46,3 +46,58 @@ docker run --rm --name learnalist \
 -e HUGO_EXTERNAL=false \
 learnalist:latest --config=/srv/learnalist/config/docker.config.yaml server
 ```
+
+# Develop with nats
+## Run nats locally
+
+```sh
+docker run \
+-p 4222:4222 \
+-p 8222:8222 \
+-v /tmp/nats-store/:/tmp/nats-store/ nats-streaming:alpine3.12 \
+--max_age 10s \
+--store=FILE \
+--dir=/tmp/nats-store \
+--file_auto_sync=1ms \
+--stan_debug=true \
+--debug=true \
+--http_port 8222
+```
+
+
+## Running the api server
+
+```sh
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make run-api-server
+```
+
+
+## Running slack events
+- Get slack secret from the cluster, checkout [api.events](./api.events.md)
+
+```sh
+cd server
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-slack-events" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+EVENTS_SLACK_WEBHOOK="XXX" \
+go run main.go --config=../config/dev.config.yaml tools slack-events
+```
+
+
+## Running the event reader
+
+```sh
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-event-reader" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+go run main.go --config=../config/dev.config.yaml tools event-reader
+```

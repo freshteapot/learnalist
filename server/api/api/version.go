@@ -9,7 +9,7 @@ import (
 )
 
 func (m *Manager) V1GetVersion(c echo.Context) error {
-	response := api.HttpGetVersionResponse{
+	response := api.HTTPGetVersionResponse{
 		GitHash: version.GetGitHash(),
 		GitDate: version.GetGitDate(),
 		Version: version.GetVersion(),

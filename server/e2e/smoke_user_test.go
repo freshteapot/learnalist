@@ -27,7 +27,7 @@ var _ = Describe("Smoke user", func() {
 		defer response.Body.Close()
 
 		decoder := json.NewDecoder(response.Body)
-		var userCredentials api.HttpLoginResponse
+		var userCredentials api.HTTPLoginResponse
 		err = decoder.Decode(&userCredentials)
 		Expect(err).ShouldNot(HaveOccurred())
 

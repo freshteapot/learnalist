@@ -19,6 +19,7 @@ kill -9 $(lsof -ti tcp:1234) 2>/dev/null
 
 # Config setup
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TOP_LEVEL="${CWD}/../"
 HUGO_DIR="${CWD}/../hugo"
 SERVER_CONFIG="../config.dev_external.yaml"
 DEFAULT_SERVER_CONFIG="${CWD}/../config/dev.config.yaml"
@@ -55,6 +56,7 @@ ls -lah "$HUGO_DIR/public"
 # Start the server
 cd server && \
 go run --tags="json1" main.go --config=$SERVER_CONFIG server &
+
 # Start static site engine
 cd $HUGO_DIR && \
 hugo server \
@@ -69,3 +71,8 @@ hugo server \
 -b $_BASEURL --bind $_BIND \
 &
 sleep 1
+
+
+cd $TOP_LEVEL
+cd js
+npm run dev:js:components

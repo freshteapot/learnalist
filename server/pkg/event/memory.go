@@ -1,39 +1,43 @@
 package event
 
-import (
-	"encoding/json"
-
-	messagebus "github.com/vardius/message-bus"
-)
-
-type lalMessageBus struct {
-	bus messagebus.MessageBus
+type memoryBus struct {
+	listeners []eventlogPubSubListener
 }
 
-// TODO maybe skip the whole messageBus and just use nats?
-func NewMemoryBus() messagebus.MessageBus {
-	return &lalMessageBus{
-		bus: messagebus.New(queueSize),
+func NewMemoryBus() EventlogPubSub {
+	return &memoryBus{}
+}
+
+func (b *memoryBus) Close() {
+	b.listeners = make([]eventlogPubSubListener, 0)
+
+}
+
+func (b *memoryBus) Subscribe(key string, fn interface{}) {
+	listener := eventlogPubSubListener{
+		key: key,
+		fn:  fn,
+	}
+	b.listeners = append(b.listeners, listener)
+}
+
+func (b *memoryBus) Publish(moment Eventlog) {
+	for _, listener := range b.listeners {
+		type HandlerType func(entry Eventlog)
+		if f, ok := listener.fn.(func(entry Eventlog)); ok {
+			HandlerType(f)(moment)
+		}
 	}
 }
 
-func (b *lalMessageBus) Publish(topic string, args ...interface{}) {
-	var eventLog Eventlog
-	err := json.Unmarshal(args[0].([]byte), &eventLog)
-	if err != nil {
-		panic(err)
+func (b *memoryBus) Start() {
+}
+
+func (b *memoryBus) Unsubscribe(key string) {
+	for index, listener := range b.listeners {
+		if listener.key == key {
+			b.listeners = append(b.listeners[:index], b.listeners[index+1:]...)
+			break
+		}
 	}
-	b.bus.Publish(topic, eventLog)
-}
-
-func (b *lalMessageBus) Close(topic string) {
-	b.bus.Close(topic)
-}
-
-func (b *lalMessageBus) Subscribe(topic string, fn interface{}) error {
-	return b.bus.Subscribe(topic, fn)
-}
-
-func (b *lalMessageBus) Unsubscribe(topic string, fn interface{}) error {
-	return b.bus.Unsubscribe(topic, fn)
 }

@@ -11,8 +11,8 @@ import (
 Username is required, needs to be at least 5 characters and can only be letters, numbers _ and -.
 Password is required, minimum length of 7.
 */
-func Validate(input api.HttpUserRegisterInput) (api.HttpUserRegisterInput, error) {
-	var cleaned api.HttpUserRegisterInput
+func Validate(input api.HTTPUserRegisterInput) (api.HTTPUserRegisterInput, error) {
+	var cleaned api.HTTPUserRegisterInput
 
 	v := validate.New(&input)
 	v.StopOnError = false
