@@ -50,6 +50,12 @@ type HttpLoginResponse struct {
 
 type HttpLoginRequest HttpUserRegisterInput
 
+type HTTPLogoutRequest struct {
+	Kind     string `json:"kind"`
+	UserUUID string `json:"user_uuid"`
+	Token    string `json:"token"`
+}
+
 var (
 	HTTPErrorResponse = HttpResponseMessage{
 		Message: i18n.InternalServerErrorFunny,

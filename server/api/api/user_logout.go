@@ -13,15 +13,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type HTTPLogoutRequest struct {
-	Kind     string `json:"kind"`
-	UserUUID string `json:"user_uuid"`
-	Token    string `json:"token"`
-}
-
 func (m *Manager) V1PostLogout(c echo.Context) error {
 	var err error
-	var input HTTPLogoutRequest
+	var input api.HTTPLogoutRequest
 	defer c.Request().Body.Close()
 	response := api.HttpResponseMessage{}
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)

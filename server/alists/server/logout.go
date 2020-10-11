@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
@@ -24,7 +23,6 @@ func (m *Manager) Logout(c echo.Context) error {
 
 	userUUID, err := session.GetUserUUIDByToken(token)
 	if err != nil {
-		fmt.Println("token not found, just redirect")
 		return c.Redirect(http.StatusFound, redirectURL)
 	}
 
