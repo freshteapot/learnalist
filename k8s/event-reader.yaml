@@ -8,6 +8,9 @@ spec:
   selector:
     matchLabels:
       app: event-reader
+  replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
