@@ -44,7 +44,7 @@ HUGO_EXTERNAL=false \
 make run-api-server
 ```
 
-```
+```sh
 EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-event-reader" \
