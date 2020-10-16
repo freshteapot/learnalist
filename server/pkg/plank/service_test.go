@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
@@ -27,32 +26,35 @@ var _ = Describe("Testing API", func() {
 		repo    *mocks.PlankRepository
 		logger  *logrus.Logger
 		c       echo.Context
+		e       *echo.Echo
 		req     *http.Request
 		rec     *httptest.ResponseRecorder
 		user    *uuid.User
 	)
 
+	BeforeEach(func() {
+		user = &uuid.User{
+			Uuid: "fake-123",
+		}
+		eventMessageBus := &mocks.EventlogPubSub{}
+		eventMessageBus.On("Subscribe", "plank", mock.Anything)
+		event.SetBus(eventMessageBus)
+
+		e = echo.New()
+
+		logger, _ = test.NewNullLogger()
+		repo = &mocks.PlankRepository{}
+		service = plank.NewService(repo, logger)
+	})
+
 	When("Requesting history", func() {
 		BeforeEach(func() {
-			user = &uuid.User{
-				Uuid: "fake-123",
-			}
-
-			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Subscribe", mock.Anything, mock.Anything)
-			event.SetBus(eventMessageBus)
-
 			method := http.MethodPost
 			uri := "/api/v1/plank/history"
-			req, rec = setupFakeEndpoint(method, uri, "")
-			e := echo.New()
+			req, rec = testutils.SetupJSONEndpoint(method, uri, "")
 			c = e.NewContext(req, rec)
 			c.SetPath("/api/v1/plank/history")
 			c.Set("loggedInUser", *user)
-
-			logger, _ = test.NewNullLogger()
-			repo = &mocks.PlankRepository{}
-			service = plank.NewService(repo, logger)
 		})
 
 		It("Repo lookup failed", func() {
@@ -84,11 +86,3 @@ var _ = Describe("Testing API", func() {
 		})
 	})
 })
-
-func setupFakeEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {
-	req := httptest.NewRequest(method, uri, strings.NewReader(body))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
-	rec := httptest.NewRecorder()
-	return req, rec
-}

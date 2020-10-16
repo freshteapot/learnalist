@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/labstack/echo/v4"
 	. "github.com/onsi/gomega"
 )
 
@@ -63,4 +64,16 @@ func ToHttpResponse(response *http.Response, err error) (api.HTTPResponse, error
 	buf, _ := ioutil.ReadAll(response.Body)
 	obj.Body = buf
 	return obj, err
+}
+
+func SetupJSONEndpoint(method string, uri string, body string) (*http.Request, *httptest.ResponseRecorder) {
+	var input io.Reader
+	if body != "" {
+		input = strings.NewReader(body)
+	}
+	req := httptest.NewRequest(method, uri, input)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	return req, rec
 }
