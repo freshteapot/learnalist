@@ -1,6 +1,7 @@
 <script>
   // TODO do I care how often they hit save?
   import { push } from "svelte-spa-router";
+  import Header from "./header.svelte";
   import LoginModal from "../../components/login_modal.svelte";
   import { loggedIn, notify } from "../../shared.js";
   import store from "./store.js";
@@ -28,6 +29,8 @@
   }
 </script>
 
+<Header />
+
 <div class="flex flex-column">
   <div class=" w-100 pa3 mr2">
     <button class="br3" on:click={() => push('/play/total_recall')}>
@@ -36,7 +39,6 @@
     <button class="br3" on:click={() => push('/play/slideshow')}>
       Slideshow
     </button>
-
     <button class="br3" on:click={() => push('/settings')}>Settings</button>
     {#if loggedIn()}
       <button

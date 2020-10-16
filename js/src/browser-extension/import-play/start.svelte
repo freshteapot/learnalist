@@ -1,5 +1,6 @@
 <script>
   import { push } from "svelte-spa-router";
+  import Header from "./header.svelte";
   import Info from "./info.svelte";
   import store from "./store.js";
   import { onMount } from "svelte";
@@ -134,13 +135,11 @@
   }
 </script>
 
+<Header />
 {#if show != ''}
   <div class="flex flex-column">
-    <div class=" w-100 pa3 mr2">
-      <button class="br3" on:click={() => push('/settings')}>Settings</button>
-    </div>
     {#if show == 'welcome'}
-      <div class=" w-100 pa3 mr2">
+      <div class="w-100 pa3 mr2">
         <h1>Welcome!</h1>
         <p>We will only try and load lists from</p>
         <ul class="list">
