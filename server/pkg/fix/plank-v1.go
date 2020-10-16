@@ -28,28 +28,6 @@ func (f plankV1) Key() string {
 	return f.key
 }
 
-func (f plankV1) GetLists() []string {
-	db := f.db
-	lists := make([]string, 0)
-	query := `
-SELECT
-	uuid
-FROM
-	alist_kv,
-	json_each(body, '$.info.labels')
-WHERE
-	json_valid(body)
-AND
-	json_each.value LIKE 'plank';
-`
-	err := db.Select(&lists, query)
-	if err != nil {
-		fmt.Println(err)
-		panic("...")
-	}
-	return lists
-}
-
 func (f plankV1) GetPlankRecords() []plankV1UserAndData {
 	db := f.db
 	lists := make([]plankV1UserAndData, 0)
