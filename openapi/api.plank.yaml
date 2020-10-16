@@ -105,6 +105,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Not able to find plank record linked to this user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
         "500":
           description: unexpected error
           content:

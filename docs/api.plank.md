@@ -59,3 +59,10 @@ curl -XPOST \
 }
 '
 ```
+
+# Delete Entry by UUID
+```sh
+curl -XDELETE \
+-u'iamchris:test123' \
+'http://localhost:1234/api/v1/plank/ba9277fc4c6190fb875ad8f9cee848dba699937f'
+```

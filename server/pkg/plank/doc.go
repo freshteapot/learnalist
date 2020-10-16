@@ -10,11 +10,12 @@ var (
 	ErrEntryExists = errors.New("item.exists")
 )
 
-type Repository interface {
+type PlankRepository interface {
+	GetEntry(UUID string, userUUID string) (HttpRequestInput, error)
 	SaveEntry(entry Entry) error
 	// Return in time order, latest first
 	History(userUUID string) ([]HttpRequestInput, error)
-	DeleteEntry(userUUID string, UUID string) error
+	DeleteEntry(UUID string, userUUID string) error
 	DeleteEntriesByUser(userUUID string) error
 }
 

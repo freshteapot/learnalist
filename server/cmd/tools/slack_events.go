@@ -13,6 +13,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
@@ -125,7 +126,17 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if moment.Kind == spaced_repetition.EventKindDeleted {
 			msg.Text = fmt.Sprintf("User:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
 		}
+	case plank.EventApiPlank:
+		b, _ := json.Marshal(entry.Data)
+		var moment plank.EventPlank
+		json.Unmarshal(b, &moment)
+		if moment.Kind == plank.EventKindNew {
+			msg.Text = fmt.Sprintf("User:%s added a plank:%s", moment.UserUUID, moment.Data.UUID)
+		}
 
+		if moment.Kind == plank.EventKindDeleted {
+			msg.Text = fmt.Sprintf("User:%s deleted a plank:%s", moment.UserUUID, moment.Data.UUID)
+		}
 	default:
 		b, _ := json.Marshal(entry)
 		fmt.Println(string(b))

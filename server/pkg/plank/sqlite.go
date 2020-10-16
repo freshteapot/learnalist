@@ -1,6 +1,7 @@
 package plank
 
 import (
+	"database/sql"
 	"encoding/json"
 	"strings"
 	"time"
@@ -9,9 +10,10 @@ import (
 )
 
 var (
+	SqlGetEntry            = `SELECT body FROM plank WHERE uuid=? AND user_uuid=?`
 	SqlSaveEntry           = `INSERT INTO plank(uuid, body, user_uuid, created) values(?, ?, ?, ?)`
 	SqlGetHistory          = `SELECT body FROM plank WHERE user_uuid=? ORDER BY created DESC`
-	SqlDeleteEntry         = `DELETE FROM plank WHERE user_uuid=? and uuid=?`
+	SqlDeleteEntry         = `DELETE FROM plank WHERE uuid=? AND user_uuid=?`
 	SqlDeleteEntriesByUser = `DELETE FROM plank WHERE user_uuid=?`
 )
 
@@ -19,7 +21,7 @@ type SqliteRepository struct {
 	db *sqlx.DB
 }
 
-func NewSqliteRepository(db *sqlx.DB) Repository {
+func NewSqliteRepository(db *sqlx.DB) PlankRepository {
 	return SqliteRepository{
 		db: db,
 	}
@@ -42,6 +44,24 @@ func (r SqliteRepository) History(userUUID string) ([]HttpRequestInput, error) {
 	}
 
 	return history, nil
+}
+
+func (r SqliteRepository) GetEntry(UUID string, userUUID string) (HttpRequestInput, error) {
+	var (
+		body   string
+		record HttpRequestInput
+	)
+
+	err := r.db.Get(&body, SqlGetEntry, UUID, userUUID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = ErrNotFound
+		}
+		return record, err
+	}
+
+	_ = json.Unmarshal([]byte(body), &record)
+	return record, err
 }
 
 func (r SqliteRepository) SaveEntry(entry Entry) error {

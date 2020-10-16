@@ -114,9 +114,16 @@ Step2: rebuild static site
 					Body:     record,
 					Created:  created.UTC(),
 				}
-				//fmt.Println(item)
+
 				err := repo.SaveEntry(item)
-				fmt.Println(err)
+				if err != nil {
+					if err != plank.ErrEntryExists {
+						fmt.Println(rawPlank)
+						fmt.Println("error on save, abort.", err)
+						panic("rewind...")
+					}
+
+				}
 			}
 
 			dal.RemoveAlist(alistUUID, userUUID)
@@ -127,6 +134,7 @@ Step2: rebuild static site
 		err = history.Save(fixup)
 		if err != nil {
 			fmt.Println("Failed to save, this is an utter mess, panic!")
+			os.Exit(1)
 		}
 	},
 }

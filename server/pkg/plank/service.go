@@ -12,21 +12,19 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/jmoiron/sqlx"
+
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
 type PlankService struct {
-	db         *sqlx.DB
-	repo       Repository
+	repo       PlankRepository
 	logContext logrus.FieldLogger
 }
 
-func NewService(db *sqlx.DB, log logrus.FieldLogger) PlankService {
+func NewService(repo PlankRepository, log logrus.FieldLogger) PlankService {
 	s := PlankService{
-		db:         db,
-		repo:       NewSqliteRepository(db),
+		repo:       repo,
 		logContext: log,
 	}
 
@@ -123,14 +121,30 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
+	record, err := s.repo.GetEntry(UUID, user.Uuid)
+	if err != nil {
+		if err == ErrNotFound {
+			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
+				Message: "Plank record cant be found, terribly sorry.",
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
 
-	// TODO check if entry exsits
-	err := s.repo.DeleteEntry(user.Uuid, UUID)
+	err = s.repo.DeleteEntry(UUID, user.Uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	// TODO Add event for plank being deleted
+	event.GetBus().Publish(event.Eventlog{
+		Kind: EventApiPlank,
+		Data: EventPlank{
+			Kind:     EventKindDeleted,
+			UserUUID: user.Uuid,
+			Data:     record,
+		},
+	})
+
 	return c.NoContent(http.StatusNoContent)
 }
 

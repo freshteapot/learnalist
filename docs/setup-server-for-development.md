@@ -105,6 +105,7 @@ go run main.go --config=../config/dev.config.yaml tools slack-events
 ## Running the event reader
 
 ```sh
+cd server
 EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-event-reader" \
