@@ -108,7 +108,7 @@
 <svelte:options tag={null} accessors={true} />
 <article>
   <header>
-    <h1 class="f2 measure">Slideshow</h1>
+    <h1>Slideshow</h1>
     <button class="br3" on:click={forward}>Next</button>
     <button class="br3" on:click={handleClose}>Close</button>
   </header>

@@ -64,7 +64,7 @@
 
 <article>
   <header>
-    <h1 class="f2 measure">Total Recall</h1>
+    <h1>Total Recall</h1>
     <button class="br3" on:click={handleClose}>Close</button>
   </header>
 
