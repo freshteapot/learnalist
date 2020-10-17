@@ -3,6 +3,7 @@ package plank_test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -22,21 +23,25 @@ import (
 
 var _ = Describe("Testing API", func() {
 	var (
-		service plank.PlankService
-		repo    *mocks.PlankRepository
-		logger  *logrus.Logger
-		c       echo.Context
-		e       *echo.Echo
-		req     *http.Request
-		rec     *httptest.ResponseRecorder
-		user    *uuid.User
+		sampleRecords   = `[{"beginningTime":1602264153548,"currentTime":1602264219291,"intervalTime":15,"intervalTimerNow":5681,"laps":4,"showIntervals":true,"timerNow":65743,"uuid":"98952178a3d23a356a396ffdc9e726629f80b8a8"}]`
+		service         plank.PlankService
+		repo            *mocks.PlankRepository
+		eventMessageBus *mocks.EventlogPubSub
+		logger          *logrus.Logger
+		c               echo.Context
+		e               *echo.Echo
+		req             *http.Request
+		rec             *httptest.ResponseRecorder
+		user            *uuid.User
+		records         []plank.HttpRequestInput
+		record          plank.HttpRequestInput
 	)
 
 	BeforeEach(func() {
 		user = &uuid.User{
 			Uuid: "fake-123",
 		}
-		eventMessageBus := &mocks.EventlogPubSub{}
+		eventMessageBus = &mocks.EventlogPubSub{}
 		eventMessageBus.On("Subscribe", "plank", mock.Anything)
 		event.SetBus(eventMessageBus)
 
@@ -45,6 +50,9 @@ var _ = Describe("Testing API", func() {
 		logger, _ = test.NewNullLogger()
 		repo = &mocks.PlankRepository{}
 		service = plank.NewService(repo, logger)
+
+		json.Unmarshal([]byte(sampleRecords), &records)
+		record = records[0]
 	})
 
 	When("Requesting history", func() {
@@ -73,16 +81,120 @@ var _ = Describe("Testing API", func() {
 		})
 
 		It("One entry", func() {
-			rawRecords := `[{"beginningTime":1602264153548,"currentTime":1602264219291,"intervalTime":15,"intervalTimerNow":5681,"laps":4,"showIntervals":true,"timerNow":65743,"uuid":"98952178a3d23a356a396ffdc9e726629f80b8a8"}]`
 			var expect []plank.HttpRequestInput
-			var records []plank.HttpRequestInput
-
-			json.Unmarshal([]byte(rawRecords), &records)
 			repo.On("History", user.Uuid).Return(records, nil)
 			service.History(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			json.Unmarshal(rec.Body.Bytes(), &expect)
 			Expect(records).To(Equal(expect))
+		})
+	})
+
+	When("Adding a record", func() {
+		BeforeEach(func() {
+			b, _ := json.Marshal(record)
+			method := http.MethodPost
+			uri := "/api/v1/plank/"
+			req, rec = testutils.SetupJSONEndpoint(method, uri, string(b))
+			c = e.NewContext(req, rec)
+			c.SetPath(uri)
+			c.Set("loggedInUser", *user)
+		})
+
+		It("Failed to save", func() {
+			want := errors.New("want")
+			repo.On("SaveEntry", mock.Anything).Return(want)
+			service.RecordPlank(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("saved", func() {
+			repo.On("SaveEntry", mock.Anything).Return(nil)
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
+				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
+				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindNew))
+				return true
+			}))
+
+			service.RecordPlank(c)
+			Expect(rec.Code).To(Equal(http.StatusCreated))
+			b, _ := json.Marshal(record)
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
+		})
+
+		It("already recorded", func() {
+			repo.On("SaveEntry", mock.Anything).Return(plank.ErrEntryExists)
+			service.RecordPlank(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			b, _ := json.Marshal(record)
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
+		})
+	})
+
+	When("Deleting a record", func() {
+		var (
+			recordUUID = "98952178a3d23a356a396ffdc9e726629f80b8a8"
+			method     = http.MethodDelete
+		)
+		BeforeEach(func() {
+			b, _ := json.Marshal(record)
+			uri := fmt.Sprintf("/api/v1/plank/%s", recordUUID)
+			req, rec = testutils.SetupJSONEndpoint(method, uri, string(b))
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/plank/:uuid")
+			c.Set("loggedInUser", *user)
+			c.SetParamNames("uuid")
+			c.SetParamValues(recordUUID)
+		})
+
+		It("UUID is missing", func() {
+			// Not sure this is possible
+			c.SetParamNames("uuid")
+			c.SetParamValues("")
+			service.DeletePlankRecord(c)
+			Expect(rec.Code).To(Equal(http.StatusBadRequest))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InputMissingListUuid)
+		})
+
+		It("Issue saving to repo", func() {
+			want := errors.New("want")
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{}, want)
+			service.DeletePlankRecord(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Record not found", func() {
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{}, plank.ErrNotFound)
+			service.DeletePlankRecord(c)
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.PlankRecordNotFound)
+		})
+
+		It("Record found, but failed to delete", func() {
+			want := errors.New("want")
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{UUID: recordUUID}, nil)
+			repo.On("DeleteEntry", recordUUID, user.Uuid).Return(want)
+			service.DeletePlankRecord(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("record removed", func() {
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(record, nil)
+			repo.On("DeleteEntry", recordUUID, user.Uuid).Return(nil)
+
+			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
+				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
+				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindDeleted))
+				return true
+			}))
+
+			service.DeletePlankRecord(c)
+			Expect(rec.Code).To(Equal(http.StatusNoContent))
 		})
 	})
 })

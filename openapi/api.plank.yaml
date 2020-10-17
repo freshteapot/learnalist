@@ -45,7 +45,7 @@ paths:
               $ref: "#/components/schemas/Plank"
       responses:
         "200":
-          description: Entry already exists
+          description: Plank record already exists
           content:
             application/json:
               schema:

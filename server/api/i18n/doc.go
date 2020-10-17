@@ -53,6 +53,7 @@ const (
 	ApiShareNoChange                            = "No change made"
 	ApiUserLogoutError                          = "Please refer to the api documentation regarding /user/logout"
 	ApiUserLoginError                           = "Please refer to the api documentation regarding /user/login"
+	PlankRecordNotFound                         = "Plank record cant be found, terribly sorry"
 )
 
 var (

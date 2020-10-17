@@ -77,7 +77,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 
 	// If it was already in the system, return
 	if !actuallySaved {
-		return c.JSON(http.StatusCreated, input)
+		return c.JSON(http.StatusOK, input)
 	}
 
 	event.GetBus().Publish(event.Eventlog{
@@ -121,18 +121,29 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
+
 	record, err := s.repo.GetEntry(UUID, user.Uuid)
 	if err != nil {
 		if err == ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
-				Message: "Plank record cant be found, terribly sorry.",
+				Message: i18n.PlankRecordNotFound,
 			})
 		}
+		s.logContext.WithFields(logrus.Fields{
+			"event":     "delete.record.lookup",
+			"uuid":      UUID,
+			"user_uuid": user.Uuid,
+		}).Error("repo")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	err = s.repo.DeleteEntry(UUID, user.Uuid)
 	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"event":     "api.delete.record.remove",
+			"uuid":      UUID,
+			"user_uuid": user.Uuid,
+		}).Error("repo")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
