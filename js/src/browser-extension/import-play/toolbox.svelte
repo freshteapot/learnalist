@@ -1,6 +1,5 @@
 <script>
   import { push } from "svelte-spa-router";
-  import Header from "./header.svelte";
   const toolbox = [
     {
       href: "/toolbox/read-write-repeat",
@@ -9,11 +8,13 @@
     {
       href: "/start",
       description: `Import and play`
+    },
+    {
+      href: "/settings",
+      description: `Settings`
     }
   ];
 </script>
-
-<Header />
 
 <div class="flex flex-column">
   <div class="w-100 pa3 mr2">

@@ -1,7 +1,6 @@
 <script>
   // Ifølge har visepresident Mike Pence nå gått med på å ha pleksiglass mellom seg og motdebattant Kamala Harris under visepresidentdebatten natt til torsdag i Salt Lake City. I går avviste Pence å godta slike barrierer.
   import { text_area_resize } from "./auto_resize_height.js";
-  import Header from "../header.svelte";
 
   let input = "";
   let offset = 0;
@@ -72,7 +71,6 @@
 </style>
 
 <svelte:window on:keydown={handleKeydown} />
-<Header />
 
 <div class="flex flex-column">
   {#if state === 'start'}

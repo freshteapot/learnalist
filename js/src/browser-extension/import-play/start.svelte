@@ -1,6 +1,6 @@
 <script>
   import { push } from "svelte-spa-router";
-  import Header from "./header.svelte";
+
   import Info from "./info.svelte";
   import store from "./store.js";
   import { onMount } from "svelte";
@@ -135,7 +135,6 @@
   }
 </script>
 
-<Header />
 {#if show != ''}
   <div class="flex flex-column">
     {#if show == 'welcome'}

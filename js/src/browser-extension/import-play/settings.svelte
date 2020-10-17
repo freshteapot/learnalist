@@ -1,6 +1,5 @@
 <script>
   import { push } from "svelte-spa-router";
-  import Header from "./header.svelte";
 
   import {
     saveConfiguration,
@@ -24,7 +23,6 @@
   }
 </script>
 
-<Header />
 <div class="flex flex-column">
   <div class="w-100 pa3 mr2">
     <h2>Change server</h2>
