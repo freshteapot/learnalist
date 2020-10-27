@@ -46,7 +46,7 @@ token=$(echo $response | jq -r '.token')
 ```sh
 curl -XPOST \
 -H"Authorization: Bearer ${token}" \
--H 'challenge: c:test:123' \
+-H 'x-challenge: c:test:123' \
 'http://127.0.0.1:1234/api/v1/plank/' -d'
 {
     "showIntervals": true,

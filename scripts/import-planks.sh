@@ -14,7 +14,7 @@ PLANKS=$(eval $CMD)
 
 for plank in $PLANKS; do
     # Not using challenge
-    # -H 'challenge: c:test:123' \
+    # -H 'x-challenge: c:test:123' \
     CMD=$(
 cat <<_EOF_
 curl -XPOST \

@@ -14,7 +14,7 @@
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
 -u'iamchris:test123' \
--H 'challenge: c:test:123' \
+-H 'x-challenge: c:test:123' \
 'http://localhost:1234/api/v1/spaced-repetition/' -d '
 {
   "show": "Mars",
