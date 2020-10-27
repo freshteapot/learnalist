@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
@@ -137,6 +138,20 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if moment.Kind == plank.EventKindDeleted {
 			msg.Text = fmt.Sprintf("User:%s deleted a plank:%s", moment.UserUUID, moment.Data.UUID)
 		}
+	case challenge.EventChallengeDone:
+		b, _ := json.Marshal(entry.Data)
+		var moment challenge.EventChallengeDoneEntry
+		json.Unmarshal(b, &moment)
+		if moment.Kind == challenge.EventKindPlank {
+			b, _ = json.Marshal(moment.Data)
+			var record plank.HttpRequestInput
+			json.Unmarshal(b, &record)
+			msg.Text = fmt.Sprintf("User:%s added a plank:%s to challenge:%s", moment.UserUUID, record.UUID, moment.UUID)
+		} else {
+			return
+		}
+		// TODO Add challene notification
+
 	default:
 		b, _ := json.Marshal(entry)
 		fmt.Println(string(b))
