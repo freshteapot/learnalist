@@ -36,6 +36,12 @@ paths:
         - plank
       operationId: addPlankEntry
       description: Add plank stats
+      parameters:
+        - in: header
+          name: x-challenge
+          description: Link plank record to a challenge uuid
+          schema:
+            type: string
       requestBody:
         description: Stats about the plank
         required: true

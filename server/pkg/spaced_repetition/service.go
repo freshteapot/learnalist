@@ -82,7 +82,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		// Baked the challenge system into the service
 		// VS
 		// UI needs more complexity
-		challengeUUID := c.Request().Header.Get("challenge")
+		challengeUUID := c.Request().Header.Get("x-challenge")
 		if challengeUUID != "" {
 			event.GetBus().Publish(event.Eventlog{
 				Kind: challenge.EventChallengeDone,

@@ -94,7 +94,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 	// UI needs more complexity
 
 	// Send event if challenge
-	challengeUUID := c.Request().Header.Get("challenge")
+	challengeUUID := c.Request().Header.Get("x-challenge")
 	if challengeUUID != "" {
 		event.GetBus().Publish(event.Eventlog{
 			Kind: challenge.EventChallengeDone,
