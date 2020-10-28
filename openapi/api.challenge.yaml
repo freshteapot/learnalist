@@ -1,0 +1,150 @@
+components:
+  schemas:
+    ChallengeInput:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+          enum:
+            - plank-group
+        description:
+          type: string
+        uuid:
+          type: string
+    Challenge:
+      required:
+        - uuid
+      allOf:
+        - $ref: "#/components/schemas/ChallengeInput"
+        - type: object
+          properties:
+            created:
+              type: string
+              format: date-time
+              description: Set to UTC
+
+paths:
+  /challenge/:
+    post:
+      tags:
+        - challenge
+      operationId: createChallenge
+      description: Create a new challenge
+      requestBody:
+        description: Stats about the plank
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChallengeInput"
+      responses:
+        "201":
+          description: Challenge created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Challenge"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenges/{userUUID}:
+    get:
+      tags:
+        - challenge
+      description: Get all challenges for a given user
+      operationId: getChallengesByUser
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+          required: true
+          description: userUUID to get challenges
+      responses:
+        "200":
+          description: Return list of all challenges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Challenge"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenge/{uuid}/join:
+    put:
+      tags:
+        - challenge
+      description: Join a challenge
+      operationId: joinChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Join challenge
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Not able to challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenge/{uuid}/leave:
+    put:
+      tags:
+        - challenge
+      description: Leave a challenge
+      operationId: leaveChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Left challenge
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Not able to challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

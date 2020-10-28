@@ -22,6 +22,7 @@ import (
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
@@ -129,7 +130,10 @@ var ServerCmd = &cobra.Command{
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
-		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService)
+		var challengeRepo challenge.ChallengeRepository
+		challengeService := challenge.NewService(challengeRepo, logger.WithField("context", "challenge-service"))
+
+		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService, challengeService)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

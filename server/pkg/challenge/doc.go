@@ -1,5 +1,11 @@
 package challenge
 
+type ChallengeRepository interface {
+	GetChallengesByUser(userUUID string) ([]interface{}, error)
+	Join(UUID string, userUUID string) error
+	Leave(UUID string, userUUID string) error
+}
+
 type EventChallengeDoneEntry struct {
 	Kind     string      `json:"kind"`
 	UUID     string      `json:"uuid"`

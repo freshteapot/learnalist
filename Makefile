@@ -56,6 +56,7 @@ generate-openapi-one:
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.user.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.alist.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.challenge.yaml && \
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g openapi-yaml -o /tmp/openapi/one
 
 generate-openapi-markdown: generate-openapi-one

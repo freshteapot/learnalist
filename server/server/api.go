@@ -5,11 +5,18 @@ import (
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
-func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRepetitionService spaced_repetition.SpacedRepetitionService, plankService plank.PlankService) {
+func InitApi(
+	apiManager *api.Manager,
+	assetService assets.AssetService,
+	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
+	plankService plank.PlankService,
+	challengeService challenge.ChallengeService,
+) {
 
 	authConfig := authenticate.Config{
 		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
@@ -78,4 +85,14 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	plank.GET("/history", plankService.History)
 	plank.DELETE("/:uuid", plankService.DeletePlankRecord)
 	plank.POST("/", plankService.RecordPlank)
+
+	// Challenge
+	v1.GET("/challenges/:userUUID", challengeService.Challenges)
+	challengeV1 := server.Group("/api/v1/challenge")
+	challengeV1.Use(authenticate.Auth(authConfig))
+
+	challengeV1.PUT("/:uuid/join", challengeService.Join)
+	challengeV1.PUT("/:uuid/leave", challengeService.Leave)
+	challengeV1.POST("/", challengeService.Create)
+	challengeV1.GET("/:uuid", challengeService.Get)
 }
