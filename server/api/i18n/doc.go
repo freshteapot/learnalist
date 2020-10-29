@@ -10,6 +10,7 @@ const (
 	ValidationErrorListV2                       = "Failed to pass list type v2."
 	ValidationErrorListV3                       = "Failed to pass list type v3."
 	ValidationErrorListV4                       = "Failed to pass list type v4."
+	ValidationErrorListV5                       = "Failed to pass list type v5."
 	ValidationWarningLabelToLong                = "The label cannot be longer than 20 characters."
 	ValidationUUIDMismatch                      = "The list uuid in the uri doesnt match that in the payload"
 	ValidationAlists                            = "Please refer to the documentation on lists"
@@ -54,6 +55,7 @@ const (
 	ApiUserLogoutError                          = "Please refer to the api documentation regarding /user/logout"
 	ApiUserLoginError                           = "Please refer to the api documentation regarding /user/login"
 	PlankRecordNotFound                         = "Plank record cant be found, terribly sorry"
+	ChallengeNotFound                           = "Challenge cant be found, terribly sorry"
 )
 
 var (
