@@ -86,6 +86,7 @@ var (
 	EventChallengeDone        = "challenge.done"
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
+	KindPlankGroup            = "plank-group"
 )
 
 type EventEntry struct {

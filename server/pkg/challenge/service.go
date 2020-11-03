@@ -2,7 +2,6 @@ package challenge
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -31,58 +30,12 @@ func NewService(repo ChallengeRepository, acl acl.AclChallenge, log logrus.Field
 	}
 
 	event.GetBus().Subscribe("challenge", func(entry event.Eventlog) {
-		fmt.Println("TODO: take from slack events")
-
 		switch entry.Kind {
 		case event.ApiUserDelete:
-			b, err := json.Marshal(entry.Data)
-			if err != nil {
-				return
-			}
-
-			var moment event.EventUser
-			json.Unmarshal(b, &moment)
-			s.repo.DeleteUser(moment.UUID)
-			fmt.Println("delete user")
-			return
+			s.removeUser(entry)
 		case EventChallengeDone:
-			var moment EventChallengeDoneEntry
-			b, _ := json.Marshal(entry.Data)
-			json.Unmarshal(b, &moment)
-
-			challengeUUID := moment.UUID
-			if moment.Kind != EventKindPlank {
-				s.logContext.WithFields(logrus.Fields{
-					"kind":           moment.Kind,
-					"challenge_uuid": challengeUUID,
-					"user_uuid":      moment.UserUUID,
-				}).Info("kind not supported")
-				return
-			}
-
-			b, _ = json.Marshal(moment.Data)
-			var record ChallengePlankRecord
-			json.Unmarshal(b, &record)
-			fmt.Printf("Write to db kind: %s, challenge:%s, user:%s, record:%s\n",
-				moment.Kind,
-				challengeUUID,
-				moment.UserUUID,
-				record.UUID,
-			)
-			// Do I tightly couple?
-			// Why not the whole thing is tightly coupled
-			// save plank
-			// TODO how do I know when its deleted?
-			// delete plank by userUUID
-			err := s.repo.AddRecord(challengeUUID, record.UUID, moment.UserUUID)
-			if err != nil {
-				fmt.Println(err)
-			}
-			return
-		default:
-			return
+			s.eventChallengeDone(entry)
 		}
-
 	})
 	return s
 }
@@ -91,12 +44,6 @@ func (s ChallengeService) Challenges(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
 	lookupUserUUID := c.Param("userUUID")
-	if lookupUserUUID == "" {
-		response := api.HTTPResponseMessage{
-			Message: "Missing userUUID",
-		}
-		return c.JSON(http.StatusBadRequest, response)
-	}
 
 	if lookupUserUUID != userUUID {
 		response := api.HTTPResponseMessage{
@@ -126,7 +73,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	if challengeInput.Kind != "plank-group" {
+	if challengeInput.Kind != KindPlankGroup {
 		response := api.HTTPResponseMessage{
 			Message: "Not valid kind",
 		}
@@ -155,10 +102,10 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	s.acl.MakeChallengePrivate(challengeUUID, userUUID)
-	s.acl.ShareChallengeWithPublic(challengeUUID)
-	s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
-	// Add user to the list
+	_ = s.acl.MakeChallengePrivate(challengeUUID, userUUID)
+	_ = s.acl.ShareChallengeWithPublic(challengeUUID)
+	_ = s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
+
 	challenge, err := s.repo.Get(challengeUUID)
 	if err != nil {
 		response := api.HTTPResponseMessage{
@@ -167,12 +114,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	// Let the data be challenge specific
-	response := api.HTTPResponseMessage{
-		Message: fmt.Sprintf("TODO: create challenge for %s", userUUID),
-	}
-	fmt.Println(response)
-	return c.JSON(http.StatusOK, challenge)
+	return c.JSON(http.StatusCreated, challenge)
 }
 
 func (s ChallengeService) Join(c echo.Context) error {
@@ -187,16 +129,15 @@ func (s ChallengeService) Join(c echo.Context) error {
 			})
 		}
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
-			Message: i18n.InternalServerErrorAclLookup,
+			Message: i18n.InternalServerErrorFunny,
 		})
 	}
 
 	allow, err := s.acl.HasUserChallengeWriteAccess(challengeUUID, userUUID)
 	if err != nil {
-		response := api.HTTPResponseMessage{
+		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		})
 	}
 
 	if allow {
@@ -221,24 +162,23 @@ func (s ChallengeService) Leave(c echo.Context) error {
 				Message: i18n.PlankRecordNotFound,
 			})
 		}
+
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
-			Message: i18n.InternalServerErrorAclLookup,
+			Message: i18n.InternalServerErrorFunny,
 		})
 	}
 
 	allow, err := s.acl.HasUserChallengeWriteAccess(challengeUUID, userUUID)
 	if err != nil {
-		response := api.HTTPResponseMessage{
+		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		})
 	}
 
 	if !allow {
-		response := api.HTTPResponseMessage{
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
 			Message: i18n.AclHttpAccessDeny,
-		}
-		return c.JSON(http.StatusForbidden, response)
+		})
 	}
 
 	_ = s.acl.RevokeUserChallengeWriteAccess(challengeUUID, userUUID)
