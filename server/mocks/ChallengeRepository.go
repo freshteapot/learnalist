@@ -26,13 +26,13 @@ func (_m *ChallengeRepository) AddRecord(UUID string, extUUID string, userUUID s
 	return r0
 }
 
-// Create provides a mock function with given fields: _a0
-func (_m *ChallengeRepository) Create(_a0 challenge.ChallengeEntry) error {
-	ret := _m.Called(_a0)
+// Create provides a mock function with given fields: userUUID, _a1
+func (_m *ChallengeRepository) Create(userUUID string, _a1 challenge.ChallengeInfo) error {
+	ret := _m.Called(userUUID, _a1)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(challenge.ChallengeEntry) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(string, challenge.ChallengeInfo) error); ok {
+		r0 = rf(userUUID, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -68,15 +68,29 @@ func (_m *ChallengeRepository) DeleteRecord(extUUID string, userUUID string) err
 	return r0
 }
 
+// DeleteUser provides a mock function with given fields: userUUID
+func (_m *ChallengeRepository) DeleteUser(userUUID string) error {
+	ret := _m.Called(userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Get provides a mock function with given fields: UUID
-func (_m *ChallengeRepository) Get(UUID string) (challenge.ChallengeBody, error) {
+func (_m *ChallengeRepository) Get(UUID string) (challenge.ChallengeInfo, error) {
 	ret := _m.Called(UUID)
 
-	var r0 challenge.ChallengeBody
-	if rf, ok := ret.Get(0).(func(string) challenge.ChallengeBody); ok {
+	var r0 challenge.ChallengeInfo
+	if rf, ok := ret.Get(0).(func(string) challenge.ChallengeInfo); ok {
 		r0 = rf(UUID)
 	} else {
-		r0 = ret.Get(0).(challenge.ChallengeBody)
+		r0 = ret.Get(0).(challenge.ChallengeInfo)
 	}
 
 	var r1 error
@@ -90,15 +104,15 @@ func (_m *ChallengeRepository) Get(UUID string) (challenge.ChallengeBody, error)
 }
 
 // GetChallengesByUser provides a mock function with given fields: userUUID
-func (_m *ChallengeRepository) GetChallengesByUser(userUUID string) ([]challenge.ChallengeBody, error) {
+func (_m *ChallengeRepository) GetChallengesByUser(userUUID string) ([]challenge.ChallengeShortInfo, error) {
 	ret := _m.Called(userUUID)
 
-	var r0 []challenge.ChallengeBody
-	if rf, ok := ret.Get(0).(func(string) []challenge.ChallengeBody); ok {
+	var r0 []challenge.ChallengeShortInfo
+	if rf, ok := ret.Get(0).(func(string) []challenge.ChallengeShortInfo); ok {
 		r0 = rf(userUUID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]challenge.ChallengeBody)
+			r0 = ret.Get(0).([]challenge.ChallengeShortInfo)
 		}
 	}
 

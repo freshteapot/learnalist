@@ -30,6 +30,27 @@ func (_m *AclReader) HasUserAssetReadAccess(extUUID string, userUUID string) (bo
 	return r0, r1
 }
 
+// HasUserChallengeOwnerAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *AclReader) HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error) {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(extUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // HasUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
 func (_m *AclReader) HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error) {
 	ret := _m.Called(extUUID, userUUID)
