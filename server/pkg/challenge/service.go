@@ -35,38 +35,55 @@ func NewService(repo ChallengeRepository, acl acl.Acl, log logrus.FieldLogger) C
 	event.GetBus().Subscribe("challenge", func(entry event.Eventlog) {
 		fmt.Println("TODO: take from slack events")
 
-		if entry.Kind != EventChallengeDone {
+		switch entry.Kind {
+		case event.ApiUserDelete:
+			b, err := json.Marshal(entry.Data)
+			if err != nil {
+				return
+			}
+
+			var moment event.EventUser
+			json.Unmarshal(b, &moment)
+			s.repo.DeleteUser(moment.UUID)
+			fmt.Println("delete user")
+			break
+		case EventChallengeDone:
+			var moment EventChallengeDoneEntry
+			b, _ := json.Marshal(entry.Data)
+			json.Unmarshal(b, &moment)
+
+			challengeUUID := moment.UUID
+			if moment.Kind != EventKindPlank {
+				s.logContext.WithFields(logrus.Fields{
+					"kind":           moment.Kind,
+					"challenge_uuid": challengeUUID,
+					"user_uuid":      moment.UserUUID,
+				}).Info("kind not supported")
+				return
+			}
+
+			b, _ = json.Marshal(moment.Data)
+			var record ChallengePlankRecord
+			json.Unmarshal(b, &record)
+			fmt.Printf("Write to db kind: %s, challenge:%s, user:%s, record:%s\n",
+				moment.Kind,
+				challengeUUID,
+				moment.UserUUID,
+				record.UUID,
+			)
+			// Do I tightly couple?
+			// Why not the whole thing is tightly coupled
+			// save plank
+			// TODO how do I know when its deleted?
+			// delete plank by userUUID
+			err := s.repo.AddRecord(challengeUUID, record.UUID, moment.UserUUID)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		default:
 			return
 		}
-
-		var moment EventChallengeDoneEntry
-		b, _ := json.Marshal(entry.Data)
-		json.Unmarshal(b, &moment)
-
-		challengeUUID := moment.UUID
-		if moment.Kind != EventKindPlank {
-			s.logContext.WithFields(logrus.Fields{
-				"kind":           moment.Kind,
-				"challenge_uuid": challengeUUID,
-				"user_uuid":      moment.UserUUID,
-			}).Info("kind not supported")
-			return
-		}
-
-		b, _ = json.Marshal(moment.Data)
-		var record ChallengePlankRecord
-		json.Unmarshal(b, &record)
-		fmt.Printf("Write to db kind: %s, challenge:%s, user:%s, record:%s\n",
-			moment.Kind,
-			challengeUUID,
-			moment.UserUUID,
-			record.UUID,
-		)
-		// Do I tightly couple?
-		// Why not the whole thing is tightly coupled
-		// save plank
-		// delete plank by userUUID
-		return
 
 	})
 	return s
@@ -101,17 +118,17 @@ func (s ChallengeService) Create(c echo.Context) error {
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
-	var body ChallengeBody
-	json.Unmarshal(jsonBytes, &body)
+	var challengeInput ChallengeInfo
+	json.Unmarshal(jsonBytes, &challengeInput)
 
-	if body.Description == "" {
+	if challengeInput.Description == "" {
 		response := api.HTTPResponseMessage{
 			Message: "Description cant be empty",
 		}
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	if body.Kind != "plank-group" {
+	if challengeInput.Kind != "plank-group" {
 		response := api.HTTPResponseMessage{
 			Message: "Not valid kind",
 		}
@@ -121,15 +138,17 @@ func (s ChallengeService) Create(c echo.Context) error {
 	UUID := guuid.New()
 	challengeUUID := UUID.String()
 
-	body.UUID = challengeUUID
-	body.Created = ""
+	challengeInput.UUID = challengeUUID
+	challengeInput.Created = ""
+	challengeInput.Records = make([]ChallengePlankRecord, 0)
+	challengeInput.Users = []ChallengePlankUsers{
+		{
+			UserUUID: userUUID,
+			Name:     "TODO - creator",
+		},
+	}
 
-	b, _ := json.Marshal(body)
-	err := s.repo.Create(ChallengeEntry{
-		UUID:     challengeUUID,
-		UserUUID: userUUID,
-		Body:     string(b),
-	})
+	err := s.repo.Create(userUUID, challengeInput)
 
 	if err != nil {
 		response := api.HTTPResponseMessage{
@@ -174,12 +193,22 @@ func (s ChallengeService) Join(c echo.Context) error {
 		})
 	}
 
-	s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
-
-	response := api.HTTPResponseMessage{
-		Message: fmt.Sprintf("TODO: user %s wants to join challenge %s", userUUID, challengeUUID),
+	allow, err := s.acl.HasUserChallengeWriteAccess(challengeUUID, userUUID)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	if allow {
+		return c.NoContent(http.StatusOK)
+	}
+
+	_ = s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
+
+	_ = s.repo.Join(challengeUUID, userUUID)
+	return c.NoContent(http.StatusOK)
 }
 
 func (s ChallengeService) Leave(c echo.Context) error {
@@ -198,13 +227,51 @@ func (s ChallengeService) Leave(c echo.Context) error {
 			Message: i18n.InternalServerErrorAclLookup,
 		})
 	}
-	s.acl.RevokeUserChallengeWriteAccess(challengeUUID, userUUID)
-	// TODO Keep records?
-	// Soft delete?
-	response := api.HTTPResponseMessage{
-		Message: fmt.Sprintf("TODO: user %s wants to leave challenge %s", userUUID, challengeUUID),
+
+	allow, err := s.acl.HasUserChallengeWriteAccess(challengeUUID, userUUID)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
 	}
-	return c.JSON(http.StatusOK, response)
+
+	if !allow {
+		response := api.HTTPResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	_ = s.acl.RevokeUserChallengeWriteAccess(challengeUUID, userUUID)
+	_ = s.repo.Leave(challengeUUID, userUUID)
+	// Keep the records
+	return c.NoContent(http.StatusOK)
+}
+
+func (s ChallengeService) Delete(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	userUUID := user.Uuid
+	challengeUUID := c.Param("uuid")
+
+	allow, err := s.acl.HasUserChallengeOwnerAccess(challengeUUID, userUUID)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	if !allow {
+		response := api.HTTPResponseMessage{
+			Message: i18n.AclHttpAccessDeny,
+		}
+		return c.JSON(http.StatusForbidden, response)
+	}
+
+	_ = s.repo.Delete(challengeUUID)
+	_ = s.acl.DeleteChallenge(challengeUUID)
+	return c.NoContent(http.StatusOK)
 }
 
 func (s ChallengeService) Get(c echo.Context) error {
@@ -238,10 +305,5 @@ func (s ChallengeService) Get(c echo.Context) error {
 		})
 	}
 
-	// Why not use list_type and then filter?
-	response := api.HTTPResponseMessage{
-		Message: fmt.Sprintf("TODO: Get challenge %s, for user %s", challengeUUID, userUUID),
-	}
-	fmt.Println(response.Message)
 	return c.JSON(http.StatusOK, challenge)
 }

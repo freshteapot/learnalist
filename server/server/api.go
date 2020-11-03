@@ -95,4 +95,5 @@ func InitApi(
 	challengeV1.PUT("/:uuid/leave", challengeService.Leave)
 	challengeV1.POST("/", challengeService.Create)
 	challengeV1.GET("/:uuid", challengeService.Get)
+	challengeV1.DELETE("/:uuid", challengeService.Delete)
 }

@@ -15,18 +15,20 @@ var (
 	SqlGetEntry    = `SELECT * FROM challenge WHERE uuid=?`
 	SqlSaveEntry   = `INSERT INTO challenge(uuid, user_uuid, body) values(?, ?, ?)`
 	SqlDeleteEntry = `DELETE FROM challenge WHERE uuid=?`
-	//SqlDeleteEntriesByUser = `DELETE FROM challenge WHERE user_uuid=?`
-	SqlAddRecord    = `INSERT INTO challenge_record(uuid, ext_uuid, user_uuid) values(?, ?, ?)`
-	SqlDeleteRecord = `DELETE FROM challenge_record WHERE ext_uuid=? AND user_uuid=?`
-	//SqlDeleteRecords       = `DELETE FROM challenge_record WHERE uuid=?`
+
+	SqlDeleteRecords     = `DELETE FROM challenge_records WHERE uuid=?`
+	SqlAddRecord         = `INSERT INTO challenge_records(uuid, ext_uuid, user_uuid) values(?, ?, ?)`
+	SqlDeleteRecord      = `DELETE FROM challenge_records WHERE ext_uuid=? AND user_uuid=?`
+	SqlDeleteUserRecords = `DELETE FROM challenge_records WHERE user_uuid=?`
+
 	// Tightly couple the planks with the challenges for now.
-	SqlPlankRecords = `
+	SqlGetPlankRecords = `
 SELECT
-	c.uuid, c.user_uuid, p.body
+	c.user_uuid, p.body
 FROM
 	plank AS p
 INNER JOIN
-	challenge_record AS c
+	challenge_records AS c
 WHERE
 	c.uuid = ?
 AND
@@ -35,8 +37,13 @@ ORDER BY
 	p.created
 DESC
 `
+
 	SqlGetChallengesByUser = `
-SELECT c.*
+SELECT
+	c.uuid,
+	json_extract(c.body, '$.kind') AS kind,
+	json_extract(c.body, '$.description') AS description,
+	c.created
 FROM challenge AS c
 INNER JOIN
 (
@@ -67,9 +74,9 @@ func NewSqliteRepository(db *sqlx.DB) ChallengeRepository {
 	}
 }
 
-func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeBody, error) {
-	challenges := make([]ChallengeBody, 0)
-	dbItems := make([]ChallengeEntry, 0)
+func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeShortInfo, error) {
+	challenges := make([]ChallengeShortInfo, 0)
+	dbItems := make([]ChallengeShortInfoDB, 0)
 	// Not happy with this approach but its partly safe as we check they are logged in
 	err := r.db.Select(&dbItems, fmt.Sprintf(SqlGetChallengesByUser, userUUID, userUUID), userUUID)
 
@@ -78,48 +85,139 @@ func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeBody,
 	}
 
 	for _, entry := range dbItems {
-		var body ChallengeBody
-		json.Unmarshal([]byte(entry.Body), &body)
-		body.UUID = entry.UUID
-		body.Created = entry.Created.Format(time.RFC3339Nano)
-		challenges = append(challenges, body)
+		info := ChallengeShortInfo{
+			UUID:        entry.UUID,
+			Kind:        entry.Kind,
+			Description: entry.Description,
+			Created:     entry.Created.Format(time.RFC3339Nano),
+		}
+		challenges = append(challenges, info)
 	}
 
 	return challenges, nil
 }
 
 func (r SqliteRepository) Join(UUID string, userUUID string) error {
+	// I wonder how bad this will be VS a table with challenge_uuid, user_uuid, name
+	// Remove from the list
+	name := "fake"
+	var path string
+	findPath := `
+SELECT u.path
+FROM
+	challenge, json_tree(challenge.body, '$.users') AS u
+WHERE
+	u.key='user_uuid'
+AND
+	u.value=?;
+`
+	r.db.Get(&path, findPath, userUUID)
+
+	if path != "" {
+		deleteUserByPath := `UPDATE challenge SET body=json_remove(body, ?) WHERE uuid=?;`
+		_, err := r.db.Exec(deleteUserByPath, path, UUID)
+		fmt.Println(err)
+	}
+
+	type dbUser struct {
+		UserUUID string `json:"user_uuid"`
+		Name     string `json:"name"`
+	}
 	// Add user to the list
-	return errors.New("TODO")
-}
-func (r SqliteRepository) Leave(UUID string, userUUID string) error {
-	return errors.New("TODO")
+	b, _ := json.Marshal(dbUser{
+		UserUUID: userUUID,
+		Name:     name,
+	})
+
+	userObject := string(b)
+	addUser := `
+UPDATE
+	challenge
+SET
+	body=json_insert(body, "$.users[#]", json(?))
+WHERE
+	uuid=?
+`
+	_, err := r.db.Exec(addUser, userObject, UUID)
+	return err
 }
 
-func (r SqliteRepository) Create(challenge ChallengeEntry) error {
-	_, err := r.db.Exec(SqlSaveEntry, challenge.UUID, challenge.UserUUID, challenge.Body)
+func (r SqliteRepository) Leave(UUID string, userUUID string) error {
+	var path string
+	findPath := `
+SELECT u.path
+FROM
+	challenge, json_tree(challenge.body, '$.users') AS u
+WHERE
+	u.key='user_uuid'
+AND
+	u.value=?;
+`
+	err := r.db.Get(&path, findPath, userUUID)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("leave.failed.finding.user")
+	}
+
+	if path != "" {
+		deleteUserByPath := `UPDATE challenge SET body=json_remove(body, ?) WHERE uuid=?;`
+		_, err := r.db.Exec(deleteUserByPath, path, UUID)
+		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+			return errors.New("leave.failed.deleting.user")
+		}
+	}
+	return nil
+}
+
+func (r SqliteRepository) Create(userUUID string, challenge ChallengeInfo) error {
+	b, _ := json.Marshal(challenge)
+	_, err := r.db.Exec(SqlSaveEntry, challenge.UUID, userUUID, string(b))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r SqliteRepository) Get(UUID string) (ChallengeBody, error) {
-	var body ChallengeBody
-	entry := ChallengeEntry{}
+func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
+	var challenge ChallengeInfo
+	entry := ChallengeInfoDB{}
 	err := r.db.Get(&entry, SqlGetEntry, UUID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return body, ErrNotFound
+			return challenge, ErrNotFound
 		}
-		return body, err
+		return challenge, err
 	}
 
-	json.Unmarshal([]byte(entry.Body), &body)
-	body.UUID = entry.UUID
-	body.Created = entry.Created.Format(time.RFC3339Nano)
-	return body, nil
+	json.Unmarshal([]byte(entry.Body), &challenge)
+	challenge.UUID = entry.UUID
+	challenge.Created = entry.Created.Format(time.RFC3339Nano)
+
+	// Get the records
+	type dbRecord struct {
+		UserUUID string `json:"user_uuid" db:"user_uuid"`
+		Record   string `json:"body" db:"body"`
+	}
+
+	dbItems := make([]dbRecord, 0)
+	// When nothing is found, there is no error.
+	err = r.db.Select(&dbItems, SqlGetPlankRecords, UUID)
+
+	if err != nil {
+		return challenge, err
+	}
+
+	for _, item := range dbItems {
+		var record ChallengePlankRecord
+		json.Unmarshal([]byte(item.Record), &record)
+		record.UserUUID = item.UserUUID
+
+		challenge.Records = append(challenge.Records, record)
+	}
+	return challenge, nil
 }
 
 func (r SqliteRepository) AddRecord(UUID string, extUUID string, userUUID string) error {
@@ -136,11 +234,37 @@ func (r SqliteRepository) AddRecord(UUID string, extUUID string, userUUID string
 func (r SqliteRepository) DeleteRecord(extUUID string, userUUID string) error {
 	_, err := r.db.Exec(SqlDeleteRecord, extUUID, userUUID)
 	return err
-	return errors.New("TODO")
 }
 
 func (r SqliteRepository) Delete(UUID string) error {
-	// Delete challenge
-	// Delete records
-	return errors.New("TODO")
+	tx, err := r.db.Beginx()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteRecords, UUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteEntry, UUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (r SqliteRepository) DeleteUser(userUUID string) error {
+	_, err := r.db.Exec(SqlDeleteUserRecords, userUUID)
+	return err
 }

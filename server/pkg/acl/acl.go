@@ -27,6 +27,7 @@ type AclChallenge interface {
 
 type AclReaderChallenge interface {
 	HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error)
+	HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error)
 }
 
 type AclWriterChallenge interface {

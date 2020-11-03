@@ -8,6 +8,12 @@ CREATE TABLE IF NOT EXISTS challenge (
 
 CREATE INDEX IF NOT EXISTS challenge_created ON challenge (user_uuid, created);
 
+CREATE TABLE IF NOT EXISTS challenge_users (
+  uuid CHARACTER(36) not null primary key,
+  user_uuid CHARACTER(36) not null,
+  info text,
+  UNIQUE(uuid, user_uuid)
+);
 
 CREATE TABLE IF NOT EXISTS challenge_records (
   uuid CHARACTER(36) not null primary key,

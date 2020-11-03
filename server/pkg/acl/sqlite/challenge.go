@@ -24,3 +24,7 @@ func (store *Sqlite) DeleteChallenge(extUUID string) error {
 func (store *Sqlite) HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error) {
 	return store.HasUserKindWriteAccess("challenge", extUUID, userUUID)
 }
+
+func (store *Sqlite) HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error) {
+	return store.HasUserKindOwnerAccess("challenge", extUUID, userUUID)
+}
