@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
@@ -20,12 +19,11 @@ import (
 
 type ChallengeService struct {
 	repo       ChallengeRepository
-	aListRepo  alist.DatastoreAlists
-	acl        acl.Acl // Change to AclChallenge
+	acl        acl.AclChallenge
 	logContext logrus.FieldLogger
 }
 
-func NewService(repo ChallengeRepository, acl acl.Acl, log logrus.FieldLogger) ChallengeService {
+func NewService(repo ChallengeRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
 	s := ChallengeService{
 		repo:       repo,
 		acl:        acl,
@@ -46,7 +44,7 @@ func NewService(repo ChallengeRepository, acl acl.Acl, log logrus.FieldLogger) C
 			json.Unmarshal(b, &moment)
 			s.repo.DeleteUser(moment.UUID)
 			fmt.Println("delete user")
-			break
+			return
 		case EventChallengeDone:
 			var moment EventChallengeDoneEntry
 			b, _ := json.Marshal(entry.Data)
