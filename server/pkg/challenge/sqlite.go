@@ -27,13 +27,12 @@ var (
 SELECT
 	c.user_uuid, p.body
 FROM
-	plank AS p
-INNER JOIN
 	challenge_records AS c
+INNER JOIN
+	plank AS p
+ON (p.uuid = c.ext_uuid AND p.user_uuid = c.user_uuid)
 WHERE
 	c.uuid = ?
-AND
-	p.uuid = c.ext_uuid
 ORDER BY
 	p.created
 DESC

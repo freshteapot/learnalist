@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Smoke Challenge Plank", func() {
+var _ = FDescribe("Smoke Challenge Plank", func() {
 
 	var client *openapi.APIClient
 
@@ -62,7 +62,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 		Expect(info.Description).To(Equal(challengeInput.Description))
 
 		// Add plank
-		recordJSON := `
+		record1JSON := `
 		{
 			"showIntervals": true,
 			"intervalTime": 15,
@@ -72,16 +72,44 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			"intervalTimerNow": 5681,
 			"laps": 4
 		}`
-		var record openapi.Plank
+		var record1 openapi.Plank
 
-		json.Unmarshal([]byte(recordJSON), &record)
-		_, response, err = client.PlankApi.AddPlankEntry(auth, record, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		json.Unmarshal([]byte(record1JSON), &record1)
+		_, response, err = client.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		// Double check posting the same plank returns 200
-		_, response, err = client.PlankApi.AddPlankEntry(auth, record, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		_, response, err = client.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
+		// Add another record
+		record2JSON := `
+		{
+			"showIntervals": false,
+			"intervalTime": 0,
+			"beginningTime": 1602264153549,
+			"currentTime": 1602264219291,
+			"timerNow": 65742,
+			"intervalTimerNow": 65742,
+			"laps": 0
+		}`
+		var record2 openapi.Plank
+
+		json.Unmarshal([]byte(record2JSON), &record2)
+		record2, response, err = client.PlankApi.AddPlankEntry(auth, record2, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		Expect(err).To(BeNil())
+		Expect(response.StatusCode).To(Equal(http.StatusCreated))
+
+		challengeInfo, response, err := client.ChallengeApi.GetChallenge(auth, info.Uuid)
+
+		Expect(err).To(BeNil())
+		Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+		Expect(len(challengeInfo.Records)).To(Equal(2))
+		a, _ := json.Marshal(challengeInfo.Records[0])
+		var expect openapi.Plank
+		json.Unmarshal(a, &expect)
+		Expect(expect).To(Equal(record2))
 
 		// Delete user
 		_, response, err = client.UserApi.DeleteUser(auth, data1.Uuid)

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS plank (
-  uuid CHARACTER(36)  not null primary key,
+  uuid CHARACTER(36) not null,
   body text,
   user_uuid CHARACTER(36),
   created DATETIME not null default (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
