@@ -20,6 +20,10 @@ type ChallengePlankUsers struct {
 	Name     string `json:"name"`
 }
 
+type ChallengeRecordUUID struct {
+	UUID string `json:"uuid"`
+}
+
 type ChallengePlankRecord struct {
 	UserUUID         string `json:"user_uuid"`
 	UUID             string `json:"uuid"`
@@ -37,8 +41,8 @@ type ChallengeInfo struct {
 	Kind        string                 `json:"kind"`
 	Description string                 `json:"description"`
 	Created     string                 `json:"created"`
-	Users       []ChallengePlankUsers  `json:"users,omitempty"`
-	Records     []ChallengePlankRecord `json:"records,omitempty"`
+	Users       []ChallengePlankUsers  `json:"users"`
+	Records     []ChallengePlankRecord `json:"records"`
 }
 
 type ChallengeInfoDB struct {
@@ -70,7 +74,7 @@ type ChallengeRepository interface {
 	Get(UUID string) (ChallengeInfo, error)
 	Delete(UUID string) error
 	DeleteUser(userUUID string) error
-	AddRecord(UUID string, extUUID string, userUUID string) error
+	AddRecord(UUID string, extUUID string, userUUID string) (int, error)
 	DeleteRecord(extUUID string, userUUID string) error
 }
 
@@ -84,6 +88,7 @@ type EventChallengeDoneEntry struct {
 // Event specific
 var (
 	EventChallengeDone        = "challenge.done"
+	EventChallengeNewRecord   = "challenge.newrecord"
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"

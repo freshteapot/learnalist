@@ -8,11 +8,20 @@ import (
 )
 
 func NewManagement(storage ManagementStorage, site ManagementSite, insights event.Insights) management {
-	return management{
+	m := management{
 		storage:  storage,
 		site:     site,
 		insights: insights,
 	}
+
+	event.GetBus().Subscribe("user-management", func(entry event.Eventlog) {
+		switch entry.Kind {
+		case event.ApiUserRegister:
+			m.eventUserRegister(entry)
+		}
+	})
+
+	return m
 }
 
 // FindUser Find the user uuid based on the search string

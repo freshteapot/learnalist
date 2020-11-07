@@ -4,7 +4,6 @@ components:
       type: object
       required:
         - uuid
-        - action
       properties:
         uuid:
           type: string

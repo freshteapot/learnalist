@@ -18,8 +18,22 @@ import (
 When a user is created it returns a 201.
 When a user is created with the same username and password it returns a 200.
 When a user is created with a username in the system it returns a 400.
+
+How to know its a throw away?
+user_info
+	json object
+		throw_away:true,
+		created_via: plank_app_v1,
+		display_name: "chris",
+
+
+event system to run hourly to keep a rolling window of users who have been active?
+or create a
+
 */
 func (m *Manager) V1PostRegister(c echo.Context) error {
+	// If security header is missing, force creation to be a temporary user.
+	// Or make all accounts temporary until we elevate them?
 	var input api.HTTPUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
@@ -31,7 +45,9 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-
+	// Filter:
+	//	created_via
+	// 	displayName
 	cleanedUser := api.HTTPUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,

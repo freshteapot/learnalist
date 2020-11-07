@@ -78,6 +78,17 @@ make run-api-server
 ```
 
 ## Running the development locally
+### nats
+```sh
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make develop
+```
+### memory
 ```sh
 make clear-site rebuild-db
 EVENTS_VIA="memory" \

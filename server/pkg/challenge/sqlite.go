@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -17,7 +18,7 @@ var (
 	SqlDeleteEntry = `DELETE FROM challenge WHERE uuid=?`
 
 	SqlDeleteRecords     = `DELETE FROM challenge_records WHERE uuid=?`
-	SqlAddRecord         = `INSERT INTO challenge_records(uuid, ext_uuid, user_uuid) values(?, ?, ?)`
+	SqlAddRecord         = `INSERT INTO challenge_records(uuid, user_uuid, ext_uuid) values(?, ?, ?)`
 	SqlDeleteRecord      = `DELETE FROM challenge_records WHERE ext_uuid=? AND user_uuid=?`
 	SqlDeleteUserRecords = `DELETE FROM challenge_records WHERE user_uuid=?`
 
@@ -195,6 +196,7 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 	json.Unmarshal([]byte(entry.Body), &challenge)
 	challenge.UUID = entry.UUID
 	challenge.Created = entry.Created.Format(time.RFC3339Nano)
+	challenge.Records = make([]ChallengePlankRecord, 0)
 
 	// Get the records
 	type dbRecord struct {
@@ -220,15 +222,16 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 	return challenge, nil
 }
 
-func (r SqliteRepository) AddRecord(UUID string, extUUID string, userUUID string) error {
-	_, err := r.db.Exec(SqlAddRecord, UUID, extUUID, userUUID)
+func (r SqliteRepository) AddRecord(UUID string, extUUID string, userUUID string) (int, error) {
+	_, err := r.db.Exec(SqlAddRecord, UUID, userUUID, extUUID)
+
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
-			return nil
+			return http.StatusOK, nil
 		}
-		return err
+		return http.StatusInternalServerError, err
 	}
-	return nil
+	return http.StatusCreated, nil
 }
 
 func (r SqliteRepository) DeleteRecord(extUUID string, userUUID string) error {

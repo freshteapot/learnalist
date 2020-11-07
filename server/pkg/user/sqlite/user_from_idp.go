@@ -35,6 +35,7 @@ AND
 AND
 	identifier=?`
 
+	// TODO either use it and expose a get method or remove this
 	UserFromIDPSelectByUserUUID = `
 SELECT
 	user_uuid, idp, identifier, kind, info, created

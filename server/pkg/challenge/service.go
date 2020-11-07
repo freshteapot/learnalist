@@ -35,6 +35,8 @@ func NewService(repo ChallengeRepository, acl acl.AclChallenge, log logrus.Field
 			s.removeUser(entry)
 		case EventChallengeDone:
 			s.eventChallengeDone(entry)
+		case EventChallengeNewRecord:
+			s.eventNotify(entry)
 		}
 	})
 	return s
