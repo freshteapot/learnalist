@@ -13,6 +13,7 @@
 - [ ] Event for when a challenge is created
 - [ ] Create throw away accounts
 - [ ] On logout on throw away account, send a delete message for the user?
+- [ ] Delete user, does not delete challenge. Still not sure I want to.
 
 ```json
 {
