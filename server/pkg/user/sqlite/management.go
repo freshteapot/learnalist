@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -9,6 +10,27 @@ import (
 type sqliteManagement struct {
 	db *sqlx.DB
 }
+
+const (
+	SqlUserInfoGet    = `SELECT json_extract(body, '$') AS body FROM user_info WHERE uuid=?`
+	SqlUserInfoCreate = `INSERT INTO user_info(uuid, body) values(?, json_insert('{}'))`
+	SqlUserInfoUpdate = `
+UPDATE
+    user_info
+SET
+    body=json_patch(body, ?)
+WHERE
+	uuid=?
+`
+	SqlUserInfoRemove = `
+UPDATE
+    user_info
+SET
+    body=json_remove(body, ?)
+WHERE
+	uuid=?
+`
+)
 
 func NewSqliteManagementStorage(db *sqlx.DB) sqliteManagement {
 	return sqliteManagement{db: db}
@@ -132,4 +154,29 @@ func (m sqliteManagement) DeleteList(listUUID string) error {
 		return err
 	}
 	return nil
+}
+
+// SaveInfo a very free approach to storing user info
+func (m sqliteManagement) SaveInfo(userUUID string, info []byte) error {
+	_, err := m.db.Exec(SqlUserInfoCreate, userUUID)
+	if err != nil {
+		if err.Error() != "UNIQUE constraint failed: user_info.uuid" {
+			return err
+		}
+	}
+	_, err = m.db.Exec(SqlUserInfoUpdate, string(info), userUUID)
+	return err
+}
+
+// RemoveInfo remove key, regardless if it exists
+func (m sqliteManagement) RemoveInfo(userUUID string, key string) error {
+	_, err := m.db.Exec(SqlUserInfoRemove, fmt.Sprintf(`$.%s`, key), userUUID)
+	fmt.Println(err)
+	return err
+}
+
+func (m sqliteManagement) GetInfo(userUUID string) ([]byte, error) {
+	var info []byte
+	err := m.db.Get(&info, SqlUserInfoGet, userUUID)
+	return info, err
 }

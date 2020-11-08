@@ -2,7 +2,6 @@ package challenge
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -89,12 +88,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 	challengeInput.UUID = challengeUUID
 	challengeInput.Created = ""
 	challengeInput.Records = make([]ChallengePlankRecord, 0)
-	challengeInput.Users = []ChallengePlankUsers{
-		{
-			UserUUID: userUUID,
-			Name:     "TODO - creator",
-		},
-	}
+	challengeInput.Users = make([]ChallengePlankUser, 0)
 
 	err := s.repo.Create(userUUID, challengeInput)
 
@@ -110,7 +104,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 	_ = s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
 
 	challenge, err := s.repo.Get(challengeUUID)
-	fmt.Println(err)
+
 	if err != nil {
 		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorAclLookup,

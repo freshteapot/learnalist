@@ -104,7 +104,7 @@ var _ = FDescribe("Smoke Challenge Plank", func() {
 
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
-
+		// Confirm record 2 is latest, as it was the latest event
 		Expect(len(challengeInfo.Records)).To(Equal(2))
 		a, _ := json.Marshal(challengeInfo.Records[0])
 		var expect openapi.Plank

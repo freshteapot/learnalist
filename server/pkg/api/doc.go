@@ -8,8 +8,15 @@ type HTTPResponse struct {
 }
 
 type HTTPUserRegisterInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string        `json:"username"`
+	Password string        `json:"password"`
+	Extra    HTTPUserExtra `json:"extra,omitempty"`
+}
+
+type HTTPUserExtra struct {
+	DisplayName string `json:"display_name,omitempty"`
+	CreatedVia  string `json:"created_via,omitempty"`
+	ThrowAway   string `json:"throw_away,omitempty"` // Have to use string so it can be ignored in the json, little ugly
 }
 
 type HTTPUserRegisterResponse struct {

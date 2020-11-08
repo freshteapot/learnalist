@@ -70,3 +70,11 @@ func (m management) DeleteUser(userUUID string) error {
 	})
 	return nil
 }
+
+func (m management) SaveInfo(userUUID string, info []byte) error {
+	return m.storage.SaveInfo(userUUID, info)
+}
+
+func (m management) GetInfo(userUUID string) ([]byte, error) {
+	return m.storage.GetInfo(userUUID)
+}

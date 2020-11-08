@@ -16,3 +16,9 @@ CREATE TABLE IF NOT EXISTS challenge_records (
 
 CREATE UNIQUE INDEX IF NOT EXISTS challenge_records_uniq ON challenge_records (uuid, user_uuid, ext_uuid);
 
+
+CREATE TABLE IF NOT EXISTS user_info (
+  uuid CHARACTER(36) not null primary key,
+  body text,
+  UNIQUE(uuid)
+);

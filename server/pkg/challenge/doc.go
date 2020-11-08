@@ -9,13 +9,13 @@ import (
 // Could start without name for now.
 type HttpChallengePlankRecords struct {
 	UUID    string                 `json:"uuid"`
-	Users   []ChallengePlankUsers  `json:"users"`
+	Users   []ChallengePlankUser   `json:"users"`
 	Records []ChallengePlankRecord `json:"records"`
 }
 
 // TODO user doesnt have a name.
 // TODO maybe add it to JOIN
-type ChallengePlankUsers struct {
+type ChallengePlankUser struct {
 	UserUUID string `json:"user_uuid"`
 	Name     string `json:"name"`
 }
@@ -41,7 +41,7 @@ type ChallengeInfo struct {
 	Kind        string                 `json:"kind"`
 	Description string                 `json:"description"`
 	Created     string                 `json:"created"`
-	Users       []ChallengePlankUsers  `json:"users"`
+	Users       []ChallengePlankUser   `json:"users"`
 	Records     []ChallengePlankRecord `json:"records"`
 }
 

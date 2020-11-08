@@ -53,9 +53,27 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		Password: input.Password,
 	}
 
+	extra := input.Extra
+	extra.ThrowAway = "true"
+	// TODO support register without throwaway
+	// to allow a user to register without it being set as a throw away
+	// check header for security access
+
+	// TODO currently supported
+	if extra.CreatedVia != "plank.app.v1" {
+		extra.CreatedVia = ""
+	}
+
+	// Validate display name
+	if len(extra.DisplayName) > 20 {
+		response := api.HTTPResponseMessage{
+			Message: i18n.ValidationUserRegister,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
-
 		response := api.HTTPResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
@@ -79,6 +97,9 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		// TODO Log this
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	extraB, _ := json.Marshal(extra)
+	m.userManagement.SaveInfo(aUser.UserUUID, extraB)
 
 	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserRegister,

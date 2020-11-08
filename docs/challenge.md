@@ -14,6 +14,14 @@
 - [ ] Create throw away accounts
 - [ ] On logout on throw away account, send a delete message for the user?
 - [ ] Delete user, does not delete challenge. Still not sure I want to.
+- [ ] App breaks a lot when no internet
+- [x] Join challenge via challenge ID.
+- [ ] Register screen (set display name).
+- [ ] How to link the plank app to the website?
+
+```
+SocketException: OS Error: Operation timed out, errno = 60, address = 192.168.0.10, port = 54497
+```
 
 ```json
 {

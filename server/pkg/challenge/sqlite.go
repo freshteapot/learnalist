@@ -22,6 +22,22 @@ var (
 	SqlDeleteRecord      = `DELETE FROM challenge_records WHERE ext_uuid=? AND user_uuid=?`
 	SqlDeleteUserRecords = `DELETE FROM challenge_records WHERE user_uuid=?`
 
+	SqlGetChallengeUsers = `
+SELECT
+	uuid,
+IFNULL(json_extract(body, '$.display_name'), uuid) AS display_name
+FROM
+	user_info
+WHERE
+	uuid IN(
+	SELECT
+		user_uuid
+	FROM
+		challenge_records
+	WHERE
+		uuid=?
+)
+`
 	// Tightly couple the planks with the challenges for now.
 	SqlGetPlankRecords = `
 SELECT
@@ -218,6 +234,28 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 
 		challenge.Records = append(challenge.Records, record)
 	}
+
+	// users
+	type dbUser struct {
+		UserUUID    string `db:"uuid"`
+		DisplayName string `db:"display_name"`
+	}
+
+	challenge.Users = make([]ChallengePlankUser, 0)
+	dbChalengeUsers := make([]dbUser, 0)
+	// When nothing is found, there is no error.
+	err = r.db.Select(&dbChalengeUsers, SqlGetChallengeUsers, UUID)
+	if err != nil {
+		return challenge, err
+	}
+
+	for _, item := range dbChalengeUsers {
+		challenge.Users = append(challenge.Users, ChallengePlankUser{
+			UserUUID: item.UserUUID,
+			Name:     item.DisplayName,
+		})
+	}
+
 	return challenge, nil
 }
 
