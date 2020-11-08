@@ -14,7 +14,7 @@ import (
 
 type Manager struct {
 	Datastore      models.Datastore
-	userManagement user.Management
+	UserManagement user.Management
 	Acl            acl.Acl
 	DatabaseName   string
 	HugoHelper     hugo.HugoSiteBuilder
@@ -34,7 +34,7 @@ func NewManager(
 ) *Manager {
 	return &Manager{
 		Datastore:      datastore,
-		userManagement: userManagement,
+		UserManagement: userManagement,
 		Acl:            acl,
 		DatabaseName:   databaseName,
 		HugoHelper:     hugoHelper,

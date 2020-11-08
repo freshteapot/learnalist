@@ -99,7 +99,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	}
 
 	extraB, _ := json.Marshal(extra)
-	m.userManagement.SaveInfo(aUser.UserUUID, extraB)
+	m.UserManagement.SaveInfo(aUser.UserUUID, extraB)
 
 	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserRegister,

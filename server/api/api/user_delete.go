@@ -22,7 +22,7 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
-	err := m.userManagement.DeleteUser(userUUID)
+	err := m.UserManagement.DeleteUser(userUUID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"event":     event.UserDeleted,

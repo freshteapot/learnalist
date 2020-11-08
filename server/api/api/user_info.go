@@ -25,7 +25,7 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 		})
 	}
 
-	b, err := m.userManagement.GetInfo(userUUID)
+	b, err := m.UserManagement.GetInfo(userUUID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"event":     event.UserInfo,
@@ -76,7 +76,7 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	input.CreatedVia = ""
 
 	b, _ := json.Marshal(input)
-	err = m.userManagement.SaveInfo(userUUID, b)
+	err = m.UserManagement.SaveInfo(userUUID, b)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"event":     event.UserInfo,

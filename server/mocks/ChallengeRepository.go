@@ -13,17 +13,24 @@ type ChallengeRepository struct {
 }
 
 // AddRecord provides a mock function with given fields: UUID, extUUID, userUUID
-func (_m *ChallengeRepository) AddRecord(UUID string, extUUID string, userUUID string) error {
+func (_m *ChallengeRepository) AddRecord(UUID string, extUUID string, userUUID string) (int, error) {
 	ret := _m.Called(UUID, extUUID, userUUID)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string, string) error); ok {
+	var r0 int
+	if rf, ok := ret.Get(0).(func(string, string, string) int); ok {
 		r0 = rf(UUID, extUUID, userUUID)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(int)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+		r1 = rf(UUID, extUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Create provides a mock function with given fields: userUUID, _a1
