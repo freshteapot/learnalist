@@ -136,6 +136,9 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 }
 
 func (s SlackEvents) challengeNewRecord(entry event.Eventlog) string {
+	// TODO move / copy to the system that sends push notifications
+	// TODO use this to trigger a rebuild of the challenge page for static site
+	// Use this event to add user to active list
 	if entry.Kind != challenge.EventChallengeNewRecord {
 		return ""
 	}

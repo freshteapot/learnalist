@@ -2,38 +2,14 @@ package challenge
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
 
-func (s ChallengeService) eventNotify(entry event.Eventlog) {
-	if entry.Kind != EventChallengeNewRecord {
-		return
-	}
-
-	var moment EventChallengeDoneEntry
-	b, _ := json.Marshal(entry.Data)
-	json.Unmarshal(b, &moment)
-
-	challengeUUID := moment.UUID
-
-	b, _ = json.Marshal(moment.Data)
-	var record ChallengeRecordUUID
-	json.Unmarshal(b, &record)
-
-	// TODO move / copy to the system that sends push notifications
-	// TODO use this to trigger a rebuild of the challenge page for static site
-	// Use this event to add user to active list
-	fmt.Printf("Challenge %s (%s) has a new record %s by user %s\n",
-		challengeUUID,
-		moment.Kind,
-		record.UUID,
-		moment.UserUUID)
-}
-
+// removeUser when a user is deleted
+// Currently we only remove the users entries, not any entries they created.
 func (s ChallengeService) removeUser(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserDelete {
 		return
@@ -49,6 +25,7 @@ func (s ChallengeService) removeUser(entry event.Eventlog) {
 	s.repo.DeleteUser(moment.UUID)
 	s.logContext.WithFields(logrus.Fields{
 		"user_uuid": moment.UUID,
+		"event":     event.UserDeleted,
 	}).Info("user removed")
 }
 

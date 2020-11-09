@@ -58,6 +58,7 @@ func (s *AssetService) DeleteUserAssets(userUUID string) {
 		"user_uuid": userUUID,
 		"directory": directory,
 		"action":    "rm_user_assets",
+		"event":     event.UserDeleted,
 	}).Info("removing assets")
 	os.RemoveAll(directory)
 }
