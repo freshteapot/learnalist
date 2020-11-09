@@ -30,7 +30,6 @@ func (s ChallengeService) removeUser(entry event.Eventlog) {
 }
 
 func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
-	// TODO how do I know when its deleted?
 	if entry.Kind != EventChallengeDone {
 		return
 	}
