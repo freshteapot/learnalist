@@ -34,14 +34,6 @@ AND
 	kind="email"
 AND
 	identifier=?`
-
-	UserFromIDPSelectByUserUUID = `
-SELECT
-	user_uuid, idp, identifier, kind, info, created
-FROM
-	user_from_idp
-WHERE
-	user_uuid=?`
 )
 
 func NewUserFromIDP(db *sqlx.DB) *UserFromIDP {

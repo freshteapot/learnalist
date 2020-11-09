@@ -8,11 +8,20 @@ import (
 )
 
 func NewManagement(storage ManagementStorage, site ManagementSite, insights event.Insights) management {
-	return management{
+	m := management{
 		storage:  storage,
 		site:     site,
 		insights: insights,
 	}
+
+	event.GetBus().Subscribe("user-management", func(entry event.Eventlog) {
+		switch entry.Kind {
+		case event.ApiUserRegister:
+			m.eventUserRegister(entry)
+		}
+	})
+
+	return m
 }
 
 // FindUser Find the user uuid based on the search string
@@ -60,4 +69,12 @@ func (m management) DeleteUser(userUUID string) error {
 		"user_uuid": userUUID,
 	})
 	return nil
+}
+
+func (m management) SaveInfo(userUUID string, info []byte) error {
+	return m.storage.SaveInfo(userUUID, info)
+}
+
+func (m management) GetInfo(userUUID string) ([]byte, error) {
+	return m.storage.GetInfo(userUUID)
 }

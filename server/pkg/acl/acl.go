@@ -7,6 +7,7 @@ type Acl interface {
 type AclWriter interface {
 	AclWriterList
 	AclWriterAsset
+	AclWriterChallenge
 }
 
 type AclList interface {
@@ -18,6 +19,26 @@ type AclAsset interface {
 	AclReaderAsset
 	AclWriterAsset
 }
+
+type AclChallenge interface {
+	AclReaderChallenge
+	AclWriterChallenge
+}
+
+type AclReaderChallenge interface {
+	HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error)
+	HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error)
+}
+
+type AclWriterChallenge interface {
+	GrantUserChallengeWriteAccess(extUUID string, userUUID string) error
+	RevokeUserChallengeWriteAccess(extUUID string, userUUID string) error
+	ShareChallengeWithPublic(extUUID string) error
+	// Share an challenge only with yourself, this should remove any previous access rules
+	MakeChallengePrivate(extUUID string, userUUID string) error
+	DeleteChallenge(extUUID string) error // TODO rename
+}
+
 type AclReaderAsset interface {
 	HasUserAssetReadAccess(extUUID string, userUUID string) (bool, error)
 	IsListPublic(extUUID string) (bool, error)
@@ -69,4 +90,5 @@ type AclReaderList interface {
 type AclReader interface {
 	AclReaderList
 	AclReaderAsset
+	AclReaderChallenge
 }

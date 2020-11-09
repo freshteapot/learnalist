@@ -1,0 +1,274 @@
+components:
+  schemas:
+    ChallengePlankRecord:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Plank"
+        - type: object
+          properties:
+            user_uuid:
+              type: string
+              description: User uuid
+    ChallengeInput:
+      type: object
+      required:
+        - kind
+        - description
+      properties:
+        kind:
+          type: string
+          enum:
+            - plank-group
+        description:
+          type: string
+    ChallengeShortInfo:
+      required:
+        - uuid
+      allOf:
+        - $ref: "#/components/schemas/ChallengeInput"
+        - type: object
+          properties:
+            created:
+              type: string
+              format: date-time
+              description: Set to UTC
+            uuid:
+              type: string
+    ChallengeInfo:
+      required:
+        - records
+        - users
+      allOf:
+        - $ref: "#/components/schemas/ChallengeShortInfo"
+        - type: object
+          properties:
+            users:
+              type: array
+              description: List of users
+              items:
+                type: object
+                properties:
+                  user_uuid:
+                    type: string
+                    description: User uuid
+                  name:
+                    type: string
+                    description: Name the user wants for this challenge
+            records:
+              type: array
+              description: List of records, specific to the kind
+              items:
+                $ref: "#/components/schemas/ChallengePlankRecord"
+
+paths:
+  /challenge/:
+    post:
+      tags:
+        - challenge
+      operationId: createChallenge
+      description: Create a new challenge
+      requestBody:
+        description: Setup a challenge
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChallengeInput"
+      responses:
+        "201":
+          description: Challenge created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeShortInfo"
+        "422":
+          description: Most likely, the description is empty or the kind is not valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenges/{userUUID}:
+    get:
+      tags:
+        - challenge
+      description: Get all challenges for a given user
+      operationId: getChallengesByUser
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+          required: true
+          description: userUUID to get challenges
+      responses:
+        "200":
+          description: Return list of all challenges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChallengeShortInfo"
+        "403":
+          description: Lacking permission to look up the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenge/{uuid}/join:
+    put:
+      tags:
+        - challenge
+      description: Join a challenge
+      operationId: joinChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Join challenge
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Challenge doesn't exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenge/{uuid}/leave:
+    put:
+      tags:
+        - challenge
+      description: Leave a challenge
+      operationId: leaveChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Left challenge
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: You can only leave a challenge you have joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Challenge doesn't exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /challenge/{uuid}:
+    get:
+      tags:
+        - challenge
+      description: Get all challenge info, users and records
+      operationId: getChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Challenge info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeInfo"
+        "403":
+          description: You can only lookup challenges that you have joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Challenge doesn't exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+    delete:
+      tags:
+        - challenge
+      description: Delete a challenge, forever
+      operationId: deleteChallenge
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Challenge deleted
+        "403":
+          description: You can only delete a challenge if you created it
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Challenge doesn't exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

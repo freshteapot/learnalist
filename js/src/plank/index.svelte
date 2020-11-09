@@ -21,11 +21,11 @@
 
   function loadCurrent() {
     if (!loggedIn()) {
-      store.today();
       store.history();
       return;
     }
-
+    // TODO confirm and remove
+    /*
     store.today().then(() => {
       //TODO this might be a race condition
       saveEntriesFromStorage();
@@ -34,6 +34,13 @@
       }
       store.history();
     });
+    */
+    // TODO why is this not async?
+    saveEntriesFromStorage();
+    if (window.location.search.includes("login_redirect=true")) {
+      console.log("Assumed redirect from login");
+    }
+    store.history();
   }
 
   function startTime() {

@@ -17,6 +17,7 @@ func init() {
 	RootCmd.AddCommand(integrationTestsCmd)
 	RootCmd.AddCommand(stubSQLFileCmd)
 	RootCmd.AddCommand(fixInteractV1Cmd)
+	RootCmd.AddCommand(fixPlankV1Cmd)
 	RootCmd.AddCommand(user.RootCmd)
 	RootCmd.AddCommand(api.RootCmd)
 	RootCmd.AddCommand(docs.RootCmd)

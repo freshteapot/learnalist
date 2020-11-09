@@ -7,6 +7,7 @@ import (
 const (
 	UserRegistered = "user-registered"
 	UserDeleted    = "user-deleted"
+	UserInfo       = "user-info"
 )
 
 type Insights interface {

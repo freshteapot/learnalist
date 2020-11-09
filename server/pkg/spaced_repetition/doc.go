@@ -50,11 +50,11 @@ type HTTPRequestInputSettingsV2 struct {
 }
 
 type SpacedRepetitionEntry struct {
-	UUID     string    `db:"uuid"`
-	Body     string    `db:"body"`
-	UserUUID string    `db:"user_uuid"`
-	WhenNext time.Time `db:"when_next"`
-	Created  time.Time `db:"created"`
+	UUID     string    `json:"uuid" db:"uuid"`
+	Body     string    `json:"body" db:"body"`
+	UserUUID string    `json:"user_uuid" db:"user_uuid"`
+	WhenNext time.Time `json:"when_next" db:"when_next"`
+	Created  time.Time `json:"created" db:"created"`
 }
 
 const (

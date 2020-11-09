@@ -37,6 +37,20 @@ func (_m *AclWriter) DeleteByExtUUID(extUUID string) error {
 	return r0
 }
 
+// DeleteChallenge provides a mock function with given fields: extUUID
+func (_m *AclWriter) DeleteChallenge(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteList provides a mock function with given fields: alistUUID
 func (_m *AclWriter) DeleteList(alistUUID string) error {
 	ret := _m.Called(alistUUID)
@@ -53,6 +67,20 @@ func (_m *AclWriter) DeleteList(alistUUID string) error {
 
 // GrantUserAssetReadAccess provides a mock function with given fields: extUUID, userUUID
 func (_m *AclWriter) GrantUserAssetReadAccess(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// GrantUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *AclWriter) GrantUserChallengeWriteAccess(extUUID string, userUUID string) error {
 	ret := _m.Called(extUUID, userUUID)
 
 	var r0 error
@@ -107,6 +135,20 @@ func (_m *AclWriter) MakeAssetPrivate(extUUID string, userUUID string) error {
 	return r0
 }
 
+// MakeChallengePrivate provides a mock function with given fields: extUUID, userUUID
+func (_m *AclWriter) MakeChallengePrivate(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // MakeListPrivate provides a mock function with given fields: alistUUID, userUUID
 func (_m *AclWriter) MakeListPrivate(alistUUID string, userUUID string) error {
 	ret := _m.Called(alistUUID, userUUID)
@@ -123,6 +165,20 @@ func (_m *AclWriter) MakeListPrivate(alistUUID string, userUUID string) error {
 
 // RevokeUserAssetReadAccess provides a mock function with given fields: extUUID, userUUID
 func (_m *AclWriter) RevokeUserAssetReadAccess(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RevokeUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *AclWriter) RevokeUserChallengeWriteAccess(extUUID string, userUUID string) error {
 	ret := _m.Called(extUUID, userUUID)
 
 	var r0 error
@@ -165,6 +221,20 @@ func (_m *AclWriter) RevokeUserListWriteAccess(alistUUID string, userUUID string
 
 // ShareAssetWithPublic provides a mock function with given fields: extUUID
 func (_m *AclWriter) ShareAssetWithPublic(extUUID string) error {
+	ret := _m.Called(extUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(extUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ShareChallengeWithPublic provides a mock function with given fields: extUUID
+func (_m *AclWriter) ShareChallengeWithPublic(extUUID string) error {
 	ret := _m.Called(extUUID)
 
 	var r0 error

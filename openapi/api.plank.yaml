@@ -1,0 +1,125 @@
+components:
+  schemas:
+    Plank:
+      type: object
+      required:
+        - showIntervals
+        - intervalTime
+        - beginningTime
+        - currentTime
+        - timerNow
+        - intervalTimerNow
+        - laps
+      properties:
+        uuid:
+          type: string
+        showIntervals:
+          type: boolean
+        intervalTime:
+          type: integer
+        beginningTime:
+          type: integer
+          format: int64
+        currentTime:
+          type: integer
+          format: int64
+        timerNow:
+          type: integer
+        intervalTimerNow:
+          type: integer
+        laps:
+          type: integer
+paths:
+  /plank/:
+    post:
+      tags:
+        - plank
+      operationId: addPlankEntry
+      description: Add plank stats
+      parameters:
+        - in: header
+          name: x-challenge
+          description: Link plank record to a challenge uuid
+          schema:
+            type: string
+      requestBody:
+        description: Stats about the plank
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Plank"
+      responses:
+        "200":
+          description: Plank record already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plank"
+        "201":
+          description: Plank added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plank"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /plank/history:
+    get:
+      tags:
+        - plank
+      description: Get all planks for a given user
+      operationId: getPlankHistoryByUser
+      responses:
+        "200":
+          description: Return list of all entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plank"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /plank/{uuid}:
+    delete:
+      tags:
+        - plank
+      description: Delete a single entry based on the UUID
+      operationId: deletePlankEntry
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: entry deleted
+        "400":
+          description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Not able to find plank record linked to this user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

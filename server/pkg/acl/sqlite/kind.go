@@ -178,3 +178,8 @@ func (store *Sqlite) HasUserKindWriteAccess(kind string, extUUID string, userUUI
 	access := fmt.Sprintf(keys.KindWriteAccessForUser, kind, extUUID, userUUID)
 	return store.accessExsits(access)
 }
+
+func (store *Sqlite) HasUserKindOwnerAccess(kind string, extUUID string, userUUID string) (bool, error) {
+	access := fmt.Sprintf(keys.KindOwnerAccessForUser, kind, extUUID, userUUID)
+	return store.accessExsits(access)
+}

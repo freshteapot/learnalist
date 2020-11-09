@@ -12,6 +12,8 @@ type ManagementStorage interface {
 	GetLists(userUUID string) ([]string, error)
 	DeleteUser(userUUID string) error
 	DeleteList(listUUID string) error
+	SaveInfo(userUUID string, info []byte) error
+	GetInfo(userUUID string) ([]byte, error)
 }
 
 type ManagementSite interface {
@@ -22,6 +24,8 @@ type ManagementSite interface {
 type Management interface {
 	FindUser(search string) ([]string, error)
 	DeleteUser(userUUID string) error
+	SaveInfo(userUUID string, info []byte) error
+	GetInfo(userUUID string) ([]byte, error)
 }
 
 type management struct {

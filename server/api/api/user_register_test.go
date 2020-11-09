@@ -21,6 +21,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 	When("/register", func() {
 		var (
+			userManagement              *mocks.Management
 			datastore                   *mocks.Datastore
 			userWithUsernameAndPassword *mocks.UserWithUsernameAndPassword
 			endpoint                    = "/api/v1/user/register"
@@ -29,7 +30,9 @@ var _ = Describe("Testing Register user endpoint", func() {
 		BeforeEach(func() {
 			datastore = &mocks.Datastore{}
 			userWithUsernameAndPassword = &mocks.UserWithUsernameAndPassword{}
+			userManagement = &mocks.Management{}
 			m.Datastore = datastore
+			m.UserManagement = userManagement
 		})
 
 		Context("POST'ing invalid input", func() {
@@ -99,6 +102,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 				userWithUsernameAndPassword.On("Register", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 					Return(userInfo, nil)
 
+				userManagement.On("SaveInfo", "fake-123", mock.Anything).Return(nil)
 				eventMessageBus := &mocks.EventlogPubSub{}
 				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
 					Expect(moment.Kind).To(Equal(event.ApiUserRegister))

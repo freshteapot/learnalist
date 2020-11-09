@@ -5,10 +5,18 @@ import (
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
+	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
-func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRepetitionService spaced_repetition.SpacedRepetitionService) {
+func InitApi(
+	apiManager *api.Manager,
+	assetService assets.AssetService,
+	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
+	plankService plank.PlankService,
+	challengeService challenge.ChallengeService,
+) {
 
 	authConfig := authenticate.Config{
 		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
@@ -29,6 +37,8 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	v1.GET("/version", apiManager.V1GetVersion)
 
 	v1.POST("/user/register", apiManager.V1PostRegister)
+	v1.GET("/user/info/:uuid", apiManager.V1GetUserInfo)
+	v1.PATCH("/user/info/:uuid", apiManager.V1PatchUserInfo)
 	v1.POST("/user/login", apiManager.V1PostLogin)
 	v1.POST("/user/logout", apiManager.V1PostLogout)
 	v1.DELETE("/user/:uuid", apiManager.V1DeleteUser)
@@ -70,4 +80,22 @@ func InitApi(apiManager *api.Manager, assetService assets.AssetService, spacedRe
 	srs.DELETE("/:uuid", spacedRepetitionService.DeleteEntry)
 	srs.POST("/", spacedRepetitionService.SaveEntry)
 	srs.POST("/viewed", spacedRepetitionService.EntryViewed)
+
+	// Plank
+	plank := server.Group("/api/v1/plank")
+	plank.Use(authenticate.Auth(authConfig))
+	plank.GET("/history", plankService.History)
+	plank.DELETE("/:uuid", plankService.DeletePlankRecord)
+	plank.POST("/", plankService.RecordPlank)
+
+	// Challenge
+	v1.GET("/challenges/:userUUID", challengeService.Challenges)
+	challengeV1 := server.Group("/api/v1/challenge")
+	challengeV1.Use(authenticate.Auth(authConfig))
+
+	challengeV1.PUT("/:uuid/join", challengeService.Join)
+	challengeV1.PUT("/:uuid/leave", challengeService.Leave)
+	challengeV1.POST("/", challengeService.Create)
+	challengeV1.GET("/:uuid", challengeService.Get)
+	challengeV1.DELETE("/:uuid", challengeService.Delete)
 }

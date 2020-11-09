@@ -14,11 +14,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-/*
-When a user is created it returns a 201.
-When a user is created with the same username and password it returns a 200.
-When a user is created with a username in the system it returns a 400.
-*/
+// V1PostRegister When a user is created it returns a 201.
+// When a user is created with the same username and password it returns a 200.
+// When a user is created with a username in the system it returns a 400.
 func (m *Manager) V1PostRegister(c echo.Context) error {
 	var input api.HTTPUserRegisterInput
 	defer c.Request().Body.Close()
@@ -31,15 +29,27 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-
 	cleanedUser := api.HTTPUserRegisterInput{
 		Username: input.Username,
 		Password: input.Password,
 	}
 
+	// TODO Secure endpoint https://github.com/freshteapot/learnalist-api/issues/153
+	extra := input.Extra
+	if extra.CreatedVia != "plank.app.v1" {
+		extra.CreatedVia = ""
+	}
+
+	// Validate display name
+	if len(extra.DisplayName) > 20 {
+		response := api.HTTPResponseMessage{
+			Message: i18n.ValidationUserRegister,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
 	cleanedUser, err = user.Validate(cleanedUser)
 	if err != nil {
-
 		response := api.HTTPResponseMessage{
 			Message: i18n.ValidationUserRegister,
 		}
@@ -63,6 +73,9 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		// TODO Log this
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	extraB, _ := json.Marshal(extra)
+	m.UserManagement.SaveInfo(aUser.UserUUID, extraB)
 
 	event.GetBus().Publish(event.Eventlog{
 		Kind: event.ApiUserRegister,
