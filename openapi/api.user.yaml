@@ -152,7 +152,7 @@ paths:
               $ref: "#/components/schemas/HttpUserInfoInput"
       responses:
         "200":
-          description: user deleted
+          description: user info has been changed
           content:
             application/json:
               schema:
