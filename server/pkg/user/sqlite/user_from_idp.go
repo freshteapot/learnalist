@@ -34,15 +34,6 @@ AND
 	kind="email"
 AND
 	identifier=?`
-
-	// TODO either use it and expose a get method or remove this
-	UserFromIDPSelectByUserUUID = `
-SELECT
-	user_uuid, idp, identifier, kind, info, created
-FROM
-	user_from_idp
-WHERE
-	user_uuid=?`
 )
 
 func NewUserFromIDP(db *sqlx.DB) *UserFromIDP {
