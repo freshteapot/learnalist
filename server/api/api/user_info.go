@@ -38,7 +38,6 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 
 	var extra api.HTTPUserExtra
 	err = json.Unmarshal(b, &extra)
-	extra.ThrowAway = ""
 	extra.CreatedVia = ""
 	if extra.DisplayName == "" {
 		extra.DisplayName = userUUID

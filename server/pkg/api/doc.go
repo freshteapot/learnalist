@@ -16,7 +16,6 @@ type HTTPUserRegisterInput struct {
 type HTTPUserExtra struct {
 	DisplayName string `json:"display_name,omitempty"`
 	CreatedVia  string `json:"created_via,omitempty"`
-	ThrowAway   string `json:"throw_away,omitempty"` // Have to use string so it can be ignored in the json, little ugly
 }
 
 type HTTPUserRegisterResponse struct {
