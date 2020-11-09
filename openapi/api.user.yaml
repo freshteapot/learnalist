@@ -153,10 +153,6 @@ paths:
       responses:
         "200":
           description: user info has been changed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HttpResponseMessage"
         "500":
           description: unexpected error
           content:
