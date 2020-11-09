@@ -25,7 +25,6 @@ func (s ChallengeService) eventNotify(entry event.Eventlog) {
 	json.Unmarshal(b, &record)
 
 	// TODO move / copy to the system that sends push notifications
-	// TODO copy to slack
 	// TODO use this to trigger a rebuild of the challenge page for static site
 	// Use this event to add user to active list
 	fmt.Printf("Challenge %s (%s) has a new record %s by user %s\n",
@@ -77,12 +76,8 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 	var record ChallengePlankRecord
 	json.Unmarshal(b, &record)
 
-	fmt.Println("record", string(b))
-	fmt.Println("challenge", challengeUUID)
-	fmt.Println("record.uuid", record.UUID)
-	fmt.Println("userUUID moment", moment.UserUUID)
-	// Need to know if this event was added or ignored
-	// If added trigger a new event for notifications
+	// Add the record
+	// If it is a new entry, send a event that it was new.
 	status, err := s.repo.AddRecord(challengeUUID, record.UUID, moment.UserUUID)
 	if status == http.StatusInternalServerError {
 		s.logContext.WithFields(logrus.Fields{

@@ -150,10 +150,6 @@ func (s SlackEvents) challengeNewRecord(entry event.Eventlog) string {
 	var record challenge.ChallengeRecordUUID
 	json.Unmarshal(b, &record)
 
-	// TODO move / copy to the system that sends push notifications
-	// TODO copy to slack
-	// TODO use this to trigger a rebuild of the challenge page for static site
-	// Use this event to add user to active list
 	return fmt.Sprintf("Challenge %s (%s) has a new record %s by user %s\n",
 		challengeUUID,
 		moment.Kind,

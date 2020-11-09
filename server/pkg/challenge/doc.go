@@ -5,16 +5,12 @@ import (
 	"time"
 )
 
-// Users are required for the name
-// Could start without name for now.
 type HttpChallengePlankRecords struct {
 	UUID    string                 `json:"uuid"`
 	Users   []ChallengePlankUser   `json:"users"`
 	Records []ChallengePlankRecord `json:"records"`
 }
 
-// TODO user doesnt have a name.
-// TODO maybe add it to JOIN
 type ChallengePlankUser struct {
 	UserUUID string `json:"user_uuid"`
 	Name     string `json:"name"`
