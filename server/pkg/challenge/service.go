@@ -123,7 +123,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 	if err != nil {
 		if err == ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
-				Message: i18n.PlankRecordNotFound,
+				Message: i18n.ChallengeNotFound,
 			})
 		}
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
@@ -157,7 +157,7 @@ func (s ChallengeService) Leave(c echo.Context) error {
 	if err != nil {
 		if err == ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
-				Message: i18n.PlankRecordNotFound,
+				Message: i18n.ChallengeNotFound,
 			})
 		}
 
@@ -233,7 +233,7 @@ func (s ChallengeService) Get(c echo.Context) error {
 	if err != nil {
 		if err == ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
-				Message: i18n.PlankRecordNotFound,
+				Message: i18n.ChallengeNotFound,
 			})
 		}
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
