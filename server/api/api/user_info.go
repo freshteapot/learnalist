@@ -71,7 +71,6 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	}
 
 	// On purpose dont let these be set.
-	input.ThrowAway = ""
 	input.CreatedVia = ""
 
 	b, _ := json.Marshal(input)
