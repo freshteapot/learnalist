@@ -12,6 +12,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type SqliteRepository struct {
+	db *sqlx.DB
+}
+
+// Get the records
+type dbRecord struct {
+	UserUUID string `json:"user_uuid" db:"user_uuid"`
+	Record   string `json:"body" db:"body"`
+}
+
+// users
+type dbUser struct {
+	UserUUID    string `db:"uuid"`
+	DisplayName string `db:"display_name"`
+}
+
 var (
 	SqlGetEntry    = `SELECT * FROM challenge WHERE uuid=?`
 	SqlSaveEntry   = `INSERT INTO challenge(uuid, user_uuid, body) values(?, ?, ?)`
@@ -80,10 +96,6 @@ DESC
 `
 )
 
-type SqliteRepository struct {
-	db *sqlx.DB
-}
-
 func NewSqliteRepository(db *sqlx.DB) ChallengeRepository {
 	return SqliteRepository{
 		db: db,
@@ -114,6 +126,7 @@ func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeShort
 }
 
 func (r SqliteRepository) Join(UUID string, userUUID string) error {
+	// TODO is this function needed anymore?
 	// I wonder how bad this will be VS a table with challenge_uuid, user_uuid, name
 	// Remove from the list
 	name := "fake"
@@ -159,6 +172,8 @@ WHERE
 }
 
 func (r SqliteRepository) Leave(UUID string, userUUID string) error {
+	// TODO is this function needed anymore?
+	// I like the code
 	var path string
 	findPath := `
 SELECT u.path
@@ -213,19 +228,8 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 	challenge.Created = entry.Created.Format(time.RFC3339Nano)
 	challenge.Records = make([]ChallengePlankRecord, 0)
 
-	// Get the records
-	type dbRecord struct {
-		UserUUID string `json:"user_uuid" db:"user_uuid"`
-		Record   string `json:"body" db:"body"`
-	}
-
 	dbItems := make([]dbRecord, 0)
-	// When nothing is found, there is no error.
-	err = r.db.Select(&dbItems, SqlGetPlankRecords, UUID)
-
-	if err != nil {
-		return challenge, err
-	}
+	r.db.Select(&dbItems, SqlGetPlankRecords, UUID)
 
 	for _, item := range dbItems {
 		var record ChallengePlankRecord
@@ -235,21 +239,12 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 		challenge.Records = append(challenge.Records, record)
 	}
 
-	// users
-	type dbUser struct {
-		UserUUID    string `db:"uuid"`
-		DisplayName string `db:"display_name"`
-	}
-
 	challenge.Users = make([]ChallengePlankUser, 0)
-	dbChalengeUsers := make([]dbUser, 0)
-	// When nothing is found, there is no error.
-	err = r.db.Select(&dbChalengeUsers, SqlGetChallengeUsers, UUID)
-	if err != nil {
-		return challenge, err
-	}
+	dbChallengeUsers := make([]dbUser, 0)
 
-	for _, item := range dbChalengeUsers {
+	r.db.Select(&dbChallengeUsers, SqlGetChallengeUsers, UUID)
+
+	for _, item := range dbChallengeUsers {
 		challenge.Users = append(challenge.Users, ChallengePlankUser{
 			UserUUID: item.UserUUID,
 			Name:     item.DisplayName,

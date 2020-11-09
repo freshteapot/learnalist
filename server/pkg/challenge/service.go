@@ -143,8 +143,9 @@ func (s ChallengeService) Join(c echo.Context) error {
 	}
 
 	_ = s.acl.GrantUserChallengeWriteAccess(challengeUUID, userUUID)
-
-	_ = s.repo.Join(challengeUUID, userUUID)
+	// I am not sure I need this
+	// Or I need to move the above logic into it
+	//_ = s.repo.Join(challengeUUID, userUUID)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -180,8 +181,15 @@ func (s ChallengeService) Leave(c echo.Context) error {
 	}
 
 	_ = s.acl.RevokeUserChallengeWriteAccess(challengeUUID, userUUID)
-	_ = s.repo.Leave(challengeUUID, userUUID)
-	// Keep the records
+	// I am not sure I need this
+	// Or I need to move the above logic into it
+	//_ = s.repo.Leave(challengeUUID, userUUID)
+
+	// If I want to build a cache
+	// listen to changes to displayName
+	// listen to addrecord
+	// listen to join
+	// listen to leave
 	return c.NoContent(http.StatusOK)
 }
 
