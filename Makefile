@@ -90,6 +90,7 @@ generate-docs-api-overview: generate-openapi-one
 	cd server && \
 	yq r /tmp/openapi/one/learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 
+
 ###############################################################################
 #
 # More production than development
