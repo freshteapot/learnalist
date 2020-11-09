@@ -1,6 +1,19 @@
 components:
   examples:
   schemas:
+    HttpUserInfoInput:
+      type: object
+      properties:
+        display_name:
+          type: string
+          maxLength: 20
+          description: This will be used to address you in the app(s) or website.
+        created_via:
+          type: string
+          description: Let the server know the user was created via the plank app.
+          enum:
+            - plank.app.v1
+
     HttpUserRegisterInput:
       type: object
       required:
@@ -11,6 +24,9 @@ components:
           type: string
         password:
           type: string
+        extra:
+          $ref: "#/components/schemas/HttpUserInfoInput"
+
     HttpUserRegisterResponse:
       type: object
       required:
@@ -114,6 +130,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+  /user/info/{uuid}:
+    patch:
+      tags:
+        - user
+      description: Single or many updates to the users information
+      operationId: patchUserInfo
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of user to modify
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Allowed attributes to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpUserInfoInput"
+      responses:
+        "200":
+          description: user deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
   /user/{uuid}:
     delete:
       tags:

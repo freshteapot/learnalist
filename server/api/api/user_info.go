@@ -55,7 +55,7 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {
 		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
-			Message: "You can only get info for the user you are logged in with",
+			Message: "You can only update info for the user you are logged in with",
 		})
 	}
 
@@ -89,14 +89,3 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
-
-/*
-curl \
--H"Authorization: Bearer ${token}" \
--X"PATCH" \
-"http://127.0.0.1:1234/api/v1/user/info/$userUUID" \
--d '{
-	"display_name":"food",
-	"fake": "1"
-}'
-*/
