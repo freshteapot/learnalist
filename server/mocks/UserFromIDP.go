@@ -9,20 +9,20 @@ type UserFromIDP struct {
 	mock.Mock
 }
 
-// Lookup provides a mock function with given fields: idp, identifier, kind
-func (_m *UserFromIDP) Lookup(idp string, identifier string, kind string) (string, error) {
-	ret := _m.Called(idp, identifier, kind)
+// Lookup provides a mock function with given fields: idp, kind, identifier
+func (_m *UserFromIDP) Lookup(idp string, kind string, identifier string) (string, error) {
+	ret := _m.Called(idp, kind, identifier)
 
 	var r0 string
 	if rf, ok := ret.Get(0).(func(string, string, string) string); ok {
-		r0 = rf(idp, identifier, kind)
+		r0 = rf(idp, kind, identifier)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
-		r1 = rf(idp, identifier, kind)
+		r1 = rf(idp, kind, identifier)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -30,20 +30,20 @@ func (_m *UserFromIDP) Lookup(idp string, identifier string, kind string) (strin
 	return r0, r1
 }
 
-// Register provides a mock function with given fields: idp, identifier, info
-func (_m *UserFromIDP) Register(idp string, identifier string, info []byte) (string, error) {
-	ret := _m.Called(idp, identifier, info)
+// Register provides a mock function with given fields: idp, kind, identifier, info
+func (_m *UserFromIDP) Register(idp string, kind string, identifier string, info []byte) (string, error) {
+	ret := _m.Called(idp, kind, identifier, info)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(string, string, []byte) string); ok {
-		r0 = rf(idp, identifier, info)
+	if rf, ok := ret.Get(0).(func(string, string, string, []byte) string); ok {
+		r0 = rf(idp, kind, identifier, info)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string, []byte) error); ok {
-		r1 = rf(idp, identifier, info)
+	if rf, ok := ret.Get(1).(func(string, string, string, []byte) error); ok {
+		r1 = rf(idp, kind, identifier, info)
 	} else {
 		r1 = ret.Error(1)
 	}

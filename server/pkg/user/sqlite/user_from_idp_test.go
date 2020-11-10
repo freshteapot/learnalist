@@ -45,7 +45,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Register(idp, identifier, info)
+				_, err = repository.Register(idp, kind, identifier, info)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -55,7 +55,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err := repository.Register(idp, identifier, info)
+				_, err := repository.Register(idp, kind, identifier, info)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -67,7 +67,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Lookup(idp, identifier, kind)
+				_, err = repository.Lookup(idp, kind, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -78,7 +78,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Lookup(idp, identifier, kind)
+				_, err = repository.Lookup(idp, kind, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -91,7 +91,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnRows(rs)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				found, err := repository.Lookup(idp, identifier, kind)
+				found, err := repository.Lookup(idp, kind, identifier)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(Equal(userUUID))
 			})

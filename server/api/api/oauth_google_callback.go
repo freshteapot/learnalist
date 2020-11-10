@@ -80,7 +80,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	}
 
 	// Look up the user based on their email and association with google.
-	userUUID, err := userFromIDP.Lookup("google", userInfo.Email, user.IDPKindEmail)
+	userUUID, err := userFromIDP.Lookup("google", user.IDPKindEmail, userInfo.Email)
 	if err != nil {
 		if err != user.ErrNotFound {
 			logger.WithFields(logrus.Fields{
@@ -91,7 +91,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register("google", userInfo.Email, contents)
+		userUUID, err = userFromIDP.Register("google", user.IDPKindEmail, userInfo.Email, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-register-user",

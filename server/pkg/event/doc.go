@@ -5,21 +5,22 @@ import (
 )
 
 const (
-	ApiUserDelete             = "api.user.delete"
-	ApiUserLogin              = "api.user.login"
-	ApiUserLogout             = "api.user.logout"
-	BrowserUserLogout         = "browser.user.logout"
-	ApiUserRegister           = "api.user.register"
-	ApiListSaved              = "api.list.saved"
-	ApiListDelete             = "api.list.delete"
-	ApiSpacedRepetition       = "api.spacedrepetition"
-	TopicMonolog              = "lal.monolog"
-	KindUserRegisterUsername  = "username"
-	KindUserRegisterIDPGoogle = "idp:google"
-	KindUserLoginIDPGoogle    = "idp:google"
-	KindUserLoginUsername     = "username"
-	KindUserLogoutSession     = "logout.session"
-	KindUserLogoutSessions    = "logout.sessions"
+	ApiUserDelete                    = "api.user.delete"
+	ApiUserLogin                     = "api.user.login"
+	ApiUserLogout                    = "api.user.logout"
+	BrowserUserLogout                = "browser.user.logout"
+	ApiUserRegister                  = "api.user.register"
+	ApiListSaved                     = "api.list.saved"
+	ApiListDelete                    = "api.list.delete"
+	ApiSpacedRepetition              = "api.spacedrepetition"
+	TopicMonolog                     = "lal.monolog"
+	KindUserRegisterUsername         = "username"
+	KindUserRegisterIDPGoogle        = "idp:google"
+	KindUserLoginIDPGoogle           = "idp:google"
+	KindUserLoginIDPGoogleViaIdToken = "idp:google:idtoken"
+	KindUserLoginUsername            = "username"
+	KindUserLogoutSession            = "logout.session"
+	KindUserLogoutSessions           = "logout.sessions"
 )
 
 var (

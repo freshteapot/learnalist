@@ -130,7 +130,16 @@ var ServerCmd = &cobra.Command{
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
-		userService := user.NewService(db, userManagement)
+		userService := user.NewService(
+			db,
+			[]string{
+				"com.googleusercontent.apps.922982262824-02not0saigm3up5i76btfgfj2sillnlo", //TODO config this
+				//TODO add learnalist
+			},
+			userFromIDP,
+			userSession,
+			hugoHelper,
+			logger.WithField("context", "user-service"))
 
 		challengeService := challenge.NewService(challenge.NewSqliteRepository(db), acl, logger.WithField("context", "challenge-service"))
 

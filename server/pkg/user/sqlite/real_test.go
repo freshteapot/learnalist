@@ -27,11 +27,11 @@ var _ = Describe("Testing Acl", func() {
 
 	XIt("Testing with real queries", func() {
 		repository = storage.NewUserFromIDP(db)
-		userUUID, err := repository.Register("google", "fake@freshteapot.net", []byte(`{"name", "chris"}`))
+		userUUID, err := repository.Register("google", user.IDPKindEmail, "fake@freshteapot.net", []byte(`{"name", "chris"}`))
 		Expect(err).ShouldNot(HaveOccurred())
 		fmt.Println(userUUID)
 
-		userUUID_2, err := repository.Lookup("google", "fake@freshteapot.net", user.IDPKindEmail)
+		userUUID_2, err := repository.Lookup("google", user.IDPKindEmail, "fake@freshteapot.net")
 		fmt.Println(userUUID_2)
 		fmt.Println(err)
 	})

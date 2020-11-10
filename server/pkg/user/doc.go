@@ -82,8 +82,8 @@ type UserWithUsernameAndPassword interface {
 }
 
 type UserFromIDP interface {
-	Register(idp string, identifier string, info []byte) (userUUID string, err error)
-	Lookup(idp string, identifier string, kind string) (userUUID string, err error)
+	Register(idp string, kind string, identifier string, info []byte) (userUUID string, err error)
+	Lookup(idp string, kind string, identifier string) (userUUID string, err error)
 }
 
 var ErrNotFound = errors.New("user-not-found")
