@@ -148,7 +148,7 @@ make push-image
 make sync-site-assets
 ```
 
-Make sure k8s file is uptodate
+Make sure k8s file is upto date
 ```sh
 kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
@@ -195,7 +195,7 @@ make sync-db-files
 
 ## Via a pod
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
 ```
 Update tables
 ```sh
