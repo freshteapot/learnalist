@@ -46,7 +46,8 @@ func (store *UserFromIDP) Register(idp string, kind string, identifier string, i
 	id := guuid.New()
 	userUUID = id.String()
 	// TODO change this
-	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, identifier, kind, string(info))
+	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, kind, identifier, string(info))
+	// TODO handle when inset matches (shouldnt happen)
 	return userUUID, err
 }
 

@@ -41,8 +41,8 @@ func InitApi(
 	v1.POST("/user/register", apiManager.V1PostRegister)
 	v1.GET("/user/info/:uuid", apiManager.V1GetUserInfo)
 	v1.PATCH("/user/info/:uuid", apiManager.V1PatchUserInfo)
-	v1.POST("/user/login", apiManager.V1PostLogin)
 	v1.POST("/user/login/idp", userService.LoginViaIDP)
+	v1.POST("/user/login", apiManager.V1PostLogin)
 	v1.POST("/user/logout", apiManager.V1PostLogout)
 	v1.DELETE("/user/:uuid", apiManager.V1DeleteUser)
 

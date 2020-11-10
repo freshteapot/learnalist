@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -14,6 +15,7 @@ import (
 )
 
 func (m *Manager) V1PostLogin(c echo.Context) error {
+	fmt.Println("Hello")
 	var input api.HTTPUserRegisterInput
 	response := api.HTTPResponseMessage{}
 

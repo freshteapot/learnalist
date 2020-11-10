@@ -34,6 +34,10 @@ func Skip(c echo.Context) bool {
 		if url == "/user/login" {
 			return true
 		}
+
+		if url == "/user/login/idp" {
+			return true
+		}
 	default:
 		return false
 	}

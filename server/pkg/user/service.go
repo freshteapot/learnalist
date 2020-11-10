@@ -17,6 +17,14 @@ import (
 	"google.golang.org/api/oauth2/v1"
 )
 
+/*
+curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login/idp' -d'
+{
+    "idp": "google",
+    "id_token": "XXX",
+}
+'
+*/
 type UserService struct {
 	db          *sqlx.DB
 	userFromIDP UserFromIDP
@@ -27,9 +35,9 @@ type UserService struct {
 }
 
 type LoginIDPInput struct {
-	Idp     string `json:"idp"`
-	IDToken string `json:"id_token"`
-	Via     string `json:"via"`
+	Idp         string `json:"idp"`
+	IDToken     string `json:"id_token"`
+	AccessToken string `json:"access_token"`
 }
 
 type LoginIDPResponse struct {
@@ -59,22 +67,16 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-
-		return c.JSON(http.StatusBadRequest, api.HTTPResponseMessage{
-			Message: "TODO 1",
-		})
+		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
 	if input.Idp != "google" {
-		return c.JSON(http.StatusBadRequest, api.HTTPResponseMessage{
-			Message: "TODO 2",
-		})
-	}
-
-	if input.Via != "plank.app.v1" {
-		return c.JSON(http.StatusBadRequest, api.HTTPResponseMessage{
-			Message: "TODO 2",
-		})
+		logContext.WithFields(logrus.Fields{
+			"event": "idp-not-supported",
+			"idp":   input.Idp,
+			"error": err,
+		}).Error("Future feature")
+		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
 	// Convert token
@@ -88,7 +90,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
-	// TODO pass this in
 	if !utils.StringArrayContains(s.issuedTo, token.IssuedTo) {
 		logContext.WithFields(logrus.Fields{
 			"event":           "idp-issued",
@@ -104,6 +105,8 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	//fmt.Println("Email", token.Email)
 
 	// Lookup user by idp + ID
+	// TODO what should the contents be?
+	// TODO Do I want to send in the accessToken and get the data? do i care?
 	contents := []byte(`{"action":"//TODO"}`)
 	extUserID := token.UserId
 	userUUID, err := userFromIDP.Lookup(input.Idp, IDPKindUserID, extUserID)
@@ -116,8 +119,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			}).Error("Issue in login via idp")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
-		// TODO what should contents be?
-		// TODO add IDPKindUserID to register
+
 		// Create a new user
 		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserID, contents)
 		if err != nil {

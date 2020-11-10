@@ -133,7 +133,7 @@ var ServerCmd = &cobra.Command{
 		userService := user.NewService(
 			db,
 			[]string{
-				"com.googleusercontent.apps.922982262824-02not0saigm3up5i76btfgfj2sillnlo", //TODO config this
+				"922982262824-02not0saigm3up5i76btfgfj2sillnlo.apps.googleusercontent.com", //TODO config this
 				//TODO add learnalist
 			},
 			userFromIDP,
