@@ -31,7 +31,7 @@ var _ = Describe("Testing Acl", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 		fmt.Println(userUUID)
 
-		userUUID_2, err := repository.Lookup("google", "fake@freshteapot.net")
+		userUUID_2, err := repository.Lookup("google", "fake@freshteapot.net", user.IDPKindEmail)
 		fmt.Println(userUUID_2)
 		fmt.Println(err)
 	})

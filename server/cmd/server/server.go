@@ -130,9 +130,11 @@ var ServerCmd = &cobra.Command{
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()
 
+		userService := user.NewService(db, userManagement)
+
 		challengeService := challenge.NewService(challenge.NewSqliteRepository(db), acl, logger.WithField("context", "challenge-service"))
 
-		server.InitApi(apiManager, assetService, spacedRepetitionService, plankService, challengeService)
+		server.InitApi(apiManager, userService, assetService, spacedRepetitionService, plankService, challengeService)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

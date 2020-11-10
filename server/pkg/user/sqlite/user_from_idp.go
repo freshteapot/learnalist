@@ -31,7 +31,7 @@ FROM
 WHERE
 	idp=?
 AND
-	kind="email"
+	kind=?
 AND
 	identifier=?`
 )
@@ -45,13 +45,14 @@ func NewUserFromIDP(db *sqlx.DB) *UserFromIDP {
 func (store *UserFromIDP) Register(idp string, identifier string, info []byte) (userUUID string, err error) {
 	id := guuid.New()
 	userUUID = id.String()
-	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, identifier, "email", string(info))
+	// TODO change this
+	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, identifier, user.IDPKindEmail, string(info))
 	return userUUID, err
 }
 
-func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string, err error) {
+func (store *UserFromIDP) Lookup(idp string, identifier string, kind string) (userUUID string, err error) {
 	var item DatabaseUserFromIDP
-	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
+	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, kind, identifier)
 	if err == sql.ErrNoRows {
 		err = user.ErrNotFound
 	}

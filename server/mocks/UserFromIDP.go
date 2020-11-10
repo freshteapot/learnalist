@@ -9,20 +9,20 @@ type UserFromIDP struct {
 	mock.Mock
 }
 
-// Lookup provides a mock function with given fields: idp, identifier
-func (_m *UserFromIDP) Lookup(idp string, identifier string) (string, error) {
-	ret := _m.Called(idp, identifier)
+// Lookup provides a mock function with given fields: idp, identifier, kind
+func (_m *UserFromIDP) Lookup(idp string, identifier string, kind string) (string, error) {
+	ret := _m.Called(idp, identifier, kind)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(string, string) string); ok {
-		r0 = rf(idp, identifier)
+	if rf, ok := ret.Get(0).(func(string, string, string) string); ok {
+		r0 = rf(idp, identifier, kind)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(idp, identifier)
+	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+		r1 = rf(idp, identifier, kind)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -8,10 +8,12 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
 func InitApi(
 	apiManager *api.Manager,
+	userService user.UserService,
 	assetService assets.AssetService,
 	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
 	plankService plank.PlankService,
@@ -40,6 +42,7 @@ func InitApi(
 	v1.GET("/user/info/:uuid", apiManager.V1GetUserInfo)
 	v1.PATCH("/user/info/:uuid", apiManager.V1PatchUserInfo)
 	v1.POST("/user/login", apiManager.V1PostLogin)
+	v1.POST("/user/login/idp", userService.LoginViaIDP)
 	v1.POST("/user/logout", apiManager.V1PostLogout)
 	v1.DELETE("/user/:uuid", apiManager.V1DeleteUser)
 

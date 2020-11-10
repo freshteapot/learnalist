@@ -7,6 +7,11 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 )
 
+const (
+	IDPKindEmail  = "email"
+	IDPKindUserID = "id"
+)
+
 type ManagementStorage interface {
 	FindUserUUID(search string) ([]string, error)
 	GetLists(userUUID string) ([]string, error)
@@ -78,7 +83,7 @@ type UserWithUsernameAndPassword interface {
 
 type UserFromIDP interface {
 	Register(idp string, identifier string, info []byte) (userUUID string, err error)
-	Lookup(idp string, identifier string) (userUUID string, err error)
+	Lookup(idp string, identifier string, kind string) (userUUID string, err error)
 }
 
 var ErrNotFound = errors.New("user-not-found")
