@@ -132,10 +132,7 @@ var ServerCmd = &cobra.Command{
 
 		userService := user.NewService(
 			db,
-			[]string{
-				"922982262824-02not0saigm3up5i76btfgfj2sillnlo.apps.googleusercontent.com", //TODO config this
-				//TODO add learnalist
-			},
+			viper.GetStringSlice("server.loginWith.idp"),
 			userFromIDP,
 			userSession,
 			hugoHelper,

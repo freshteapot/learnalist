@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS user_from_idp (
- user_uuid CHARACTER(36) UNIQUE PRIMARY KEY,
+ user_uuid CHARACTER(36),
  idp TEXT NOT NULL,
  identifier TEXT NOT NULL,
  kind TEXT NOT NULL,
  info TEXT NOT NULL DEFAULT '',
  created integer(4) not null default (strftime('%s','now')),
- UNIQUE(idp, kind, identifier)
+ UNIQUE(user_uuid, idp, kind, identifier)
 );

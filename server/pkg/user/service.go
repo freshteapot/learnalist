@@ -34,15 +34,10 @@ type UserService struct {
 	logContext  logrus.FieldLogger
 }
 
-type LoginIDPInput struct {
+type HTTPUserLoginIDPInput struct {
 	Idp         string `json:"idp"`
 	IDToken     string `json:"id_token"`
 	AccessToken string `json:"access_token"`
-}
-
-type LoginIDPResponse struct {
-	Token    string `json:"token"`
-	UserUUID string `json:"user_uuid"`
 }
 
 func NewService(db *sqlx.DB, issuedTo []string, userFromIDP UserFromIDP, userSession Session, hugoHelper hugo.HugoHelper, logContext logrus.FieldLogger) UserService {
@@ -61,7 +56,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	userSession := s.userSession
 
 	logContext := s.logContext
-	var input LoginIDPInput
+	var input HTTPUserLoginIDPInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
@@ -119,7 +114,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			}).Error("Issue in login via idp")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
-
 		// Create a new user
 		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserID, contents)
 		if err != nil {
@@ -174,7 +168,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		},
 	})
 
-	return c.JSON(http.StatusOK, LoginIDPResponse{
+	return c.JSON(http.StatusOK, api.HTTPLoginResponse{
 		Token:    session.Token,
 		UserUUID: userUUID,
 	})
