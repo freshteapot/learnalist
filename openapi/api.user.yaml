@@ -110,10 +110,10 @@ paths:
       tags:
         - user
       operationId: loginWithIdpIdToken
-      description: Login with idToken
+      description: Login with idToken, mostly to support mobile devices.
       security: []
       requestBody:
-        description: Username and password
+        description: Based on the idp, we will verify your id_token and log you in.
         required: true
         content:
           application/json:
