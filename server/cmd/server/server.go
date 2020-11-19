@@ -26,6 +26,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
@@ -132,15 +133,16 @@ var ServerCmd = &cobra.Command{
 
 		userService := user.NewService(
 			db,
-			viper.GetStringSlice("server.loginWith.idp"),
+			viper.GetStringSlice("server.loginWith.idp.issuedTo"),
 			userFromIDP,
 			userSession,
 			hugoHelper,
 			logger.WithField("context", "user-service"))
 
 		challengeService := challenge.NewService(challenge.NewSqliteRepository(db), acl, logger.WithField("context", "challenge-service"))
+		mobileService := mobile.NewService(logger.WithField("context", "mobile-service"))
 
-		server.InitApi(apiManager, userService, assetService, spacedRepetitionService, plankService, challengeService)
+		server.InitApi(apiManager, userService, assetService, spacedRepetitionService, plankService, challengeService, mobileService)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

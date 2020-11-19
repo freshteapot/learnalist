@@ -22,9 +22,11 @@ components:
           type: string
           maxLength: 20
           description: This will be used to address you in the app(s) or website.
+          default: ""
         created_via:
           type: string
           description: Let the server know the user was created via the plank app.
+          default: ""
           enum:
             - plank.app.v1
 

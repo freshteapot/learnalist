@@ -6,6 +6,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
+	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -18,6 +19,7 @@ func InitApi(
 	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
 	plankService plank.PlankService,
 	challengeService challenge.ChallengeService,
+	mobileService mobile.MobileService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -101,4 +103,9 @@ func InitApi(
 	challengeV1.POST("/", challengeService.Create)
 	challengeV1.GET("/:uuid", challengeService.Get)
 	challengeV1.DELETE("/:uuid", challengeService.Delete)
+
+	// Mobile
+	mobileV1 := server.Group("/api/v1/mobile")
+	mobileV1.Use(authenticate.Auth(authConfig))
+	mobileV1.POST("/register-device", mobileService.RegisterDevice)
 }

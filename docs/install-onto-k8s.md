@@ -214,3 +214,16 @@ cat  /srv/learnalist/db/XXX | sqlite3 /srv/learnalist/server.db
     - name: srv-learnalist-volume
       mountPath: "/src"
 ```
+
+
+
+# Get configmaps
+
+```sh
+kubectl get configmaps learnalist-config -oyaml | yq r - "data[config.yaml]" > current.yaml
+```
+
+
+```sh
+kubectl create configmap learnalist-config --from-file=config.yaml=current.yaml -o yaml --dry-run | kubectl replace -f -
+```
