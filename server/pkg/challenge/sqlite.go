@@ -366,3 +366,25 @@ WHERE
 	}
 	return users, nil
 }
+
+// GetUserDisplayName return empty if it doesnt exist
+func (r SqliteRepository) GetUserDisplayName(uuid string) string {
+	query := `
+SELECT
+	IFNULL(json_extract(body, '$.display_name'), "")
+FROM
+	user_info
+WHERE
+	uuid=?`
+	displayName := ""
+	r.db.Get(&displayName, query, uuid)
+	return displayName
+}
+
+// GetChallengeDescription
+func (r SqliteRepository) GetChallengeDescription(uuid string) string {
+	query := `SELECT json_extract(body, '$.description') FROM challenge WHERE uuid=?`
+	name := ""
+	r.db.Get(&name, query, uuid)
+	return name
+}

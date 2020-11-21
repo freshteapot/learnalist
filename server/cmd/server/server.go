@@ -142,7 +142,9 @@ var ServerCmd = &cobra.Command{
 		challengeRepo := challenge.NewSqliteRepository(db)
 		challengeNotificationRepo := challengeRepo.(challenge.ChallengeNotificationRepository)
 		challengeService := challenge.NewService(challengeRepo, challengeNotificationRepo, acl, logger.WithField("context", "challenge-service"))
-		mobileService := mobile.NewService(logger.WithField("context", "mobile-service"))
+		mobileService := mobile.NewService(
+			mobile.NewSqliteRepository(db),
+			logger.WithField("context", "mobile-service"))
 
 		server.InitApi(apiManager, userService, assetService, spacedRepetitionService, plankService, challengeService, mobileService)
 		server.InitAlists(acl, dal, hugoHelper)

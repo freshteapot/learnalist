@@ -11,6 +11,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// TODO need nats option with other subject
+// TODO do we drop memory?
+// TODO mobile_device table needs a file
+// I now have enough informaiton to send to the topic to build the message
+// Or do I build the message here?
+// Note, it doesnt need to have setup the other channel, to publish to it
+
+func (s ChallengeService) OnEvent(entry event.Eventlog) {
+	switch entry.Kind {
+	case event.ApiUserDelete:
+		s.removeUser(entry)
+	case EventChallengeDone:
+		s.eventChallengeDone(entry)
+	}
+	// Not the cleanest approach
+	s.eventChallengePushNotification(entry)
+}
+
 // removeUser when a user is deleted
 // Currently we only remove the users entries, not any entries they created.
 func (s ChallengeService) removeUser(entry event.Eventlog) {
@@ -94,14 +112,8 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	var (
 		challengeUUID string
 		userUUID      string
-		title         string
-		body          string
+		template      string
 	)
-
-	// TODO
-	challengeName := "Join Tine Rehab"
-	// TODO
-	userDisplayName := "Tine"
 
 	switch entry.Kind {
 	case EventChallengeNewRecord:
@@ -110,28 +122,46 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
+		entryType := "record"
+		if moment.Kind == EventKindPlank {
+			entryType = "plank"
+		}
 
-		title = "Challenge update"
-		body = fmt.Sprintf("%s added a record to %s", userDisplayName, challengeName)
+		template = fmt.Sprintf(`%%s added a %s to %%s`, entryType)
 	case EventChallengeJoined:
+		var entry2 event.EventKV
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &entry2)
+		b, _ = json.Marshal(entry2.Data)
+
 		var moment ChallengeJoined
-		b, _ := json.Marshal(entry.Data)
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
 
-		title = "Challenge update"
-		body = fmt.Sprintf("%s joined %s", userDisplayName, challengeName)
+		template = "%s has joined %s"
 	case EventChallengeLeft:
-		var moment ChallengeLeft
+		var entry2 event.EventKV
 		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &entry2)
+		b, _ = json.Marshal(entry2.Data)
+
+		var moment ChallengeLeft
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
-
-		title = "Challenge update"
-		body = fmt.Sprintf("%s left %s", userDisplayName, challengeName)
+		fmt.Println(string(b))
+		template = "%s has left %s"
 	}
+
+	challengeName := s.challengeNotificationRepository.GetChallengeDescription(challengeUUID)
+	userDisplayName := s.challengeNotificationRepository.GetUserDisplayName(userUUID)
+	if userDisplayName == "" {
+		userDisplayName = "Someone"
+	}
+
+	title := "Challenge update"
+	body := fmt.Sprintf(template, userDisplayName, challengeName)
 
 	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID)
 	for _, user := range users {
@@ -139,26 +169,17 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		if user.UserUUID == userUUID {
 			continue
 		}
-		fmt.Println("write notification for user", user.DisplayName, user)
-		// TODO need nats option with other subject
-		// TODO do we drop memory?
-		// TODO mobile_device table needs a file
-		// I now have enough informaiton to send to the topic to build the message
-		// Or do I build the message here?
-		// Note, it doesnt need to have setup the other channel, to publish to it
-		data2 := map[string]string{
-			"uuid":   challengeUUID,
-			"who":    userDisplayName,
-			"name":   challengeName,
-			"action": entry.Kind,
-		}
 
 		message := &messaging.Message{
 			Notification: &messaging.Notification{
 				Title: title,
 				Body:  body,
 			},
-			Data:  data2,
+			Data: map[string]string{
+				"uuid":   challengeUUID,
+				"name":   challengeName,
+				"action": entry.Kind,
+			},
 			Token: user.Token,
 		}
 

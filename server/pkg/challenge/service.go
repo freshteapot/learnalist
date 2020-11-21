@@ -31,16 +31,7 @@ func NewService(repo ChallengeRepository, challengeNotificationRepository Challe
 		logContext:                      log,
 	}
 
-	event.GetBus().Subscribe(event.TopicMonolog, "challenge", func(entry event.Eventlog) {
-		switch entry.Kind {
-		case event.ApiUserDelete:
-			s.removeUser(entry)
-		case EventChallengeDone:
-			s.eventChallengeDone(entry)
-		}
-		// Not the cleanest approach
-		s.eventChallengePushNotification(entry)
-	})
+	event.GetBus().Subscribe(event.TopicMonolog, "challenge", s.OnEvent)
 	return s
 }
 

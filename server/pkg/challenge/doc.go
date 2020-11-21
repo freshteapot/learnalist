@@ -70,6 +70,8 @@ type ChallengeNotificationUserInfo struct {
 
 type ChallengeNotificationRepository interface {
 	GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error)
+	GetUserDisplayName(uuid string) string
+	GetChallengeDescription(uuid string) string
 }
 
 type ChallengeRepository interface {

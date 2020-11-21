@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -17,15 +18,18 @@ import (
 
 type MobileService struct {
 	logContext logrus.FieldLogger
+	repo       MobileRepository
 }
 
-func NewService(log logrus.FieldLogger) MobileService {
+func NewService(repo MobileRepository, log logrus.FieldLogger) MobileService {
 	s := MobileService{
+		repo:       repo,
 		logContext: log,
 	}
 
 	event.GetBus().Subscribe(event.TopicMonolog, "mobile", func(entry event.Eventlog) {
 		fmt.Println("TODO")
+		// TODO handle delete
 	})
 	return s
 }
@@ -47,11 +51,17 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	// TODO register it
-	s.logContext.WithFields(logrus.Fields{
-		"input":     string(jsonBytes),
-		"user_uuid": userUUID,
-	}).Info("TODO save to db or push to event or something")
+	err := s.repo.SaveDeviceInfo(userUUID, registerInput.Token)
+	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error":     err,
+			"input":     string(jsonBytes),
+			"user_uuid": userUUID,
+		}).Error("Failed to register device")
+		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		})
+	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventMobileDeviceRegistered,
