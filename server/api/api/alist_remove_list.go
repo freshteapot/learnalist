@@ -34,7 +34,7 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiListDelete,
 		Data: event.EventList{
 			UUID:     alistUUID,

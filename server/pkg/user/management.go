@@ -14,7 +14,7 @@ func NewManagement(storage ManagementStorage, site ManagementSite, insights even
 		insights: insights,
 	}
 
-	event.GetBus().Subscribe("user-management", func(entry event.Eventlog) {
+	event.GetBus().Subscribe(event.TopicMonolog, "user-management", func(entry event.Eventlog) {
 		switch entry.Kind {
 		case event.ApiUserRegister:
 			m.eventUserRegister(entry)

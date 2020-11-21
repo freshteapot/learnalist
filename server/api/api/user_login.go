@@ -54,7 +54,7 @@ func (m *Manager) V1PostLogin(c echo.Context) error {
 	cookie := authenticate.NewLoginCookie(session.Token)
 	c.SetCookie(cookie)
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,

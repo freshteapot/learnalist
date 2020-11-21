@@ -32,7 +32,7 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserDelete,
 		Data: event.EventUser{
 			UUID: userUUID,

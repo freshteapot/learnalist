@@ -77,7 +77,7 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 	extraB, _ := json.Marshal(extra)
 	m.UserManagement.SaveInfo(aUser.UserUUID, extraB)
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserRegister,
 		Data: event.EventUser{
 			UUID: aUser.UserUUID,

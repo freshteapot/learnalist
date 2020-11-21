@@ -71,7 +71,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	}
 
 	if statusCode == http.StatusCreated {
-		event.GetBus().Publish(event.Eventlog{
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: EventApiSpacedRepetition,
 			Data: EventSpacedRepetition{
 				Kind: EventKindNew,
@@ -84,7 +84,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		// UI needs more complexity
 		challengeUUID := c.Request().Header.Get("x-challenge")
 		if challengeUUID != "" {
-			event.GetBus().Publish(event.Eventlog{
+			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 				Kind: challenge.EventChallengeDone,
 				Data: challenge.EventChallengeDoneEntry{
 					UUID:     challengeUUID,
@@ -118,7 +118,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	}
 
 	// This event fires, even if the entry doesnt exist
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind: EventKindDeleted,
@@ -222,7 +222,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind:   EventKindViewed,

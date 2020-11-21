@@ -41,5 +41,5 @@ func SetupEventBus(logContext logrus.FieldLogger) {
 		logContext.Fatal("server.events.via is not valid, memory or nats")
 	}
 
-	GetBus().Start()
+	GetBus().Start(TopicMonolog)
 }

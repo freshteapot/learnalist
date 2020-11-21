@@ -38,7 +38,7 @@ func (m *Manager) Logout(c echo.Context) error {
 		session.RemoveSessionForUser(userUUID, token)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.BrowserUserLogout,
 		Data: event.EventUser{
 			UUID: userUUID,

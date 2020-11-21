@@ -31,7 +31,7 @@ func NewService(repo ChallengeRepository, challengeNotificationRepository Challe
 		logContext:                      log,
 	}
 
-	event.GetBus().Subscribe("challenge", func(entry event.Eventlog) {
+	event.GetBus().Subscribe(event.TopicMonolog, "challenge", func(entry event.Eventlog) {
 		switch entry.Kind {
 		case event.ApiUserDelete:
 			s.removeUser(entry)
@@ -114,7 +114,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventChallengeCreated,
 		Data: event.EventKV{
 			UUID: challengeUUID,
@@ -157,7 +157,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 	// Or I need to move the above logic into it
 	//_ = s.repo.Join(challengeUUID, userUUID)
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventChallengeJoined,
 		Data: event.EventKV{
 			UUID: challengeUUID,
@@ -213,7 +213,7 @@ func (s ChallengeService) Leave(c echo.Context) error {
 	// listen to join
 	// listen to leave
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventChallengeLeft,
 		Data: event.EventKV{
 			UUID: challengeUUID,

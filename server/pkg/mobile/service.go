@@ -24,7 +24,7 @@ func NewService(log logrus.FieldLogger) MobileService {
 		logContext: log,
 	}
 
-	event.GetBus().Subscribe("mobile", func(entry event.Eventlog) {
+	event.GetBus().Subscribe(event.TopicMonolog, "mobile", func(entry event.Eventlog) {
 		fmt.Println("TODO")
 	})
 	return s
@@ -53,7 +53,7 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		"user_uuid": userUUID,
 	}).Info("TODO save to db or push to event or something")
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventMobileDeviceRegistered,
 		Data: event.EventKV{
 			UUID: userUUID,

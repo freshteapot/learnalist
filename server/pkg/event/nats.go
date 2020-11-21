@@ -11,9 +11,9 @@ import (
 )
 
 type natsBus struct {
-	sc        stan.Conn
-	sub       stan.Subscription
-	listeners []eventlogPubSubListener
+	sc            stan.Conn
+	subscriptions map[string]stan.Subscription
+	listeners     []eventlogPubSubListener
 }
 
 func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.FieldLogger) *natsBus {
@@ -41,22 +41,24 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 	}
 }
 
-func (b *natsBus) Publish(moment Eventlog) {
+func (b *natsBus) Publish(topic string, moment Eventlog) {
 	mb, _ := json.Marshal(moment)
-	topic := TopicMonolog
+
 	if err := b.sc.Publish(topic, mb); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (b *natsBus) Close() {
-	err := b.sub.Close()
-	if err != nil {
-		fmt.Printf("error closing stan sub: %v\n", err)
+	for _, sub := range b.subscriptions {
+		err := sub.Close()
+		if err != nil {
+			fmt.Printf("error closing stan sub: %v\n", err)
+		}
 	}
 
 	nc := b.sc.NatsConn()
-	err = b.sc.Close()
+	err := b.sc.Close()
 	if err != nil {
 		fmt.Printf("error closing stan: %v\n", err)
 	}
@@ -64,16 +66,16 @@ func (b *natsBus) Close() {
 	nc.Close()
 }
 
-func (b *natsBus) Subscribe(key string, fn interface{}) {
+func (b *natsBus) Subscribe(topic string, key string, fn interface{}) {
 	listener := eventlogPubSubListener{
-		key: key,
-		fn:  fn,
+		topic: topic,
+		key:   key,
+		fn:    fn,
 	}
 	b.listeners = append(b.listeners, listener)
 }
 
-func (b *natsBus) Start() {
-	topic := TopicMonolog
+func (b *natsBus) Start(topic string) {
 	var err error
 	mcb := func(msg *stan.Msg) {
 		var entryLog Eventlog
@@ -84,6 +86,10 @@ func (b *natsBus) Start() {
 		}
 
 		for _, listener := range b.listeners {
+			if listener.topic != topic {
+				return
+			}
+
 			type HandlerType func(entry Eventlog)
 			if f, ok := listener.fn.(func(entry Eventlog)); ok {
 				HandlerType(f)(entryLog)
@@ -92,17 +98,19 @@ func (b *natsBus) Start() {
 	}
 
 	durableName := "internal-system"
-	b.sub, err = b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
+	sub, err := b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
 
 	if err != nil {
 		b.sc.Close()
 		log.Fatalf("Failed to start subscription on '%s': %v", topic, err)
 	}
+
+	b.subscriptions[topic] = sub
 }
 
-func (b *natsBus) Unsubscribe(key string) {
+func (b *natsBus) Unsubscribe(topic string, key string) {
 	for index, listener := range b.listeners {
-		if listener.key == key {
+		if listener.topic == topic && listener.key == key {
 			b.listeners = append(b.listeners[:index], b.listeners[index+1:]...)
 			break
 		}

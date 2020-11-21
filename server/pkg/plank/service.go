@@ -28,7 +28,7 @@ func NewService(repo PlankRepository, log logrus.FieldLogger) PlankService {
 		logContext: log,
 	}
 
-	event.GetBus().Subscribe("plank", s.monologSubscribe)
+	event.GetBus().Subscribe(event.TopicMonolog, "plank", s.monologSubscribe)
 	return s
 }
 
@@ -80,7 +80,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 		return c.JSON(http.StatusOK, input)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventApiPlank,
 		Data: EventPlank{
 			Kind:     EventKindNew,
@@ -96,7 +96,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 	// Send event if challenge
 	challengeUUID := c.Request().Header.Get("x-challenge")
 	if challengeUUID != "" {
-		event.GetBus().Publish(event.Eventlog{
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: challenge.EventChallengeDone,
 			Data: challenge.EventChallengeDoneEntry{
 				UUID:     challengeUUID,
@@ -147,7 +147,7 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventApiPlank,
 		Data: EventPlank{
 			Kind:     EventKindDeleted,

@@ -28,15 +28,16 @@ var (
 )
 
 type eventlogPubSubListener struct {
-	key string
-	fn  interface{}
+	topic string
+	key   string
+	fn    interface{}
 }
 type EventlogPubSub interface {
-	Start()
+	Start(topic string)
 	Close()
-	Publish(moment Eventlog)
-	Subscribe(key string, fn interface{})
-	Unsubscribe(key string)
+	Publish(topic string, moment Eventlog)
+	Subscribe(topic string, key string, fn interface{})
+	Unsubscribe(topic string, key string)
 }
 
 type Eventlog struct {

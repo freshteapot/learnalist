@@ -73,7 +73,7 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 		return
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventChallengeNewRecord,
 		Data: moment,
 	})

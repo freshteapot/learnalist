@@ -126,7 +126,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
 
-		event.GetBus().Publish(event.Eventlog{
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
 				UUID: userUUID,
@@ -161,7 +161,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	}
 
 	// TODO is this kind supported in slack?
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,

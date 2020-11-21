@@ -100,7 +100,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
 
-		event.GetBus().Publish(event.Eventlog{
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
 				UUID: userUUID,
@@ -129,7 +129,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
