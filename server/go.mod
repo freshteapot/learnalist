@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.58.0 // indirect
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/antihax/optional v1.0.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1

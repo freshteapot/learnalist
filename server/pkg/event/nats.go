@@ -37,7 +37,8 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 
 	logContext.Info("connected to nats server")
 	return &natsBus{
-		sc: sc,
+		sc:            sc,
+		subscriptions: make(map[string]stan.Subscription, 0),
 	}
 }
 
@@ -97,6 +98,7 @@ func (b *natsBus) Start(topic string) {
 		}
 	}
 
+	// Maybe I want to change to QueueSubscribe
 	durableName := "internal-system"
 	sub, err := b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
 

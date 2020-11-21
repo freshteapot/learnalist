@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"firebase.google.com/go/messaging"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
@@ -93,7 +94,14 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	var (
 		challengeUUID string
 		userUUID      string
+		title         string
+		body          string
 	)
+
+	// TODO
+	challengeName := "Join Tine Rehab"
+	// TODO
+	userDisplayName := "Tine"
 
 	switch entry.Kind {
 	case EventChallengeNewRecord:
@@ -102,18 +110,27 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
+
+		title = "Challenge update"
+		body = fmt.Sprintf("%s added a record to %s", userDisplayName, challengeName)
 	case EventChallengeJoined:
 		var moment ChallengeJoined
 		b, _ := json.Marshal(entry.Data)
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
+
+		title = "Challenge update"
+		body = fmt.Sprintf("%s joined %s", userDisplayName, challengeName)
 	case EventChallengeLeft:
 		var moment ChallengeLeft
 		b, _ := json.Marshal(entry.Data)
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
+
+		title = "Challenge update"
+		body = fmt.Sprintf("%s left %s", userDisplayName, challengeName)
 	}
 
 	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID)
@@ -128,5 +145,27 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		// TODO mobile_device table needs a file
 		// I now have enough informaiton to send to the topic to build the message
 		// Or do I build the message here?
+		// Note, it doesnt need to have setup the other channel, to publish to it
+		data2 := map[string]string{
+			"uuid":   challengeUUID,
+			"who":    userDisplayName,
+			"name":   challengeName,
+			"action": entry.Kind,
+		}
+
+		message := &messaging.Message{
+			Notification: &messaging.Notification{
+				Title: title,
+				Body:  body,
+			},
+			Data:  data2,
+			Token: user.Token,
+		}
+
+		event.GetBus().Publish("challenges", event.Eventlog{
+			Kind: "push-notification",
+			Data: message,
+		})
+
 	}
 }
