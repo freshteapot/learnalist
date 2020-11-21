@@ -2,8 +2,10 @@ package challenge
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
@@ -75,4 +77,56 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 		Kind: EventChallengeNewRecord,
 		Data: moment,
 	})
+}
+
+func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
+	allowed := []string{
+		EventChallengeNewRecord,
+		EventChallengeJoined,
+		EventChallengeLeft,
+	}
+
+	if !utils.StringArrayContains(allowed, entry.Kind) {
+		return
+	}
+
+	var (
+		challengeUUID string
+		userUUID      string
+	)
+
+	switch entry.Kind {
+	case EventChallengeNewRecord:
+		var moment EventChallengeDoneEntry
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &moment)
+		challengeUUID = moment.UUID
+		userUUID = moment.UserUUID
+	case EventChallengeJoined:
+		var moment ChallengeJoined
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &moment)
+		challengeUUID = moment.UUID
+		userUUID = moment.UserUUID
+	case EventChallengeLeft:
+		var moment ChallengeLeft
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &moment)
+		challengeUUID = moment.UUID
+		userUUID = moment.UserUUID
+	}
+
+	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID)
+	for _, user := range users {
+		// Ignore the user who created the moment
+		if user.UserUUID == userUUID {
+			continue
+		}
+		fmt.Println("write notification for user", user.DisplayName, user)
+		// TODO need nats option with other subject
+		// TODO do we drop memory?
+		// TODO mobile_device table needs a file
+		// I now have enough informaiton to send to the topic to build the message
+		// Or do I build the message here?
+	}
 }

@@ -23,4 +23,8 @@ func init() {
 	RootCmd.AddCommand(docs.RootCmd)
 	RootCmd.AddCommand(eventReaderCMD)
 	RootCmd.AddCommand(slackEventsCMD)
+	RootCmd.AddCommand(monologCMD)
+	RootCmd.AddCommand(monolog2CMD)
+	RootCmd.AddCommand(challengeNotificationsCMD)
+	RootCmd.AddCommand(consumeChallengesCMD)
 }

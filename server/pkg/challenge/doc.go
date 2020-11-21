@@ -62,6 +62,16 @@ type ChallengeShortInfo struct {
 	Created     string `json:"created"`
 }
 
+type ChallengeNotificationUserInfo struct {
+	UserUUID    string `json:"user_uuid"`
+	DisplayName string `json:"display_name"`
+	Token       string `json:"token"`
+}
+
+type ChallengeNotificationRepository interface {
+	GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error)
+}
+
 type ChallengeRepository interface {
 	GetChallengesByUser(userUUID string) ([]ChallengeShortInfo, error)
 	Join(UUID string, userUUID string) error
@@ -72,6 +82,16 @@ type ChallengeRepository interface {
 	DeleteUser(userUUID string) error
 	AddRecord(UUID string, extUUID string, userUUID string) (int, error)
 	DeleteRecord(extUUID string, userUUID string) error
+}
+
+type ChallengeLeft struct {
+	UUID     string `json:"uuid"`
+	UserUUID string `json:"user_uuid"`
+}
+
+type ChallengeJoined struct {
+	UUID     string `json:"uuid"`
+	UserUUID string `json:"user_uuid"`
 }
 
 type EventChallengeDoneEntry struct {
@@ -85,6 +105,11 @@ type EventChallengeDoneEntry struct {
 var (
 	EventChallengeDone        = "challenge.done"
 	EventChallengeNewRecord   = "challenge.newrecord"
+	EventChallengeCreated     = "challenge.ceated"
+	EventChallengeDeleted     = "challenge.deleted"
+	EventChallengeJoined      = "challenge.joined"
+	EventChallengeLeft        = "challenge.left"
+	EventChallengeMeta        = "challenge.meta" // challenge with users, not records
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"

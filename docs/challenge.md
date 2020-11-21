@@ -167,3 +167,55 @@ curl -XPOST \
 }
 '
 ```
+
+
+
+
+#####
+Playing with events
+
+```sh
+docker run --rm -it synadia/nats-box:latest \
+-p 8080:8080 \
+```
+
+docker run --rm --name nats-box \
+-p 4222:4222 \
+synadia/nats-box:latest
+
+
+
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make run-api-server
+
+
+
+response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
+{
+    "username":"iamtest1",
+    "password":"test123"
+}
+')
+userUUID=$(echo $response | jq -r '.user_uuid')
+token=$(echo $response | jq -r '.token')
+
+
+- [ ] Need to add user to object on join
+- [ ] Need to add user to object on leave
+- [ ] How to get displayName
+
+
+---
+- I could cheat and just write to challenges with the notification I want.
+    - db lookups
+    - sending is decoupled
+
+- Much simpler
+- Make it throw away
+
+

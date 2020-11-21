@@ -53,6 +53,17 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		"user_uuid": userUUID,
 	}).Info("TODO save to db or push to event or something")
 
+	event.GetBus().Publish(event.Eventlog{
+		Kind: EventMobileDeviceRegistered,
+		Data: event.EventKV{
+			UUID: userUUID,
+			Data: DeviceInfo{
+				Token:    registerInput.Token,
+				UserUUID: userUUID,
+			},
+		},
+	})
+
 	return c.JSON(http.StatusOK, api.HTTPResponseMessage{
 		Message: "Device registered",
 	})

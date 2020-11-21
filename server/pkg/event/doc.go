@@ -40,8 +40,9 @@ type EventlogPubSub interface {
 }
 
 type Eventlog struct {
-	Kind string      `json:"kind"`
-	Data interface{} `json:"data"`
+	Kind      string      `json:"kind"`
+	Data      interface{} `json:"data"`
+	Timestamp int64       `json:"timestamp,omitempty"`
 }
 
 type EventUser struct {
@@ -54,4 +55,9 @@ type EventList struct {
 	UserUUID string       `json:"user_uuid"`
 	Action   string       `json:"action,omitempty"`
 	Data     *alist.Alist `json:"data,omitempty"`
+}
+
+type EventKV struct {
+	UUID string      `json:"uuid"`
+	Data interface{} `json:"data"`
 }

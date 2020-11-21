@@ -303,3 +303,66 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 	_, err := r.db.Exec(SqlDeleteUserRecords, userUUID)
 	return err
 }
+
+// GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
+// Not sure how I feel about this
+func (r SqliteRepository) GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error) {
+	query := `
+WITH _users(user_uuid, access) AS (
+SELECT
+	user_uuid,
+	access
+FROM
+	acl_simple
+WHERE
+	ext_uuid=?
+),
+_usersWithWriteAccess(user_uuid) AS (
+SELECT
+	user_uuid
+FROM
+	_users
+WHERE
+	access LIKE "api:challenge:%%:write:%%"
+),
+_usersWithDisplayName(user_uuid, display_name) AS (
+	SELECT
+	uuid,
+	IFNULL(json_extract(body, '$.display_name'), uuid) AS display_name
+FROM
+	user_info
+WHERE
+	uuid IN(SELECT user_uuid FROM _usersWithWriteAccess)
+)
+SELECT
+	m.user_uuid,
+	m.token,
+	u.display_name
+FROM
+	mobile_device as m
+INNER JOIN
+	_usersWithDisplayName AS u ON (u.user_uuid = m.user_uuid)
+WHERE
+	m.user_uuid IN(SELECT user_uuid FROM _usersWithDisplayName)
+`
+
+	type dbUser struct {
+		UserUUID    string `db:"user_uuid"`
+		DisplayName string `db:"display_name"`
+		Token       string `db:"token"`
+	}
+
+	dbItems := make([]dbUser, 0)
+	users := make([]ChallengeNotificationUserInfo, 0)
+	err := r.db.Select(&dbItems, query, challengeUUID)
+	fmt.Println(err)
+
+	for _, item := range dbItems {
+		users = append(users, ChallengeNotificationUserInfo{
+			UserUUID:    item.UserUUID,
+			DisplayName: item.DisplayName,
+			Token:       item.Token,
+		})
+	}
+	return users, nil
+}
