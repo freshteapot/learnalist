@@ -86,12 +86,9 @@ generate-openapi-dart: generate-openapi-one
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g dart -o /tmp/openapi/dart \
 	--additional-properties ensureUniqueParams=false
 
-
 generate-docs-api-overview: generate-openapi-one
 	cd server && \
-	yq r /tmp/openapi/one/learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
-
-
+	cat /tmp/openapi/one/learnalist.yaml | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 ###############################################################################
 #
 # More production than development

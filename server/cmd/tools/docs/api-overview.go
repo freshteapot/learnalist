@@ -2,16 +2,15 @@ package docs
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
 
-	"github.com/itchyny/gojq"
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/spf13/cobra"
 )
 
@@ -20,72 +19,10 @@ type Endpoint struct {
 	Method      string   `json:"method"`
 	Description string   `json:"description"`
 	StatusCodes []string `json:"status_codes"`
+	Tag         string   `json:"tag"`
 }
 
 type DocsApiOverview struct{}
-
-func (d DocsApiOverview) GetEndpoints(input []byte) []Endpoint {
-	var data map[string]interface{}
-	json.Unmarshal(input, &data)
-	query, err := gojq.Parse(".paths | to_entries")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	var endpoints []Endpoint
-	iter := query.Run(data)
-	for {
-		v, ok := iter.Next()
-		if !ok {
-			break
-		}
-		if err, ok := v.(error); ok {
-			log.Fatalln(err)
-		}
-
-		for _, e := range v.([]interface{}) {
-			e := e.(map[string]interface{})
-
-			endpoint := d.parseEndpoint(e["key"].(string), e["value"].(map[string]interface{}))
-			endpoints = append(endpoints, endpoint...)
-		}
-	}
-	return endpoints
-}
-
-// parseEndpoint extract out path details and find all possible statuscodes
-func (d DocsApiOverview) parseEndpoint(key string, value map[string]interface{}) []Endpoint {
-	var endpoints []Endpoint
-	query, _ := gojq.Parse("to_entries")
-	iter := query.Run(value) // or query.RunWithContext
-	for {
-		v, ok := iter.Next()
-		if !ok {
-			break
-		}
-		if err, ok := v.(error); ok {
-			log.Fatalln(err)
-		}
-
-		for _, e := range v.([]interface{}) {
-			e := e.(map[string]interface{})
-			responses := e["value"].(map[string]interface{})["responses"].(map[string]interface{})
-			statusCodes := make([]string, 0)
-			for k := range responses {
-				statusCodes = append(statusCodes, k)
-			}
-
-			endpoint := Endpoint{
-				Path:        key,
-				Method:      e["key"].(string),
-				Description: e["value"].(map[string]interface{})["description"].(string),
-				StatusCodes: statusCodes,
-			}
-			endpoints = append(endpoints, endpoint)
-		}
-	}
-	return endpoints
-}
 
 func (d DocsApiOverview) Render(endpoints []Endpoint) string {
 	funcMap := template.FuncMap{
@@ -123,9 +60,45 @@ var apiOverviewCMD = &cobra.Command{
 	Use:   "api-overview",
 	Short: "Create markdown for api contents via openapi",
 	Run: func(cmd *cobra.Command, args []string) {
-		builder := DocsApiOverview{}
 		b, _ := ioutil.ReadAll(os.Stdin)
-		endpoints := builder.GetEndpoints(b)
+		s, _ := openapi3.NewSwaggerLoader().LoadSwaggerFromData(b)
+
+		var endpoints []Endpoint
+		for k, path := range s.Paths {
+			for _, method := range []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete} {
+				operation := path.GetOperation(method)
+				if operation == nil {
+					continue
+				}
+
+				statusCodes := make([]string, 0, len(operation.Responses))
+				for k := range operation.Responses {
+					statusCodes = append(statusCodes, k)
+				}
+
+				sort.Strings(statusCodes)
+				tag := ""
+				if len(operation.Tags) > 0 {
+					tag = operation.Tags[0]
+				}
+
+				endpoint := Endpoint{
+					Path:        k,
+					Method:      method,
+					Description: operation.Description,
+					StatusCodes: statusCodes,
+					Tag:         tag,
+				}
+
+				endpoints = append(endpoints, endpoint)
+			}
+		}
+
+		sort.Slice(endpoints, func(i, j int) bool {
+			return endpoints[i].Tag < endpoints[j].Tag
+		})
+
+		builder := DocsApiOverview{}
 		fmt.Println(builder.Render(endpoints))
 	},
 }

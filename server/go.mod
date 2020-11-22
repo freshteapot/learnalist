@@ -9,6 +9,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/antihax/optional v1.0.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
+	github.com/getkin/kin-openapi v0.30.0
 	github.com/google/uuid v1.1.1
 	github.com/gookit/goutil v0.2.7 // indirect
 	github.com/gookit/validate v1.2.0
