@@ -2,8 +2,6 @@ package event
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
@@ -14,6 +12,7 @@ type natsBus struct {
 	sc            stan.Conn
 	subscriptions map[string]stan.Subscription
 	listeners     []eventlogPubSubListener
+	logContext    logrus.FieldLogger
 }
 
 func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.FieldLogger) *natsBus {
@@ -39,6 +38,7 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 	return &natsBus{
 		sc:            sc,
 		subscriptions: make(map[string]stan.Subscription, 0),
+		logContext:    logContext,
 	}
 }
 
@@ -46,7 +46,7 @@ func (b *natsBus) Publish(topic string, moment Eventlog) {
 	mb, _ := json.Marshal(moment)
 
 	if err := b.sc.Publish(topic, mb); err != nil {
-		log.Fatal(err)
+		b.logContext.Fatal(err)
 	}
 }
 
@@ -54,16 +54,19 @@ func (b *natsBus) Close() {
 	for _, sub := range b.subscriptions {
 		err := sub.Close()
 		if err != nil {
-			fmt.Printf("error closing stan sub: %v\n", err)
+			b.logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("error closing stan sub")
 		}
 	}
 
 	nc := b.sc.NatsConn()
 	err := b.sc.Close()
 	if err != nil {
-		fmt.Printf("error closing stan: %v\n", err)
+		b.logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("error closing stan")
 	}
-
 	nc.Close()
 }
 
@@ -82,7 +85,6 @@ func (b *natsBus) Start(topic string) {
 		var entryLog Eventlog
 		err := json.Unmarshal(msg.Data, &entryLog)
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 
@@ -104,7 +106,10 @@ func (b *natsBus) Start(topic string) {
 
 	if err != nil {
 		b.sc.Close()
-		log.Fatalf("Failed to start subscription on '%s': %v", topic, err)
+		b.logContext.WithFields(logrus.Fields{
+			"error": err,
+			"topic": topic,
+		}).Fatal("Failed to start subscription")
 	}
 
 	b.subscriptions[topic] = sub

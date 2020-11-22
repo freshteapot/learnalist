@@ -105,12 +105,13 @@ type EventChallengeDoneEntry struct {
 
 // Event specific
 var (
-	EventChallengeDone        = "challenge.done"
-	EventChallengeNewRecord   = "challenge.newrecord"
-	EventChallengeCreated     = "challenge.ceated"
-	EventChallengeDeleted     = "challenge.deleted"
-	EventChallengeJoined      = "challenge.joined"
-	EventChallengeLeft        = "challenge.left"
+	EventChallengeDone      = "challenge.done"
+	EventChallengeNewRecord = "challenge.newrecord"
+	EventChallengeCreated   = "challenge.ceated"
+	EventChallengeDeleted   = "challenge.deleted"
+	EventChallengeJoined    = "challenge.joined"
+	EventChallengeLeft      = "challenge.left"
+	// TODO remove this
 	EventChallengeMeta        = "challenge.meta" // challenge with users, not records
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"

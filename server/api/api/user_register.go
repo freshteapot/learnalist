@@ -85,8 +85,6 @@ func (m *Manager) V1PostRegister(c echo.Context) error {
 		},
 	})
 
-	// TODO Quick hack is to Post displayName here to be picked up by the challenge system
-
 	response := api.HTTPUserRegisterResponse{
 		Uuid:     aUser.UserUUID,
 		Username: aUser.Username,

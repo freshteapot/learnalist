@@ -11,13 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// TODO need nats option with other subject
-// TODO do we drop memory?
-// TODO mobile_device table needs a file
-// I now have enough informaiton to send to the topic to build the message
-// Or do I build the message here?
-// Note, it doesnt need to have setup the other channel, to publish to it
-
 func (s ChallengeService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
