@@ -1,4 +1,4 @@
-package tools
+package challenges
 
 import (
 	"context"
@@ -21,8 +21,8 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 )
 
-var challengeNotificationsCMD = &cobra.Command{
-	Use:   "challenge-notifications",
+var pushNotificationsCMD = &cobra.Command{
+	Use:   "push-notifications",
 	Short: "Read events via nats",
 	Long: `
 

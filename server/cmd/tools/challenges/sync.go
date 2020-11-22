@@ -1,4 +1,4 @@
-package tools
+package challenges
 
 import (
 	"encoding/json"
@@ -18,9 +18,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 )
 
-var consumeChallengesCMD = &cobra.Command{
-	Use:   "consume-challenges",
-	Short: "Read events via nats",
+var syncCMD = &cobra.Command{
+	Use:   "sync",
+	Short: "Copy across challenge specific events",
 	Long: `
 
 	ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
