@@ -15,8 +15,10 @@ func (s ChallengeService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
 		s.removeUser(entry)
+		return
 	case EventChallengeDone:
 		s.eventChallengeDone(entry)
+		return
 	}
 	// Not the cleanest approach
 	s.eventChallengePushNotification(entry)
