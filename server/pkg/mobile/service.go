@@ -2,7 +2,6 @@ package mobile
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -27,10 +26,7 @@ func NewService(repo MobileRepository, log logrus.FieldLogger) MobileService {
 		logContext: log,
 	}
 
-	event.GetBus().Subscribe(event.TopicMonolog, "mobile", func(entry event.Eventlog) {
-		fmt.Println("TODO")
-		// TODO handle delete
-	})
+	event.GetBus().Subscribe(event.TopicMonolog, "mobile", s.OnEvent)
 	return s
 }
 
