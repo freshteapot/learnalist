@@ -93,7 +93,7 @@ var _ = Describe("Testing Alist endpoints", func() {
 				}
 
 				eventMessageBus := &mocks.EventlogPubSub{}
-				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					Expect(moment.Kind).To(Equal(event.ApiListSaved))
 					Expect(moment.Data.(event.EventList).UUID).To(Equal(savedList.Uuid))
 					Expect(moment.Data.(event.EventList).Action).To(Equal("created"))

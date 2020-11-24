@@ -94,7 +94,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			hugoHelper.On("WritePublicLists", mock.Anything)
 			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiUserDelete))
 				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
 				return true

@@ -111,7 +111,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 				Return(nil)
 
 			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiUserLogout))
 				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
 				Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLogoutSession))
@@ -142,7 +142,7 @@ var _ = Describe("Testing user logout endpoint", func() {
 				Return(nil)
 
 			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiUserLogout))
 				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
 				Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLogoutSessions))

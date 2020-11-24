@@ -12,8 +12,8 @@ type ChallengeNotificationRepository struct {
 	mock.Mock
 }
 
-// GetChallengeName provides a mock function with given fields: uuid
-func (_m *ChallengeNotificationRepository) GetChallengeName(uuid string) string {
+// GetChallengeDescription provides a mock function with given fields: uuid
+func (_m *ChallengeNotificationRepository) GetChallengeDescription(uuid string) string {
 	ret := _m.Called(uuid)
 
 	var r0 string

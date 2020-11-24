@@ -42,7 +42,6 @@ var _ = Describe("Testing Processing push notifications", func() {
 
 		eventMessageBus.On("Publish", "challenges", mock.MatchedBy(func(moment event.Eventlog) bool {
 			Expect(moment.Kind).To(Equal("push-notification"))
-			fmt.Println("TODO")
 
 			var msg *messaging.Message
 			b, _ := json.Marshal(moment.Data)
@@ -54,7 +53,7 @@ var _ = Describe("Testing Processing push notifications", func() {
 		}))
 		event.SetBus(eventMessageBus)
 
-		challengeNotificationRepository.On("GetChallengeName", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return("A test challenge")
+		challengeNotificationRepository.On("GetChallengeDescription", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return("A test challenge")
 		challengeNotificationRepository.On("GetUserDisplayName", "e1848e0b-c939-435e-8090-2f28eb9a2308").Return("Chris")
 		challengeNotificationRepository.On("GetUsersInfo", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return([]challenge.ChallengeNotificationUserInfo{
 			{

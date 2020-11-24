@@ -92,7 +92,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetAllListsByUser", user.Uuid).Return([]alist.ShortInfo{}, nil)
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			eventMessageBus := &mocks.EventlogPubSub{}
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiListDelete))
 				Expect(moment.Data.(event.EventList).UUID).To(Equal(alistUUID))
 				return true

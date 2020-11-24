@@ -209,7 +209,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				// I bet there is a better way
 				try := 0
 				eventMessageBus := &mocks.EventlogPubSub{}
-				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					if try == 0 {
 						Expect(moment.Kind).To(Equal(event.ApiUserRegister))
 						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPGoogle))
