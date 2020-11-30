@@ -3,7 +3,6 @@ package challenges
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -116,7 +115,6 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 
 				if err.Error() == "Requested entity was not found." {
 					// TODO send message to remove this token from the list
-					fmt.Println("Remove token", message.Token)
 					logContext.WithFields(logrus.Fields{
 						"event": "stale",
 						"token": message.Token,
