@@ -39,9 +39,12 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
-		viper.SetDefault("topic", "lal.monolog")
+		viper.SetDefault("topic", "")
 		viper.BindEnv("topic", "TOPIC")
 		topic := viper.GetString("topic")
+		if topic == "" {
+			logger.Fatal("topic needs setting")
+		}
 
 		natsServer := viper.GetString("server.events.nats.server")
 		clusterID := viper.GetString("server.events.stan.clusterID")
@@ -103,6 +106,12 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 			if err != nil {
 				if err.Error() == "The registration token is not a valid FCM registration token" {
 					// TODO send message to remove this token from the list
+					return
+				}
+
+				if err.Error() == "Requested entity was not found." {
+					// TODO send message to remove this token from the list
+					fmt.Println("Remove token", message.Token)
 					return
 				}
 				log.Fatalln(err)

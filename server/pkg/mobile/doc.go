@@ -5,7 +5,7 @@ var (
 )
 
 type MobileRepository interface {
-	SaveDeviceInfo(userUUID string, token string) error
+	SaveDeviceInfo(userUUID string, token string) (int, error)
 	DeleteByUser(userUUID string) error
 }
 type DeviceInfo struct {

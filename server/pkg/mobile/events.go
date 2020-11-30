@@ -15,8 +15,6 @@ func (s MobileService) OnEvent(entry event.Eventlog) {
 	}
 }
 
-// removeUser when a user is deleted
-// Currently we only remove the users entries, not any entries they created.
 func (s MobileService) removeUser(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserDelete {
 		return

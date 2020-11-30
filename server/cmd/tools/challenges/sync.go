@@ -25,6 +25,14 @@ var syncCMD = &cobra.Command{
 
 	ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
 	ssh $SSH_SERVER sudo kubectl port-forward deployment/stan01 4222:4222 &
+
+	TOPIC=lal.monolog \
+	EVENTS_STAN_CLIENT_ID=challenges-sync \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	tools challenge sync
+
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()

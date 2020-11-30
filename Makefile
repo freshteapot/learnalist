@@ -26,6 +26,24 @@ test:
 	cd server && \
 	./cover.sh
 
+run-challenges-sync:
+	cd server && \
+	TOPIC=lal.monolog \
+	EVENTS_STAN_CLIENT_ID=challenges-sync \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	tools challenges sync
+
+run-challenges-push-notifications:
+	cd server && \
+	TOPIC=challenges \
+	EVENTS_STAN_CLIENT_ID=challenges-push-notifications \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	tools challenges push-notifications
+
 run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server

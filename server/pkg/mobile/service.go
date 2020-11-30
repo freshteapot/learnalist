@@ -47,7 +47,7 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	err := s.repo.SaveDeviceInfo(userUUID, registerInput.Token)
+	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput.Token)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
@@ -59,6 +59,13 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
+	if status == http.StatusOK {
+		return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+			Message: "Device registered",
+		})
+	}
+
+	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventMobileDeviceRegistered,
 		Data: event.EventKV{

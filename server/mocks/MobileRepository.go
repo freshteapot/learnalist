@@ -24,15 +24,22 @@ func (_m *MobileRepository) DeleteByUser(userUUID string) error {
 }
 
 // SaveDeviceInfo provides a mock function with given fields: userUUID, token
-func (_m *MobileRepository) SaveDeviceInfo(userUUID string, token string) error {
+func (_m *MobileRepository) SaveDeviceInfo(userUUID string, token string) (int, error) {
 	ret := _m.Called(userUUID, token)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+	var r0 int
+	if rf, ok := ret.Get(0).(func(string, string) int); ok {
 		r0 = rf(userUUID, token)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(int)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(userUUID, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }

@@ -64,7 +64,6 @@ docker run \
 --http_port 8222
 ```
 
-
 ## Running the api server
 
 ```sh
@@ -119,4 +118,25 @@ EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-event-reader" \
 EVENTS_NATS_SERVER="127.0.0.1" \
 go run main.go --config=../config/dev.config.yaml tools event-reader
+```
+
+
+## Run the challenge sync service
+```sh
+TOPIC=lal.monolog \
+EVENTS_STAN_CLIENT_ID=challenges-sync \
+EVENTS_STAN_CLUSTER_ID=test-cluster \
+EVENTS_NATS_SERVER=127.0.0.1 \
+go run main.go --config=../config/dev.config.yaml \
+tools challenge sync
+```
+
+## Read topc
+```sh
+TOPIC=lal.monolog \
+EVENTS_STAN_CLIENT_ID=nats-reader \
+EVENTS_STAN_CLUSTER_ID=test-cluster \
+EVENTS_NATS_SERVER=127.0.0.1 \
+go run main.go --config=../config/dev.config.yaml \
+tools natsutils read
 ```

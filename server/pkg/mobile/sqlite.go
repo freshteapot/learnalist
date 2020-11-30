@@ -1,6 +1,8 @@
 package mobile
 
 import (
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -19,15 +21,15 @@ func NewSqliteRepository(db *sqlx.DB) MobileRepository {
 	}
 }
 
-func (r SqliteRepository) SaveDeviceInfo(userUUID string, token string) error {
+func (r SqliteRepository) SaveDeviceInfo(userUUID string, token string) (int, error) {
 	_, err := r.db.Exec(SqlSave, userUUID, token)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.token" {
-			return nil
+			return http.StatusOK, nil
 		}
-		return err
+		return http.StatusInternalServerError, err
 	}
-	return nil
+	return http.StatusCreated, nil
 }
 
 func (r SqliteRepository) DeleteByUser(userUUID string) error {
