@@ -49,6 +49,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 		natsServer := viper.GetString("server.events.nats.server")
 		clusterID := viper.GetString("server.events.stan.clusterID")
 		clientID := viper.GetString("server.events.stan.clientID")
+		pathToCredentials := viper.GetString("server.fcm.credentials")
 		opts := []nats.Option{nats.Name("lal-go-server")}
 		nc, err := nats.Connect(natsServer, opts...)
 
@@ -57,7 +58,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 		}
 
 		logContext := logger.WithFields(logrus.Fields{
-			"context":    "monolog",
+			"context":    "challenge-push-notifications",
 			"cluster_id": clusterID,
 			"client_id":  clientID,
 		})
@@ -76,7 +77,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 		}
 		defer logCloser(sc)
 
-		opt := option.WithCredentialsFile("/Users/tinkerbell/Downloads/freshteapot.net_api-project-922982262824-firebase-adminsdk-5wofg-8a5ca7a592.json")
+		opt := option.WithCredentialsFile(pathToCredentials)
 		app, err := firebase.NewApp(context.Background(), nil, opt)
 		if err != nil {
 			log.Fatalf("error initializing app: %v\n", err)
@@ -102,22 +103,30 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 
 			// Send a message to the device corresponding to the provided
 			// registration token.
-			response, err := client.Send(ctx, message)
+			_, err := client.Send(ctx, message)
 			if err != nil {
 				if err.Error() == "The registration token is not a valid FCM registration token" {
 					// TODO send message to remove this token from the list
+					logContext.WithFields(logrus.Fields{
+						"event": "invalid",
+						"token": message.Token,
+					}).Error("bad token")
 					return
 				}
 
 				if err.Error() == "Requested entity was not found." {
 					// TODO send message to remove this token from the list
 					fmt.Println("Remove token", message.Token)
+					logContext.WithFields(logrus.Fields{
+						"event": "stale",
+						"token": message.Token,
+					}).Error("bad token")
 					return
 				}
 				log.Fatalln(err)
 			}
 			// Response is a message ID string.
-			fmt.Println("Successfully sent message:", response)
+			// fmt.Println("Successfully sent message:", response)
 		}
 
 		durableName := "challenges.pushNotifications"

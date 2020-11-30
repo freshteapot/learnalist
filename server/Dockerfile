@@ -1,7 +1,7 @@
 # ----------------------------------------------------
 # Base
 # ----------------------------------------------------
-FROM golang:1.14.2-alpine3.11 AS build_base
+FROM golang:1.15-alpine3.12 AS build_base
 RUN apk update && \
     apk add --no-cache \
     build-base \

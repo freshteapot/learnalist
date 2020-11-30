@@ -91,7 +91,6 @@ kubectl create configmap learnalist-config --from-file=config.yaml=config/lal01.
 
 
 
-
 ```sh
 rsync -avzP \
 --rsync-path="sudo rsync" \
@@ -226,4 +225,11 @@ kubectl get configmaps learnalist-config -oyaml | yq r - "data[config.yaml]" > c
 
 ```sh
 kubectl create configmap learnalist-config --from-file=config.yaml=current.yaml -o yaml --dry-run | kubectl replace -f -
+```
+
+# Setup secrets for
+## Fcm
+```
+kubectl create secret generic learnalist-fcm \
+--from-file=fcm-credentials.json=./../secrets/fcm-credentials.json
 ```
