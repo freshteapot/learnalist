@@ -152,6 +152,7 @@ Make sure k8s file is upto date
 kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
 kubectl apply -f k8s/event-reader.yaml
+kubectl apply -f k8s/challenges-sync.yaml
 ```
 
 Patch if only bumped latest version

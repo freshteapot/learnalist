@@ -58,7 +58,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 		}
 
 		logContext := logger.WithFields(logrus.Fields{
-			"context":    "challenge-push-notifications",
+			"context":    "challenges-push-notifications",
 			"cluster_id": clusterID,
 			"client_id":  clientID,
 		})

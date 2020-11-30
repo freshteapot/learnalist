@@ -53,7 +53,7 @@ var syncCMD = &cobra.Command{
 		}
 
 		logContext := logger.WithFields(logrus.Fields{
-			"context":    "monolog",
+			"context":    "challenges-sync",
 			"cluster_id": clusterID,
 			"client_id":  clientID,
 		})
