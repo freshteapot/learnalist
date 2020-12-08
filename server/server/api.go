@@ -6,16 +6,20 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
+	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
 func InitApi(
 	apiManager *api.Manager,
+	userService user.UserService,
 	assetService assets.AssetService,
 	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
 	plankService plank.PlankService,
 	challengeService challenge.ChallengeService,
+	mobileService mobile.MobileService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -39,6 +43,7 @@ func InitApi(
 	v1.POST("/user/register", apiManager.V1PostRegister)
 	v1.GET("/user/info/:uuid", apiManager.V1GetUserInfo)
 	v1.PATCH("/user/info/:uuid", apiManager.V1PatchUserInfo)
+	v1.POST("/user/login/idp", userService.LoginViaIDP)
 	v1.POST("/user/login", apiManager.V1PostLogin)
 	v1.POST("/user/logout", apiManager.V1PostLogout)
 	v1.DELETE("/user/:uuid", apiManager.V1DeleteUser)
@@ -98,4 +103,9 @@ func InitApi(
 	challengeV1.POST("/", challengeService.Create)
 	challengeV1.GET("/:uuid", challengeService.Get)
 	challengeV1.DELETE("/:uuid", challengeService.Delete)
+
+	// Mobile
+	mobileV1 := server.Group("/api/v1/mobile")
+	mobileV1.Use(authenticate.Auth(authConfig))
+	mobileV1.POST("/register-device", mobileService.RegisterDevice)
 }

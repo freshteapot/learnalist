@@ -1,0 +1,44 @@
+components:
+  schemas:
+    HttpMobileRegisterInput:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: FCM token linked to the device
+          default: ""
+paths:
+  /mobile/register-device:
+    post:
+      tags:
+        - mobile
+      operationId: registerDevice
+      description: Register the user and the token, to be able to send push notifications
+      requestBody:
+        description: Device information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpMobileRegisterInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Most likely, the token is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

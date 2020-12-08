@@ -38,6 +38,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		oauth2Config    *mocks.OAuth2ConfigInterface
 		manager         *api.Manager
 		challenge       string
+		fakeExtUserID   string
 		want            error
 	)
 
@@ -67,6 +68,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		e = echo.New()
 
 		challenge = "fake-123"
+		fakeExtUserID = "fake-ext-user-id-123"
 		want = errors.New("fail")
 	})
 
@@ -171,7 +173,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 		It("Response is not valid json", func() {
 			want := errors.New("fail")
-			userFromIDP.On("Lookup", "google", "fake@learnalist.net").Return("", want)
+			userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", want)
 			uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 			req, rec := setupFakeEndpoint(method, uri, "")
 			c := e.NewContext(req, rec)
@@ -181,8 +183,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 		When("User lookup returns not found, we register the user", func() {
 			It("Failed to register user due to saving to storage", func() {
-				userFromIDP.On("Lookup", "google", "fake@learnalist.net").Return("", user.ErrNotFound)
-				userFromIDP.On("Register", "google", "fake@learnalist.net", mock.Anything).Return("", errors.New("fail"))
+				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", user.ErrNotFound)
+				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 				req, rec := setupFakeEndpoint(method, uri, "")
 				c := e.NewContext(req, rec)
@@ -197,8 +199,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 				testHugoHelper := &mocks.HugoSiteBuilder{}
 				testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-				userFromIDP.On("Lookup", "google", "fake@learnalist.net").Return("", user.ErrNotFound)
-				userFromIDP.On("Register", "google", "fake@learnalist.net", mock.Anything).Return(userUUID, nil)
+				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", user.ErrNotFound)
+				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
 				datastore.On("GetAllListsByUser", userUUID).Return(noLists)
 				userSession.On("Activate", mock.Anything).Return(nil)
 				oauthReadWriter.On("GetTokenInfo", userUUID).Return(nil, errors.New("not found"))
@@ -207,7 +209,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				// I bet there is a better way
 				try := 0
 				eventMessageBus := &mocks.EventlogPubSub{}
-				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					if try == 0 {
 						Expect(moment.Kind).To(Equal(event.ApiUserRegister))
 						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPGoogle))

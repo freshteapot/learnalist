@@ -75,7 +75,8 @@ SELECT
 	c.uuid,
 	json_extract(c.body, '$.kind') AS kind,
 	json_extract(c.body, '$.description') AS description,
-	c.created
+	c.created,
+	c.user_uuid
 FROM challenge AS c
 INNER JOIN
 (
@@ -118,6 +119,7 @@ func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeShort
 			Kind:        entry.Kind,
 			Description: entry.Description,
 			Created:     entry.Created.Format(time.RFC3339Nano),
+			CreatedBy:   entry.UserUUID,
 		}
 		challenges = append(challenges, info)
 	}
@@ -225,6 +227,7 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 
 	json.Unmarshal([]byte(entry.Body), &challenge)
 	challenge.UUID = entry.UUID
+	challenge.CreatedBy = entry.UserUUID
 	challenge.Created = entry.Created.Format(time.RFC3339Nano)
 	challenge.Records = make([]ChallengePlankRecord, 0)
 
@@ -302,4 +305,89 @@ func (r SqliteRepository) Delete(UUID string) error {
 func (r SqliteRepository) DeleteUser(userUUID string) error {
 	_, err := r.db.Exec(SqlDeleteUserRecords, userUUID)
 	return err
+}
+
+// GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
+// Not sure how I feel about this
+func (r SqliteRepository) GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error) {
+	query := `
+WITH _users(user_uuid, access) AS (
+SELECT
+	user_uuid,
+	access
+FROM
+	acl_simple
+WHERE
+	ext_uuid=?
+),
+_usersWithWriteAccess(user_uuid) AS (
+SELECT
+	user_uuid
+FROM
+	_users
+WHERE
+	access LIKE "api:challenge:%%:write:%%"
+),
+_usersWithDisplayName(user_uuid, display_name) AS (
+	SELECT
+	uuid,
+	IFNULL(json_extract(body, '$.display_name'), uuid) AS display_name
+FROM
+	user_info
+WHERE
+	uuid IN(SELECT user_uuid FROM _usersWithWriteAccess)
+)
+SELECT
+	m.user_uuid,
+	m.token,
+	u.display_name
+FROM
+	mobile_device as m
+INNER JOIN
+	_usersWithDisplayName AS u ON (u.user_uuid = m.user_uuid)
+WHERE
+	m.user_uuid IN(SELECT user_uuid FROM _usersWithDisplayName)
+`
+
+	type dbUser struct {
+		UserUUID    string `db:"user_uuid"`
+		DisplayName string `db:"display_name"`
+		Token       string `db:"token"`
+	}
+
+	dbItems := make([]dbUser, 0)
+	users := make([]ChallengeNotificationUserInfo, 0)
+	err := r.db.Select(&dbItems, query, challengeUUID)
+	fmt.Println(err)
+
+	for _, item := range dbItems {
+		users = append(users, ChallengeNotificationUserInfo{
+			UserUUID:    item.UserUUID,
+			DisplayName: item.DisplayName,
+			Token:       item.Token,
+		})
+	}
+	return users, nil
+}
+
+// GetUserDisplayName return empty if it doesnt exist
+func (r SqliteRepository) GetUserDisplayName(uuid string) string {
+	query := `
+SELECT
+	IFNULL(json_extract(body, '$.display_name'), "")
+FROM
+	user_info
+WHERE
+	uuid=?`
+	displayName := ""
+	r.db.Get(&displayName, query, uuid)
+	return displayName
+}
+
+// GetChallengeDescription
+func (r SqliteRepository) GetChallengeDescription(uuid string) string {
+	query := `SELECT json_extract(body, '$.description') FROM challenge WHERE uuid=?`
+	name := ""
+	r.db.Get(&name, query, uuid)
+	return name
 }

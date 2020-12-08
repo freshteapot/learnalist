@@ -8,6 +8,8 @@ server:
     directory: "/srv/learnalist/assets"
   sqlite:
     database: /srv/learnalist/server.db
+  fcm:
+    credentials: /srv/learnalist/config/fcm-credentials.json
   port: "1234"
   cors:
     allowedOrigins: "*"

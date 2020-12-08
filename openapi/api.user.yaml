@@ -1,6 +1,20 @@
 components:
   examples:
   schemas:
+    HttpUserLoginIDPInput:
+      type: object
+      properties:
+        idp:
+          type: string
+          enum:
+            - google
+        id_token:
+          type: string
+          description: We will verify this to confirm your identity and create an account linked to your id.
+        access_token:
+          type: string
+          description: We might use this to lookup your basic info.
+
     HttpUserInfoInput:
       type: object
       properties:
@@ -8,9 +22,11 @@ components:
           type: string
           maxLength: 20
           description: This will be used to address you in the app(s) or website.
+          default: ""
         created_via:
           type: string
           description: Let the server know the user was created via the plank app.
+          default: ""
           enum:
             - plank.app.v1
 
@@ -91,6 +107,39 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
 
+  /user/login/idp:
+    post:
+      tags:
+        - user
+      operationId: loginWithIdpIdToken
+      description: Login with idToken, mostly to support mobile devices.
+      security: []
+      requestBody:
+        description: Based on the idp, we will verify your id_token and log you in.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HttpUserLoginIDPInput"
+      responses:
+        "200":
+          description: You now have a login session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpUserLoginResponse"
+        "403":
+          description: Missing data or invalid id_token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
   /user/login:
     post:
       tags:
@@ -107,7 +156,7 @@ paths:
               $ref: "#/components/schemas/HttpUserLoginRequest"
       responses:
         "200":
-          description: You now have a login session already exists
+          description: You now have a login session
           content:
             application/json:
               schema:

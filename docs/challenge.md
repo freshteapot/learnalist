@@ -1,45 +1,7 @@
 # Challenge
-## TODO
-- [X] Store challenges
-- [ ] Create UI for plank challenge
-- [ ] Create UI for SRS challenge
-- [ ] How to provide feedback for the challenges
-- [ ] How to delete an entry via challenge = straight forward
-- [ ] How to delete an entry via plank = has to listen
-- [ ] Command to remove challenges that have no users in.
-- [ ] Events for when record added to challenge
-- [ ] Event for when user leaves a challenge
-- [ ] Event for when user joins a challenge
-- [ ] Event for when a challenge is created
-- [ ] Create throw away accounts
-- [ ] On logout on throw away account, send a delete message for the user?
-- [ ] Delete user, does not delete challenge. Still not sure I want to.
-- [ ] App breaks a lot when no internet
-- [x] Join challenge via challenge ID.
-- [ ] Register screen (set display name).
-- [ ] How to link the plank app to the website?
-
-```
-SocketException: OS Error: Operation timed out, errno = 60, address = 192.168.0.10, port = 54497
-```
-
-```json
-{
-    "username": "iamtest",
-    "password": "test123",
-    "extra": {
-        "displayName": "Chris",
-        "created_via": "plank_v1",
-        "secure": false,
-        "created": "When RFC nano"
-    }
-}
-```
-- secure set internally based on header
-- display limit to 20 characters
-- created_via = reject if not valid
-- user event process the info to build user preferences
-
+## Today
+- Create a group (challenge), invite your friends, and be inspired to do some planking
+- [More info](./ideas/challenges.md)
 
 ## Development
 

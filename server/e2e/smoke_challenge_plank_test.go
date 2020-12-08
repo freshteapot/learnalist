@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Smoke Challenge Plank", func() {
+var _ = Describe("Smoke Challenge Plank", func() {
 
 	var client *openapi.APIClient
 

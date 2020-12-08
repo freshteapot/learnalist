@@ -26,6 +26,24 @@ test:
 	cd server && \
 	./cover.sh
 
+run-challenges-sync:
+	cd server && \
+	TOPIC=lal.monolog \
+	EVENTS_STAN_CLIENT_ID=challenges-sync \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	tools challenges sync
+
+run-notifications-push-notifications:
+	cd server && \
+	TOPIC=notifications \
+	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	tools notifications push-notifications
+
 run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
@@ -57,6 +75,7 @@ generate-openapi-one:
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.alist.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.challenge.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.mobile.yaml && \
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g openapi-yaml -o /tmp/openapi/one
 
 generate-openapi-markdown: generate-openapi-one
@@ -85,12 +104,9 @@ generate-openapi-dart: generate-openapi-one
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g dart -o /tmp/openapi/dart \
 	--additional-properties ensureUniqueParams=false
 
-
 generate-docs-api-overview: generate-openapi-one
 	cd server && \
-	yq r /tmp/openapi/one/learnalist.yaml -j | jq -r -c | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
-
-
+	cat /tmp/openapi/one/learnalist.yaml | go run main.go tools --config=../config/dev.config.yaml docs api-overview > ../docs/api.auto.md
 ###############################################################################
 #
 # More production than development

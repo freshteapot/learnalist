@@ -21,6 +21,7 @@ var _ = Describe("Testing User from IDP", func() {
 			dbCon      *sqlx.DB
 			mockSql    sqlmock.Sqlmock
 			idp        string
+			kind       string
 			identifier string
 			info       []byte
 		)
@@ -28,7 +29,8 @@ var _ = Describe("Testing User from IDP", func() {
 		BeforeEach(func() {
 			dbCon, mockSql, err = helper.GetMockDB()
 			idp = "google"
-			identifier = "fake@learnalist.net"
+			identifier = "fake-ext-user-id-123"
+			kind = "id"
 			info = []byte(`{"hello": "world"}`)
 		})
 
@@ -43,7 +45,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Register(idp, identifier, info)
+				_, err = repository.Register(idp, kind, identifier, info)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -53,7 +55,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err := repository.Register(idp, identifier, info)
+				_, err := repository.Register(idp, kind, identifier, info)
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -65,7 +67,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Lookup(idp, identifier)
+				_, err = repository.Lookup(idp, kind, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -76,7 +78,7 @@ var _ = Describe("Testing User from IDP", func() {
 					WillReturnError(want)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				_, err = repository.Lookup(idp, identifier)
+				_, err = repository.Lookup(idp, kind, identifier)
 				Expect(err).Should(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
@@ -85,11 +87,11 @@ var _ = Describe("Testing User from IDP", func() {
 				userUUID := "fake-user-123"
 				rs := sqlmock.NewRows([]string{"user_uuid"}).AddRow(userUUID)
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
-					WithArgs(idp, identifier).
+					WithArgs(idp, kind, identifier).
 					WillReturnRows(rs)
 
 				repository = storage.NewUserFromIDP(dbCon)
-				found, err := repository.Lookup(idp, identifier)
+				found, err := repository.Lookup(idp, kind, identifier)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(found).To(Equal(userUUID))
 			})

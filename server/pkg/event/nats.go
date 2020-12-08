@@ -2,8 +2,6 @@ package event
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
@@ -11,9 +9,10 @@ import (
 )
 
 type natsBus struct {
-	sc        stan.Conn
-	sub       stan.Subscription
-	listeners []eventlogPubSubListener
+	sc            stan.Conn
+	subscriptions map[string]stan.Subscription
+	listeners     []eventlogPubSubListener
+	logContext    logrus.FieldLogger
 }
 
 func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.FieldLogger) *natsBus {
@@ -37,53 +36,63 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 
 	logContext.Info("connected to nats server")
 	return &natsBus{
-		sc: sc,
+		sc:            sc,
+		subscriptions: make(map[string]stan.Subscription, 0),
+		logContext:    logContext,
 	}
 }
 
-func (b *natsBus) Publish(moment Eventlog) {
+func (b *natsBus) Publish(topic string, moment Eventlog) {
 	mb, _ := json.Marshal(moment)
-	topic := TopicMonolog
+
 	if err := b.sc.Publish(topic, mb); err != nil {
-		log.Fatal(err)
+		b.logContext.Fatal(err)
 	}
 }
 
 func (b *natsBus) Close() {
-	err := b.sub.Close()
-	if err != nil {
-		fmt.Printf("error closing stan sub: %v\n", err)
+	for _, sub := range b.subscriptions {
+		err := sub.Close()
+		if err != nil {
+			b.logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("error closing stan sub")
+		}
 	}
 
 	nc := b.sc.NatsConn()
-	err = b.sc.Close()
+	err := b.sc.Close()
 	if err != nil {
-		fmt.Printf("error closing stan: %v\n", err)
+		b.logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("error closing stan")
 	}
-
 	nc.Close()
 }
 
-func (b *natsBus) Subscribe(key string, fn interface{}) {
+func (b *natsBus) Subscribe(topic string, key string, fn interface{}) {
 	listener := eventlogPubSubListener{
-		key: key,
-		fn:  fn,
+		topic: topic,
+		key:   key,
+		fn:    fn,
 	}
 	b.listeners = append(b.listeners, listener)
 }
 
-func (b *natsBus) Start() {
-	topic := TopicMonolog
+func (b *natsBus) Start(topic string) {
 	var err error
 	mcb := func(msg *stan.Msg) {
 		var entryLog Eventlog
 		err := json.Unmarshal(msg.Data, &entryLog)
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 
 		for _, listener := range b.listeners {
+			if listener.topic != topic {
+				return
+			}
+
 			type HandlerType func(entry Eventlog)
 			if f, ok := listener.fn.(func(entry Eventlog)); ok {
 				HandlerType(f)(entryLog)
@@ -91,18 +100,24 @@ func (b *natsBus) Start() {
 		}
 	}
 
+	// Maybe I want to change to QueueSubscribe
 	durableName := "internal-system"
-	b.sub, err = b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
+	sub, err := b.sc.Subscribe(topic, mcb, stan.DurableName(durableName))
 
 	if err != nil {
 		b.sc.Close()
-		log.Fatalf("Failed to start subscription on '%s': %v", topic, err)
+		b.logContext.WithFields(logrus.Fields{
+			"error": err,
+			"topic": topic,
+		}).Fatal("Failed to start subscription")
 	}
+
+	b.subscriptions[topic] = sub
 }
 
-func (b *natsBus) Unsubscribe(key string) {
+func (b *natsBus) Unsubscribe(topic string, key string) {
 	for index, listener := range b.listeners {
-		if listener.key == key {
+		if listener.topic == topic && listener.key == key {
 			b.listeners = append(b.listeners[:index], b.listeners[index+1:]...)
 			break
 		}

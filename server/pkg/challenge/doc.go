@@ -37,6 +37,7 @@ type ChallengeInfo struct {
 	Kind        string                 `json:"kind"`
 	Description string                 `json:"description"`
 	Created     string                 `json:"created"`
+	CreatedBy   string                 `json:"created_by"`
 	Users       []ChallengePlankUser   `json:"users"`
 	Records     []ChallengePlankRecord `json:"records"`
 }
@@ -53,6 +54,7 @@ type ChallengeShortInfoDB struct {
 	Description string    `db:"description"`
 	Kind        string    `db:"kind"`
 	Created     time.Time `db:"created"`
+	UserUUID    string    `db:"user_uuid"`
 }
 
 type ChallengeShortInfo struct {
@@ -60,6 +62,19 @@ type ChallengeShortInfo struct {
 	Description string `json:"description"`
 	Kind        string `json:"kind"`
 	Created     string `json:"created"`
+	CreatedBy   string `json:"created_by"`
+}
+
+type ChallengeNotificationUserInfo struct {
+	UserUUID    string `json:"user_uuid"`
+	DisplayName string `json:"display_name"`
+	Token       string `json:"token"`
+}
+
+type ChallengeNotificationRepository interface {
+	GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error)
+	GetUserDisplayName(uuid string) string
+	GetChallengeDescription(uuid string) string
 }
 
 type ChallengeRepository interface {
@@ -74,6 +89,16 @@ type ChallengeRepository interface {
 	DeleteRecord(extUUID string, userUUID string) error
 }
 
+type ChallengeLeft struct {
+	UUID     string `json:"uuid"`
+	UserUUID string `json:"user_uuid"`
+}
+
+type ChallengeJoined struct {
+	UUID     string `json:"uuid"`
+	UserUUID string `json:"user_uuid"`
+}
+
 type EventChallengeDoneEntry struct {
 	Kind     string      `json:"kind"`
 	UUID     string      `json:"uuid"`
@@ -85,6 +110,10 @@ type EventChallengeDoneEntry struct {
 var (
 	EventChallengeDone        = "challenge.done"
 	EventChallengeNewRecord   = "challenge.newrecord"
+	EventChallengeCreated     = "challenge.ceated"
+	EventChallengeDeleted     = "challenge.deleted" // Today we dont delete challenges via the api
+	EventChallengeJoined      = "challenge.joined"
+	EventChallengeLeft        = "challenge.left"
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"

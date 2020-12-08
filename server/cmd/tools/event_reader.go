@@ -20,7 +20,7 @@ var eventReaderCMD = &cobra.Command{
 		logger.Info("Read events")
 		event.SetDefaultSettingsForCMD()
 		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
-		event.GetBus().Subscribe("read-event", readEventLog)
+		event.GetBus().Subscribe(event.TopicMonolog, "read-event", readEventLog)
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)

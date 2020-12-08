@@ -66,4 +66,8 @@ var (
 	HTTPErrorResponse = HTTPResponseMessage{
 		Message: i18n.InternalServerErrorFunny,
 	}
+
+	HTTPAccessDeniedResponse = HTTPResponseMessage{
+		Message: i18n.AclHttpAccessDeny,
+	}
 )

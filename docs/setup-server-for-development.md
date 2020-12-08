@@ -55,15 +55,12 @@ docker run \
 -p 4222:4222 \
 -p 8222:8222 \
 -v /tmp/nats-store/:/tmp/nats-store/ nats-streaming:alpine3.12 \
---max_age 10s \
 --store=FILE \
 --dir=/tmp/nats-store \
---file_auto_sync=1ms \
 --stan_debug=true \
 --debug=true \
 --http_port 8222
 ```
-
 
 ## Running the api server
 
@@ -120,3 +117,30 @@ EVENTS_STAN_CLIENT_ID="lal-event-reader" \
 EVENTS_NATS_SERVER="127.0.0.1" \
 go run main.go --config=../config/dev.config.yaml tools event-reader
 ```
+
+
+## Run the challenge sync service
+```sh
+TOPIC=lal.monolog \
+EVENTS_STAN_CLIENT_ID=challenges-sync \
+EVENTS_STAN_CLUSTER_ID=test-cluster \
+EVENTS_NATS_SERVER=127.0.0.1 \
+go run main.go --config=../config/dev.config.yaml \
+tools challenge sync
+```
+
+## Read topic
+### lal.monolog
+Main topic where almost all events go
+### notifications
+Topic where communications goto
+
+```sh
+TOPIC=lal.monolog \
+EVENTS_STAN_CLIENT_ID=nats-reader \
+EVENTS_STAN_CLUSTER_ID=test-cluster \
+EVENTS_NATS_SERVER=127.0.0.1 \
+go run main.go --config=../config/dev.config.yaml \
+tools natsutils read
+```
+

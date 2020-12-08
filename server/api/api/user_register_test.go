@@ -104,7 +104,7 @@ var _ = Describe("Testing Register user endpoint", func() {
 
 				userManagement.On("SaveInfo", "fake-123", mock.Anything).Return(nil)
 				eventMessageBus := &mocks.EventlogPubSub{}
-				eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					Expect(moment.Kind).To(Equal(event.ApiUserRegister))
 					Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterUsername))
 					return true

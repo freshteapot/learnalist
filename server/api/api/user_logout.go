@@ -81,7 +81,7 @@ func (m *Manager) V1PostLogout(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	event.GetBus().Publish(event.Eventlog{
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogout,
 		Data: event.EventUser{
 			UUID: userUUID,

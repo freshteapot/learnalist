@@ -103,7 +103,9 @@ func (m sqliteManagement) DeleteUser(userUUID string) error {
 		"DELETE FROM acl_simple WHERE user_uuid=?",
 		"DELETE FROM oauth2_token_info WHERE user_uuid=?",
 		"DELETE FROM user_sessions WHERE user_uuid=?",
-		"DELETE FROM user_from_idp WHERE user_uuid=?"}
+		"DELETE FROM user_from_idp WHERE user_uuid=?",
+		"DELETE FROM user_info WHERE uuid=?",
+	}
 
 	tx, err := db.Beginx()
 	if err != nil {

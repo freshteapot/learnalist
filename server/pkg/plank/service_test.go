@@ -42,7 +42,7 @@ var _ = Describe("Testing API", func() {
 			Uuid: "fake-123",
 		}
 		eventMessageBus = &mocks.EventlogPubSub{}
-		eventMessageBus.On("Subscribe", "plank", mock.Anything)
+		eventMessageBus.On("Subscribe", event.TopicMonolog, "plank", mock.Anything)
 		event.SetBus(eventMessageBus)
 
 		e = echo.New()
@@ -111,7 +111,7 @@ var _ = Describe("Testing API", func() {
 
 		It("saved", func() {
 			repo.On("SaveEntry", mock.Anything).Return(nil)
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
 				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
 				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindNew))
@@ -186,7 +186,7 @@ var _ = Describe("Testing API", func() {
 			repo.On("GetEntry", recordUUID, user.Uuid).Return(record, nil)
 			repo.On("DeleteEntry", recordUUID, user.Uuid).Return(nil)
 
-			eventMessageBus.On("Publish", mock.MatchedBy(func(moment event.Eventlog) bool {
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
 				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
 				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindDeleted))

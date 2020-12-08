@@ -17,22 +17,22 @@ func (_m *EventlogPubSub) Close() {
 	_m.Called()
 }
 
-// Publish provides a mock function with given fields: moment
-func (_m *EventlogPubSub) Publish(moment event.Eventlog) {
-	_m.Called(moment)
+// Publish provides a mock function with given fields: topic, moment
+func (_m *EventlogPubSub) Publish(topic string, moment event.Eventlog) {
+	_m.Called(topic, moment)
 }
 
-// Start provides a mock function with given fields:
-func (_m *EventlogPubSub) Start() {
-	_m.Called()
+// Start provides a mock function with given fields: topic
+func (_m *EventlogPubSub) Start(topic string) {
+	_m.Called(topic)
 }
 
-// Subscribe provides a mock function with given fields: key, fn
-func (_m *EventlogPubSub) Subscribe(key string, fn interface{}) {
-	_m.Called(key, fn)
+// Subscribe provides a mock function with given fields: topic, key, fn
+func (_m *EventlogPubSub) Subscribe(topic string, key string, fn interface{}) {
+	_m.Called(topic, key, fn)
 }
 
-// Unsubscribe provides a mock function with given fields: key
-func (_m *EventlogPubSub) Unsubscribe(key string) {
-	_m.Called(key)
+// Unsubscribe provides a mock function with given fields: topic, key
+func (_m *EventlogPubSub) Unsubscribe(topic string, key string) {
+	_m.Called(topic, key)
 }

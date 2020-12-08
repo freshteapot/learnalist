@@ -91,7 +91,6 @@ kubectl create configmap learnalist-config --from-file=config.yaml=config/lal01.
 
 
 
-
 ```sh
 rsync -avzP \
 --rsync-path="sudo rsync" \
@@ -113,7 +112,7 @@ make sync-site-assets
 kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 
-# Install
+# Install everything
 ```sh
 make generate-openapi-js
 make generate-openapi-go
@@ -148,11 +147,12 @@ make push-image
 make sync-site-assets
 ```
 
-Make sure k8s file is uptodate
+Make sure k8s file is upto date
 ```sh
 kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
 kubectl apply -f k8s/event-reader.yaml
+kubectl apply -f k8s/notifications-push-notifications.yaml
 ```
 
 Patch if only bumped latest version
@@ -164,6 +164,7 @@ _EOF_
 kubectl patch deployment learnalist -p "${PATCH}"
 kubectl patch deployment event-reader -p "${PATCH}"
 kubectl patch deployment slack-events -p "${PATCH}"
+kubectl patch deployment notifications-push-notifications -p "${PATCH}"
 ```
 
 ```sh
@@ -195,7 +196,7 @@ make sync-db-files
 
 ## Via a pod
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
 ```
 Update tables
 ```sh
@@ -213,4 +214,24 @@ cat  /srv/learnalist/db/XXX | sqlite3 /srv/learnalist/server.db
   volumeMounts:
     - name: srv-learnalist-volume
       mountPath: "/src"
+```
+
+
+
+# Get configmaps
+
+```sh
+kubectl get configmaps learnalist-config -oyaml | yq r - "data[config.yaml]" > current.yaml
+```
+
+
+```sh
+kubectl create configmap learnalist-config --from-file=config.yaml=current.yaml -o yaml --dry-run | kubectl replace -f -
+```
+
+# Setup secrets for
+## Fcm
+```
+kubectl create secret generic learnalist-fcm \
+--from-file=fcm-credentials.json=./../secrets/fcm-credentials.json
 ```

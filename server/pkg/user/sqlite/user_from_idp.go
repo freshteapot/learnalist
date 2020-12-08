@@ -22,7 +22,7 @@ type UserFromIDP struct {
 }
 
 const (
-	UserFromIDPInsertEntry  = `INSERT INTO user_from_idp (user_uuid, idp, identifier, kind, info) VALUES (?, ?, ?, ?, ?)`
+	UserFromIDPInsertEntry  = `INSERT INTO user_from_idp (user_uuid, idp, kind, identifier, info) VALUES (?, ?, ?, ?, ?)`
 	UserFromIDPFindUserUUID = `
 SELECT
 	user_uuid, idp, identifier, kind, info, created
@@ -31,7 +31,7 @@ FROM
 WHERE
 	idp=?
 AND
-	kind="email"
+	kind=?
 AND
 	identifier=?`
 )
@@ -42,16 +42,16 @@ func NewUserFromIDP(db *sqlx.DB) *UserFromIDP {
 	}
 }
 
-func (store *UserFromIDP) Register(idp string, identifier string, info []byte) (userUUID string, err error) {
+func (store *UserFromIDP) Register(idp string, kind string, identifier string, info []byte) (userUUID string, err error) {
 	id := guuid.New()
 	userUUID = id.String()
-	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, identifier, "email", string(info))
+	_, err = store.db.Exec(UserFromIDPInsertEntry, userUUID, idp, kind, identifier, string(info))
 	return userUUID, err
 }
 
-func (store *UserFromIDP) Lookup(idp string, identifier string) (userUUID string, err error) {
+func (store *UserFromIDP) Lookup(idp string, kind string, identifier string) (userUUID string, err error) {
 	var item DatabaseUserFromIDP
-	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, identifier)
+	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, kind, identifier)
 	if err == sql.ErrNoRows {
 		err = user.ErrNotFound
 	}

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications-push-notifications
+  labels:
+    app: notifications-push-notifications
+spec:
+  selector:
+    matchLabels:
+      app: notifications-push-notifications
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: notifications-push-notifications
+    spec:
+      containers:
+        - name: notifications-push-notifications
+          image: registry.devbox/learnalist:latest
+          args:
+            [
+              "--config=/etc/learnalist/config.yaml",
+              "tools",
+              "notifications",
+              "push-notifications",
+            ]
+          env:
+            - name: TOPIC
+              value: notifications
+            - name: EVENTS_NATS_SERVER
+              value: "nats.default.svc.cluster.local"
+            - name: EVENTS_STAN_CLIENT_ID
+              value: "lal-notifications-push-notifications"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: secrets-fcm-credentials-volume
+              mountPath: /srv/learnalist/config/fcm-credentials.json
+              subPath: fcm-credentials.json
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learnalist-config
+        - name: secrets-fcm-credentials-volume
+          secret:
+            secretName: learnalist-fcm

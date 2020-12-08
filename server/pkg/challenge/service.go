@@ -17,26 +17,21 @@ import (
 )
 
 type ChallengeService struct {
-	repo       ChallengeRepository
-	acl        acl.AclChallenge
-	logContext logrus.FieldLogger
+	repo                            ChallengeRepository
+	challengeNotificationRepository ChallengeNotificationRepository
+	acl                             acl.AclChallenge
+	logContext                      logrus.FieldLogger
 }
 
-func NewService(repo ChallengeRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
+func NewService(repo ChallengeRepository, challengeNotificationRepository ChallengeNotificationRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
 	s := ChallengeService{
-		repo:       repo,
-		acl:        acl,
-		logContext: log,
+		repo:                            repo,
+		challengeNotificationRepository: challengeNotificationRepository,
+		acl:                             acl,
+		logContext:                      log,
 	}
 
-	event.GetBus().Subscribe("challenge", func(entry event.Eventlog) {
-		switch entry.Kind {
-		case event.ApiUserDelete:
-			s.removeUser(entry)
-		case EventChallengeDone:
-			s.eventChallengeDone(entry)
-		}
-	})
+	event.GetBus().Subscribe(event.TopicMonolog, "challenge", s.OnEvent)
 	return s
 }
 
@@ -110,6 +105,14 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: EventChallengeCreated,
+		Data: event.EventKV{
+			UUID: challengeUUID,
+			Data: challenge,
+		},
+	})
+
 	return c.JSON(http.StatusCreated, challenge)
 }
 
@@ -144,6 +147,18 @@ func (s ChallengeService) Join(c echo.Context) error {
 	// I am not sure I need this
 	// Or I need to move the above logic into it
 	//_ = s.repo.Join(challengeUUID, userUUID)
+
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: EventChallengeJoined,
+		Data: event.EventKV{
+			UUID: challengeUUID,
+			Data: ChallengeJoined{
+				UUID:     challengeUUID,
+				UserUUID: userUUID,
+			},
+		},
+	})
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -188,6 +203,17 @@ func (s ChallengeService) Leave(c echo.Context) error {
 	// listen to addrecord
 	// listen to join
 	// listen to leave
+
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: EventChallengeLeft,
+		Data: event.EventKV{
+			UUID: challengeUUID,
+			Data: ChallengeLeft{
+				UUID:     challengeUUID,
+				UserUUID: userUUID,
+			},
+		},
+	})
 	return c.NoContent(http.StatusOK)
 }
 
@@ -213,6 +239,8 @@ func (s ChallengeService) Delete(c echo.Context) error {
 
 	_ = s.repo.Delete(challengeUUID)
 	_ = s.acl.DeleteChallenge(challengeUUID)
+
+	// TODO add event challenge.deleted
 	return c.NoContent(http.StatusOK)
 }
 
