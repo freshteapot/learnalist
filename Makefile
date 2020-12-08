@@ -35,14 +35,14 @@ run-challenges-sync:
 	go run main.go --config=../config/dev.config.yaml \
 	tools challenges sync
 
-run-challenges-push-notifications:
+run-notifications-push-notifications:
 	cd server && \
-	TOPIC=challenges \
-	EVENTS_STAN_CLIENT_ID=challenges-push-notifications \
+	TOPIC=notifications \
+	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run main.go --config=../config/dev.config.yaml \
-	tools challenges push-notifications
+	tools notifications push-notifications
 
 run-api-server:
 	cd server && \

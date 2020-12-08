@@ -106,14 +106,12 @@ type EventChallengeDoneEntry struct {
 
 // Event specific
 var (
-	EventChallengeDone      = "challenge.done"
-	EventChallengeNewRecord = "challenge.newrecord"
-	EventChallengeCreated   = "challenge.ceated"
-	EventChallengeDeleted   = "challenge.deleted"
-	EventChallengeJoined    = "challenge.joined"
-	EventChallengeLeft      = "challenge.left"
-	// TODO remove this
-	EventChallengeMeta        = "challenge.meta" // challenge with users, not records
+	EventChallengeDone        = "challenge.done"
+	EventChallengeNewRecord   = "challenge.newrecord"
+	EventChallengeCreated     = "challenge.ceated"
+	EventChallengeDeleted     = "challenge.deleted" // Today we dont delete challenges via the api
+	EventChallengeJoined      = "challenge.joined"
+	EventChallengeLeft        = "challenge.left"
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"

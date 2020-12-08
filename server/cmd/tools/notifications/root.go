@@ -1,4 +1,4 @@
-package challenges
+package notifications
 
 import (
 	"io"
@@ -8,12 +8,12 @@ import (
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "challenges",
-	Short: "Challenge commands",
+	Use:   "notifications",
+	Short: "notification commands",
 }
 
 func init() {
-	RootCmd.AddCommand(syncCMD)
+	RootCmd.AddCommand(pushNotificationsCMD)
 }
 
 func logCloser(c io.Closer) {

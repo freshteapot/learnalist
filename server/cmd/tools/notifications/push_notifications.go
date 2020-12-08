@@ -1,4 +1,4 @@
-package challenges
+package notifications
 
 import (
 	"context"
@@ -28,16 +28,17 @@ var pushNotificationsCMD = &cobra.Command{
 ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
 ssh $SSH_SERVER sudo kubectl port-forward deployment/stan01 4222:4222 &
 
-TOPIC=challenges \
-EVENTS_STAN_CLIENT_ID=challenge-push-notifications \
+TOPIC=notifications \
+EVENTS_STAN_CLIENT_ID=push-notifications \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
-go run main.go --config=../config/dev.config.yaml tools challenge-notifications
+go run main.go --config=../config/dev.config.yaml tools notifications push-notifications
 
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
+		// Leaving empty, but should be notifications
 		viper.SetDefault("topic", "")
 		viper.BindEnv("topic", "TOPIC")
 		topic := viper.GetString("topic")
@@ -57,7 +58,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 		}
 
 		logContext := logger.WithFields(logrus.Fields{
-			"context":    "challenges-push-notifications",
+			"context":    "push-notifications",
 			"cluster_id": clusterID,
 			"client_id":  clientID,
 		})
@@ -92,7 +93,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 			var moment event.Eventlog
 			json.Unmarshal(msg.Data, &moment)
 
-			if moment.Kind != "push-notification" {
+			if moment.Kind != event.KindPushNotification {
 				return
 			}
 

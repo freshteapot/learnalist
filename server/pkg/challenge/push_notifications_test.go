@@ -41,7 +41,7 @@ var _ = Describe("Testing Processing push notifications", func() {
 		eventMessageBus.On("Subscribe", event.TopicMonolog, "challenge", mock.Anything)
 
 		eventMessageBus.On("Publish", "challenges", mock.MatchedBy(func(moment event.Eventlog) bool {
-			Expect(moment.Kind).To(Equal("push-notification"))
+			Expect(moment.Kind).To(Equal(event.KindPushNotification))
 
 			var msg *messaging.Message
 			b, _ := json.Marshal(moment.Data)

@@ -6,6 +6,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/docs"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/natsutils"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/user"
+	"github.com/freshteapot/learnalist-api/server/cmd/tools/notifications"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +25,9 @@ func init() {
 	RootCmd.AddCommand(api.RootCmd)
 	RootCmd.AddCommand(natsutils.RootCmd)
 	RootCmd.AddCommand(challenges.RootCmd)
+	RootCmd.AddCommand(notifications.RootCmd)
 	RootCmd.AddCommand(docs.RootCmd)
 	RootCmd.AddCommand(eventReaderCMD)
 	RootCmd.AddCommand(slackEventsCMD)
+
 }

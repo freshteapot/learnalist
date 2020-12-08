@@ -78,7 +78,6 @@ var syncCMD = &cobra.Command{
 			challenge.EventChallengeDeleted,
 			challenge.EventChallengeJoined,
 			challenge.EventChallengeLeft,
-			mobile.EventMobileDeviceRegistered,
 		}
 
 		handle := func(msg *stan.Msg) {

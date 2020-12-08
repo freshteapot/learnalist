@@ -21,6 +21,7 @@ const (
 	KindUserLoginUsername            = "username"
 	KindUserLogoutSession            = "logout.session"
 	KindUserLogoutSessions           = "logout.sessions"
+	KindPushNotification             = "push-notification"
 	ActionCreated                    = "created"
 	ActionUpdated                    = "updated"
 )
