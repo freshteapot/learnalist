@@ -3,8 +3,8 @@
 - A user can join or leave.
 - An event system is in place to react to different events.
 - Currently only used with "planks".
+- Arrived at this document, as I had todos. That were not going to get done straight away.
 
-- Arrived at this doocument, as I had todos. That were not going to get done straight away.
 
 ## Create UI for plank challenge
 - [Humble plank](https://github.com/freshteapot/the_humble_plank) is a mobile offering.
