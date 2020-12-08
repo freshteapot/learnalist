@@ -7,8 +7,8 @@
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 {
-    "username":"iamchris",
-    "password":"test123"
+  "username":"iamchris",
+  "password":"test123"
 }
 '
 ```
@@ -32,7 +32,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login/idp' -d'
 {
   "idp": "google",
   "id_token": "XXX",
-	"access_token": "XXX"
+  "access_token": "XXX"
 }
 '
 ```
