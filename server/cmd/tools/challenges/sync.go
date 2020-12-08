@@ -15,7 +15,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
-	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 )
 
 var syncCMD = &cobra.Command{
