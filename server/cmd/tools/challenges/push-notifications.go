@@ -102,7 +102,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 
 			// Send a message to the device corresponding to the provided
 			// registration token.
-			_, err := client.Send(ctx, message)
+			response, err := client.Send(ctx, message)
 			if err != nil {
 				if err.Error() == "The registration token is not a valid FCM registration token" {
 					// TODO send message to remove this token from the list
@@ -123,8 +123,7 @@ go run main.go --config=../config/dev.config.yaml tools challenge-notifications
 				}
 				log.Fatalln(err)
 			}
-			// Response is a message ID string.
-			// fmt.Println("Successfully sent message:", response)
+			logContext.WithField("response", response).Info("success")
 		}
 
 		durableName := "challenges.pushNotifications"

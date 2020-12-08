@@ -153,6 +153,7 @@ kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
 kubectl apply -f k8s/event-reader.yaml
 kubectl apply -f k8s/challenges-sync.yaml
+kubectl apply -f k8s/challenges-push-notifications.yaml
 ```
 
 Patch if only bumped latest version
@@ -164,6 +165,8 @@ _EOF_
 kubectl patch deployment learnalist -p "${PATCH}"
 kubectl patch deployment event-reader -p "${PATCH}"
 kubectl patch deployment slack-events -p "${PATCH}"
+kubectl patch deployment challenged-sync -p "${PATCH}"
+kubectl patch deployment challenged-push-notifications -p "${PATCH}"
 ```
 
 ```sh

@@ -219,3 +219,27 @@ token=$(echo $response | jq -r '.token')
 - Make it throw away
 
 
+
+
+- [ ] Install config
+- [x] setup datbase
+- [ ] Document how to query stan remotely
+
+
+curl -XPOST 'https://learnalist.net/api/v1/user/register' -d'
+{
+    "username":"iamtest1",
+    "password":"test123"
+}
+'
+
+
+response=$(curl -s -XPOST 'https://learnalist.net/api/v1/user/login' -d'
+{
+    "username":"iamtest1",
+    "password":"test123"
+}
+')
+userUUID=$(echo $response | jq -r '.user_uuid')
+token=$(echo $response | jq -r '.token')
+curl -i -XDELETE -H"Authorization: Bearer ${token}" "https://learnalist.net/api/v1/user/${userUUID}"
