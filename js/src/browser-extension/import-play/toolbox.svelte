@@ -10,6 +10,10 @@
       description: `Import and play`
     },
     {
+      href: "/toolbox/import-from-tabs",
+      description: `Import for spaced learning`
+    },
+    {
       href: "/settings",
       description: `Settings`
     }

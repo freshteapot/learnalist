@@ -7,6 +7,7 @@
   import Settings from "./settings.svelte";
   import Toolbox from "./toolbox.svelte";
   import ReadWriteRepeat from "./read-write-repeat/app.svelte";
+  import ImportFromTabs from "./import-from-tabs/app.svelte";
   import TotalRecall from "../../components/interact/routes/total_recall_v2.svelte";
   import Slideshow from "../../components/interact/routes/slideshow_v2.svelte";
   import SpacedRepetitionAdd from "../../components/interact/routes/spaced_repetition_v2.svelte";
@@ -18,6 +19,7 @@
     "/settings": Settings,
     "/toolbox": Toolbox,
     "/toolbox/read-write-repeat": ReadWriteRepeat,
+    "/toolbox/import-from-tabs": ImportFromTabs,
     "/play/total_recall": TotalRecall,
     "/play/slideshow": Slideshow,
     "/interact/spaced_repetition/add": SpacedRepetitionAdd,
