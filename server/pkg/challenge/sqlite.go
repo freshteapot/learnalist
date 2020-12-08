@@ -75,7 +75,8 @@ SELECT
 	c.uuid,
 	json_extract(c.body, '$.kind') AS kind,
 	json_extract(c.body, '$.description') AS description,
-	c.created
+	c.created,
+	c.user_uuid
 FROM challenge AS c
 INNER JOIN
 (
@@ -118,6 +119,7 @@ func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeShort
 			Kind:        entry.Kind,
 			Description: entry.Description,
 			Created:     entry.Created.Format(time.RFC3339Nano),
+			CreatedBy:   entry.UserUUID,
 		}
 		challenges = append(challenges, info)
 	}

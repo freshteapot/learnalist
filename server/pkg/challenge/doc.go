@@ -37,7 +37,7 @@ type ChallengeInfo struct {
 	Kind        string                 `json:"kind"`
 	Description string                 `json:"description"`
 	Created     string                 `json:"created"`
-	CreatedBy   string                 `json:"created_by"` // TODO add to openapi, hook up into the api
+	CreatedBy   string                 `json:"created_by"`
 	Users       []ChallengePlankUser   `json:"users"`
 	Records     []ChallengePlankRecord `json:"records"`
 }
@@ -54,6 +54,7 @@ type ChallengeShortInfoDB struct {
 	Description string    `db:"description"`
 	Kind        string    `db:"kind"`
 	Created     time.Time `db:"created"`
+	UserUUID    string    `db:"user_uuid"`
 }
 
 type ChallengeShortInfo struct {
@@ -61,6 +62,7 @@ type ChallengeShortInfo struct {
 	Description string `json:"description"`
 	Kind        string `json:"kind"`
 	Created     string `json:"created"`
+	CreatedBy   string `json:"created_by"`
 }
 
 type ChallengeNotificationUserInfo struct {
