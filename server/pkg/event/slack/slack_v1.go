@@ -193,9 +193,10 @@ func (s SlackEvents) challengeNewRecord(entry event.Eventlog) string {
 	var record challenge.ChallengeRecordUUID
 	json.Unmarshal(b, &record)
 
-	return fmt.Sprintf("Challenge %s (%s) has a new record %s by user %s\n",
-		challengeUUID,
-		moment.Kind,
+	return fmt.Sprintf("user:%s added record:%s (%s) to challenge:%s\n",
+		moment.UserUUID,
 		record.UUID,
-		moment.UserUUID)
+		moment.Kind,
+		challengeUUID,
+	)
 }
