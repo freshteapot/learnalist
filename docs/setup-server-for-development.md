@@ -129,7 +129,12 @@ go run main.go --config=../config/dev.config.yaml \
 tools challenge sync
 ```
 
-## Read topc
+## Read topic
+### lal.monolog
+Main topic where almost all events go
+### notifications
+Topic where communications goto
+
 ```sh
 TOPIC=lal.monolog \
 EVENTS_STAN_CLIENT_ID=nats-reader \
@@ -138,3 +143,4 @@ EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools natsutils read
 ```
+
