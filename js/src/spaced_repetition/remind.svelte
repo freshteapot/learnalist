@@ -110,6 +110,14 @@
     }
   }
 
+  function handleKeydown(event) {
+    switch (event.code) {
+      case "Space":
+        flipIt();
+        break;
+    }
+  }
+
   $: get();
   $: showEntry(state);
 </script>
@@ -119,6 +127,7 @@
 </style>
 
 <svelte:options tag={null} />
+<svelte:window on:keydown={handleKeydown} />
 
 {#if state === 'show-entry'}
   <div class="flex flex-column">
