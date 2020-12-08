@@ -116,6 +116,8 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 
 				if err.Error() == "Requested entity was not found." {
 					// TODO send message to remove this token from the list
+					// Poor mans option
+					// cat events.ndjson | jq -r 'select(.event=="stale") | "DELETE FROM mobile_device WHERE token=\"\(.token)\";"'
 					logContext.WithFields(logrus.Fields{
 						"event": "stale",
 						"token": message.Token,
