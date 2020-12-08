@@ -24,6 +24,7 @@ components:
     ChallengeShortInfo:
       required:
         - uuid
+        - created_by
       allOf:
         - $ref: "#/components/schemas/ChallengeInput"
         - type: object
@@ -32,6 +33,9 @@ components:
               type: string
               format: date-time
               description: Set to UTC
+            created_by:
+              type: string
+              description: User who created the challenge
             uuid:
               type: string
     ChallengeInfo:

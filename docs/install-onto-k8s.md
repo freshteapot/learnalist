@@ -112,7 +112,7 @@ make sync-site-assets
 kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 
-# Install
+# Install everything
 ```sh
 make generate-openapi-js
 make generate-openapi-go
