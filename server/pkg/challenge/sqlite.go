@@ -225,6 +225,7 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 
 	json.Unmarshal([]byte(entry.Body), &challenge)
 	challenge.UUID = entry.UUID
+	challenge.CreatedBy = entry.UserUUID
 	challenge.Created = entry.Created.Format(time.RFC3339Nano)
 	challenge.Records = make([]ChallengePlankRecord, 0)
 

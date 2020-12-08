@@ -6,19 +6,24 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 )
 
+type PostWebhook = func(url string, msg *slack.WebhookMessage) error
+
 type SlackEvents struct {
+	post       PostWebhook
 	webhook    string
 	logContext logrus.FieldLogger
 }
 
-func NewSlackV1Events(webhook string, logContext logrus.FieldLogger) SlackEvents {
+func NewSlackV1Events(post PostWebhook, webhook string, logContext logrus.FieldLogger) SlackEvents {
 	return SlackEvents{
+		post:       post,
 		webhook:    webhook,
 		logContext: logContext,
 	}
@@ -32,12 +37,12 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("%s: user %s registered via %s", entry.Kind, moment.UUID, moment.Kind)
+		msg.Text = fmt.Sprintf("%s: user:%s registered via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogin:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("%s: user %s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
+		msg.Text = fmt.Sprintf("%s: user:%s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogout:
 	case event.BrowserUserLogout:
 		b, _ := json.Marshal(entry.Data)
@@ -53,12 +58,12 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			clearing = "all sessions"
 		}
 
-		msg.Text = fmt.Sprintf("%s: user %s logged out via %s, clearing %s", entry.Kind, moment.UUID, via, clearing)
+		msg.Text = fmt.Sprintf("%s: user:%s logged out via %s, clearing %s", entry.Kind, moment.UUID, via, clearing)
 	case event.ApiUserDelete:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("%s: user %s should be deleted", entry.Kind, moment.UUID)
+		msg.Text = fmt.Sprintf("%s: user:%s should be deleted", entry.Kind, moment.UUID)
 	case event.ApiListSaved:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList
@@ -75,7 +80,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 
 		if moment.Kind == spaced_repetition.EventKindNew {
-			msg.Text = fmt.Sprintf("User:%s added a new entry for spaced based learning", moment.Data.UserUUID)
+			msg.Text = fmt.Sprintf("user:%s added a new entry for spaced based learning", moment.Data.UserUUID)
 		}
 
 		if moment.Kind == spaced_repetition.EventKindViewed {
@@ -87,22 +92,22 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			if moment.Action == "decr" {
 				when = "sooner"
 			}
-			msg.Text = fmt.Sprintf("User:%s will be reminded %s of entry:%s", moment.Data.UserUUID, when, moment.Data.UUID)
+			msg.Text = fmt.Sprintf("user:%s will be reminded %s of entry:%s", moment.Data.UserUUID, when, moment.Data.UUID)
 		}
 
 		if moment.Kind == spaced_repetition.EventKindDeleted {
-			msg.Text = fmt.Sprintf("User:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
+			msg.Text = fmt.Sprintf("user:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
 		}
 	case plank.EventApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment plank.EventPlank
 		json.Unmarshal(b, &moment)
 		if moment.Kind == plank.EventKindNew {
-			msg.Text = fmt.Sprintf("User:%s added a plank:%s", moment.UserUUID, moment.Data.UUID)
+			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.UUID)
 		}
 
 		if moment.Kind == plank.EventKindDeleted {
-			msg.Text = fmt.Sprintf("User:%s deleted a plank:%s", moment.UserUUID, moment.Data.UUID)
+			msg.Text = fmt.Sprintf("user:%s deleted a plank:%s", moment.UserUUID, moment.Data.UUID)
 		}
 	case challenge.EventChallengeDone:
 		b, _ := json.Marshal(entry.Data)
@@ -112,7 +117,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			b, _ = json.Marshal(moment.Data)
 			var record plank.HttpRequestInput
 			json.Unmarshal(b, &record)
-			msg.Text = fmt.Sprintf("User:%s added a plank:%s to challenge:%s", moment.UserUUID, record.UUID, moment.UUID)
+			msg.Text = fmt.Sprintf("user:%s added a plank:%s to challenge:%s", moment.UserUUID, record.UUID, moment.UUID)
 		} else {
 			return
 		}
@@ -122,14 +127,49 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if msg.Text == "" {
 			return
 		}
+	case challenge.EventChallengeCreated:
+		var momentKV event.EventKV
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &momentKV)
+		b, _ = json.Marshal(momentKV.Data)
+		var moment challenge.ChallengeInfo
+		json.Unmarshal(b, &moment)
 
+		msg.Text = fmt.Sprintf("user:%s created challenge:%s", moment.CreatedBy, moment.UUID)
+	//case challenge.EventChallengeDeleted   = "challenge.deleted"
+	case challenge.EventChallengeJoined:
+		var momentKV event.EventKV
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &momentKV)
+		b, _ = json.Marshal(momentKV.Data)
+		var moment challenge.ChallengeJoined
+		json.Unmarshal(b, &moment)
+
+		msg.Text = fmt.Sprintf("user:%s joined challenge:%s", moment.UserUUID, moment.UUID)
+	case challenge.EventChallengeLeft:
+		var momentKV event.EventKV
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &momentKV)
+		b, _ = json.Marshal(momentKV.Data)
+		var moment challenge.ChallengeLeft
+		json.Unmarshal(b, &moment)
+
+		msg.Text = fmt.Sprintf("user:%s left challenge:%s", moment.UserUUID, moment.UUID)
+	case mobile.EventMobileDeviceRegistered:
+		var momentKV event.EventKV
+		b, _ := json.Marshal(entry.Data)
+		json.Unmarshal(b, &momentKV)
+
+		userUUID := momentKV.UUID
+		msg.Text = fmt.Sprintf("user:%s registered mobile token", userUUID)
 	default:
 		b, _ := json.Marshal(entry)
 		fmt.Println(string(b))
 		msg.Text = entry.Kind
 	}
 
-	err := slack.PostWebhook(s.webhook, &msg)
+	// We parse this in to make it easier to mock
+	err := s.post(s.webhook, &msg)
 	if err != nil {
 		s.logContext.Panic(err)
 	}

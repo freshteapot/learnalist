@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/slack-go/slack"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -27,7 +28,7 @@ var slackEventsCMD = &cobra.Command{
 
 		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
-		reader := eventReader.NewSlackV1Events(webhook, logger.WithField("context", "slack-events"))
+		reader := eventReader.NewSlackV1Events(slack.PostWebhook, webhook, logger.WithField("context", "slack-events"))
 		event.GetBus().Subscribe(event.TopicMonolog, "slack-listener", reader.Read)
 
 		signals := make(chan os.Signal, 1)

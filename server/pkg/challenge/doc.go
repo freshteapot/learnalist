@@ -37,6 +37,7 @@ type ChallengeInfo struct {
 	Kind        string                 `json:"kind"`
 	Description string                 `json:"description"`
 	Created     string                 `json:"created"`
+	CreatedBy   string                 `json:"created_by"` // TODO add to openapi, hook up into the api
 	Users       []ChallengePlankUser   `json:"users"`
 	Records     []ChallengePlankRecord `json:"records"`
 }
