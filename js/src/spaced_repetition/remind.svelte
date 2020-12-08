@@ -9,6 +9,8 @@
   let show;
   let data;
 
+  let wrapper;
+
   let listElement = document.querySelector("#list-info");
   let playElement = document.querySelector("#play");
 
@@ -113,6 +115,10 @@
   function handleKeydown(event) {
     switch (event.code) {
       case "Space":
+        // Stop normal behaviour and remove the current focus
+        event.preventDefault();
+        wrapper.querySelector(":focus") &&
+          wrapper.querySelector(":focus").blur();
         flipIt();
         break;
     }
@@ -130,7 +136,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if state === 'show-entry'}
-  <div class="flex flex-column">
+  <div bind:this={wrapper} class="flex flex-column">
 
     <article>
       <nav>
