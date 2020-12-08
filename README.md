@@ -18,8 +18,7 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 * look at [Readme](docs/README.md).
 
 ## Chrome Extension
-* [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
-
+- [Learnalist toolbox](./js/browser-extension/import-play/README.md).
 ## Developing the Web UI
 * look at [Readme](server/doc/developing-with-svelte-hugo-server.md).
 
