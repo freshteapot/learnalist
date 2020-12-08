@@ -92,10 +92,10 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	statusCode := http.StatusOK
-	action := "udpated"
+	action := event.ActionUpdated
 	if method == http.MethodPost {
 		statusCode = http.StatusCreated
-		action = "created"
+		action = event.ActionCreated
 	}
 
 	// This will break if the list is too large (size of nats 1mb)

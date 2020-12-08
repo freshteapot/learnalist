@@ -21,6 +21,8 @@ const (
 	KindUserLoginUsername            = "username"
 	KindUserLogoutSession            = "logout.session"
 	KindUserLogoutSessions           = "logout.sessions"
+	ActionCreated                    = "created"
+	ActionUpdated                    = "updated"
 )
 
 var (
