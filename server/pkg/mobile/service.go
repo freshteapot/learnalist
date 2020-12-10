@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -47,7 +48,21 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput.Token)
+	// TODO Update plank app, reject if "", today, assume plank
+	if registerInput.AppIdentifier == "" {
+		registerInput.AppIdentifier = "plank.v1"
+	}
+
+	// TODO maybe drop v1 to make it easier to lookup.
+	allowed := []string{"plank.v1", "remind.v1"}
+	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
+		response := api.HTTPResponseMessage{
+			Message: "App identifier is not supported",
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
@@ -65,6 +80,9 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
+	// TODO do I actually need to send this today?
+	// TODO if yes, include app_identifier
+	// TODO maybe add DeviceInfo to openapi
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventMobileDeviceRegistered,

@@ -310,6 +310,8 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 // GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
 // Not sure how I feel about this
 func (r SqliteRepository) GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error) {
+	// Currently hardcoded to plank.v1, first user of the challenge
+	// TODO in the future, we might want to pass in "plank, remind, plank.v1, remind.v1" to get specific for the challenge
 	query := `
 WITH _users(user_uuid, access) AS (
 SELECT
@@ -347,6 +349,8 @@ INNER JOIN
 	_usersWithDisplayName AS u ON (u.user_uuid = m.user_uuid)
 WHERE
 	m.user_uuid IN(SELECT user_uuid FROM _usersWithDisplayName)
+AND
+	m.app_identifier IN ("plank.v1")
 `
 
 	type dbUser struct {
