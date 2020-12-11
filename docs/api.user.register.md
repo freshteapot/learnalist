@@ -5,7 +5,7 @@
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
-    "username":"iamchris",
+    "username":"iamtest1",
     "password":"test123"
 }
 '
@@ -15,6 +15,6 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 ```
 {
   "uuid": "0c6868e3-fc75-5161-be05-ce24ba59226e",
-  "username": "iamchris"
+  "username": "iamtest1"
 }
 ```

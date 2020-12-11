@@ -11,13 +11,13 @@
 
 # Get Next item to learn
 ```sh
-curl -XGET -u'iamchris:test123' \
+curl -XGET -u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/next'
 ```
 
 # Get All entries
 ```sh
-curl -XGET  -u'iamchris:test123' \
+curl -XGET  -u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/all'
 ```
 
@@ -27,7 +27,7 @@ curl -XGET  -u'iamchris:test123' \
 ## V1
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
--u'iamchris:test123' \
+-u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/'  -d '
 {
   "show": "Hello",
@@ -40,7 +40,7 @@ curl -XPOST -H "Content-Type: application/json" \
 ## Add V2
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
--u'iamchris:test123' \
+-u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/' -d '
 {
   "show": "Mars",
@@ -60,7 +60,7 @@ curl -XPOST -H "Content-Type: application/json" \
 # Delete Entry by UUID
 ```sh
 curl -XDELETE \
--u'iamchris:test123' \
+-u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/ba9277fc4c6190fb875ad8f9cee848dba699937f'
 ```
 
@@ -69,7 +69,7 @@ curl -XDELETE \
 ## Increase the gap till entry is seen again
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
--u'iamchris:test123'  \
+-u'iamtest1:test123'  \
 'http://localhost:1234/api/v1/spaced-repetition/viewed' -d '
 {
   "uuid": "75698c0f5a7b904f1799ceb68e2afe67ad987689",
@@ -82,7 +82,7 @@ curl -XPOST -H "Content-Type: application/json" \
 ## Decrease the gap till entry is seen again
 ```sh
 curl -XPOST -H "Content-Type: application/json" \
--u'iamchris:test123' \
+-u'iamtest1:test123' \
 'http://localhost:1234/api/v1/spaced-repetition/viewed' -d '
 {
   "uuid": "75698c0f5a7b904f1799ceb68e2afe67ad987689",

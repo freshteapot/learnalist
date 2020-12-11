@@ -17,7 +17,7 @@ var deleteUserCmd = &cobra.Command{
 		server := "http://127.0.0.1:1234"
 
 		credentials := api.HTTPLoginRequest{
-			Username: "iamchris",
+			Username: "iamtest1",
 			Password: "test123",
 		}
 

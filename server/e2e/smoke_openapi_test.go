@@ -30,7 +30,7 @@ var _ = Describe("Testing openapi", func() {
 		config.BasePath = "http://localhost:1234/api/v1"
 
 		auth := context.WithValue(context.Background(), openapi.ContextBasicAuth, openapi.BasicAuth{
-			UserName: "iamchris",
+			UserName: "iamtest1",
 			Password: "test123",
 		})
 
@@ -46,7 +46,7 @@ var _ = Describe("Testing openapi", func() {
 		config.BasePath = "http://localhost:1234/api/v1"
 		client := openapi.NewAPIClient(config)
 		input := openapi.HttpUserRegisterInput{
-			Username: "iamchris1",
+			Username: "iamtest11",
 			Password: "test123",
 		}
 
@@ -76,7 +76,7 @@ var _ = Describe("Testing openapi", func() {
 		config.BasePath = "http://localhost:1234/api/v1"
 		client := openapi.NewAPIClient(config)
 		input := openapi.HttpUserRegisterInput{
-			Username: "iamchris2",
+			Username: "iamtest12",
 			Password: "test123",
 		}
 

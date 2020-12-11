@@ -11,7 +11,7 @@ import (
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 )
 
-var usernameOwner = "iamchris"
+var usernameOwner = "iamtest1"
 var password = "test123"
 var usernameReader = "iamusera"
 
