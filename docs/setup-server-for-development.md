@@ -51,15 +51,7 @@ learnalist:latest --config=/srv/learnalist/config/docker.config.yaml server
 ## Run nats locally
 
 ```sh
-docker run \
--p 4222:4222 \
--p 8222:8222 \
--v /tmp/nats-store/:/tmp/nats-store/ nats-streaming:alpine3.12 \
---store=FILE \
---dir=/tmp/nats-store \
---stan_debug=true \
---debug=true \
---http_port 8222
+make run-nats-from-docker
 ```
 
 ## Running the api server

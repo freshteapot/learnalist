@@ -26,6 +26,22 @@ test:
 	cd server && \
 	./cover.sh
 
+run-nats-from-docker:
+	rm -rf /tmp/nats-store/ && \
+	mkdir -p /tmp/nats-store/ && \
+	docker run \
+	-d \
+	--rm \
+	--name lal-nats \
+	-p 4222:4222 \
+	-p 8222:8222 \
+	-v /tmp/nats-store/:/tmp/nats-store/ nats-streaming:alpine3.12 \
+	--store=FILE \
+	--dir=/tmp/nats-store \
+	--stan_debug=true \
+	--debug=true \
+	--http_port 8222
+
 run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
