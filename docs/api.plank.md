@@ -26,7 +26,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/plank' -d'
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
-    "username":"iamchris",
+    "username":"iamtest1",
     "password":"test123"
 }
 '
@@ -35,7 +35,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 ```sh
 response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 {
-    "username":"iamchris",
+    "username":"iamtest1",
     "password":"test123"
 }
 ')
@@ -63,6 +63,6 @@ curl -XPOST \
 # Delete Entry by UUID
 ```sh
 curl -XDELETE \
--u'iamchris:test123' \
+-u'iamtest1:test123' \
 'http://localhost:1234/api/v1/plank/ba9277fc4c6190fb875ad8f9cee848dba699937f'
 ```

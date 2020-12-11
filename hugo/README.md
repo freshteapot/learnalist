@@ -12,7 +12,7 @@ http://localhost:1313/alist/5d4c9869-1d26-567d-82be-497c3521368a.html
 
 # Make list public
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamtest1:test123' -d '{
   "alist_uuid": "5d4c9869-1d26-567d-82be-497c3521368a",
   "action": "public"
 }'

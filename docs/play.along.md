@@ -12,20 +12,20 @@ When the database is created, it is empty.
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 {
-    "username":"iamchris",
+    "username":"iamtest1",
     "password":"test123"
 }
 '
 ```
 Response is
 ```sh
-{"uuid":"1ff95121-1570-5e96-8bd9-bb62fac0b999","username":"iamchris"}
+{"uuid":"1ff95121-1570-5e96-8bd9-bb62fac0b999","username":"iamtest1"}
 ```
 
 ### Add a list of type v1.
 
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
 {
     "data": [
         "monday",
@@ -50,13 +50,13 @@ curl 'http://localhost:1234/api/v1/alist/by/me'
 ```
 
 ```sh
-curl 'http://localhost:1234/api/v1/alist/by/me' -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me' -u'iamtest1:test123'
 ```
 
 ### Add a list of type v2.
 
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
 {
     "data": [
         {
@@ -73,7 +73,7 @@ curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 
 ### Add a list of type v3 (concept2)
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
 {
   "data": [
     {
@@ -103,22 +103,22 @@ curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 
 Again, query all the lists by you.
 ```sh
-curl 'http://localhost:1234/api/v1/alist/by/me'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me'  -u'iamtest1:test123'
 ```
 
 Filter based on list type v3.
 ```sh
-curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v3'  -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/by/me?list_type=v3'  -u'iamtest1:test123'
 ```
 
 Or an individual list.
 ```sh
-curl 'http://localhost:1234/api/v1/alist/{uuid}' -u'iamchris:test123'
+curl 'http://localhost:1234/api/v1/alist/{uuid}' -u'iamtest1:test123'
 ```
 
 #Create a list with a label or two
 ```sh
-curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/api/v1/alist -u'iamchris:test123' -d'
+curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/api/v1/alist -u'iamtest1:test123' -d'
 {
     "data": [
         "monday",
@@ -142,7 +142,7 @@ curl -s -w "%{http_code}\n" -XPOST http://localhost:1234/api/v1/alist -u'iamchri
 
 Now try querying for this list via the labels filter
 ```sh
-curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/api/v1/alist/by/me?labels=english' -u'iamchris:test123'
+curl -s -w "%{http_code}\n"  -XGET 'http://localhost:1234/api/v1/alist/by/me?labels=english' -u'iamtest1:test123'
 ```
 
 
@@ -168,7 +168,7 @@ curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 ```
 
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
 {
     "data": [
         "monday",
@@ -191,7 +191,7 @@ curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
 Grant example
 
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamtest1:test123' -d '{
   "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "user_uuid": "f3572f35-eb7d-5a16-a13f-925e3dd270f6",
   "action": "grant"
@@ -200,7 +200,7 @@ curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' 
 
 Revoke example
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamtest1:test123' -d '{
   "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "user_uuid": "f3572f35-eb7d-5a16-a13f-925e3dd270f6",
   "action": "revoke"
@@ -210,7 +210,7 @@ curl -XPUT 'http://localhost:1234/api/v1/share/readaccess' -u'iamchris:test123' 
 
 Share list with the public
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamtest1:test123' -d '{
   "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "action": "public"
 }'
@@ -220,7 +220,7 @@ curl -XGET 'http://localhost:1234/api/v1/alist/14ae1d04-f26a-524c-8539-2a7059f35
 
 Share list with friends
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamtest1:test123' -d '{
   "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "action": "friends"
 }'
@@ -228,7 +228,7 @@ curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
 
 Share list only with owner
 ```sh
-curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamchris:test123' -d '{
+curl -XPUT 'http://localhost:1234/api/v1/share/alist' -u'iamtest1:test123' -d '{
   "alist_uuid": "14ae1d04-f26a-524c-8539-2a7059f359e8",
   "action": "private"
 }'

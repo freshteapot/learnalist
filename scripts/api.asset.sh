@@ -1,4 +1,4 @@
-LAL_USERNAME="iamchris"
+LAL_USERNAME="iamtest1"
 LAL_PASSWORD="test123"
 LAL_SERVER="http://localhost:1234"
 

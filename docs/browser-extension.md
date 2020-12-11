@@ -1,5 +1,5 @@
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamchris:test123' -d'
+curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
 {
   "info": {
     "title": "Norwegian",

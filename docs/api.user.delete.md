@@ -24,7 +24,7 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" \
 ```sh
 response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 {
-    "username":"iamchris",
+    "username":"iamtest1",
     "password":"test123"
 }
 ')
