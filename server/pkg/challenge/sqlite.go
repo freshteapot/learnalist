@@ -310,8 +310,6 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 // GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
 // Not sure how I feel about this
 func (r SqliteRepository) GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error) {
-	// Currently hardcoded to plank.v1, first user of the challenge
-	// TODO in the future, we might want to pass in "plank, remind, plank.v1, remind.v1" to get specific for the challenge
 	query := `
 WITH _users(user_uuid, access) AS (
 SELECT
@@ -367,11 +365,11 @@ AND
 	}
 
 	// This should be looked up, based on the challengeUUID
-	query, args, err := sqlx.In(query, challengeUUID, mobileApps)
-	fmt.Println("sqlx.In", err)
+	query, args, _ := sqlx.In(query, challengeUUID, mobileApps)
+	//fmt.Println("sqlx.In", err)
 	query = r.db.Rebind(query)
-	err = r.db.Select(&dbItems, query, args...)
-	fmt.Println("db.Select", err)
+	_ = r.db.Select(&dbItems, query, args...)
+	//fmt.Println("db.Select", err)
 
 	for _, item := range dbItems {
 		users = append(users, ChallengeNotificationUserInfo{
