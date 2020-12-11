@@ -309,7 +309,7 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 
 // GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
 // Not sure how I feel about this
-func (r SqliteRepository) GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error) {
+func (r SqliteRepository) GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error) {
 	// Currently hardcoded to plank.v1, first user of the challenge
 	// TODO in the future, we might want to pass in "plank, remind, plank.v1, remind.v1" to get specific for the challenge
 	query := `
@@ -350,7 +350,7 @@ INNER JOIN
 WHERE
 	m.user_uuid IN(SELECT user_uuid FROM _usersWithDisplayName)
 AND
-	m.app_identifier IN ("plank.v1")
+	m.app_identifier IN (?)
 `
 
 	type dbUser struct {
@@ -361,8 +361,17 @@ AND
 
 	dbItems := make([]dbUser, 0)
 	users := make([]ChallengeNotificationUserInfo, 0)
-	err := r.db.Select(&dbItems, query, challengeUUID)
-	fmt.Println(err)
+
+	if len(mobileApps) == 0 {
+		return users, nil
+	}
+
+	// This should be looked up, based on the challengeUUID
+	query, args, err := sqlx.In(query, challengeUUID, mobileApps)
+	fmt.Println("sqlx.In", err)
+	query = r.db.Rebind(query)
+	err = r.db.Select(&dbItems, query, args...)
+	fmt.Println("db.Select", err)
 
 	for _, item := range dbItems {
 		users = append(users, ChallengeNotificationUserInfo{
@@ -386,12 +395,4 @@ WHERE
 	displayName := ""
 	r.db.Get(&displayName, query, uuid)
 	return displayName
-}
-
-// GetChallengeDescription
-func (r SqliteRepository) GetChallengeDescription(uuid string) string {
-	query := `SELECT json_extract(body, '$.description') FROM challenge WHERE uuid=?`
-	name := ""
-	r.db.Get(&name, query, uuid)
-	return name
 }

@@ -72,9 +72,8 @@ type ChallengeNotificationUserInfo struct {
 }
 
 type ChallengeNotificationRepository interface {
-	GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error)
+	GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error)
 	GetUserDisplayName(uuid string) string
-	GetChallengeDescription(uuid string) string
 }
 
 type ChallengeRepository interface {
@@ -117,6 +116,9 @@ var (
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"
+	PlankGroupMobileApps      = []string{
+		"plank.v1",
+	}
 )
 
 type EventEntry struct {

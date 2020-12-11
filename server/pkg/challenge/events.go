@@ -93,6 +93,13 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 	})
 }
 
+/*
+# Notes as I untangle this
+
+- kind = plank-group
+- we list all challenges, when we query the challenges endpoint, today the mobile apps are not filtering out the plank-group
+// TODO humble plank app to filter out plank-group, manually vs api?
+*/
 func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	allowed := []string{
 		EventChallengeNewRecord,
@@ -149,7 +156,23 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		template = "%s has left %s"
 	}
 
-	challengeName := s.challengeNotificationRepository.GetChallengeDescription(challengeUUID)
+	mobileApps := make([]string, 0)
+	// Possibly gets expensive as it includes the users and the results
+	// Plus side of including users and results, means any summary info I want in the message is available
+	// We wait for it to become an issue :P
+	info, _ := s.repo.Get(challengeUUID)
+	switch info.Kind {
+	case KindPlankGroup:
+		mobileApps = PlankGroupMobileApps
+	default:
+		s.logContext.WithFields(logrus.Fields{
+			"kind":           info.Kind,
+			"challenge_uuid": challengeUUID,
+		}).Error("kind not supported for push notifications, yet!")
+		return
+	}
+
+	challengeName := info.Description
 	userDisplayName := s.challengeNotificationRepository.GetUserDisplayName(userUUID)
 	if userDisplayName == "" {
 		userDisplayName = "Someone"
@@ -158,7 +181,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	title := "Challenge update"
 	body := fmt.Sprintf(template, userDisplayName, challengeName)
 
-	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID)
+	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID, mobileApps)
 	for _, user := range users {
 		// Ignore the user who created the moment
 		if user.UserUUID == userUUID {

@@ -24,7 +24,7 @@ func NewSqliteRepository(db *sqlx.DB) MobileRepository {
 
 // TODO Next change, lets drop in the object as a json object aside from the following
 func (r SqliteRepository) SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error) {
-	_, err := r.db.Exec(SqlSave, userUUID, input.Token, input.AppIdentifier)
+	_, err := r.db.Exec(SqlSave, userUUID, input.AppIdentifier, input.Token)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.app_identifier, mobile_device.token" {
 			return http.StatusOK, nil

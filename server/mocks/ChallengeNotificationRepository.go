@@ -12,20 +12,6 @@ type ChallengeNotificationRepository struct {
 	mock.Mock
 }
 
-// GetChallengeDescription provides a mock function with given fields: uuid
-func (_m *ChallengeNotificationRepository) GetChallengeDescription(uuid string) string {
-	ret := _m.Called(uuid)
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func(string) string); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
 // GetUserDisplayName provides a mock function with given fields: uuid
 func (_m *ChallengeNotificationRepository) GetUserDisplayName(uuid string) string {
 	ret := _m.Called(uuid)
@@ -40,13 +26,13 @@ func (_m *ChallengeNotificationRepository) GetUserDisplayName(uuid string) strin
 	return r0
 }
 
-// GetUsersInfo provides a mock function with given fields: challengeUUID
-func (_m *ChallengeNotificationRepository) GetUsersInfo(challengeUUID string) ([]challenge.ChallengeNotificationUserInfo, error) {
-	ret := _m.Called(challengeUUID)
+// GetUsersInfo provides a mock function with given fields: challengeUUID, mobileApps
+func (_m *ChallengeNotificationRepository) GetUsersInfo(challengeUUID string, mobileApps []string) ([]challenge.ChallengeNotificationUserInfo, error) {
+	ret := _m.Called(challengeUUID, mobileApps)
 
 	var r0 []challenge.ChallengeNotificationUserInfo
-	if rf, ok := ret.Get(0).(func(string) []challenge.ChallengeNotificationUserInfo); ok {
-		r0 = rf(challengeUUID)
+	if rf, ok := ret.Get(0).(func(string, []string) []challenge.ChallengeNotificationUserInfo); ok {
+		r0 = rf(challengeUUID, mobileApps)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]challenge.ChallengeNotificationUserInfo)
@@ -54,8 +40,8 @@ func (_m *ChallengeNotificationRepository) GetUsersInfo(challengeUUID string) ([
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(challengeUUID)
+	if rf, ok := ret.Get(1).(func(string, []string) error); ok {
+		r1 = rf(challengeUUID, mobileApps)
 	} else {
 		r1 = ret.Error(1)
 	}

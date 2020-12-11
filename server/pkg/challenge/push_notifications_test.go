@@ -53,9 +53,15 @@ var _ = Describe("Testing Processing push notifications", func() {
 		}))
 		event.SetBus(eventMessageBus)
 
-		challengeNotificationRepository.On("GetChallengeDescription", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return("A test challenge")
+		// TODO maybe verify not suppoorted kind
+		challengeRepository.On("Get", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return(challenge.ChallengeInfo{
+			UUID:        "07c59b8e-ff54-4a32-8a00-caeebdee523d",
+			Kind:        challenge.KindPlankGroup,
+			Description: "A test challenge",
+		}, nil)
+
 		challengeNotificationRepository.On("GetUserDisplayName", "e1848e0b-c939-435e-8090-2f28eb9a2308").Return("Chris")
-		challengeNotificationRepository.On("GetUsersInfo", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return([]challenge.ChallengeNotificationUserInfo{
+		challengeNotificationRepository.On("GetUsersInfo", "07c59b8e-ff54-4a32-8a00-caeebdee523d", challenge.PlankGroupMobileApps).Return([]challenge.ChallengeNotificationUserInfo{
 			{
 				UserUUID: "fake-user-123",
 				Token:    "fake-token-123",
