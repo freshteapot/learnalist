@@ -13,7 +13,8 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 
 # Getting Started
-
+- [An index of sorts](docs/README.md)
+- [Setup development environment](docs/setup-server-for-development.md)
 ## Server
 * look at [Readme](docs/README.md).
 
@@ -22,11 +23,3 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 ## Developing the Web UI
 * look at [Readme](server/doc/developing-with-svelte-hugo-server.md).
-
-## Mobile app built with flutter
-* [learnalist-mobile](https://github.com/freshteapot/learnalist-mobile).
-
-
-## iOS Bacis app
-* look at [Readme](https://github.com/freshteapot/learnalist-ios/blob/master/README.md).
-
