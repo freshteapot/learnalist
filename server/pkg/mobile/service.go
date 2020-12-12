@@ -2,8 +2,10 @@ package mobile
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
@@ -58,7 +60,7 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 	allowed := []string{apps.PlankV1, apps.RemindV1}
 	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
 		response := api.HTTPResponseMessage{
-			Message: "App identifier is not supported",
+			Message: fmt.Sprintf("App identifier is not supported: %s", strings.Join(allowed, ",")),
 		}
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
