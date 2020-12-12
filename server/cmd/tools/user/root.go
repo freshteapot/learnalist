@@ -12,5 +12,4 @@ var RootCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(deleteUserCmd)
 	RootCmd.AddCommand(findCmd)
-	RootCmd.AddCommand(scratchCMD)
 }
