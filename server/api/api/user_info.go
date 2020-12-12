@@ -37,6 +37,7 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
+	return c.JSONBlob(http.StatusOK, b)
 	var extra openapi.HttpUserInfoInput
 	err = json.Unmarshal(b, &extra)
 	extra.CreatedVia = ""
