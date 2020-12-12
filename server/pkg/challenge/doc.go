@@ -71,7 +71,7 @@ type ChallengeNotificationUserInfo struct {
 	Token       string `json:"token"`
 }
 
-type ChallengeNotificationRepository interface {
+type ChallengePushNotificationRepository interface {
 	GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error)
 	GetUserDisplayName(uuid string) string
 }

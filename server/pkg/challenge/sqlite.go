@@ -308,7 +308,6 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 }
 
 // GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
-// Not sure how I feel about this
 func (r SqliteRepository) GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error) {
 	query := `
 WITH _users(user_uuid, access) AS (
@@ -364,12 +363,9 @@ AND
 		return users, nil
 	}
 
-	// This should be looked up, based on the challengeUUID
 	query, args, _ := sqlx.In(query, challengeUUID, mobileApps)
-	//fmt.Println("sqlx.In", err)
 	query = r.db.Rebind(query)
 	_ = r.db.Select(&dbItems, query, args...)
-	//fmt.Println("db.Select", err)
 
 	for _, item := range dbItems {
 		users = append(users, ChallengeNotificationUserInfo{

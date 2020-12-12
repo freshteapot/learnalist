@@ -166,7 +166,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	}
 
 	challengeName := info.Description
-	userDisplayName := s.challengeNotificationRepository.GetUserDisplayName(userUUID)
+	userDisplayName := s.challengePushNotificationRepository.GetUserDisplayName(userUUID)
 	if userDisplayName == "" {
 		userDisplayName = "Someone"
 	}
@@ -174,7 +174,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	title := "Challenge update"
 	body := fmt.Sprintf(template, userDisplayName, challengeName)
 
-	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID, mobileApps)
+	users, _ := s.challengePushNotificationRepository.GetUsersInfo(challengeUUID, mobileApps)
 	for _, user := range users {
 		// Ignore the user who created the moment
 		if user.UserUUID == userUUID {
