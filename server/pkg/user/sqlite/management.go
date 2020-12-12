@@ -170,8 +170,13 @@ func (m sqliteManagement) SaveInfo(userUUID string, info []byte) error {
 	return err
 }
 
+// TODO this is not in use, how do we patch and remove?
+// TODO there are no docs on how this works
+// TODO no tests
 // RemoveInfo remove key, regardless if it exists
+// Dont use ".", as it breaks, ":" works
 func (m sqliteManagement) RemoveInfo(userUUID string, key string) error {
+	// Maybe document this use of "remind.v1"
 	_, err := m.db.Exec(SqlUserInfoRemove, fmt.Sprintf(`$.%s`, key), userUUID)
 	fmt.Println(err)
 	return err

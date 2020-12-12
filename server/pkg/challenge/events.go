@@ -93,13 +93,6 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 	})
 }
 
-/*
-# Notes as I untangle this
-
-- kind = plank-group
-- we list all challenges, when we query the challenges endpoint, today the mobile apps are not filtering out the plank-group
-// TODO humble plank app to filter out plank-group, manually vs api?
-*/
 func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	allowed := []string{
 		EventChallengeNewRecord,
