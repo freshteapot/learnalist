@@ -51,7 +51,6 @@ var _ = Describe("Smoke list access", func() {
 		httpResponse, err = learnalistClient.GetAlistHtml(userInfoReader, aList.Uuid)
 		assert.NoError(err)
 		assert.Equal(httpResponse.StatusCode, http.StatusOK)
-
 		assert.True(strings.Contains(string(httpResponse.Body), "<title>Days of the Week</title>"))
 
 		fmt.Println("> Share the list with friends only")
