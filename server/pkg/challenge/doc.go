@@ -3,6 +3,8 @@ package challenge
 import (
 	"errors"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 )
 
 type HttpChallengePlankRecords struct {
@@ -117,7 +119,7 @@ var (
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"
 	PlankGroupMobileApps      = []string{
-		"plank.v1",
+		apps.PlankV1,
 	}
 )
 

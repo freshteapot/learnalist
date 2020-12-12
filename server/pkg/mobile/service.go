@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 
@@ -50,11 +51,11 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 
 	// TODO Update plank app, reject if "", today, assume plank
 	if registerInput.AppIdentifier == "" {
-		registerInput.AppIdentifier = "plank.v1"
+		s.logContext.Warn("Fix humble plank to set plankV1 and then reject if empty")
+		registerInput.AppIdentifier = apps.PlankV1
 	}
 
-	// TODO maybe drop v1 to make it easier to lookup.
-	allowed := []string{"plank.v1", "remind.v1"}
+	allowed := []string{apps.PlankV1, apps.RemindV1}
 	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
 		response := api.HTTPResponseMessage{
 			Message: "App identifier is not supported",

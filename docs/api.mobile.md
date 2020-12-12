@@ -47,7 +47,7 @@ curl -i -XPOST \
 -d '
 {
   "token": "fake-token-123456",
-  "app_identifier": "plank.v1"
+  "app_identifier": "plank:v1"
 }'
 
 # Other valid option
@@ -57,7 +57,7 @@ curl -i -XPOST \
 -d '
 {
   "token": "fake-token-123456",
-  "app_identifier": "remind.v1"
+  "app_identifier": "remind:v1"
 }'
 
 
