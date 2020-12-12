@@ -4,11 +4,20 @@ components:
       type: object
       required:
         - token
+        - app_identifier
       properties:
         token:
           type: string
           description: FCM token linked to the device
           default: ""
+        app_identifier:
+          type: string
+          description: A unique identifier to allow the system to link a user with an app and use the correct token.
+          default: ""
+          enum:
+            - plank:v1
+            - remind:v1
+
 paths:
   /mobile/register-device:
     post:
@@ -31,7 +40,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
         "422":
-          description: Most likely, the token is empty
+          description: Most likely, the token is empty, or the app_identifier is [empty, not valid]
           content:
             application/json:
               schema:

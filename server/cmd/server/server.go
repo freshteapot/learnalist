@@ -140,7 +140,7 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "user-service"))
 
 		challengeRepo := challenge.NewSqliteRepository(db)
-		challengeNotificationRepo := challengeRepo.(challenge.ChallengeNotificationRepository)
+		challengeNotificationRepo := challengeRepo.(challenge.ChallengePushNotificationRepository)
 		challengeService := challenge.NewService(challengeRepo, challengeNotificationRepo, acl, logger.WithField("context", "challenge-service"))
 		mobileService := mobile.NewService(
 			mobile.NewSqliteRepository(db),

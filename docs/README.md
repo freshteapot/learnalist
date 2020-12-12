@@ -10,3 +10,4 @@
 * [Golang tips](./tips.md)
 * [Try curl requests](./play.along.md)
 * [Manual testing of endpoints](./manual.test.md)
+* [DB updates](./manual-db-update.md)

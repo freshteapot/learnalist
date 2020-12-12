@@ -17,10 +17,10 @@ import (
 
 var _ = Describe("Testing Processing push notifications", func() {
 	var (
-		logger                          *logrus.Logger
-		hook                            *test.Hook
-		challengeNotificationRepository *mocks.ChallengeNotificationRepository
-		challengeRepository             *mocks.ChallengeRepository
+		logger                              *logrus.Logger
+		hook                                *test.Hook
+		challengePushNotificationRepository *mocks.ChallengePushNotificationRepository
+		challengeRepository                 *mocks.ChallengeRepository
 	)
 
 	BeforeEach(func() {
@@ -35,7 +35,7 @@ var _ = Describe("Testing Processing push notifications", func() {
 		json.Unmarshal([]byte(rawMoment), &entry)
 
 		challengeRepository = &mocks.ChallengeRepository{}
-		challengeNotificationRepository = &mocks.ChallengeNotificationRepository{}
+		challengePushNotificationRepository = &mocks.ChallengePushNotificationRepository{}
 		eventMessageBus := &mocks.EventlogPubSub{}
 
 		eventMessageBus.On("Subscribe", event.TopicMonolog, "challenge", mock.Anything)
@@ -53,16 +53,22 @@ var _ = Describe("Testing Processing push notifications", func() {
 		}))
 		event.SetBus(eventMessageBus)
 
-		challengeNotificationRepository.On("GetChallengeDescription", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return("A test challenge")
-		challengeNotificationRepository.On("GetUserDisplayName", "e1848e0b-c939-435e-8090-2f28eb9a2308").Return("Chris")
-		challengeNotificationRepository.On("GetUsersInfo", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return([]challenge.ChallengeNotificationUserInfo{
+		// TODO maybe verify not suppoorted kind
+		challengeRepository.On("Get", "07c59b8e-ff54-4a32-8a00-caeebdee523d").Return(challenge.ChallengeInfo{
+			UUID:        "07c59b8e-ff54-4a32-8a00-caeebdee523d",
+			Kind:        challenge.KindPlankGroup,
+			Description: "A test challenge",
+		}, nil)
+
+		challengePushNotificationRepository.On("GetUserDisplayName", "e1848e0b-c939-435e-8090-2f28eb9a2308").Return("Chris")
+		challengePushNotificationRepository.On("GetUsersInfo", "07c59b8e-ff54-4a32-8a00-caeebdee523d", challenge.PlankGroupMobileApps).Return([]challenge.ChallengeNotificationUserInfo{
 			{
 				UserUUID: "fake-user-123",
 				Token:    "fake-token-123",
 			},
 		}, nil)
 
-		service := challenge.NewService(challengeRepository, challengeNotificationRepository, nil, logger)
+		service := challenge.NewService(challengeRepository, challengePushNotificationRepository, nil, logger)
 		service.OnEvent(entry)
 	})
 })

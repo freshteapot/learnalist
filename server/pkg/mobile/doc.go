@@ -1,11 +1,13 @@
 package mobile
 
+import "github.com/freshteapot/learnalist-api/server/pkg/openapi"
+
 var (
 	EventMobileDeviceRegistered = "mobile.register"
 )
 
 type MobileRepository interface {
-	SaveDeviceInfo(userUUID string, token string) (int, error)
+	SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error)
 	DeleteByUser(userUUID string) error
 }
 type DeviceInfo struct {

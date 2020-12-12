@@ -3,6 +3,7 @@ package mobile
 import (
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,7 +12,7 @@ type SqliteRepository struct {
 }
 
 var (
-	SqlSave               = `INSERT INTO mobile_device(user_uuid, token) values(?, ?)`
+	SqlSave               = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
 	SqlDeleteDeviceByUser = `DELETE FROM mobile_device WHERE user_uuid=?`
 )
 
@@ -21,10 +22,11 @@ func NewSqliteRepository(db *sqlx.DB) MobileRepository {
 	}
 }
 
-func (r SqliteRepository) SaveDeviceInfo(userUUID string, token string) (int, error) {
-	_, err := r.db.Exec(SqlSave, userUUID, token)
+// TODO Next change, lets drop in the object as a json object aside from the following
+func (r SqliteRepository) SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error) {
+	_, err := r.db.Exec(SqlSave, userUUID, input.AppIdentifier, input.Token)
 	if err != nil {
-		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.token" {
+		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.app_identifier, mobile_device.token" {
 			return http.StatusOK, nil
 		}
 		return http.StatusInternalServerError, err

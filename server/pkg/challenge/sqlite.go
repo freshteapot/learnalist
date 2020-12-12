@@ -308,8 +308,7 @@ func (r SqliteRepository) DeleteUser(userUUID string) error {
 }
 
 // GetUsersInfo returns users with tokens, userUUID is not unique here, as one user can have many devices
-// Not sure how I feel about this
-func (r SqliteRepository) GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error) {
+func (r SqliteRepository) GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error) {
 	query := `
 WITH _users(user_uuid, access) AS (
 SELECT
@@ -347,6 +346,8 @@ INNER JOIN
 	_usersWithDisplayName AS u ON (u.user_uuid = m.user_uuid)
 WHERE
 	m.user_uuid IN(SELECT user_uuid FROM _usersWithDisplayName)
+AND
+	m.app_identifier IN (?)
 `
 
 	type dbUser struct {
@@ -357,8 +358,14 @@ WHERE
 
 	dbItems := make([]dbUser, 0)
 	users := make([]ChallengeNotificationUserInfo, 0)
-	err := r.db.Select(&dbItems, query, challengeUUID)
-	fmt.Println(err)
+
+	if len(mobileApps) == 0 {
+		return users, nil
+	}
+
+	query, args, _ := sqlx.In(query, challengeUUID, mobileApps)
+	query = r.db.Rebind(query)
+	_ = r.db.Select(&dbItems, query, args...)
 
 	for _, item := range dbItems {
 		users = append(users, ChallengeNotificationUserInfo{
@@ -382,12 +389,4 @@ WHERE
 	displayName := ""
 	r.db.Get(&displayName, query, uuid)
 	return displayName
-}
-
-// GetChallengeDescription
-func (r SqliteRepository) GetChallengeDescription(uuid string) string {
-	query := `SELECT json_extract(body, '$.description') FROM challenge WHERE uuid=?`
-	name := ""
-	r.db.Get(&name, query, uuid)
-	return name
 }

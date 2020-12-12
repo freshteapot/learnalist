@@ -35,10 +35,15 @@ var _ = Describe("Testing openapi", func() {
 		})
 
 		client := openapi.NewAPIClient(config)
-		data, response, err := client.SpacedRepetitionApi.GetNextSpacedRepetitionEntry(auth)
+		_, response, err := client.SpacedRepetitionApi.GetNextSpacedRepetitionEntry(auth)
+		/*
+			fmt.Println("data", data)
+			fmt.Println("response", response.StatusCode)
+			fmt.Println("err", err)
+		*/
 		Expect(err).Should(HaveOccurred())
 		Expect(response.StatusCode).To(Equal(http.StatusNotFound))
-		fmt.Println(data)
+
 	})
 
 	It("Register user", func() {

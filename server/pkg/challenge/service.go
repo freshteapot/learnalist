@@ -17,18 +17,18 @@ import (
 )
 
 type ChallengeService struct {
-	repo                            ChallengeRepository
-	challengeNotificationRepository ChallengeNotificationRepository
-	acl                             acl.AclChallenge
-	logContext                      logrus.FieldLogger
+	repo                                ChallengeRepository
+	challengePushNotificationRepository ChallengePushNotificationRepository
+	acl                                 acl.AclChallenge
+	logContext                          logrus.FieldLogger
 }
 
-func NewService(repo ChallengeRepository, challengeNotificationRepository ChallengeNotificationRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
+func NewService(repo ChallengeRepository, challengePushNotificationRepository ChallengePushNotificationRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
 	s := ChallengeService{
-		repo:                            repo,
-		challengeNotificationRepository: challengeNotificationRepository,
-		acl:                             acl,
-		logContext:                      log,
+		repo:                                repo,
+		challengePushNotificationRepository: challengePushNotificationRepository,
+		acl:                                 acl,
+		logContext:                          log,
 	}
 
 	event.GetBus().Subscribe(event.TopicMonolog, "challenge", s.OnEvent)

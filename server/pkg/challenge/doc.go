@@ -3,6 +3,8 @@ package challenge
 import (
 	"errors"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 )
 
 type HttpChallengePlankRecords struct {
@@ -71,10 +73,9 @@ type ChallengeNotificationUserInfo struct {
 	Token       string `json:"token"`
 }
 
-type ChallengeNotificationRepository interface {
-	GetUsersInfo(challengeUUID string) ([]ChallengeNotificationUserInfo, error)
+type ChallengePushNotificationRepository interface {
+	GetUsersInfo(challengeUUID string, mobileApps []string) ([]ChallengeNotificationUserInfo, error)
 	GetUserDisplayName(uuid string) string
-	GetChallengeDescription(uuid string) string
 }
 
 type ChallengeRepository interface {
@@ -117,6 +118,9 @@ var (
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"
+	PlankGroupMobileApps      = []string{
+		apps.PlankV1,
+	}
 )
 
 type EventEntry struct {

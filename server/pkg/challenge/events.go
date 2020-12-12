@@ -149,8 +149,24 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		template = "%s has left %s"
 	}
 
-	challengeName := s.challengeNotificationRepository.GetChallengeDescription(challengeUUID)
-	userDisplayName := s.challengeNotificationRepository.GetUserDisplayName(userUUID)
+	mobileApps := make([]string, 0)
+	// Possibly gets expensive as it includes the users and the results
+	// Plus side of including users and results, means any summary info I want in the message is available
+	// We wait for it to become an issue :P
+	info, _ := s.repo.Get(challengeUUID)
+	switch info.Kind {
+	case KindPlankGroup:
+		mobileApps = PlankGroupMobileApps
+	default:
+		s.logContext.WithFields(logrus.Fields{
+			"kind":           info.Kind,
+			"challenge_uuid": challengeUUID,
+		}).Error("kind not supported for push notifications, yet!")
+		return
+	}
+
+	challengeName := info.Description
+	userDisplayName := s.challengePushNotificationRepository.GetUserDisplayName(userUUID)
 	if userDisplayName == "" {
 		userDisplayName = "Someone"
 	}
@@ -158,7 +174,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	title := "Challenge update"
 	body := fmt.Sprintf(template, userDisplayName, challengeName)
 
-	users, _ := s.challengeNotificationRepository.GetUsersInfo(challengeUUID)
+	users, _ := s.challengePushNotificationRepository.GetUsersInfo(challengeUUID, mobileApps)
 	for _, user := range users {
 		// Ignore the user who created the moment
 		if user.UserUUID == userUUID {

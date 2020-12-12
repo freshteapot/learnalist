@@ -2,12 +2,16 @@ package mobile
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 
@@ -47,7 +51,21 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput.Token)
+	// TODO Update plank app, reject if "", today, assume plank
+	if registerInput.AppIdentifier == "" {
+		s.logContext.Warn("Fix humble plank to set plankV1 and then reject if empty")
+		registerInput.AppIdentifier = apps.PlankV1
+	}
+
+	allowed := []string{apps.PlankV1, apps.RemindV1}
+	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
+		response := api.HTTPResponseMessage{
+			Message: fmt.Sprintf("App identifier is not supported: %s", strings.Join(allowed, ",")),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
@@ -65,6 +83,9 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
+	// TODO do I actually need to send this today?
+	// TODO if yes, include app_identifier
+	// TODO maybe add DeviceInfo to openapi
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: EventMobileDeviceRegistered,
