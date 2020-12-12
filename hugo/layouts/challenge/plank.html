@@ -1,0 +1,62 @@
+{{ define "main" }}
+{{- $challenge := getJSON "data/challenge/" $.Params.uuid ".json" -}}
+{{- $name := "Someone" }}
+{{- $howManyUsers := len $challenge.users }}
+{{- $howManyRecords := len $challenge.records }}
+
+{{ $count := 0 }}
+{{ range $record :=  $challenge.records }}
+{{ $count = add $count $record.timerNow }}
+{{ end }}
+
+{{ $readTime := div $count 1000}}
+{{ $minutes := math.Floor (div $readTime 60) }}
+{{ $seconds := mod $readTime 60 }}
+
+{{ $minutesPlanked := printf "%.f.%.2d" $minutes $seconds}}
+<!--
+    Credit: https://kodify.net/hugo/strings/reading-time-text/
+-->
+
+{{$creator := (index (where $challenge.users "user_uuid" $challenge.created_by) 0)}}
+{{ if ne $creator.name $challenge.created_by }}
+{{ $name = $creator.name }}
+{{ end }}
+
+<article class="w-100 center bg-white br3 pa3 pa4-ns mv3 ">
+    <div class="tc">
+        <h1 class="f3 mb2">{{$challenge.description}}</h1>
+        <h2 class="f5 fw4 gray mt0">By {{$name}}</h2>
+
+        <div class="cf">
+            <dl class="fl fn-l w-25 dib-l w-auto-l lh-title mr5-l">
+                <dd class="f6 fw4 ml0">Users</dd>
+                <dd class="f3 fw6 ml0">{{$howManyUsers}}</dd>
+            </dl>
+            <dl class="fl fn-l w-25 dib-l w-auto-l lh-title mr5-l">
+                <dd class="f6 fw4 ml0">Planks done</dd>
+                <dd class="f3 fw6 ml0">{{$howManyRecords}}</dd>
+            </dl>
+            <dl class="fl fn-l w-50 dib-l w-auto-l lh-title mr5-l">
+                <dd class="f6 fw4 ml0">Minutes planked</dd>
+                <dd class="f3 fw6 ml0">{{$minutesPlanked}}</dd>
+            </dl>
+        </div>
+
+        <h3>How to join</h3>
+        <ol class="f5 mb2 tl">
+            <li>Open the Humble plank app (iOS or Android)</li>
+            <li>Tap on Challenge</li>
+            <li>Tap on Join a challenge</li>
+            <li>
+                <span>Copy and paste the code below</span>
+                <br>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" value="{{$challenge.uuid}}">
+            </li>
+        </ol>
+
+        <p>Currently only works via mobile</p>
+    </div>
+</article>
+
+{{ end }}
