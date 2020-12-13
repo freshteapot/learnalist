@@ -1,7 +1,7 @@
 <script>
   // TODO do I care how often they hit save?
   import { push } from "svelte-spa-router";
-  import LoginModal from "../../components/login_modal.svelte";
+  //import LoginModal from "../../components/login_modal.svelte";
   import { loggedIn, notify } from "../../shared.js";
   import store from "./store.js";
 
@@ -37,7 +37,6 @@
       Slideshow
     </button>
 
-    <button class="br3" on:click={() => push('/settings')}>Settings</button>
     {#if loggedIn()}
       <button
         class="br3"
