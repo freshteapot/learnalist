@@ -113,6 +113,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 		},
 	})
 
+	s.updateStaticSite(challenge, false, event.ActionCreated)
 	return c.JSON(http.StatusCreated, challenge)
 }
 
@@ -159,6 +160,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 		},
 	})
 
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, true, event.ActionUpdated)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -214,6 +216,7 @@ func (s ChallengeService) Leave(c echo.Context) error {
 			},
 		},
 	})
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, true, event.ActionUpdated)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -241,6 +244,7 @@ func (s ChallengeService) Delete(c echo.Context) error {
 	_ = s.acl.DeleteChallenge(challengeUUID)
 
 	// TODO add event challenge.deleted
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, false, event.ActionDeleted)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -276,4 +280,22 @@ func (s ChallengeService) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, challenge)
+}
+
+func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool, action string) {
+	// Known issue: when a user updates their display name. This will get out of sync.
+	// TODO we could look up creators of the list and rebuild, only is costly when one user has many challenges.
+	// TODO will be cheaper if I actually delete lists.
+	// https://github.com/nats-io/nats-streaming-server/issues/502#issuecomment-404463782
+	// max_payload set globally
+	if lookup {
+		// TODO should I check for error?
+		uuid := challenge.UUID
+		challenge, _ = s.repo.Get(uuid)
+	}
+
+	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+		Kind: event.ChangesetChallenge,
+		Data: challenge,
+	})
 }

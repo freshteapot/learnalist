@@ -14,7 +14,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
@@ -52,6 +54,7 @@ var rebuildStaticSiteCmd = &cobra.Command{
 		makeUserLists(db, hugoHelper)
 		makePublicLists(db, hugoHelper)
 
+		makeChallenges(db, hugoHelper)
 		time.Sleep(5 * time.Second)
 	},
 }
@@ -130,4 +133,26 @@ WHERE shared_with="public";
 		panic("Failed to make public lists")
 	}
 	helper.WritePublicLists(lists)
+}
+
+func makeChallenges(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
+	var challenges []string
+	err := db.Select(&challenges, `SELECT DISTINCT(uuid) FROM challenge`)
+	if err != nil {
+		fmt.Println(err)
+		panic("...")
+	}
+
+	challengeRepo := challenge.NewSqliteRepository(db)
+
+	for _, challengeUUID := range challenges {
+		challenge, _ := challengeRepo.Get(challengeUUID)
+		moment := event.Eventlog{
+			Kind:   event.ChangesetChallenge,
+			Action: event.ActionUpdated,
+			Data:   challenge,
+		}
+
+		helper.OnEvent(moment)
+	}
 }

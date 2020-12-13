@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,11 +12,12 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-func NewHugoAListByUserWriter(contentDirectory string, dataDirectory string, publishDirectory string) HugoAListUserWriter {
+func NewHugoAListByUserWriter(contentDirectory string, dataDirectory string, publishDirectory string, writer FileWriter) HugoAListUserWriter {
 	return HugoAListUserWriter{
 		dataDirectory:    dataDirectory,
 		contentDirectory: contentDirectory,
 		publishDirectory: publishDirectory,
+		writer:           writer,
 	}
 }
 
@@ -43,20 +43,13 @@ css_include: ["main"]
 
 	content := strings.TrimSpace(tpl.String())
 	path := fmt.Sprintf("%s/%s.md", w.contentDirectory, userUUID)
-	err := ioutil.WriteFile(path, []byte(content), 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
-
+	w.writer.Write(path, []byte(content))
 }
 
 func (w HugoAListUserWriter) Data(userUUID string, lists []alist.ShortInfo) {
 	content, _ := json.Marshal(lists)
 	path := fmt.Sprintf("%s/%s.json", w.dataDirectory, userUUID)
-	err := ioutil.WriteFile(path, content, 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
+	w.writer.Write(path, content)
 }
 
 func (w HugoAListUserWriter) GetFilesToPublish() []string {

@@ -10,10 +10,13 @@ clear-site:
 	mkdir -p ./hugo/{public/alist,public/alistsbyuser}
 	mkdir -p ./hugo/{content/alist,data/alist}
 	mkdir -p ./hugo/{content/alistsbyuser,data/alistsbyuser}
+	mkdir -p ./hugo/{content/challenge,data/challenge}
 	rm -f ./hugo/content/alist/*
 	rm -f ./hugo/content/alistsbyuser/*
 	rm -f ./hugo/data/alist/*
 	rm -f ./hugo/data/alistsbyuser/*
+	rm -f ./hugo/content/challenge/*
+	rm -f ./hugo/data/challenge/*
 	echo "[]" > ./hugo/data/public_lists.json
 	cd ./hugo && hugo
 

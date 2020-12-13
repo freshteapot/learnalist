@@ -12,11 +12,15 @@ import (
 func (h HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
+	c := h.challengeWriter.GetFilesToPublish()
 
 	logContext.WithFields(logrus.Fields{
-		"event":      "build-stats",
-		"lists":      len(a),
-		"user_lists": len(b),
+		"event": "build-stats",
+		"stats": map[string]interface{}{
+			"lists":      len(a),
+			"user_lists": len(b),
+			"challenges": len(c),
+		},
 	}).Info("stats")
 
 	toPublish := append(a, b...)

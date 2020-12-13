@@ -101,6 +101,7 @@ var ServerCmd = &cobra.Command{
 		db := database.NewDB(databaseName)
 		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
 		hugoHelper.RegisterCronJob()
+		hugoHelper.ListenForEvents()
 
 		// Setup access control layer.
 		acl := aclStorage.NewAcl(db)

@@ -19,6 +19,8 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 		RealtivePathPublic,
 		RealtivePathPublicContentAlist,
 		RealtivePathPublicContentAlistsByUser,
+		RealtivePathChallengeContent,
+		RealtivePathChallengeData,
 	}
 
 	for _, template := range check {
@@ -31,8 +33,9 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 	// This is required to keep track of the memory, I think.
 	var empty cron.EntryID
 	empty = 0
-	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
+	writer := NewHugoFileWriter(logger.WithField("context", "hugo-writer"))
 
+	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
 	return HugoHelper{
 		logger:       logger,
 		cwd:          cwd,
@@ -44,12 +47,23 @@ func NewHugoHelper(cwd string, environment string, isExternal bool, _cron *cron.
 		AlistWriter: NewHugoAListWriter(
 			fmt.Sprintf(RealtivePathContentAlist, cwd),
 			fmt.Sprintf(RealtivePathDataAlist, cwd),
-			publishDirectory),
+			publishDirectory,
+			writer),
 		AlistsByUserWriter: NewHugoAListByUserWriter(
 			fmt.Sprintf(RealtivePathContentAlistsByUser, cwd),
 			fmt.Sprintf(RealtivePathDataAlistsByUser, cwd),
-			publishDirectory),
-		PublicListsWriter: NewHugoPublicListsWriter(fmt.Sprintf(RealtivePathData, cwd)),
+			publishDirectory,
+			writer),
+		PublicListsWriter: NewHugoPublicListsWriter(
+			fmt.Sprintf(RealtivePathData, cwd),
+			publishDirectory,
+			writer),
+		challengeWriter: NewChallengeWriter(
+			fmt.Sprintf(RealtivePathChallengeContent, cwd),
+			fmt.Sprintf(RealtivePathChallengeData, cwd),
+			publishDirectory,
+			writer,
+		),
 	}
 }
 

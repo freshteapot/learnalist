@@ -253,3 +253,31 @@ kubectl create configmap learnalist-config --from-file=config.yaml=current.yaml 
 kubectl create secret generic learnalist-fcm \
 --from-file=fcm-credentials.json=./../secrets/fcm-credentials.json
 ```
+
+
+
+# Update nats configmaps
+## Nats
+### Current
+```sh
+kubectl get configmaps nats-config -oyaml | yq r - "data[nats.conf]" > nats.conf
+```
+### Update
+```sh
+kubectl create configmap stan-config --from-file=stan.conf=./k8s/nats-stan.conf -o yaml --dry-run | kubectl replace -f -
+```
+
+## Stan
+### Current
+```sh
+kubectl get configmaps stan-config -oyaml | yq r - "data[stan.conf]" > stan.conf
+```
+### Update
+```sh
+kubectl create configmap nats-config --from-file=nats.conf=./k8s/nats-nats.conf -o yaml --dry-run | kubectl replace -f -
+```
+
+# Reload nats
+```sh
+nats-server --config /etc/nats-config/nats.conf -sl reload
+```

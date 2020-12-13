@@ -3,14 +3,15 @@ package hugo
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
-func NewHugoPublicListsWriter(dataDirectory string) HugoPublicListsWriter {
+func NewHugoPublicListsWriter(dataDirectory string, publishDirectory string, writer FileWriter) HugoPublicListsWriter {
 	return HugoPublicListsWriter{
-		dataDirectory: dataDirectory,
+		dataDirectory:    dataDirectory,
+		publishDirectory: publishDirectory,
+		writer:           writer,
 	}
 }
 
@@ -22,8 +23,5 @@ func (w HugoPublicListsWriter) Content() {
 func (w HugoPublicListsWriter) Data(lists []alist.ShortInfo) {
 	content, _ := json.Marshal(lists)
 	path := fmt.Sprintf("%s/public_lists.json", w.dataDirectory)
-	err := ioutil.WriteFile(path, content, 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
+	w.writer.Write(path, content)
 }
