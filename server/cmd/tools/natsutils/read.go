@@ -97,7 +97,7 @@ var readCMD = &cobra.Command{
 func ReadOneByOneTilLatest(sc stan.Conn, topic string, onRead func(msg *stan.Msg), unsubscribe bool) {
 	// Could also use MaxInFlight with the timer to force one by one
 	d := 200 * time.Millisecond
-	// Initally we shall wait
+	// Initially we shall wait
 	ticker := time.NewTicker(500 * time.Millisecond)
 	done := make(chan bool)
 	handle := func(msg *stan.Msg) {
