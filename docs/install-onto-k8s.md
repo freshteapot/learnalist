@@ -19,6 +19,24 @@ kubectl config use-context default
 127.0.0.1 registry.devbox
 ```
 
+# Add resources from k8s
+## Nats + stan
+- First single files
+- Then update the configs
+
+# Https out of the box
+- Almost ;)
+- We are using the chart from https://math-nao.github.io/certs/.
+- Each domain for now has its own tls.
+
+```sh
+cd ~/git/secrets/acme-certs
+helm repo add certs https://math-nao.github.io/certs/charts
+helm fetch --untar certs/certs
+mkdir -p output
+helm template certs   --name certs   --values values.yaml   --output-dir=./output
+```
+
 # Fire up the registry
 - make sure container-registry (docker-registry) is running
 - log onto the server and port-forward 5000
