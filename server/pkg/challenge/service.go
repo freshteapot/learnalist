@@ -243,7 +243,7 @@ func (s ChallengeService) Delete(c echo.Context) error {
 	_ = s.repo.Delete(challengeUUID)
 	_ = s.acl.DeleteChallenge(challengeUUID)
 
-	// TODO add event challenge.deleted
+	// TODO https://github.com/freshteapot/learnalist-api/issues/175
 	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, false, event.ActionDeleted)
 	return c.NoContent(http.StatusOK)
 }
@@ -283,15 +283,19 @@ func (s ChallengeService) Get(c echo.Context) error {
 }
 
 func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool, action string) {
+	var err error
 	// Known issue: when a user updates their display name. This will get out of sync.
-	// TODO we could look up creators of the list and rebuild, only is costly when one user has many challenges.
-	// TODO will be cheaper if I actually delete lists.
-	// https://github.com/nats-io/nats-streaming-server/issues/502#issuecomment-404463782
-	// max_payload set globally
 	if lookup {
-		// TODO should I check for error?
 		uuid := challenge.UUID
-		challenge, _ = s.repo.Get(uuid)
+		challenge, err = s.repo.Get(uuid)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"event":          "sync-challenge-to-static-site",
+				"error":          err,
+				"challenge_uuid": uuid,
+			}).Error("challenge lookup failed, possibly db issue")
+			return
+		}
 	}
 
 	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
