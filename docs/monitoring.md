@@ -77,7 +77,14 @@ sqlite3 /srv/learnalist/server.db
 ```
 
 
-# Get stats from nats / stan
+# Nat & Stan
+
+## Reload config
+```sh
+kubectl -it exec nats-0  -- nats-server --config /etc/nats-config/nats.conf -sl reload
+```
+
+## Get stats
 
 ```sh
 kubectl -it exec $(kubectl get pods -l "app=nats" -o jsonpath="{.items[0].metadata.name}")  -- wget -qO - 'localhost:8222/varz' | jq
