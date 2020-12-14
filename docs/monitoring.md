@@ -75,3 +75,18 @@ cat events.ndjson | jq -r 'select(.event=="stale") | "DELETE FROM mobile_device 
 kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
 sqlite3 /srv/learnalist/server.db
 ```
+
+
+# Get stats from nats / stan
+
+```sh
+kubectl -it exec $(kubectl get pods -l "app=nats" -o jsonpath="{.items[0].metadata.name}")  -- wget -qO - 'localhost:8222/varz' | jq
+```
+
+# Query for when the cert expires
+```sh
+export SITE_URL="learnalist.net"
+export SITE_SSL_PORT="443"
+openssl s_client -connect ${SITE_URL}:${SITE_SSL_PORT} \
+  -servername ${SITE_URL} 2> /dev/null |  openssl x509 -noout  -dates
+```
