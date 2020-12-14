@@ -6,7 +6,19 @@
 - nodejs
 
 ## How ugly is the code?
-![Code coverage, manually ran](./coverage_badge.png) <a href="https://goreportcard.com/report/github.com/freshteapot/learnalist-api" target="_blank">learnalist-api on goreportcard.</a> (In a new window).
+
+```sh
+cd server
+goreportcard-cli -v
+```
+Via https://github.com/gojp/goreportcard#command-line-interface
+
+OR
+
+```sh
+cd server
+staticcheck ./...
+```
 
 # Some documentation
 * [Api](../doc/api.md)
