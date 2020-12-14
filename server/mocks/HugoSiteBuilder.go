@@ -4,6 +4,7 @@ package mocks
 
 import (
 	alist "github.com/freshteapot/learnalist-api/server/api/alist"
+	event "github.com/freshteapot/learnalist-api/server/pkg/event"
 
 	logrus "github.com/sirupsen/logrus"
 
@@ -46,6 +47,11 @@ func (_m *HugoSiteBuilder) DeleteUser(uuid string) error {
 	}
 
 	return r0
+}
+
+// OnEvent provides a mock function with given fields: entry
+func (_m *HugoSiteBuilder) OnEvent(entry event.Eventlog) {
+	_m.Called(entry)
 }
 
 // ProcessContent provides a mock function with given fields:
