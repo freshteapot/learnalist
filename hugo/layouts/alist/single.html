@@ -1,7 +1,27 @@
+{{ define "meta" }}
+{{- $aList := getJSON "data/alist/" $.Params.Uuid ".json" -}}
+
+{{- with $aList.info.shared_with -}}
+
+{{- if eq . "public" -}}
+<meta name="description" content="{{$aList.info.title}}">
+{{- if gt (len $aList.info.labels) 0 -}}
+<meta name="keywords" content="{{delimit $aList.info.labels ","}}">
+{{- end -}}
+{{- end -}}
+
+{{- if ne . "public" -}}
+<meta name="robots" content="noindex,nofollow">
+{{- end -}}
+
+{{- end -}}
+
+{{ end }}
+
+
 {{ define "header" }}
 {{- partial "title-header.html" . -}}
 {{ end }}
-
 
 {{ define "main" }}
 {{- $aList := getJSON "data/alist/" $.Params.Uuid ".json" -}}
