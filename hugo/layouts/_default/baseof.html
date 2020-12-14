@@ -1,5 +1,10 @@
 <html lang="en">
-{{- partial "head.html" $ -}}
+
+<head>
+    {{- partial "head.html" $ -}}
+    {{ block "meta" . }}{{ end }}
+</head>
+
 
 <body onload="measureCRP()" class="w-100 bg-white">
     {{- partial "header.html" $ -}}

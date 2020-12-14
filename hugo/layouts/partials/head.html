@@ -27,37 +27,36 @@
 
 {{- $shareJS := relURL $manifest.shared -}}
 
-<head>
-    <meta charset="utf-8" />
-    <title>{{.Title}}</title>
-    <meta name="api.server" content="{{.Site.Params.ApiServer}}">
-    <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" href="{{ $cssBundlePath }}">
-    <script>
-        function measureCRP() {
-            var t = window.performance.timing,
-                interactive = t.domInteractive - t.domLoading,
-                dcl = t.domContentLoadedEventStart - t.domLoading,
-                complete = t.domComplete - t.domLoading;
-            var stats = document.createElement('p');
-            stats.textContent = 'interactive: ' + interactive + 'ms, ' +
-                'dcl: ' + dcl + 'ms, complete: ' + complete + 'ms';
-            console.log(stats);
-        }
-    </script>
-    {{- with .Params.css_include -}}
-    {{- range . -}}
-    {{- $name := index $manifestCSS . -}}
-    <link rel="stylesheet" href="{{ relURL $name }}">
-    {{- end -}}
-    {{- end -}}
 
-    <script src="{{ $shareJS }}"></script>
-    {{- with .Params.js_include -}}
-    {{- range . -}}
-    {{- $name := index $manifest . -}}
-    <script type="module" src="{{ relURL $name }}"></script>
-    {{- end -}}
-    {{- end -}}
-</head>
+<meta charset="utf-8" />
+<title>{{.Title}}</title>
+<meta name="api.server" content="{{.Site.Params.ApiServer}}">
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<link rel="shortcut icon" type="image/png" href="/favicon.png" />
+<link rel="stylesheet" href="{{ $cssBundlePath }}">
+<script>
+    function measureCRP() {
+        var t = window.performance.timing,
+            interactive = t.domInteractive - t.domLoading,
+            dcl = t.domContentLoadedEventStart - t.domLoading,
+            complete = t.domComplete - t.domLoading;
+        var stats = document.createElement('p');
+        stats.textContent = 'interactive: ' + interactive + 'ms, ' +
+            'dcl: ' + dcl + 'ms, complete: ' + complete + 'ms';
+        console.log(stats);
+    }
+</script>
+{{- with .Params.css_include -}}
+{{- range . -}}
+{{- $name := index $manifestCSS . -}}
+<link rel="stylesheet" href="{{ relURL $name }}">
+{{- end -}}
+{{- end -}}
+
+<script src="{{ $shareJS }}"></script>
+{{- with .Params.js_include -}}
+{{- range . -}}
+{{- $name := index $manifest . -}}
+<script type="module" src="{{ relURL $name }}"></script>
+{{- end -}}
+{{- end -}}

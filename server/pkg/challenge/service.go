@@ -113,6 +113,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 		},
 	})
 
+	s.updateStaticSite(challenge, false, event.ActionCreated)
 	return c.JSON(http.StatusCreated, challenge)
 }
 
@@ -159,6 +160,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 		},
 	})
 
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, true, event.ActionUpdated)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -214,6 +216,7 @@ func (s ChallengeService) Leave(c echo.Context) error {
 			},
 		},
 	})
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, true, event.ActionUpdated)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -240,7 +243,8 @@ func (s ChallengeService) Delete(c echo.Context) error {
 	_ = s.repo.Delete(challengeUUID)
 	_ = s.acl.DeleteChallenge(challengeUUID)
 
-	// TODO add event challenge.deleted
+	// TODO https://github.com/freshteapot/learnalist-api/issues/175
+	s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, false, event.ActionDeleted)
 	return c.NoContent(http.StatusOK)
 }
 
@@ -276,4 +280,26 @@ func (s ChallengeService) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, challenge)
+}
+
+func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool, action string) {
+	var err error
+	// Known issue: when a user updates their display name. This will get out of sync.
+	if lookup {
+		uuid := challenge.UUID
+		challenge, err = s.repo.Get(uuid)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"event":          "sync-challenge-to-static-site",
+				"error":          err,
+				"challenge_uuid": uuid,
+			}).Error("challenge lookup failed, possibly db issue")
+			return
+		}
+	}
+
+	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+		Kind: event.ChangesetChallenge,
+		Data: challenge,
+	})
 }

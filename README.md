@@ -13,13 +13,10 @@ It will be a service, which will consume the Learnalist API. Hosted via learnali
 
 
 # Getting Started
-- [An index of sorts](docs/README.md)
-- [Setup development environment](docs/setup-server-for-development.md)
+- [An index of sorts](./docs/README.md)
+- [Setup development environment](./docs/setup-server-for-development.md)
 ## Server
-* look at [Readme](docs/README.md).
+* look at [README](./server/README.md).
 
 ## Chrome Extension
 * [learnalist-chrome-extension](https://github.com/freshteapot/learnalist-chrome-extension).
-
-## Developing the Web UI
-* look at [Readme](server/doc/developing-with-svelte-hugo-server.md).

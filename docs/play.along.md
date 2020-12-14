@@ -1,13 +1,6 @@
 # Play along.
 
-```sh
-make clear-site
-make rebuild-db
-make develop
-```
-
-When the database is created, it is empty.
-
+- [Setup development environment](./setup-server-for-development.md)
 ## You need a user first.
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
@@ -17,6 +10,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 }
 '
 ```
+
 Response is
 ```sh
 {"uuid":"1ff95121-1570-5e96-8bd9-bb62fac0b999","username":"iamtest1"}

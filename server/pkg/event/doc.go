@@ -14,6 +14,7 @@ const (
 	ApiListDelete                    = "api.list.delete"
 	ApiSpacedRepetition              = "api.spacedrepetition"
 	TopicMonolog                     = "lal.monolog"
+	TopicStaticSite                  = "lal.staticSite"
 	KindUserRegisterUsername         = "username"
 	KindUserRegisterIDPGoogle        = "idp:google"
 	KindUserLoginIDPGoogle           = "idp:google"
@@ -24,6 +25,8 @@ const (
 	KindPushNotification             = "push-notification"
 	ActionCreated                    = "created"
 	ActionUpdated                    = "updated"
+	ActionDeleted                    = "deleted"
+	ChangesetChallenge               = "changeset.challenge"
 )
 
 var (
@@ -47,6 +50,7 @@ type Eventlog struct {
 	Kind      string      `json:"kind"`
 	Data      interface{} `json:"data"`
 	Timestamp int64       `json:"timestamp,omitempty"`
+	Action    string      `json:"action,omitempty"`
 }
 
 type EventUser struct {

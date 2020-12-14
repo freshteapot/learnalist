@@ -47,6 +47,12 @@ kubectl create secret tls tls \
 --cert /Users/tinkerbell/.acme.sh/learnalist.net/fullchain.cer --dry-run -o yaml | kubectl apply -f -
 ```
 
+```sh
+export SITE_URL="learnalist.net"
+export SITE_SSL_PORT="443"
+openssl s_client -connect ${SITE_URL}:${SITE_SSL_PORT} \
+  -servername ${SITE_URL} 2> /dev/null |  openssl x509 -noout  -dates
+```
 
 # Setup Configmap
 -

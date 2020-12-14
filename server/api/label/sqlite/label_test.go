@@ -223,7 +223,7 @@ var _ = Describe("Testing Label", func() {
 				Expect(err).To(BeNil())
 			})
 
-			Specify("Sucessfully removed", func() {
+			Specify("Successfully removed", func() {
 				mockSql.ExpectBegin()
 				mockSql.ExpectExec(storage.SqlDeleteLabelByList).
 					WithArgs(alistUUID).
@@ -254,7 +254,7 @@ var _ = Describe("Testing Label", func() {
 				userUUID = "fake-123"
 			)
 
-			Specify("Sucessfully removed", func() {
+			Specify("Successfully removed", func() {
 				mockSql.ExpectBegin()
 				mockSql.ExpectExec(storage.SqlDeleteLabelByUser).
 					WithArgs(userUUID, label).

@@ -19,9 +19,11 @@ server/pkg/openapi/
 # hugo
 hugo/content/alist/
 hugo/content/alistsbyuser/
+hugo/content/challenge/
 hugo/data/public_lists.json
 hugo/data/alist/
 hugo/data/alistsbyuser/
+hugo/data/challenge/
 hugo/public/
 hugo/node_modules/
 

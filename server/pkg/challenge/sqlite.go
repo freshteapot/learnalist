@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -49,9 +50,11 @@ WHERE
 	SELECT
 		user_uuid
 	FROM
-		challenge_records
+		acl_simple
 	WHERE
-		uuid=?
+		ext_uuid=?
+	AND
+		access LIKE "api:challenge:%%:write:%%"
 )
 `
 	// Tightly couple the planks with the challenges for now.
@@ -230,28 +233,35 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 	challenge.CreatedBy = entry.UserUUID
 	challenge.Created = entry.Created.Format(time.RFC3339Nano)
 	challenge.Records = make([]ChallengePlankRecord, 0)
-
-	dbItems := make([]dbRecord, 0)
-	r.db.Select(&dbItems, SqlGetPlankRecords, UUID)
-
-	for _, item := range dbItems {
-		var record ChallengePlankRecord
-		json.Unmarshal([]byte(item.Record), &record)
-		record.UserUUID = item.UserUUID
-
-		challenge.Records = append(challenge.Records, record)
-	}
-
 	challenge.Users = make([]ChallengePlankUser, 0)
+
+	// Get users
 	dbChallengeUsers := make([]dbUser, 0)
-
 	r.db.Select(&dbChallengeUsers, SqlGetChallengeUsers, UUID)
-
+	uniqUsers := make([]string, 0)
 	for _, item := range dbChallengeUsers {
 		challenge.Users = append(challenge.Users, ChallengePlankUser{
 			UserUUID: item.UserUUID,
 			Name:     item.DisplayName,
 		})
+		uniqUsers = append(uniqUsers, item.UserUUID)
+	}
+
+	// Get records
+	dbItems := make([]dbRecord, 0)
+	r.db.Select(&dbItems, SqlGetPlankRecords, UUID)
+
+	for _, item := range dbItems {
+		// Dont include users who are not in the group
+		if !utils.StringArrayContains(uniqUsers, item.UserUUID) {
+			continue
+		}
+
+		var record ChallengePlankRecord
+		json.Unmarshal([]byte(item.Record), &record)
+
+		record.UserUUID = item.UserUUID
+		challenge.Records = append(challenge.Records, record)
 	}
 
 	return challenge, nil

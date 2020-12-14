@@ -12,11 +12,15 @@ import (
 func (h HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
+	c := h.challengeWriter.GetFilesToPublish()
 
 	logContext.WithFields(logrus.Fields{
-		"event":      "build-stats",
-		"lists":      len(a),
-		"user_lists": len(b),
+		"event": "build-stats",
+		"stats": map[string]interface{}{
+			"lists":      len(a),
+			"user_lists": len(b),
+			"challenges": len(c),
+		},
 	}).Info("stats")
 
 	toPublish := append(a, b...)
@@ -29,11 +33,20 @@ func (h HugoHelper) Build(logContext *logrus.Entry) {
 		return
 	}
 
-	h.buildSite(logContext)
+	err := h.buildSite(logContext)
+	if err != nil {
+		err := h.buildSite(logContext)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"event": "repeat-attempt-failed",
+				"error": err,
+			}).Error("failed building hugo")
+		}
+	}
 	h.StopCronJob(logContext)
 }
 
-func (h HugoHelper) buildSite(logContext *logrus.Entry) {
+func (h HugoHelper) buildSite(logContext *logrus.Entry) error {
 	logContext = logContext.WithFields(logrus.Fields{
 		"event": "build-site",
 	})
@@ -51,12 +64,14 @@ func (h HugoHelper) buildSite(logContext *logrus.Entry) {
 		logContext.WithFields(logrus.Fields{
 			"error": err,
 			"out":   string(out),
-		}).Fatal("failed")
+		}).Error("failed")
+		return err
 	}
 
 	logContext.WithFields(logrus.Fields{
 		"out": string(out),
 	}).Info("done")
+	return nil
 }
 
 func (h HugoHelper) deleteFiles(files []string) {

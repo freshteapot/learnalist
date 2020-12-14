@@ -290,7 +290,7 @@ paths:
       parameters:
         - in: query
           name: labels
-          description: Filter your lists by one or many labels. "seperated by ,".
+          description: Filter your lists by one or many labels. "separated by ,".
           schema:
             type: string
         - in: query

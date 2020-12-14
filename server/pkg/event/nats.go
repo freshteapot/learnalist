@@ -90,7 +90,7 @@ func (b *natsBus) Start(topic string) {
 
 		for _, listener := range b.listeners {
 			if listener.topic != topic {
-				return
+				continue
 			}
 
 			type HandlerType func(entry Eventlog)

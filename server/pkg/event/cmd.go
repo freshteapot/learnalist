@@ -42,4 +42,5 @@ func SetupEventBus(logContext logrus.FieldLogger) {
 	}
 
 	GetBus().Start(TopicMonolog)
+	GetBus().Start(TopicStaticSite)
 }

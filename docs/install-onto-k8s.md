@@ -19,6 +19,16 @@ kubectl config use-context default
 127.0.0.1 registry.devbox
 ```
 
+# Setup file structure
+- Log onto the server
+```
+mkdir -p /srv/learnalist/{bin,site-cache}
+cp -rf ./hugo/static/* /srv/learnalist/site-cache/
+cp -r ./hugo /srv/learnalist
+mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser,content/challenge,data/challenge}
+ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
+```
+
 # Add resources from k8s
 ## Nats + stan
 - First single files
@@ -252,4 +262,32 @@ kubectl create configmap learnalist-config --from-file=config.yaml=current.yaml 
 ```
 kubectl create secret generic learnalist-fcm \
 --from-file=fcm-credentials.json=./../secrets/fcm-credentials.json
+```
+
+
+
+# Update nats configmaps
+## Nats
+### Current
+```sh
+kubectl get configmaps nats-config -oyaml | yq r - "data[nats.conf]" > nats.conf
+```
+### Update
+```sh
+kubectl create configmap stan-config --from-file=stan.conf=./k8s/nats-stan.conf -o yaml --dry-run | kubectl replace -f -
+```
+
+## Stan
+### Current
+```sh
+kubectl get configmaps stan-config -oyaml | yq r - "data[stan.conf]" > stan.conf
+```
+### Update
+```sh
+kubectl create configmap nats-config --from-file=nats.conf=./k8s/nats-nats.conf -o yaml --dry-run | kubectl replace -f -
+```
+
+# Reload nats
+```sh
+nats-server --config /etc/nats-config/nats.conf -sl reload
 ```
