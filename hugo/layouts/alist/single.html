@@ -14,7 +14,6 @@
     {{- end -}}
     {{- end -}}
     {{- if in $allowed $aList.info.type -}}
-    <h2 id="list-title">Data</h2>
     <div id="list-data">
         {{- $name := printf "alist/%s/data.html" $aList.info.type -}}
         {{ partial $name $aList }}
