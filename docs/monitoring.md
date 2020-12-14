@@ -90,6 +90,12 @@ kubectl -it exec nats-0  -- nats-server --config /etc/nats-config/nats.conf -sl 
 kubectl -it exec $(kubectl get pods -l "app=nats" -o jsonpath="{.items[0].metadata.name}")  -- wget -qO - 'localhost:8222/varz' | jq
 ```
 
+## List stores
+```sh
+kubectl port-forward svc/stan 8222:8222 &
+curl localhost:8222/streaming/storez
+```
+
 # Query for when the cert expires
 ```sh
 export SITE_URL="learnalist.net"
@@ -97,3 +103,7 @@ export SITE_SSL_PORT="443"
 openssl s_client -connect ${SITE_URL}:${SITE_SSL_PORT} \
   -servername ${SITE_URL} 2> /dev/null |  openssl x509 -noout  -dates
 ```
+
+# Reference
+- https://docs.nats.io/nats-streaming-concepts/monitoring/endpoints
+- https://docs.nats.io/nats-server/configuration/monitoring#monitoring-endpoints
