@@ -33,11 +33,20 @@ func (h HugoHelper) Build(logContext *logrus.Entry) {
 		return
 	}
 
-	h.buildSite(logContext)
+	err := h.buildSite(logContext)
+	if err != nil {
+		err := h.buildSite(logContext)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"event": "repeat-attempt-failed",
+				"error": err,
+			}).Error("failed building hugo")
+		}
+	}
 	h.StopCronJob(logContext)
 }
 
-func (h HugoHelper) buildSite(logContext *logrus.Entry) {
+func (h HugoHelper) buildSite(logContext *logrus.Entry) error {
 	logContext = logContext.WithFields(logrus.Fields{
 		"event": "build-site",
 	})
@@ -55,12 +64,14 @@ func (h HugoHelper) buildSite(logContext *logrus.Entry) {
 		logContext.WithFields(logrus.Fields{
 			"error": err,
 			"out":   string(out),
-		}).Fatal("failed")
+		}).Error("failed")
+		return err
 	}
 
 	logContext.WithFields(logrus.Fields{
 		"out": string(out),
 	}).Info("done")
+	return nil
 }
 
 func (h HugoHelper) deleteFiles(files []string) {
