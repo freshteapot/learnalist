@@ -12,8 +12,8 @@ clear-site:
 	mkdir -p ./hugo/{content/alistsbyuser,data/alistsbyuser}
 	mkdir -p ./hugo/{content/challenge,data/challenge}
 	rm -f ./hugo/content/alist/*
-	rm -f ./hugo/content/alistsbyuser/*
 	rm -f ./hugo/data/alist/*
+	rm -f ./hugo/content/alistsbyuser/*
 	rm -f ./hugo/data/alistsbyuser/*
 	rm -f ./hugo/content/challenge/*
 	rm -f ./hugo/data/challenge/*
