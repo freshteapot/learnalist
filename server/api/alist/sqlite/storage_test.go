@@ -44,7 +44,7 @@ var _ = Describe("Testing Alist Sqlite Storage", func() {
 			userUUID = "fake-user-123"
 		)
 
-		Specify("Sucessfully removed", func() {
+		Specify("Successfully removed", func() {
 			uuid := "fake-list-123"
 			title := "I am a title"
 			rs := sqlmock.NewRows([]string{"title", "uuid"}).
@@ -64,7 +64,7 @@ var _ = Describe("Testing Alist Sqlite Storage", func() {
 	})
 
 	When("GetPublicLists", func() {
-		Specify("Sucessfully removed", func() {
+		Specify("Successfully removed", func() {
 			uuid := "fake-list-123"
 			title := "I am a title"
 			rs := sqlmock.NewRows([]string{"uuid", "title"}).
@@ -89,7 +89,7 @@ var _ = Describe("Testing Alist Sqlite Storage", func() {
 			userUUID  = "fake-user-123"
 		)
 
-		Specify("Sucessfully removed", func() {
+		Specify("Successfully removed", func() {
 			mockSql.ExpectExec(storage.SqlDeleteItemByUserAndUUID).
 				WithArgs(alistUUID, userUUID).
 				WillReturnResult(sqlmock.NewResult(1, 1))
