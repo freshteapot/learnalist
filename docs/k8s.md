@@ -104,8 +104,4 @@ rsync -avvvzP \
 # Reference
 - [acme.sh](https://github.com/acmesh-official/acme.sh)
 - [cronjob to keep ssl updated](https://github.com/math-nao/certs)
-<<<<<<< HEAD
 - [1 tls per domain](https://github.com/math-nao/certs/issues/36#issuecomment-744317680)
-=======
-
->>>>>>> 386dd0c... template looks good
