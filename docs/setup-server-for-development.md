@@ -1,5 +1,55 @@
 # Install server for development
 
+```sh
+git clone https://github.com/freshteapot/learnalist-api.git
+cd learnalist-api/
+```
+
+# Zero to hero
+## Start nats
+```sh
+make run-nats-from-docker
+```
+
+## Run
+### Full stack
+- useful when you want to work with JS or the UI
+
+```sh
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make develop
+```
+
+Your server should now be running on port 1234 with the database created at /tmp/learnalist/server.db.
+
+```sh
+curl -i http://localhost:1234/api/v1/
+```
+
+Go [try some curl requests.](./play.along.md)
+
+
+
+### Api
+- useful when you want to work with JS or the UI
+
+```sh
+make clear-site rebuild-db
+EVENTS_VIA="nats" \
+EVENTS_STAN_CLUSTER_ID="test-cluster" \
+EVENTS_STAN_CLIENT_ID="lal-server" \
+EVENTS_NATS_SERVER="127.0.0.1" \
+HUGO_EXTERNAL=false \
+make run-api-server
+```
+
+# More details
+
 ## Setup
 - setup folder structure and remove any data that already exists
 - setup empty database
@@ -20,24 +70,15 @@ make run-api-server
 HUGO_EXTERNAL=false make run-api-server
 ```
 
-## Run hugo, server, js
-- this will use hugo externally
-- hugo on port 1313
-- server on port 1234
-```sh
-make develop
-```
-
-
 ## Run via docker
-```
+```sh
 make clear-site
 make rebuild-db
 make build-image-base
 make build-image
 ```
 
-```
+```sh
 docker run --rm --name learnalist \
 -v $(pwd)/hugo:/srv/learnalist/hugo \
 -v $(pwd)/config:/srv/learnalist/config \
@@ -77,14 +118,6 @@ EVENTS_NATS_SERVER="127.0.0.1" \
 HUGO_EXTERNAL=false \
 make develop
 ```
-### memory
-```sh
-make clear-site rebuild-db
-EVENTS_VIA="memory" \
-HUGO_EXTERNAL=false \
-make develop-localhost
-```
-
 ## Running slack events
 - Get slack secret from the cluster, checkout [api.events](./api.events.md)
 
@@ -135,4 +168,3 @@ EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools natsutils read
 ```
-

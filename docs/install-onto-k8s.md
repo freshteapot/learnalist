@@ -19,6 +19,16 @@ kubectl config use-context default
 127.0.0.1 registry.devbox
 ```
 
+# Setup file structure
+- Log onto the server
+```
+mkdir -p /srv/learnalist/{bin,site-cache}
+cp -rf ./hugo/static/* /srv/learnalist/site-cache/
+cp -r ./hugo /srv/learnalist
+mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser,content/challenge,data/challenge}
+ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
+```
+
 # Add resources from k8s
 ## Nats + stan
 - First single files
