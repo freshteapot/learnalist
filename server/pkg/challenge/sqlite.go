@@ -47,7 +47,7 @@ FROM
 	user_info
 WHERE
 	uuid IN(
-		SELECT
+	SELECT
 		user_uuid
 	FROM
 		acl_simple
