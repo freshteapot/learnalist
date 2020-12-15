@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -96,14 +97,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
-	//fmt.Println("VerifiedEmail", token.VerifiedEmail)
-	//fmt.Println("UserId", token.UserId)
-	//fmt.Println("Email", token.Email)
-
-	// Lookup user by idp + ID
-	// TODO what should the contents be?
-	// TODO Do I want to send in the accessToken and get the data? do i care?
-	contents := []byte(`{"action":"//TODO"}`)
 	extUserID := token.UserId
 	userUUID, err := userFromIDP.Lookup(input.Idp, IDPKindUserID, extUserID)
 	if err != nil {
@@ -115,6 +108,38 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			}).Error("Issue in login via idp")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
+
+		// TODO needs better http setup
+		req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", input.AccessToken))
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"event": "idp-user-info-via-google-1",
+				"error": err,
+			}).Error("Issue in login via idp")
+			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		}
+
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			logContext.WithFields(logrus.Fields{
+				"event":       "idp-user-info-via-google-2",
+				"status_code": resp.StatusCode,
+				"error":       err,
+			}).Error("Issue in login via idp")
+			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		}
+
+		contents, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"event": "idp-user-info-via-google-3",
+				"error": err,
+			}).Error("Issue in login via idp")
+			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		}
+
 		// Create a new user
 		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserID, contents)
 		if err != nil {
@@ -125,7 +150,16 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			}).Error("Failed to register new user via login with id_token")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
-
+		/*
+			logContext.WithFields(logrus.Fields{
+				"event":              "idp-lookup-user-info",
+				"idp":                input.Idp,
+				"verified_email":     token.VerifiedEmail,
+				"internal_user_uuid": userUUID,
+				"external_user_id":   token.UserId,
+				"email":              token.Email,
+			}).Info("user")
+		*/
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
