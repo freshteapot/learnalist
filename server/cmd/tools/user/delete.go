@@ -29,6 +29,9 @@ var deleteUserCmd = &cobra.Command{
 	Short: "Remove a user from the system",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "tools-user-delete"))
+
 		dsn := viper.GetString("server.sqlite.database")
 
 		userUUID := args[0]
