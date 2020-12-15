@@ -49,6 +49,14 @@ func (s ChallengeService) Challenges(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	allowed := []string{"", KindPlankGroup}
+	if !utils.StringArrayContains(allowed, filterByKind) {
+		response := api.HTTPResponseMessage{
+			Message: "Not valid kind",
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
 	challenges, _ := s.repo.GetChallengesByUser(lookupUserUUID, filterByKind)
 	return c.JSON(http.StatusOK, challenges)
 }
