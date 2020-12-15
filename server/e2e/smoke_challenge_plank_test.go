@@ -117,7 +117,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 	})
 
-	FIt("Test filtering via kind", func() {
+	It("Test filtering via kind", func() {
 		// Create user
 		// Login
 		// Create challenge TODO
