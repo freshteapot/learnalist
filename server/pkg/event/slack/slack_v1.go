@@ -60,6 +60,8 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 
 		msg.Text = fmt.Sprintf("%s: user:%s logged out via %s, clearing %s", entry.Kind, moment.UUID, via, clearing)
 	case event.ApiUserDelete:
+		fallthrough
+	case event.CMDUserDelete:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
 		json.Unmarshal(b, &moment)
