@@ -1,0 +1,859 @@
+HTTP/2 302 
+content-type: text/html; charset=utf-8
+location: /ra/s.aspx?s=938634X256914680X45472
+server: Microsoft-IIS/10.0
+backend-server: A
+x-robots-tag: noindex
+date: Mon, 14 Dec 2020 21:53:52 GMT
+content-length: 160
+
+HTTP/2 200 
+cache-control: private
+content-type: text/html; charset=utf-8
+server: Microsoft-IIS/10.0
+x-aspnet-version: 4.0.30319
+request-context: appId=cid-v1:83b1df7b-e407-40cb-8870-e70fcc94f7d6
+access-control-expose-headers: Request-Context
+backend-server: A
+x-robots-tag: noindex
+access-control-allow-headers: accept, content-type
+access-control-allow-origin: *
+access-control-allow-methods: POST, GET, OPTIONS
+date: Mon, 14 Dec 2020 21:53:52 GMT
+content-length: 41782
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="no" xml:lang="no">
+<head><title>
+	Netigate
+</title><meta charset="utf-8" /><meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, height=device-height" /><meta http-equiv="x-ua-compatible" content="ie=edge" /><meta property="og:type" content="article" />
+        <meta property="og:url" content="https://netigate.se/ra/s.aspx?s=938634X256914680X45472" />
+        <meta property="og:title" content="Netigate" />
+        <meta property="og:image" content="img/share.png" />
+        <meta property="og:description" content="Unlock your full insight potential" />
+    <meta name="referrer" content="no-referrer" />
+
+    <link rel="shortcut icon" type="image/png" href="favicon.svg?v=1699260539" />
+
+    <meta name="ROBOTS" content="NOINDEX" />
+
+    <!--[if lt IE 9 ]> 
+        <link REL="StyleSheet" href="legacy.css?v=0" TYPE="text/css" />
+    <![endif]-->
+
+    
+        <script type="text/javascript">
+            var forceDesktop = false;
+            var forceMobile = false;
+
+            var currentquestion;
+        </script>
+    <link href="css/jquery-ui.css" rel="stylesheet" /><link href="css/jquery-ui.theme.css" rel="stylesheet" /><link rel="stylesheet" href="css/bootstrap.css" type="text/css" /><link rel="stylesheet" href="css/bootstrap-theme.css" type="text/css" /><link rel="stylesheet" href="css/fontawesome-pro-5.8.1-web/css/all.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/warningstyle.css?v=2020-12-09" type="text/css">
+    <link rel="stylesheet" href="css/datepicker.css?v=2020-12-09" type="text/css">
+
+    <link href="css/open-sans.css" rel="stylesheet" /><link rel="stylesheet" href="css/jquery.fullpage.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/style.css?v=2020-12-09" type="text/css">
+    <link id="themeCSS" rel="stylesheet" type="text/css" href="css/milkyway.css?v=2020-12-09" /><style id="styleholder" type="text/css">#mainbanner{background-image: url(../custuploads/aac7ba4e-f7d3-4c40-83d1-26d81e3f7822.png);;}
+#progressbardiv .progress-question {
+background: rgb(252, 60, 101);
+}
+
+#pb-percentage {
+background: rgb(252, 60, 101);
+}
+
+#fp-nav ul li a.active span {
+background: rgb(252, 60, 101);
+}
+
+.survey-question.question-type-netigateStarRating .form-check.hover > label i.fa {
+color: rgb(252, 60, 101);
+}
+
+.survey-question.question-type-netigateStarRating .form-check.star i.fa-star {
+color: rgb(252, 60, 101);
+}
+
+.survey-question.question-type-netigateStarRating .form-check i.fa-star-o {
+color: rgba(252, 60, 101, 0.6);
+}
+
+.survey-question.question-type-netigateStarRating .form-check .qoption {
+font-size: 1.2em;
+color: rgb(37, 37, 37);
+}
+
+body #contentContainer .survey-question-content {
+margin-bottom: 0px;
+}
+
+.survey-header .survey-header-content .subtitle {
+padding-top: 0px;
+padding-bottom: 0px;
+margin: 0px;
+}
+
+body {
+background: rgb(255, 255, 255);
+}
+
+#contentContainer {
+padding-top: 25px;
+}
+
+nav.navbar.navbar-fixed-top {
+height: 70px;
+padding-bottom: 0px;
+}
+
+#progressbardiv {
+height: 5px;
+bottom: auto;
+top: 70px;
+}
+
+.netigate_slide-wrapper .slide-statement {
+min-height: 50px;
+}
+
+.netigate_slide-wrapper .slide-statement .qoption {
+font-weight: bold !important;
+font-size: 1.1em;
+color: rgb(37, 37, 37);
+}
+
+.row.survey-question .survey-question-header, .netigate_slide-wrapper .slide-statement {
+font-size: 1.1em;
+color: rgb(37, 37, 37);
+}
+
+body, .survey-header .survey-header-content .subtitle, .survey-question .survey-question-header .mheader, .survey-intro .qdescription, .form-control, .form-check-label > span, .qoption:not(.infotext), .question-type-netigateSlider .range-input label.range-input-left, .question-type-netigateSlider .range-input label.range-input-right, double-matrix .qoption, .question-type-netigateMatrix .qoption {
+font-size: 1.2em;
+color: rgb(37, 37, 37);
+}
+
+.survey-question .survey-question-header .mheader {
+font-weight: bold;
+font-size: 1.2em;
+color: rgb(37, 37, 37);
+}
+
+.survey-header .survey-header-content .title {
+font-size: 1.9em;
+font-weight: bold;
+color: rgb(37, 37, 37);
+}
+
+.qoption.infotext {
+font-size: 1.2em;
+color: rgb(37, 37, 37);
+}
+
+.navbar.navbar-fixed-bottom #nextQuestion {
+background-color: rgb(252, 60, 101);
+}
+
+.navbar.navbar-fixed-bottom #nextQuestion:hover {
+background-color: rgba(252, 60, 101, 0.8);
+}
+
+.question-type-matrixRanking .form-check .form-check-label:hover .netigate_helper:before, .question-type-double-matrix .form-check .form-check-label:hover .netigate_helper:before, .question-type-netigateMatrix .form-check .form-check-label:hover .netigate_helper:before, .question-type-nps .form-check .form-check-label:hover .netigate_helper:before, .question-type-horizontal-checkboxes .form-check .form-check-label:hover .netigate_helper:before, .question-type-horizontal-radiobuttons .form-check .form-check-label:hover .netigate_helper:before, .question-type-checkboxesWithText .form-check .form-check-label:hover .netigate_helper:before, .question-type-netigateCheckboxes .form-check .form-check-label:hover .netigate_helper:before, .question-type-radiobuttonsWithText .form-check .form-check-label:hover .netigate_helper:before, .question-type-netigateRadiobutton .form-check .form-check-label:hover .netigate_helper:before {
+border-color: rgb(252, 60, 101)!important;
+}
+
+.survey-question-content .form-control:focus {
+box-shadow: none;
+border-color: rgb(252, 60, 101);
+}
+
+.question-type-matrixRanking .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-double-matrix .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-netigateMatrix .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-nps .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-horizontal-checkboxes .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-horizontal-radiobuttons .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-checkboxesWithText .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-netigateCheckboxes .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-radiobuttonsWithText .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-netigateRadiobutton .form-check input[type="radio"]:checked ~ .netigate_helper {
+background: rgb(252, 60, 101) !important;
+}
+
+.question-type-matrixRanking .form-check input:checked ~ .netigate_helper:before, .question-type-double-matrix .form-check input:checked ~ .netigate_helper:before, .question-type-netigateMatrix .form-check input:checked ~ .netigate_helper:before, .question-type-nps .form-check input:checked ~ .netigate_helper:before, .question-type-horizontal-checkboxes .form-check input:checked ~ .netigate_helper:before, .question-type-horizontal-radiobuttons .form-check input:checked ~ .netigate_helper:before, .question-type-checkboxesWithText .form-check input:checked ~ .netigate_helper:before, .question-type-netigateCheckboxes .form-check input:checked ~ .netigate_helper:before, .question-type-radiobuttonsWithText .form-check input:checked ~ .netigate_helper:before, .question-type-netigateRadiobutton .form-check input:checked ~ .netigate_helper:before {
+border-color: rgb(252, 60, 101)!important;
+}
+
+.question-type-matrixRanking .form-check .netigate_helper:after, .question-type-double-matrix .form-check .netigate_helper:after, .question-type-netigateMatrix .form-check .netigate_helper:after, .question-type-nps .form-check .netigate_helper:after, .question-type-horizontal-radiobuttons .form-check .netigate_helper:after, .question-type-radiobuttonsWithText .form-check .netigate_helper:after, .question-type-netigateRadiobutton .form-check .netigate_helper:after {
+background-color: rgb(252, 60, 101)!important;
+}
+
+.question-type-horizontal-checkboxes .form-check .netigate_helper:after, .question-type-checkboxesWithText .form-check .netigate_helper:after, .question-type-netigateCheckboxes .form-check .netigate_helper:after {
+color:rgb(252, 60, 101)!important;
+}
+
+.question-type-netigateSlider .ui-slider-range {
+background: rgb(252, 60, 101);
+}
+
+.netigate_slide-wrapper .netigate_slide-nav-container .dots .dot.dot_active {
+background: rgb(252, 60, 101);
+border-color: rgb(252, 60, 101);
+}
+
+.netigate_slide-wrapper .netigate_slide-nav {
+background-color: rgb(252, 60, 101);
+}
+
+.netigate_slide-wrapper:not(.lock_forward) .netigate_slide-nav.active:hover {
+background-color: rgba(252, 60, 101, 0.8);
+}
+
+.question-type-matrixRanking .netigate_helper:before, .question-type-double-matrix .netigate_helper:before, .question-type-netigateMatrix .netigate_helper:before, .question-type-nps .form-check .netigate_helper:before, .question-type-horizontal-checkboxes .form-check .netigate_helper:before, .question-type-horizontal-radiobuttons .form-check .netigate_helper:before, .question-type-checkboxesWithText .form-check .netigate_helper:before, .question-type-netigateCheckboxes .form-check .netigate_helper:before, .question-type-radiobuttonsWithText .form-check .netigate_helper:before, .question-type-netigateRadiobutton .form-check .netigate_helper:before
+{
+border-color: rgb(165, 165, 165);
+background-color: rgb(234, 234, 234);
+}
+
+.question-type-matrixRanking .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-double-matrix .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-netigateMatrix .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-nps .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-horizontal-checkboxes .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-horizontal-radiobuttons .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-checkboxesWithText .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-netigateCheckboxes .form-check input[type="checkbox"]:checked ~ .netigate_helper, .question-type-radiobuttonsWithText .form-check input[type="radio"]:checked ~ .netigate_helper, .question-type-netigateRadiobutton .form-check input[type="radio"]:checked ~ .netigate_helper
+{
+background: rgba(252, 60, 101, 0.6) !important;
+}
+
+.question-type-nps .form-check input[type ="radio"]:checked ~ .netigate_helper {
+background: rgb(252, 60, 101) !important;
+}
+
+@keyframes answer-click-effect {
+0% {
+background: rgba(252, 60, 101, 0.6)
+}
+100% {
+background: rgba(252, 60, 101, 0.6)
+}
+}</style><link id="wcagTheme" rel="stylesheet" type="text/css" /><link href="/ra/WebResource.axd?d=rYeilKevVLmvpDRrslgI1zueErEBcD-gpzfsNNiYjNwWRE6S5KMNTfadD-lisqxwWRdySnpxNATyAbJUSmKJ89trw2h8D2xLa1oIuxbA4h0LhWq0eN526lEht1ANz3tMrlZ-ScqJVHhOGE4ew82Qp-PV_sZsuhXhkWOds_Sl1_U1&amp;t=637399147900000000" type="text/css" rel="stylesheet" /></head>
+<body id="body" data-sid="938634" first-time-initiated="true" data-lang-rtl="false" class="page-firstpage     ">
+
+    <div id='validatorcaptions' style='display:none'><li>Velg et svaralternativ</li><li>Velg ett eller fler svaralternativ</li><li>Velg et svaralternativ fra rullegardinmenyen</li><li>Velg ett eller fler svaralternativ fra rullegardinmenyen</li><li>Tekstsvar er påkrevd</li><li>Tekstsvar er påkrevd</li><li>Kontakt</li><li>Informasjon om respondenten er allerede lagret. Kontakt personen nedenfor for mer informasjon.</li><li>Siden ble ikke funnet</li><li>Undersøkelsen er ikke tilgjengelig for øyeblikket. Kontakt eieren av undersøkelsen for mer informasjon.</li><li>Et numerisk svar er påkrevd</li><li>Du har allerede besvart denne undersøkelsen</li><li>Avslutt</li><li>Ranger [x] rader</li><li>Anngi en gyldig e-postadresse</li><li>Riktig(e) svar</li><li>Uriktig(e) svar</li><li>Velg minst [x] alternativ(er)</li><li>Du kan velge maks [x] alternativ(er)</li><li>Økten din har utløpt. Vennligst klikk på lenken igjen, eller kontakt <a href="mailto:info@netigate.se">info@netigate.se</a> om du har spørsmål.</li><li>Svar levert av</li><li>Denne undersøkelsen har nådd maks antall svar</li><li>Tidsgrensen for undesøkelsen er nådd</li><li>For å fortsette, besvar på spørsmålet ved å flytte glidebryteren</li><li>Poeng</li><li>Minst [x] tegn</li><li>Maks [x] tegn</li><li>Velg et alternativ for hver rad</li><li>Dato skal oppgis i formatet år-måned-dag (YYYY-MM-DD)</li><li>Totalsummen skal bli [x]</li></div>
+     
+    <div id='wcag-captions' style='display:none;'><li id='wcag-caption-active'>Tilgjengelighetsmodus er aktivert</li><li id='wcag-caption-inactive'>Tilgjengelighetsmodus er deaktivert</li><li id='wcag-caption-active2'>Deaktiver tilgjengelighetsmodus</li><li id='wcag-caption-inactive2'>Aktiver tilgjengelighetsmodus</li><li id='wcag-caption-progress'>Forløp</li></div>
+
+    <noscript>
+        <meta http-equiv="refresh" content="0;URL=https://netigate.se/pleaseactivatescripts.htm">
+    </noscript>
+
+    <form name="form1" method="post" action="./s.aspx?s=938634X256914680X45472" id="form1" novalidate="">
+<input type="hidden" name="ToolkitScriptManager1_HiddenField" id="ToolkitScriptManager1_HiddenField" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTg4NTA4ODc2N2Rk3zIFc5lVsVpZsxFt+0KkZ9hMbhjNeQTRbRoF5bRPN5M=" />
+
+<script></script>
+<script src="/ra/ScriptResource.axd?d=ZQ5zpGvJrxNFDNKDqCQlrnpjqBmJ_S0ggfoQ_ECG023oLeI0mmJnzTsghECbJFcDhElS5nvGxPA933zeBM1cksfoG8kqrSUW1tj-Ie45VYVV82LUhk2KdDb4lKCso4qS0&amp;t=ffffffffec54f2d7" type="text/javascript"></script>
+<script src="/ra/s.aspx?_TSM_HiddenField_=ToolkitScriptManager1_HiddenField&amp;_TSM_CombinedScripts_=%3b%3bAjaxControlToolkit%2c+Version%3d3.5.40412.0%2c+Culture%3dneutral%2c+PublicKeyToken%3d28f01b0e84b6d53e%3aen-US%3a1547e793-5b7e-48fe-8490-03a375b13a33%3a475a4ef5%3a5546a2b%3ad2e10b12%3aeffe2a26%3a37e2e5c9%3a5a682656%3abfe70f69" type="text/javascript"></script>
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2771D5ED" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAaGBXHw1nBT83JPgNwUylnn+45CBl07VhFzia3anCoUEN3SZqLla5aJ+nNMIpUAJunryE4TT2h2hirXEEop6I0d4j8XM+2+i+5msLkmuxHvacK5XdSz2jobI99ZdOrS3ygh3a/Py21D4orF4rCi1mhiOiQEUkxZ+03mR3vk5+Pj3w==" />
+        
+        
+        <nav role="presentation" class="navbar navbar-fixed-top navbar-light bg-faded">
+                 
+	            <div class="navbar-brand">
+	               <img src="../custuploads/aac7ba4e-f7d3-4c40-83d1-26d81e3f7822.png" id="mainbanner" width="30" height="30" class="display-logo" alt="" />
+	            </div>
+	            <div id="wcag_button_wrapper"></div>
+
+            <div id="progressbardiv" data-display-percentage="false">
+                <div id="progressbar" class="progress-page">
+
+</div>
+                <div id="progressBarInner" class="progress-question pbarinner" style="width:0%;">
+                    <div id="pb-percentage" aria-hidden="true">
+                        <span id="pbPercentageValue" class="pb-number">0</span>
+                        <span class="pb-symbol">%</span>
+                    </div>
+                </div>
+                <div id="progressLeft"></div>
+				<span id="progressText"></span>
+			</div> 
+        </nav>
+        <main role="main" id="main" class="container">
+
+
+            <input type="submit" name="Consentbutton$standardbutton1" value="Button" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;Consentbutton$standardbutton1&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="Consentbutton_standardbutton1" />
+
+
+
+            <div id="ContentAndFooter">
+                <div id="content" class="row">
+                    <div id="contentContainer" class="col-xs-12 survey-container">
+
+                        
+
+                    <div class='fullscreen-section req row survey-question question-type-netigateRadiobutton' name='radiobutton'><div class='col-xs-12 survey-question-header'><span class='error-message' aria-hidden='true'>*Svar er påkrevd.</span><span aria-hidden="true" class='mheader'>Totalt sett, hvor tilfreds er du med Chilimobil som leverand&#248;r?</span></div><div class='col-xs-12 survey-question-content'><fieldset class='form-group' id='ctl17_N-3-160389307'><legend class='outside-viewport'>Totalt sett, hvor tilfreds er du med Chilimobil som leverand&#248;r? *Svar er påkrevd.</legend><div class='form-check'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_0" name="ctl17$N-3-160389307" value="1" onclick="radio(this);"><span class="qoption radioQuestionOption">1 - Sv&#230;rt lite forn&#248;yd</span><div class='netigate_helper'></div></label></div><div class='form-check'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_1" name="ctl17$N-3-160389307" value="2" onclick="radio(this);"><span class="qoption radioQuestionOption">2</span><div class='netigate_helper'></div></label></div><div class='form-check'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_2" name="ctl17$N-3-160389307" value="3" onclick="radio(this);"><span class="qoption radioQuestionOption">3</span><div class='netigate_helper'></div></label></div><div class='form-check'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_3" name="ctl17$N-3-160389307" value="4" onclick="radio(this);"><span class="qoption radioQuestionOption">4</span><div class='netigate_helper'></div></label></div><div class='form-check'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_4" name="ctl17$N-3-160389307" value="5" onclick="radio(this);"><span class="qoption radioQuestionOption">5 - Sv&#230;rt forn&#248;yd</span><div class='netigate_helper'></div></label></div><div class='form-check nullWeight'><label class='form-check-label'><input  type ="radio" required class="form-check-input netigateradiobutton" id="ctl17_N-3-160389307_5" name="ctl17$N-3-160389307" value="6" onclick="radio(this);"><span class="qoption radioQuestionOption">Vet ikke&#160;</span><div class='netigate_helper'></div></label></div></fieldset></div></div></div>
+                    
+                    <div id="buttoncontainer" class="col-xs-12">
+                        <div id="buttonholder">
+                            <div id="leftbutton">
+                                
+
+                            </div>
+                            <div id="rightbutton">
+                                <input type="submit" name="Forwardbutton$standardbutton1" value="Neste" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;Forwardbutton$standardbutton1&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="Forwardbutton_standardbutton1" class="NetigateNextButton netigate-end-button btn btn-primary float-xs-right" />
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <footer id="footer" class="row"><div class='col-xs-12 credits'><div class='footerwrapper'><span class='footertext'>Survey Powered by</span> <img style='cursor:pointer' onclick="window.open('https://www.netigate.net')" src='img/Netigate-log-navy-text.svg?v=322304820' alt='Netigate' title='Netigate'><a class='footer-url' href='https://www.netigate.net/' alt='Netigate' title='Netigate' target='_blank'>Enterprise Feedback Management</a></div></div><div class='col-xs-12 footer-text'><div class='footerwrapper'><a href='mailto:arve.andreassen@chilimobil.no' class='footlink'>Kontakt</a><span class='footertext'>&nbsp;•&nbsp;</span><a href='../disclaimer.asp?lang=6&id=938634' target='_blank' class='footlink'>Juridisk varsel</a></div></div></footer>
+                <div id="scriptContainer">
+                </div>
+            </div>
+
+
+        </main>
+
+        <!-- cookie notice -->
+        <div id="cookie-popup-container">
+            <div class="cookie-text">
+                Dette nettstedet benytter informasjonskapsler for å forbedre brukeropplevelsen og gi økt funksjonalitet.
+                <a target="_blank" href="https://www.netigate.net/legal/survey-respondents-cookies/">Les mer</a>
+            </div>
+            <button type="button" class="btn cookie-btn" onkeypress="event.stopPropagation();return false;">
+                OK
+            </button>   
+        </div>
+
+        <nav role="navigation" id="navbar-bottom" class="navbar navbar-fixed-bottom navbar-light bg-faded">
+                <div id="navbar-div">                
+                    <div class="netigate_brand">
+                        <a href="https://netigate.net" target="_blank">
+                            <span lang="en" class="text">Survey powered<br/>by Netigate</span>
+                            <img class="netigate_logo" src="img/N-greyscale.svg?v=" alt=""/>
+                        </a>
+                    </div>
+
+                    <button id="nextQuestion" onkeypress="event.stopPropagation()" type="button" class="btn btn-primary">
+                        <span id="spanNext">Neste</span>
+                        <span id="spanNextPage">Neste side</span>
+                        <span id="spanFinnish">Avslutt</span>
+                        <span id="spanStartSurvey">Start undersøkelsen</span>
+                        <span id="spanStartMobile">Start undersøkelsen</span>
+                        <span id="spanFinishMobile"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                    </button>
+
+                    <button id="previousQuestion" onkeypress="event.stopPropagation()" type="button" class="btn btn-primary">
+                        <span>Tilbake</span>
+                    </button>
+                </div>
+            </nav>
+        <input name="NID" type="hidden" id="NID" value="hD72AAA3hF5034F8h1h1hhhWhhh1ghE528Ah0hhhh1h313A30h0" />
+        <input name="MID" type="hidden" id="MID" value="6008D5D7" />
+        <input name="WCAG" type="hidden" id="WCAG" />
+    
+
+<script type="text/javascript">
+//<![CDATA[
+(function() {var fn = function() {$get("ToolkitScriptManager1_HiddenField").value = '';Sys.Application.remove_init(fn);};Sys.Application.add_init(fn);})();//]]>
+</script>
+</form>
+    <form name='pdf' action='https://www.netigate.se/convert/default.aspx' target='_blank' method='post'>
+        <input type='hidden' name='HTML' /></form>
+    <div id="warning">
+    </div>
+    <div id="WarningA">
+    </div>
+    <div id="WarningB">
+    </div>
+
+    
+
+    </body>
+
+<script src="js/libraries/iejquery.js"></script>
+<script src="js/libraries/jquery-ui.min.js"></script> 
+    
+<script src="js/libraries/touchpunch.js"></script>
+
+<script type="text/javascript" src="js/libraries/modal.js"></script>
+<script type="text/javascript" src="js/libraries/bootstrap.js"></script>
+<script type='application/javascript' src='js/libraries/fastclick.js'></script>
+
+<script type="text/javascript" src="js/init.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/validator.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/HelperFunctions.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/warningmessage.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/libraries/scrolloverflow.min.js"></script>
+<script type="text/javascript" src="js/tempscript.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/navigationHandler.js?v=2020-12-09"></script>
+
+<script type="text/javascript" src="js/libraries/jquery.fullpage.min.js"></script>
+<script type="text/javascript" src="js/questions.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/features.js?v=2020-12-09"></script>
+<script type="text/javascript" src="js/cookiePopup.js?v=2020-12-09"></script>
+
+<script type="text/javascript">window.questionItems = JSON.parse('[{"QuestionItemId":160389307,"intQuestionId":8104539,"intItemOrder":1,"intParentId":0,"intItemType":9,"strItemText":"Totalt sett, hvor tilfreds er du med Chilimobil som leverand&#248;r?","intRequired":1,"intMaxLength":0,"strGUID":null,"arrQuestionItems":[]}]'); window.fromPage = 1; window.toPage = 1; </script><script type="text/javascript" src="js/secondmode.js?v=2020-12-09"></script>
+
+<script type="text/javascript" src="slider.js"></script>
+<script type="text/javascript" src="js/libraries/velocity.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#warning_div').click(function () { $(this).fadeOut(2000) });
+
+        activateWcag();
+
+        $('input[type=radio], input[type=checkbox]').keydown(function (e) {
+            if (e.keyCode == 13 || e.which == 32) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }).keyup(function (e) {
+            if (e.keyCode == 13 || e.which == 32) {
+                if (!$(this).hasClass("star-input")) {
+                    $(this).parent().click();
+                } else {
+                    $(this).click();
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+        });
+    });
+
+    function activateWcag() {
+        if ($('#WCAG').attr('Value') != null && $('#WCAG').attr('Value') == "1") {//WCAG
+            //Fix the nav-bar
+            if (!$('#body').hasClass('page-intro')) {
+                $(".netigate_brand").attr("style", "display:none;");
+                $("#navbar-div").attr("class", "container");
+                $("#navbar-div").attr("style", "max-width:800px");
+                if ($("#body").hasClass("page-firstpage")) {
+                    $("#nextQuestion").attr("style", "float:none !important;");
+                    $("#navbar-div").attr("style", "max-width:800px;text-align:center;");
+                }
+
+            } else {
+                $("#nextQuestion").attr("style", "position:absolute!important;right:0px!important;left:auto!important;");
+            }
+
+            //Set a visible outline to the visible parts of the radiobutton/checkboxes when the real (hidden) input is being focused
+            $('input[type=radio], input[type=checkbox]').focus(function () {
+                if ($(this).hasClass("star-input")) {
+                    $("i", $(this).parent()).addClass("wcagfocus");
+                } else {
+                    $('span, div', $(this).parent()).first().addClass('wcagfocus');
+                }
+            }).blur(function () {
+                if ($(this).hasClass("star-input")) {
+                    $("i", $(this).parent()).removeClass("wcagfocus");
+                } else {
+                    $('span, div', $(this).parent()).first().removeClass('wcagfocus');
+                }
+
+
+
+            });
+
+            $('.question-type-matrixRanking input[type=radio], .question-type-double-matrix input[type=radio], .classicMatrix input[type=radio]').focus(function () {
+                $(this).parent().addClass('wcagfocus');
+            }).blur(function () {
+                $(this).parent().removeClass('wcagfocus');
+            });
+
+
+            setTimeout(function () {
+                //Set the page title
+                var progress = $('#progressText').text();
+                if (progress == 'undefined' || progress == '') {
+                    var urlparam = getUrlVars()["l"];
+                    if (urlparam == null || urlparam == 'undefined') {
+                        document.title = 'Netigate - Languages';
+                    } else {
+                        document.title = 'Netigate - Intro';
+                    }
+                } else {
+                    document.title = 'Netigate - ' + progress;
+                }
+
+                //Scroll to the Question that has focus.
+                $('*').focus(function () {
+                    if (currentquestion != null && currentquestion != 'undefined' && currentquestion[0] === $(this).parents('.survey-question:first')[0]) {
+                        return;
+                    }
+                    currentquestion = $(this).parents('.survey-question:first');
+                    if (currentquestion != null && currentquestion != 'undefined' && currentquestion.offset() != null && currentquestion.offset() != 'undefined') {
+                        customScrollTo(currentquestion.offset().top - 300);
+                        //$('html,body').animate({ scrollTop: currentquestion.offset().top - 300 }, 0);
+                    }
+                });
+
+            }, 1);
+
+            if ($('#wcag_button').length > 0) {
+                $('#wcag_button span').html($("#wcag-caption-active2").text());
+                $("#wcag_tooltip").html($("#wcag-caption-active").text());
+                $("#wcag_button").focus();
+            } else {
+                //Focus on first interactive element on the page!!!!
+                focusOnfirstInteractiveElement();
+            }
+        } else {
+            focusOnfirstInteractiveElement();
+            if ($('#wcag_button').length > 0) {
+                $('#wcag_button span').html($("#wcag-caption-inactive2").text());
+                $("#wcag_tooltip").html($("#wcag-caption-inactive").text());
+            }
+        }
+        if ($('#wcag_button').length > 0) {
+            fixContrast();
+            setTimeout(function () {
+                fixContrast();
+            }, 1000);
+        }
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+    }
+
+    function fixContrast() {
+        //make sure that the "accessibility mode" buttons contrast is as high as possible depending on the background-color of the navbar
+        if ($('.navbar-fixed-top').length == 0) return;
+
+        var rgb = $('.navbar-fixed-top').css('background-color').replace(/^(rgb|rgba)\(/, '').replace(/\)$/, '').replace(/\s/g, '').split(',');
+
+        var navbar = (299 * rgb[0] + 587 * rgb[1] + 114 * rgb[2]) / 1000;
+        var white = (299 * 255 + 587 * 255 + 114 * 255) / 1000;
+        var black = (299 * 0 + 587 * 0 + 114 * 0) / 1000;
+
+        if (Math.abs(navbar - white) < Math.abs(navbar - black)) {
+            $('.fa-eye-slash').css("color", "black");
+        } else {
+            $('.fa-eye-slash').css("color", "white");
+        }
+    }
+
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function (m, key, value) {
+                vars[key] = value;
+            });
+        return vars;
+    }
+
+
+
+
+        /***
+        * Function to toggle the input field connected to a checkbox.
+        **/
+        function toggle_input(input) {
+
+            var $this = $("#" + input);
+            if ($this.attr('disabled')) $this.removeAttr('disabled');
+            else {
+                $this.attr('disabled', 'disabled');
+                $this.val("");
+            }
+
+
+        }
+    var state = new Array;
+
+    function radio(button) {
+        if (state[button.name] && state[button.name] == button.value) {
+
+            button.checked = false;
+            state[button.name] = '';
+
+            validateNavigationButtons();
+
+        }
+        else {
+            if (!$(button).hasClass('non-required')) {
+
+                if ($(button).closest('.survey-question').hasClass('question-type-netigateMatrix:not(.classicMatrix)')) {
+
+                    removeNonRequiredQuestions($(button).closest('.netigate_slide'));
+
+                } else if ($(button).closest('.survey-question').is('.question-type-netigateMatrix, .classicMatrix')) {
+
+                    removeNonRequiredQuestions($(button).closest('.matrixcolvalue'));
+
+                } else if ($(button).closest('.survey-question').hasClass('question-type-double-matrix')) {
+
+                    removeNonRequiredQuestions($(button).closest('.matrixcolvalue'));
+
+                }
+                else {
+
+                    removeNonRequiredQuestions($(button).closest('.survey-question'));
+
+                }
+            }
+
+            button.checked = true;
+            state[button.name] = button.value;
+
+        }
+
+        return true;
+    }
+
+    function starRatingRadio(button) {
+        clickStarRating(button);
+        if (state[button.name] && state[button.name] == button.value) {
+
+            state[button.name] = '';
+        }
+        else {
+            if (!$(button).hasClass('non-required')) {
+
+                if ($(button).closest('.survey-question').hasClass('question-type-netigateMatrix:not(.classicMatrix)')) {
+
+                    removeNonRequiredQuestions($(button).closest('.netigate_slide'));
+
+                } else if ($(button).closest('.survey-question').is('.question-type-netigateMatrix, .classicMatrix')) {
+
+                    removeNonRequiredQuestions($(button).closest('.matrixcolvalue'));
+
+                } else if ($(button).closest('.survey-question').hasClass('question-type-double-matrix')) {
+
+                    removeNonRequiredQuestions($(button).closest('.matrixcolvalue'));
+
+                }
+                else {
+
+                    removeNonRequiredQuestions($(button).closest('.survey-question'));
+
+                }
+            }
+
+            state[button.name] = button.value;
+
+        }
+
+        return true;
+    }
+
+    function get_check_value(strFrom, strTo) {
+        var aInput = document.getElementsByName(strFrom);
+        var aTarget = document.getElementsByName(strTo);
+        var c_value = "";
+        for (var i = 0; i < aInput.length; i++) {
+            if (aInput[i].checked) {
+                if (c_value != "") {
+                    c_value = c_value + ",";
+                }
+
+                c_value = c_value + aInput[i].value;
+            }
+
+        }
+        aTarget[0].value = c_value;
+
+    }
+    function generatepdf() {
+        document.pdf.HTML.value = document.getElementById('maindiv').innerHTML;
+        document.pdf.submit();
+    }
+    function generatepdffromcontent() {
+        document.pdf.HTML.value = document.getElementById('content').innerHTML;
+        document.pdf.submit();
+    }
+    function addAnswer(strFrom, strTo) {
+        var aTarget = document.getElementsByName(strTo);
+        aTarget.value++;
+    }
+
+    function DisableValidators(flag) {
+        /*
+            for (i = 0; i < Page_Validators.length; i++) {
+        
+                Page_Validators[i].enabled = flag;
+        
+            }
+        */
+    }
+    function EnableVal() {
+
+        /*    DisableValidators(true);
+        
+            Page_ClientValidate();
+        
+            if (!Page_IsValid) {
+        
+                DisableValidators(false);
+        
+            }
+           
+            return Page_IsValid;*/
+        return true;
+
+    }
+
+    function RankingClick(arrNames, strClickedName, element) {
+        if ($('#WCAG').attr('Value') != null && $('#WCAG').attr('Value') == "1") {//WCAG
+            var objArrClicked = document.getElementsByName(strClickedName);
+            for (var iClickedValue = 0; iClickedValue < objArrClicked.length; iClickedValue++) {
+                if (objArrClicked[iClickedValue].checked == true) {
+                    for (var i = 0; i < arrNames.length; i++) {
+                        var objAR = document.getElementsByName(arrNames[i]);
+                        for (var j = 0; j < objAR.length; j++) {
+                            if (iClickedValue == j && objAR[j].name != strClickedName && objAR[j].checked) {
+                                element.checked = false;
+                                return;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            radio(element);
+            //emptyRankingCheck(); //?
+        } else {
+            CheckRanking(arrNames, strClickedName);
+            radio(element);
+            //emptyRankingCheck(); //?
+        }
+    }
+
+    function CheckRanking(arrNames, strClickedName) {
+        var i, j;
+        var objAR;
+        var iCheked = 0;
+        var objArrClicked = document.getElementsByName(strClickedName);
+        var iClickedValue = 0;
+
+        for (i = 0; i < objArrClicked.length; i++) {
+            if (objArrClicked[i].checked == true)
+                iClickedValue = i;
+        }
+
+        for (i = 0; i < arrNames.length; i++) {
+            objAR = document.getElementsByName(arrNames[i]);
+            iCheked = 0;
+            if (i >= objAR.length) {
+                if (objAR[0].name != strClickedName) {
+                    for (j = 0; j < objAR.length; j++) {
+                        if (objAR[j].checked == true)
+                            iCheked = j;
+                    }
+
+                    if (iCheked == iClickedValue)
+                        objAR[iCheked].checked = false;
+                }
+            }
+            else {
+                if (objAR[i].name != strClickedName) {
+                    for (j = 0; j < objAR.length; j++) {
+                        if (objAR[j].checked == true)
+                            iCheked = j;
+                    }
+
+                    if (iCheked == iClickedValue)
+                        objAR[iCheked].checked = false;
+                }
+            }
+        }
+    }
+
+    function focusOnfirstInteractiveElement() {
+        if (!$("#body").hasClass("mode-one")) {
+            setTimeout(function () {
+                var firstInteractiveElement = null;
+                $(".survey-question").each(function () {
+                    if (firstInteractiveElement == null) {
+                        if ($(this).hasClass("question-type-netigateSlider")) {//Special case for slider
+                            firstInteractiveElement = $(".ui-slider-handle", $(this)).first();
+                        } else {
+                            var interactiveElements = $("input, select, textarea, a, button, .ui-slider-handle", $(this));
+                            for (var index = 0; index < interactiveElements.length; index++) {
+                                if (firstInteractiveElement == null) {
+                                    firstInteractiveElement = interactiveElements[0];
+                                }
+                            }
+                        }
+                    }
+                });
+                if (firstInteractiveElement == null) {
+                    var interactiveElements = $("a, button, input, textarea, select, [tabindex]");
+                    if (interactiveElements.length > 0) {
+                        firstInteractiveElement = interactiveElements[0];
+                    }
+                }
+
+                if ($('#wcag_button').length > 0 && $('#WCAG').attr('Value') != "1") {
+                    $('#wcag_button').focus();
+                }
+                else {
+                    $(firstInteractiveElement).focus();
+                }
+            }, 10)
+        }
+    }
+
+</script>
+
+
+<script type="text/javascript">
+    $(function () {
+        if ($('#mainbanner').attr('src') == 'none') {
+            $('#mainbanner').hide();
+        }
+        if ($('#mobilebanner').attr('src') == 'none') {
+            $('#mobilebanner').hide();
+        }
+
+      
+
+        if ($('#WCAG').attr('Value') != null && $('#WCAG').attr('Value') == "1") {//WCAG
+            $(".hasDatepicker").keydown(function (e) {//Use datepicker with keyboard
+                if (e.which == 32) {//space
+                    $('#ui-datepicker-div a:first').focus();
+                }
+            }).change(function () {
+                $(this).focus();
+            });
+             
+
+        }
+        else{ 
+        $('.bootStrapDatePicker').off('keyup').on('keyup',function(e){  
+              if(e.keyCode != 13 && typeof e.keyCode !== 'undefined' ){
+                $('#'+$(this).attr('id')).next().click(); 
+              }            
+            $('#'+$(this).attr('id')).change(function(e){
+            $(this).datepicker('hide'); $(this).focusout()})
+         });
+
+        }
+    
+
+        function val(item) {
+            return function () {
+                return $($("[id$=-" + item.QuestionItemId + "]")[0]).val();
+            };
+        }
+
+        if(typeof questionItems !== 'undefined'){
+            for (var i = 0; i < questionItems.length; i++) {
+                var item = questionItems[i];
+                item.val = val(item);
+            }
+        }
+
+    });
+
+    function handleRoleButtonKeyPress(e) {
+        if (e.keyCode == 13 || e.keyCode == 32) {
+            e.target.click();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+
+</script>
+    <script type="text/javascript" src="js/datepicker.js"></script>
+    <script  type="text/javascript">
+        $('.bootStrapDatePicker').datepicker('inputFormat', 'yyyy-MM-dd'); 
+        $('.bootStrapDatePicker').datepicker('outputFormat', 'yyyy-MM-dd');
+        $('.bootStrapDatePicker').datepicker('firstDayOfWeek', 1);
+    </script>
+</html>

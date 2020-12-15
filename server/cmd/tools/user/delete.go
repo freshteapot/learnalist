@@ -29,6 +29,9 @@ var deleteUserCmd = &cobra.Command{
 	Short: "Remove a user from the system",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "tools-user-delete"))
+
 		dsn := viper.GetString("server.sqlite.database")
 
 		userUUID := args[0]
@@ -84,6 +87,13 @@ var deleteUserCmd = &cobra.Command{
 			fmt.Println("user not found")
 			return
 		}
+
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: event.ApiUserDelete,
+			Data: event.EventUser{
+				UUID: userUUID,
+			},
+		})
 
 		hugoHelper.WritePublicLists(dal.GetPublicLists())
 		time.Sleep(1 * time.Second)

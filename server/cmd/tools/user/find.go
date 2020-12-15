@@ -22,6 +22,9 @@ var findCmd = &cobra.Command{
 	Short: "Find a user based on a username or email",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "tools-user-find"))
+
 		dsn := viper.GetString("server.sqlite.database")
 		search := args[0]
 		if search == "" {

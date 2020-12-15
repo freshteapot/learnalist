@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	CMDUserDelete                    = "cmd.user.delete"
 	ApiUserDelete                    = "api.user.delete"
 	ApiUserLogin                     = "api.user.login"
 	ApiUserLogout                    = "api.user.logout"
