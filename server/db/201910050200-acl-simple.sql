@@ -6,3 +6,4 @@ CREATE TABLE IF NOT EXISTS acl_simple (
 );
 
 CREATE INDEX IF NOT EXISTS ext_uuid_lookup ON acl_simple (ext_uuid);
+CREATE INDEX IF NOT EXISTS user_uuid_lookup ON acl_simple (user_uuid);

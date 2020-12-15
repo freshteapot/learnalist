@@ -79,7 +79,7 @@ type ChallengePushNotificationRepository interface {
 }
 
 type ChallengeRepository interface {
-	GetChallengesByUser(userUUID string) ([]ChallengeShortInfo, error)
+	GetChallengesByUser(userUUID string, filterByKind string) ([]ChallengeShortInfo, error)
 	Join(UUID string, userUUID string) error
 	Leave(UUID string, userUUID string) error
 	Create(userUUID string, challenge ChallengeInfo) error
@@ -118,7 +118,12 @@ var (
 	EventKindPlank            = "plank"
 	EventKindSpacedRepetition = "srs"
 	KindPlankGroup            = "plank-group"
-	PlankGroupMobileApps      = []string{
+	KindTODO                  = "todo" // TODO remove this when I have a new group
+	ChallengeKinds            = []string{
+		KindPlankGroup,
+		KindTODO,
+	}
+	PlankGroupMobileApps = []string{
 		apps.PlankV1,
 	}
 )

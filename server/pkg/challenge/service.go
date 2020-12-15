@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
@@ -39,6 +40,7 @@ func (s ChallengeService) Challenges(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
 	lookupUserUUID := c.Param("userUUID")
+	filterByKind := c.QueryParam("kind")
 
 	if lookupUserUUID != userUUID {
 		response := api.HTTPResponseMessage{
@@ -47,7 +49,15 @@ func (s ChallengeService) Challenges(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
-	challenges, _ := s.repo.GetChallengesByUser(lookupUserUUID)
+	allowed := []string{"", KindPlankGroup}
+	if !utils.StringArrayContains(allowed, filterByKind) {
+		response := api.HTTPResponseMessage{
+			Message: "Not valid kind",
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	challenges, _ := s.repo.GetChallengesByUser(lookupUserUUID, filterByKind)
 	return c.JSON(http.StatusOK, challenges)
 }
 
@@ -68,7 +78,8 @@ func (s ChallengeService) Create(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	if challengeInput.Kind != KindPlankGroup {
+	allowed := ChallengeKinds
+	if !utils.StringArrayContains(allowed, challengeInput.Kind) {
 		response := api.HTTPResponseMessage{
 			Message: "Not valid kind",
 		}

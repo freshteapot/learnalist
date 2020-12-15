@@ -74,28 +74,36 @@ DESC
 `
 
 	SqlGetChallengesByUser = `
-SELECT
-	c.uuid,
-	json_extract(c.body, '$.kind') AS kind,
-	json_extract(c.body, '$.description') AS description,
-	c.created,
-	c.user_uuid
-FROM challenge AS c
-INNER JOIN
-(
-SELECT REPLACE(
-	REPLACE(access,"api:challenge:", ""),
-	":write:%s", ""
-	) AS uuid
+WITH _challengeIDS(uuid) AS (
+	SELECT REPLACE(
+		REPLACE(access,"api:challenge:", ""),
+		":write:%s", ""
+		) AS uuid
+	FROM
+		acl_simple
+	WHERE
+		user_uuid=?
+	AND
+		access LIKE "api:challenge:%%:write:%s"
+),
+_challenges(uuid, kind, description, created, user_uuid) AS (
+	SELECT
+		c.uuid,
+		json_extract(c.body, '$.kind') AS kind,
+		json_extract(c.body, '$.description') AS description,
+		c.created,
+		c.user_uuid
+	FROM
+		challenge AS c
+	INNER JOIN _challengeIDS as challenges ON challenges.uuid = c.uuid
+)
+SELECT *
 FROM
-	acl_simple
+	_challenges
 WHERE
-	user_uuid=?
-AND
-	access LIKE "api:challenge:%%:write:%s"
-) as challenges ON challenges.uuid = c.uuid
+	kind IN(?)
 ORDER BY
-	c.created
+	created
 DESC
 `
 )
@@ -106,11 +114,20 @@ func NewSqliteRepository(db *sqlx.DB) ChallengeRepository {
 	}
 }
 
-func (r SqliteRepository) GetChallengesByUser(userUUID string) ([]ChallengeShortInfo, error) {
+// TODO add index for user_uuid to sql
+func (r SqliteRepository) GetChallengesByUser(userUUID string, filterByKind string) ([]ChallengeShortInfo, error) {
 	challenges := make([]ChallengeShortInfo, 0)
 	dbItems := make([]ChallengeShortInfoDB, 0)
-	// Not happy with this approach but its partly safe as we check they are logged in
-	err := r.db.Select(&dbItems, fmt.Sprintf(SqlGetChallengesByUser, userUUID, userUUID), userUUID)
+	kinds := ChallengeKinds
+	if filterByKind != "" {
+		kinds = []string{filterByKind}
+	}
+
+	query := fmt.Sprintf(SqlGetChallengesByUser, userUUID, userUUID)
+	query, args, _ := sqlx.In(query, userUUID, kinds)
+	query = r.db.Rebind(query)
+
+	err := r.db.Select(&dbItems, query, args...)
 
 	if err != nil {
 		return challenges, err
