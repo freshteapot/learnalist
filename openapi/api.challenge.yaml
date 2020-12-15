@@ -1,5 +1,10 @@
 components:
   schemas:
+    ChallengeKind:
+      type: string
+      default: ""
+      enum:
+        - plank-group
     ChallengePlankRecord:
       type: object
       allOf:
@@ -17,10 +22,11 @@ components:
       properties:
         kind:
           type: string
-          enum:
-            - plank-group
+          description: "Look at ChallengeKind for supported kinds"
+          default: ""
         description:
           type: string
+          default: ""
     ChallengeShortInfo:
       required:
         - uuid
@@ -110,6 +116,11 @@ paths:
             type: string
           required: true
           description: userUUID to get challenges
+        - in: query
+          name: kind
+          description: Filter challenges by a single kind
+          schema:
+            $ref: "#/components/schemas/ChallengeKind"
       responses:
         "200":
           description: Return list of all challenges

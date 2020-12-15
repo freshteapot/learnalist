@@ -110,13 +110,13 @@ func (_m *ChallengeRepository) Get(UUID string) (challenge.ChallengeInfo, error)
 	return r0, r1
 }
 
-// GetChallengesByUser provides a mock function with given fields: userUUID
-func (_m *ChallengeRepository) GetChallengesByUser(userUUID string) ([]challenge.ChallengeShortInfo, error) {
-	ret := _m.Called(userUUID)
+// GetChallengesByUser provides a mock function with given fields: userUUID, filterByKind
+func (_m *ChallengeRepository) GetChallengesByUser(userUUID string, filterByKind string) ([]challenge.ChallengeShortInfo, error) {
+	ret := _m.Called(userUUID, filterByKind)
 
 	var r0 []challenge.ChallengeShortInfo
-	if rf, ok := ret.Get(0).(func(string) []challenge.ChallengeShortInfo); ok {
-		r0 = rf(userUUID)
+	if rf, ok := ret.Get(0).(func(string, string) []challenge.ChallengeShortInfo); ok {
+		r0 = rf(userUUID, filterByKind)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]challenge.ChallengeShortInfo)
@@ -124,8 +124,8 @@ func (_m *ChallengeRepository) GetChallengesByUser(userUUID string) ([]challenge
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userUUID)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(userUUID, filterByKind)
 	} else {
 		r1 = ret.Error(1)
 	}
