@@ -117,12 +117,6 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 	var input openapi.RemindDailySettings
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
-	if appIdentifier != input.AppIdentifier {
-		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
-			Message: "appIdentifier is not valid",
-		})
-	}
-
 	// TODO validate time of day
 	// TODO validate tz?
 

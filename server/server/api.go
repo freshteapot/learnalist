@@ -116,5 +116,5 @@ func InitApi(
 	remindV1.Use(authenticate.Auth(authConfig))
 	remindV1.GET("/daily/:appIdentifier", remindService.GetDailySettings)
 	remindV1.DELETE("/daily/:appIdentifier", remindService.DeleteDailySettings)
-	remindV1.PUT("/daily/:appIdentifier", remindService.SetDailySettings)
+	remindV1.PUT("/daily/", remindService.SetDailySettings)
 }
