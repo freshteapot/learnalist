@@ -149,9 +149,9 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 
 	info := UserPreference{}
 	switch input.AppIdentifier {
-	case "remind:v1":
+	case apps.RemindV1:
 		info.DailyReminder.RemindV1 = &input
-	case "plank:v1":
+	case apps.PlankV1:
 		info.DailyReminder.PlankV1 = &input
 	}
 
@@ -185,11 +185,11 @@ func (s RemindService) getPreferences(userUUID string, appIdentifier string) (op
 	json.Unmarshal(b, &pref)
 
 	switch appIdentifier {
-	case "remind:v1":
+	case apps.RemindV1:
 		if pref.DailyReminder.RemindV1 != nil {
 			response = *pref.DailyReminder.RemindV1
 		}
-	case "plank:v1":
+	case apps.PlankV1:
 		if pref.DailyReminder.PlankV1 != nil {
 			response = *pref.DailyReminder.PlankV1
 		}
