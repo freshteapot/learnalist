@@ -104,36 +104,51 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 func (s RemindService) SetDailySettings(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
-	appIdentifier := c.Param("appIdentifier")
 
+	defer c.Request().Body.Close()
+	var input openapi.RemindDailySettings
+	json.NewDecoder(c.Request().Body).Decode(&input)
+
+	// Validate app_identifier
 	allowed := []string{apps.RemindV1, apps.PlankV1}
-	if !utils.StringArrayContains(allowed, appIdentifier) {
+	if !utils.StringArrayContains(allowed, input.AppIdentifier) {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "appIdentifier is not valid",
 		})
 	}
 
-	defer c.Request().Body.Close()
-
-	var input openapi.RemindDailySettings
-	json.NewDecoder(c.Request().Body).Decode(&input)
-
+	// Validate tz
 	_, err := time.LoadLocation(input.Tz)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "tz is not valid",
 		})
 	}
-
+	// Validate time_of_day
 	err = ValidateTimeOfDay(input.TimeOfDay)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "time_of_day is not valid",
 		})
 	}
+	// Validate medium
+	allowed = []string{"push", "email"}
+	if len(input.Medium) == 0 {
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: "medium is not valid",
+		})
+	}
+
+	for _, medium := range input.Medium {
+		if !utils.StringArrayContains(allowed, medium) {
+			return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+				Message: "medium is not valid",
+			})
+		}
+	}
 
 	info := UserPreference{}
-	switch appIdentifier {
+	switch input.AppIdentifier {
 	case "remind:v1":
 		info.DailyReminder.RemindV1 = &input
 	case "plank:v1":
