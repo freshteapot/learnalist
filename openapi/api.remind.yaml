@@ -34,6 +34,38 @@ components:
             type: string
             default: ""
 paths:
+  /remind/daily/:
+    put:
+      tags:
+        - remind
+      operationId: setRemindDailySetting
+      description: Set remind settings for app_identifier
+      requestBody:
+        description: Remind settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemindDailySettings"
+      responses:
+        "200":
+          description: Remind settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemindDailySettings"
+        "422":
+          description: Something wrong with the payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
   /remind/daily/{app_identifier}:
     get:
       tags:
@@ -89,37 +121,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
-        "500":
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HttpResponseMessage"
-    put:
-      tags:
-        - remind
-      operationId: setRemindDailySetting
-      description: Set remind settings for app_identifier
-      requestBody:
-        description: Remind settings
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RemindDailySettings"
-      responses:
-        "200":
-          description: Remind settings updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RemindDailySettings"
-        "201":
-          description: Remind settings added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RemindDailySettings"
         "500":
           description: unexpected error
           content:

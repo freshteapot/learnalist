@@ -12,6 +12,7 @@ var (
 
 var (
 	EventApiRemindDailySettings = "api.remind.daily.settings"
+	UserPreferenceKey           = "daily_reminder"
 )
 
 type UserPreference struct {

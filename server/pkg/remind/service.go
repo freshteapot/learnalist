@@ -2,12 +2,15 @@ package remind
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 
@@ -26,7 +29,6 @@ func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) RemindS
 		logContext: log,
 	}
 
-	//event.GetBus().Subscribe(event.TopicMonolog, "remind", s.monologSubscribe)
 	return s
 }
 
@@ -35,32 +37,16 @@ func (s RemindService) GetDailySettings(c echo.Context) error {
 	userUUID := user.Uuid
 	appIdentifier := c.Param("appIdentifier")
 
-	allowed := []string{"remind:v1", "plank:v1"}
+	allowed := []string{apps.RemindV1, apps.PlankV1}
 	if !utils.StringArrayContains(allowed, appIdentifier) {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "appIdentifier is not valid",
 		})
 	}
 
-	b, err := s.userRepo.GetInfo(userUUID)
+	response, err := s.getPreferences(userUUID, appIdentifier)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
-
-	var pref UserPreference
-	json.Unmarshal(b, &pref)
-
-	var response openapi.RemindDailySettings
-
-	switch appIdentifier {
-	case "remind:v1":
-		if pref.DailyReminder.RemindV1 != nil {
-			response = *pref.DailyReminder.RemindV1
-		}
-	case "plank:v1":
-		if pref.DailyReminder.PlankV1 != nil {
-			response = *pref.DailyReminder.PlankV1
-		}
 	}
 
 	if response.AppIdentifier == "" {
@@ -77,18 +63,39 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 	userUUID := user.Uuid
 	appIdentifier := c.Param("appIdentifier")
 
-	allowed := []string{"remind:v1", "plank:v1"}
+	allowed := []string{apps.RemindV1, apps.PlankV1}
 	if !utils.StringArrayContains(allowed, appIdentifier) {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "appIdentifier is not valid",
 		})
 	}
-	// Maybe I need user_preference code
-	key := fmt.Sprintf(`daily_notifications."%s"`, appIdentifier)
-	err := s.userRepo.RemoveInfo(userUUID, key)
+
+	response, err := s.getPreferences(userUUID, appIdentifier)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
+
+	if response.AppIdentifier == "" {
+		return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
+			Message: "Settings not found",
+		})
+	}
+
+	// This might break if we move from sqlite
+	key := fmt.Sprintf(`%s."%s"`, UserPreferenceKey, appIdentifier)
+	err = s.userRepo.RemoveInfo(userUUID, key)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: EventApiRemindDailySettings,
+		Data: event.EventKV{
+			UUID: userUUID,
+			Data: response,
+		},
+		Action: event.ActionDeleted,
+	})
 
 	return c.NoContent(http.StatusOK)
 }
@@ -98,7 +105,7 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 	userUUID := user.Uuid
 	appIdentifier := c.Param("appIdentifier")
 
-	allowed := []string{"remind:v1", "plank:v1"}
+	allowed := []string{apps.RemindV1, apps.PlankV1}
 	if !utils.StringArrayContains(allowed, appIdentifier) {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "appIdentifier is not valid",
@@ -129,7 +136,45 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 
 	b, _ := json.Marshal(info)
 
-	s.userRepo.SaveInfo(userUUID, b)
+	err := s.userRepo.SaveInfo(userUUID, b)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: EventApiRemindDailySettings,
+		Data: event.EventKV{
+			UUID: userUUID,
+			Data: info.DailyReminder,
+		},
+		Action: event.ActionUpsert,
+	})
 
 	return c.JSON(http.StatusOK, input)
+}
+
+func (s RemindService) getPreferences(userUUID string, appIdentifier string) (openapi.RemindDailySettings, error) {
+	var response openapi.RemindDailySettings
+	b, err := s.userRepo.GetInfo(userUUID)
+	if err != nil {
+		return response, err
+	}
+
+	var pref UserPreference
+	json.Unmarshal(b, &pref)
+
+	switch appIdentifier {
+	case "remind:v1":
+		if pref.DailyReminder.RemindV1 != nil {
+			response = *pref.DailyReminder.RemindV1
+		}
+	case "plank:v1":
+		if pref.DailyReminder.PlankV1 != nil {
+			response = *pref.DailyReminder.PlankV1
+		}
+	default:
+		return response, errors.New("not supported")
+	}
+
+	return response, nil
 }
