@@ -1,0 +1,128 @@
+components:
+  schemas:
+    RemindMedium:
+      type: string
+      description: What medium do you want the reminder sent via
+      default: ""
+      enum:
+        - push
+        - email
+    RemindDailySettings:
+      type: object
+      required:
+        - time_of_day
+        - tz
+        - app_identifier
+        - medium
+      properties:
+        time_of_day:
+          type: string
+          description: Time of day HH:MM
+          default: ""
+        tz:
+          type: string
+          description: Timezone
+          default: ""
+        app_identifier:
+          type: string
+          description: Which app to link this too
+          default: ""
+        medium:
+          type: array
+          description: "Which medium, look at RemindMedium"
+          items:
+            type: string
+            default: ""
+paths:
+  /remind/daily/{app_identifier}:
+    get:
+      tags:
+        - remind
+      operationId: getRemindDailySettingsByAppIdentifier
+      parameters:
+        - name: app_identifier
+          in: path
+          description: Via app_identifier which settings to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemindDailySettings"
+        "404":
+          description: Settings not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Check the app identifier is valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+    delete:
+      tags:
+        - remind
+      operationId: deleteRemindDailySettingsByAppIdentifier
+      parameters:
+        - name: app_identifier
+          in: path
+          description: Via app_identifier which settings to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: settings deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: app_identifier not found, I wonder if I want this one
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+    put:
+      tags:
+        - remind
+      operationId: setRemindDailySetting
+      description: Set remind settings for app_identifier
+      requestBody:
+        description: Remind settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemindDailySettings"
+      responses:
+        "200":
+          description: Remind settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemindDailySettings"
+        "201":
+          description: Remind settings added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemindDailySettings"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"

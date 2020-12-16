@@ -19,6 +19,7 @@ type ManagementStorage interface {
 	DeleteList(listUUID string) error
 	SaveInfo(userUUID string, info []byte) error
 	GetInfo(userUUID string) ([]byte, error)
+	RemoveInfo(userUUID string, key string) error
 }
 
 type ManagementSite interface {
@@ -31,6 +32,7 @@ type Management interface {
 	DeleteUser(userUUID string) error
 	SaveInfo(userUUID string, info []byte) error
 	GetInfo(userUUID string) ([]byte, error)
+	RemoveInfo(userUUID string, key string) error
 }
 
 type management struct {

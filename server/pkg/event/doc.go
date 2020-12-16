@@ -27,6 +27,7 @@ const (
 	ActionCreated                    = "created"
 	ActionUpdated                    = "updated"
 	ActionDeleted                    = "deleted"
+	ActionUpsert                     = "upsert"
 	ChangesetChallenge               = "changeset.challenge"
 )
 

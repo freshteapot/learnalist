@@ -106,6 +106,20 @@ func (_m *ManagementStorage) GetLists(userUUID string) ([]string, error) {
 	return r0, r1
 }
 
+// RemoveInfo provides a mock function with given fields: userUUID, key
+func (_m *ManagementStorage) RemoveInfo(userUUID string, key string) error {
+	ret := _m.Called(userUUID, key)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userUUID, key)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SaveInfo provides a mock function with given fields: userUUID, info
 func (_m *ManagementStorage) SaveInfo(userUUID string, info []byte) error {
 	ret := _m.Called(userUUID, info)

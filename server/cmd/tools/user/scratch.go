@@ -5,10 +5,70 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/remind"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+func testRemindV1(userUUID string, storage user.ManagementStorage) {
+	rawJSON := `
+	{
+		"daily_notifications": {
+			"remind:v1": {
+				"time_of_day": "20:00",
+				"tz": "todo",
+				"medium": ["push"]
+			}
+		}
+	}`
+	rawJSON = `{
+		"time_of_day": "20:00",
+		"tz": "todo",
+		"medium": ["push"],
+		"app_identifier": "remind:v1"
+	}
+	`
+	storage.RemoveInfo(userUUID, `daily_notifications`)
+	return
+	var remindInput openapi.RemindDailySettings
+	json.Unmarshal([]byte(rawJSON), &remindInput)
+	input := remind.UserPreference{}
+	input.DailyReminder.RemindV1 = &remindInput
+
+	b, _ := json.Marshal(input)
+
+	storage.SaveInfo(userUUID, b)
+
+	b, _ = storage.GetInfo(userUUID)
+	fmt.Println("get", string(b))
+	var obj remind.UserPreference
+	json.Unmarshal(b, &obj)
+
+	var response openapi.RemindDailySettings
+	fmt.Println(response)
+
+	//storage.RemoveInfo(userUUID, `daily_notifications."plank:v1"`)
+	//storage.RemoveInfo(userUUID, `daily_notifications`)
+
+	rawJSON = `{
+		"time_of_day": "20:00",
+		"tz": "todo",
+		"medium": ["push"],
+		"app_identifier": "plank:v1"
+	}
+	`
+
+	json.Unmarshal([]byte(rawJSON), &remindInput)
+	input.DailyReminder.RemindV1 = nil
+	input.DailyReminder.PlankV1 = &remindInput
+
+	b, _ = json.Marshal(input)
+
+	storage.SaveInfo(userUUID, b)
+}
 
 var scratchCMD = &cobra.Command{
 	Use:   "scratch",
@@ -30,6 +90,8 @@ var scratchCMD = &cobra.Command{
 			return
 		}
 		userUUID := r[0]
+		testRemindV1(userUUID, storage)
+		return
 		b, err := storage.GetInfo(userUUID)
 		fmt.Println(string(b), err)
 
