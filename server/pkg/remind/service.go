@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
@@ -117,8 +118,19 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 	var input openapi.RemindDailySettings
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
-	// TODO validate time of day
-	// TODO validate tz?
+	_, err := time.LoadLocation(input.Tz)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: "tz is not valid",
+		})
+	}
+
+	err = ValidateTimeOfDay(input.TimeOfDay)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: "time_of_day is not valid",
+		})
+	}
 
 	info := UserPreference{}
 	switch appIdentifier {
@@ -130,7 +142,7 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 
 	b, _ := json.Marshal(info)
 
-	err := s.userRepo.SaveInfo(userUUID, b)
+	err = s.userRepo.SaveInfo(userUUID, b)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
