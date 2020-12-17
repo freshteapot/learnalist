@@ -87,5 +87,6 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
+	// TODO would need an event to get display name
 	return c.NoContent(http.StatusOK)
 }

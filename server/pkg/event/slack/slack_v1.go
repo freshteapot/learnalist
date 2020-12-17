@@ -163,6 +163,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &momentKV)
 
 		userUUID := momentKV.UUID
+		// TODO confirm app_identifier is added
 		msg.Text = fmt.Sprintf("user:%s registered mobile token", userUUID)
 	default:
 		b, _ := json.Marshal(entry)

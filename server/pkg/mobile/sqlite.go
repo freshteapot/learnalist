@@ -1,6 +1,7 @@
 package mobile
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -40,4 +41,8 @@ func (r SqliteRepository) DeleteByUser(userUUID string) error {
 		return err
 	}
 	return nil
+}
+
+func (r SqliteRepository) DeleteByToken(token string) error {
+	return errors.New("TODO")
 }

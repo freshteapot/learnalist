@@ -2,6 +2,7 @@ package natsutils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 )
 
 var readCMD = &cobra.Command{
@@ -76,7 +78,38 @@ var readCMD = &cobra.Command{
 		ctx := context.Background()
 		ReadOneByOneTilLatest(sc, topic, func(msg *stan.Msg) {
 			fmt.Println(string(msg.Data))
-		}, false)
+			var entryLog event.Eventlog
+			err := json.Unmarshal(msg.Data, &entryLog)
+			if err != nil {
+				return
+			}
+
+			switch entryLog.Kind {
+			//case event.ApiSpacedRepetition:
+			//case plank.EventApiPlank:
+			case remind.EventApiRemindDailySettings:
+				// action = delete = remove
+				// action = upsert = save
+				b, _ := json.Marshal(entryLog.Data)
+				var moment event.EventKV
+				json.Unmarshal(b, &moment)
+				b, _ = json.Marshal(moment.Data)
+				var pref remind.UserPreference
+				json.Unmarshal(b, &pref.DailyReminder)
+
+				userUUID := moment.UUID
+				tz := pref.DailyReminder.RemindV1.Tz
+				timeOfDay := pref.DailyReminder.RemindV1.TimeOfDay
+				fmt.Printf("user:%s tz:%s timeOfDay:%s\n", userUUID, tz, timeOfDay)
+			default:
+				return
+			}
+
+		},
+			func() {
+				fmt.Println("the end")
+			},
+			false)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		latestSubscription := readLatest(ctx, sc, topic, func(msg *stan.Msg) {
@@ -94,7 +127,7 @@ var readCMD = &cobra.Command{
 	},
 }
 
-func ReadOneByOneTilLatest(sc stan.Conn, topic string, onRead func(msg *stan.Msg), unsubscribe bool) {
+func ReadOneByOneTilLatest(sc stan.Conn, topic string, onRead func(msg *stan.Msg), onFinish func(), unsubscribe bool) {
 	// Could also use MaxInFlight with the timer to force one by one
 	d := 200 * time.Millisecond
 	// Initially we shall wait
@@ -123,6 +156,7 @@ func ReadOneByOneTilLatest(sc stan.Conn, topic string, onRead func(msg *stan.Msg
 		break
 	//case t := <-ticker.C:
 	case <-ticker.C:
+		onFinish()
 		break
 	}
 

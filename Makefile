@@ -25,6 +25,11 @@ rebuild-db:
 	rm -f /tmp/learnalist/server.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
+rebuild-db-remind-daily:
+	mkdir -p /tmp/learnalist/
+	rm -f /tmp/learnalist/remind-daily.db
+	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
+
 test:
 	cd server && \
 	./cover.sh

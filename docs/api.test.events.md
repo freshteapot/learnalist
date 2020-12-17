@@ -37,7 +37,8 @@ response=$(curl -i -XPOST \
 'http://127.0.0.1:1234/api/v1/mobile/register-device' \
 -d '
 {
-  "token": "fake-token-123"
+  "token": "fake-token-123",
+  "app_identifier": "remind:v1"
 }')
 ```
 

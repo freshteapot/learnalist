@@ -83,8 +83,6 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
-	// TODO do I actually need to send this today?
-	// TODO if yes, include app_identifier
 	// TODO maybe add DeviceInfo to openapi
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
@@ -92,10 +90,12 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		Data: event.EventKV{
 			UUID: userUUID,
 			Data: DeviceInfo{
-				Token:    registerInput.Token,
-				UserUUID: userUUID,
+				Token:         registerInput.Token,
+				UserUUID:      userUUID,
+				AppIdentifier: registerInput.AppIdentifier,
 			},
 		},
+		Action: event.ActionUpsert,
 	})
 
 	return c.JSON(http.StatusOK, api.HTTPResponseMessage{
