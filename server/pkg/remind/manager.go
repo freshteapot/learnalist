@@ -7,22 +7,28 @@ import (
 	"strings"
 	"time"
 
+	"firebase.google.com/go/messaging"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
+	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
 
 type manager struct {
+	db           *sqlx.DB
 	settingsRepo RemindDailySettingsRepository
 	mobileRepo   mobile.MobileRepository
 	logContext   logrus.FieldLogger
 	filterKinds  []string
 }
 
-func NewManager(settingsRepo RemindDailySettingsRepository, mobileRepo mobile.MobileRepository, logContext logrus.FieldLogger) *manager {
+func NewManager(db *sqlx.DB, settingsRepo RemindDailySettingsRepository, mobileRepo mobile.MobileRepository, logContext logrus.FieldLogger) *manager {
 	return &manager{
+		db:           db,
 		settingsRepo: settingsRepo,
 		mobileRepo:   mobileRepo,
 		logContext:   logContext,
@@ -42,8 +48,6 @@ func (m *manager) FilterKindsBy() []string {
 
 // TODO now we need token
 // TODO now we need display_name
-// daily_reminder_medium_push
-// daily_reminder_settings
 func (m *manager) Write(entry event.Eventlog) {
 	switch entry.Kind {
 	case mobile.EventMobileDeviceRemoved:
@@ -61,13 +65,72 @@ func (m *manager) Write(entry event.Eventlog) {
 	}
 }
 
-func (m *manager) SendNotifications(startAt time.Time) {
+func (m *manager) StartSendNotifications() {
+	// TODO do we want to pass in context cancel?
+	m.logContext.Info("Sending notifications is active")
+	m.SendNotifications()
+	//ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(5 * time.Second)
+	go func() {
+
+		for {
+			select {
+			case <-ticker.C:
+				m.SendNotifications()
+			}
+		}
+	}()
+
+	//time.Sleep(1600 * time.Millisecond)
+	//ticker.Stop()
+	//done <- true
+	//fmt.Println("Ticker stopped")
+}
+
+func (m *manager) SendNotifications() {
 	// Process queue from oldeset to newest
 	// Lookup
 	// SELECT * FROM daily_reminders
 	// Send
 	// Update + set event happened=0
-	fmt.Println(startAt.Format(time.RFC3339Nano))
+	fmt.Println("looking for new notifications ", time.Now().UTC())
+	reminders := m.WhoToRemind()
+	if len(reminders) == 0 {
+		return
+	}
+
+	title := "Daily Reminder"
+	var template string
+
+	template = "It's planking time!"
+	template = "What shall we learn today"
+	template = "Nice work!"
+	body := template
+
+	for _, remindMe := range reminders {
+		fmt.Println(remindMe)
+		if remindMe.Settings.AppIdentifier == apps.RemindV1 &&
+			utils.StringArrayContains(remindMe.Settings.Medium, "push") {
+			// Make message
+			// TODO maybe action does something in the app
+			message := &messaging.Message{
+				Notification: &messaging.Notification{
+					Title: title,
+					Body:  body,
+				},
+				Token: remindMe.Medium,
+			}
+
+			// Send message
+			event.GetBus().Publish("notifications", event.Eventlog{
+				Kind: event.KindPushNotification,
+				Data: message,
+			})
+		}
+
+		// Update settings when next
+		m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+	}
 }
 
 func (m *manager) whenNext(from time.Time, to time.Time) time.Time {
@@ -76,6 +139,23 @@ func (m *manager) whenNext(from time.Time, to time.Time) time.Time {
 		whenNext = to.Add(time.Duration(24 * time.Hour))
 	}
 	return whenNext
+}
+
+func (m *manager) updateSettingsWithWhenNext(userUUID string, conf openapi.RemindDailySettings) error {
+	loc, _ := time.LoadLocation(conf.Tz)
+	parts := strings.Split(conf.TimeOfDay, ":")
+	hour, _ := strconv.Atoi(parts[0])
+	minute, _ := strconv.Atoi(parts[1])
+	now := time.Now()
+	local := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, 0, 0, loc)
+	// Has the time already passed, if yes add date
+	whenNext := m.whenNext(now, local)
+
+	return m.settingsRepo.Save(
+		userUUID,
+		conf,
+		whenNext.UTC().Format(time.RFC3339Nano),
+	)
 }
 
 func (m *manager) processSettings(entry event.Eventlog) {
@@ -101,36 +181,14 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	// action = upsert = save
 	if entry.Action == event.ActionUpsert {
 		conf := pref.DailyReminder.RemindV1
-
-		loc, _ := time.LoadLocation(conf.Tz)
-		// Settings + when_next (utc)
-		// Take settings
-		// Calculate next entry, add it
-		parts := strings.Split(conf.TimeOfDay, ":")
-		hour, _ := strconv.Atoi(parts[0])
-		minute, _ := strconv.Atoi(parts[1])
-		now := time.Now()
-		local := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, 0, 0, loc)
-		// Has the time already passed, if yes add date
-		whenNext := m.whenNext(now, local)
-
-		fmt.Printf("user:%s tz:%s timeOfDay:%s\n", userUUID, conf.Tz, conf.TimeOfDay)
-		fmt.Println("is before: ", local.Before(now))
-		fmt.Println("utc ", now.UTC().Format(time.RFC3339Nano))
-		fmt.Println("whenNext local ", whenNext.Format(time.RFC3339Nano))
-		fmt.Println("whenNext utc ", whenNext.UTC().Format(time.RFC3339Nano))
-		fmt.Printf("Write config to db and set when next to %s (utc: %s)\n", whenNext.Format(time.RFC3339Nano), whenNext.UTC().Format(time.RFC3339Nano))
-
-		// I wonder if this can be cast
-		err := m.settingsRepo.Save(userUUID,
+		err := m.updateSettingsWithWhenNext(userUUID,
 			openapi.RemindDailySettings{
 				TimeOfDay:     conf.TimeOfDay,
 				Tz:            conf.Tz,
 				Medium:        conf.Medium,
 				AppIdentifier: conf.AppIdentifier,
-			},
-			whenNext.UTC().Format(time.RFC3339Nano),
-		)
+			})
+
 		if err != nil {
 			m.logContext.Error("failed to save settings")
 		}
@@ -155,4 +213,36 @@ func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
 	if err != nil {
 		m.logContext.Error("failed to save mobile device")
 	}
+}
+
+func (m *manager) WhoToRemind() []RemindMe {
+	type dbItem struct {
+		UserUUID string `db:"user_uuid"`
+		Settings string `db:"settings"`
+		Medium   string `db:"medium"`
+	}
+
+	dbItems := make([]dbItem, 0)
+	items := make([]RemindMe, 0)
+
+	now := time.Now().UTC()
+	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
+	whenNext := whenNextTime.Format(time.RFC3339Nano)
+	fmt.Println(whenNext)
+	err := m.db.Select(&dbItems, SqlWhoToRemind, whenNext)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, item := range dbItems {
+		var settings openapi.RemindDailySettings
+		json.Unmarshal([]byte(item.Settings), &settings)
+
+		items = append(items, RemindMe{
+			UserUUID: item.UserUUID,
+			Settings: settings,
+			Medium:   item.Medium,
+		})
+	}
+	return items
 }

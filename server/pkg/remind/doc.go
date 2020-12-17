@@ -38,3 +38,9 @@ type UserPreference struct {
 func RemidDailySettingsUUID(userUUID string, appIdentifier string) string {
 	return fmt.Sprintf("%s:%s", userUUID, appIdentifier)
 }
+
+type RemindMe struct {
+	UserUUID string
+	Settings openapi.RemindDailySettings
+	Medium   string // Token or email
+}

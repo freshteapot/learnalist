@@ -8,10 +8,34 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//uuid = {userUUID}:{appIdentifier}
 var (
-	// SQL_SAVE_ITEM_AUTO_UPDATED = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
-	SqlSave = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?`
+	SqlSave        = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?`
+	SqlGetNext     = `SELECT * FROM daily_reminder_settings WHERE when_next=? ORDER BY when_next LIMIT 1`
+	SqlWhoToRemind = `
+WITH _settings(user_uuid, app_identifier, settings) AS (
+	SELECT
+		user_uuid,
+		json_extract(body, '$.app_identifier') AS app_identifier,
+		body AS settings
+	FROM
+		daily_reminder_settings
+	WHERE
+		when_next <=?
+	ORDER BY when_next DESC
+),
+_with_medium(user_uuid, settings, medium) AS (
+	SELECT
+		s.user_uuid,
+		s.settings,
+		md.token AS medium
+	FROM
+		_settings AS s
+	INNER JOIN mobile_device as md ON (md.user_uuid = s.user_uuid)
+	WHERE
+		md.app_identifier=s.app_identifier
+)
+SELECT * FROM _with_medium
+`
 )
 
 type remindDailySettingsSqliteRepository struct {

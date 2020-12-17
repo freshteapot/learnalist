@@ -42,9 +42,10 @@ var dailyCMD = &cobra.Command{
 	I can reuse mobile-device for daily_reminder_medium_push
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		startAt := time.Now().UTC()
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "remind-daily"))
+
 		viper.SetDefault("topic", "lal.monolog")
 		viper.BindEnv("topic", "TOPIC")
 		subjectRead := viper.GetString("topic")
@@ -71,7 +72,7 @@ var dailyCMD = &cobra.Command{
 		settingsRepo := remind.NewRemindDailySettingsSqliteRepository(db)
 		mobileRepo := mobile.NewSqliteRepository(db)
 
-		manager := remind.NewManager(settingsRepo, mobileRepo, logContext)
+		manager := remind.NewManager(db, settingsRepo, mobileRepo, logContext)
 		fmt.Println("mobileRepo", mobileRepo)
 		fmt.Println("settingsRepo", settingsRepo)
 
@@ -96,7 +97,7 @@ var dailyCMD = &cobra.Command{
 
 		var timer *time.Timer
 		timer = time.AfterFunc(500*time.Millisecond, func() {
-			manager.SendNotifications(startAt)
+			manager.StartSendNotifications()
 			timer.Stop()
 		})
 		defer timer.Stop()
