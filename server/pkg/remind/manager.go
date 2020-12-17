@@ -108,11 +108,9 @@ func (m *manager) SendNotifications() {
 	body := template
 
 	for _, remindMe := range reminders {
-		fmt.Println(remindMe)
 		if remindMe.Settings.AppIdentifier == apps.RemindV1 &&
 			utils.StringArrayContains(remindMe.Settings.Medium, "push") {
 			// Make message
-			// TODO maybe action does something in the app
 			message := &messaging.Message{
 				Notification: &messaging.Notification{
 					Title: title,
