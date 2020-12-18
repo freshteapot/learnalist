@@ -172,7 +172,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var deviceInfo openapi.MobileDeviceInfo
 		json.Unmarshal(b, &deviceInfo)
-		msg.Text = fmt.Sprintf(`Removed token from user:%s app:"%s"`, deviceInfo.UserUuid, deviceInfo.AppIdentifier)
+		msg.Text = fmt.Sprintf(`user:%s fcm token from app:"%s" has been removed`, deviceInfo.UserUuid, deviceInfo.AppIdentifier)
 	case remind.EventApiRemindDailySettings:
 		b, _ := json.Marshal(entry.Data)
 		var settings openapi.RemindDailySettings
