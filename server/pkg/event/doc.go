@@ -2,6 +2,7 @@ package event
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
@@ -86,4 +87,9 @@ type EventPlank struct {
 	Action   string        `json:"action"`
 	Data     openapi.Plank `json:"data"`
 	UserUUID string        `json:"user_uuid"`
+}
+
+func IsUserDeleteEvent(entry Eventlog) bool {
+	allowed := []string{ApiUserDelete, CMDUserDelete}
+	return utils.StringArrayContains(allowed, entry.Kind)
 }

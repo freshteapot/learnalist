@@ -1,7 +1,6 @@
 package mobile
 
 import (
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
@@ -56,8 +55,7 @@ func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 }
 
 func (s MobileService) removeUser(entry event.Eventlog) {
-	allowed := []string{event.ApiUserDelete, event.CMDUserDelete}
-	if !utils.StringArrayContains(allowed, entry.Kind) {
+	if !event.IsUserDeleteEvent(entry) {
 		return
 	}
 	userUUID := entry.UUID
