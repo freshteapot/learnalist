@@ -193,7 +193,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 			},
 			Token: user.Token,
 		}
-		// TODO this would be easier with a userUUID
+
 		event.GetBus().Publish("notifications", event.Eventlog{
 			UUID: userUUID,
 			Kind: event.KindPushNotification,
