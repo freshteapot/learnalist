@@ -69,10 +69,10 @@ type EventUser struct {
 }
 
 type EventList struct {
-	UUID     string       `json:"uuid"`
-	UserUUID string       `json:"user_uuid"`
-	Action   string       `json:"action,omitempty"`
-	Data     *alist.Alist `json:"data,omitempty"`
+	UUID     string      `json:"uuid"`
+	UserUUID string      `json:"user_uuid"`
+	Action   string      `json:"action,omitempty"`
+	Data     alist.Alist `json:"data,omitempty"`
 }
 
 type EventKV struct {

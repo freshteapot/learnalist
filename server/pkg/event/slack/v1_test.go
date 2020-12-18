@@ -1,6 +1,8 @@
 package event_test
 
 import (
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
@@ -27,6 +29,7 @@ var _ = Describe("Testing Events to Slack", func() {
 	It("Event unwrapping", func() {
 		challengeUUID := "fake-challenge-123"
 		userUUID := "fake-user-123"
+		alistUUID := "fake-list-123"
 
 		tests := []struct {
 			entry event.Eventlog
@@ -134,6 +137,53 @@ var _ = Describe("Testing Events to Slack", func() {
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
 					expect := "api.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					UUID: userUUID,
+					Kind: event.CMDUserDelete,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "cmd.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiListSaved,
+					Data: event.EventList{
+						UUID:     alistUUID,
+						UserUUID: userUUID,
+						Action:   "created",
+						Data: alist.Alist{
+							Info: alist.AlistInfo{
+								ListType:   alist.SimpleList,
+								SharedWith: keys.SharedWithPublic,
+							},
+							Data: []string{},
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "list:fake-list-123 (public) created by user:fake-user-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiListDelete,
+					Data: event.EventList{
+						UUID:     alistUUID,
+						UserUUID: userUUID,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "list:fake-list-123 deleted by user:fake-user-123"
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
