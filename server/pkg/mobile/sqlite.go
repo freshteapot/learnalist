@@ -1,7 +1,7 @@
 package mobile
 
 import (
-	"errors"
+	"database/sql"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -13,9 +13,17 @@ type SqliteRepository struct {
 }
 
 var (
-	SqlSave               = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
-	SqlDeleteDeviceByUser = `DELETE FROM mobile_device WHERE user_uuid=?`
+	SqlSave                = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
+	SqlDeleteDeviceByUser  = `DELETE FROM mobile_device WHERE user_uuid=?`
+	SqlDeleteDeviceByToken = `DELETE FROM mobile_device WHERE token=?`
+	SqlGetDeviceByToken    = `SELECT * FROM mobile_device WHERE token=?`
 )
+
+type dbDeviceInfo struct {
+	UserUUID      string `db:"user_uuid"`
+	AppIdentifier string `db:"app_identifier"`
+	Token         string `db:"token"`
+}
 
 func NewSqliteRepository(db *sqlx.DB) MobileRepository {
 	return SqliteRepository{
@@ -24,8 +32,8 @@ func NewSqliteRepository(db *sqlx.DB) MobileRepository {
 }
 
 // TODO Next change, lets drop in the object as a json object aside from the following
-func (r SqliteRepository) SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error) {
-	_, err := r.db.Exec(SqlSave, userUUID, input.AppIdentifier, input.Token)
+func (r SqliteRepository) SaveDeviceInfo(deviceInfo openapi.MobileDeviceInfo) (int, error) {
+	_, err := r.db.Exec(SqlSave, deviceInfo.UserUuid, deviceInfo.AppIdentifier, deviceInfo.Token)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.app_identifier, mobile_device.token" {
 			return http.StatusOK, nil
@@ -44,5 +52,29 @@ func (r SqliteRepository) DeleteByUser(userUUID string) error {
 }
 
 func (r SqliteRepository) DeleteByToken(token string) error {
-	return errors.New("TODO")
+	_, err := r.db.Exec(SqlDeleteDeviceByToken, token)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r SqliteRepository) GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error) {
+	var (
+		dbItem     dbDeviceInfo
+		deviceInfo openapi.MobileDeviceInfo
+	)
+
+	err := r.db.Get(&dbItem, SqlGetDeviceByToken, token)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = ErrNotFound
+		}
+		return deviceInfo, err
+	}
+
+	deviceInfo.AppIdentifier = dbItem.AppIdentifier
+	deviceInfo.Token = dbItem.Token
+	deviceInfo.UserUuid = dbItem.UserUUID
+	return deviceInfo, err
 }

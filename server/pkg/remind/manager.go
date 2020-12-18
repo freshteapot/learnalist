@@ -48,10 +48,16 @@ func (m *manager) FilterKindsBy() []string {
 
 // TODO now we need token
 // TODO now we need display_name
-func (m *manager) Write(entry event.Eventlog) {
+func (m *manager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case mobile.EventMobileDeviceRemoved:
 		fmt.Println("remove token from daily_reminder_medium_push")
+		b, _ := json.Marshal(entry.Data)
+		var deviceInfo openapi.MobileDeviceInfo
+		json.Unmarshal(b, &deviceInfo)
+		// TODO use openapi
+		m.settingsRepo.DeleteByApp(deviceInfo.UserUuid, deviceInfo.AppIdentifier)
+
 	case mobile.EventMobileDeviceRegistered:
 		m.processMobileDeviceRegistered(entry)
 	case event.ApiSpacedRepetition:
@@ -173,7 +179,7 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	if entry.Action == event.ActionDeleted {
 		fmt.Println("Remove settings from db")
 
-		err := m.settingsRepo.DeleteByUserAndApp(userUUID, settings.AppIdentifier)
+		err := m.settingsRepo.DeleteByApp(userUUID, settings.AppIdentifier)
 		if err != nil {
 			m.logContext.Error("failed to remove settings")
 		}
@@ -196,13 +202,10 @@ func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
 	b, _ := json.Marshal(entry.Data)
 	json.Unmarshal(b, &momentKV)
 	b, _ = json.Marshal(momentKV.Data)
-	var moment mobile.DeviceInfo
-	json.Unmarshal(b, &moment)
+	var deviceInfo openapi.MobileDeviceInfo
+	json.Unmarshal(b, &deviceInfo)
 
-	_, err := m.mobileRepo.SaveDeviceInfo(moment.UserUUID, openapi.HttpMobileRegisterInput{
-		Token:         moment.Token,
-		AppIdentifier: moment.AppIdentifier,
-	})
+	_, err := m.mobileRepo.SaveDeviceInfo(deviceInfo)
 
 	if err != nil {
 		m.logContext.Error("failed to save mobile device")

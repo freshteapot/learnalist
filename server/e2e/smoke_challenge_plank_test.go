@@ -35,7 +35,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Username: generateUsername(),
 			Password: "test123",
 		}
-		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input)
+		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))
@@ -133,7 +133,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Username: generateUsername(),
 			Password: "test123",
 		}
-		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input)
+		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))

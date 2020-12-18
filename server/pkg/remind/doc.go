@@ -18,14 +18,8 @@ var (
 
 type RemindDailySettingsRepository interface {
 	Save(userUUID string, settings openapi.RemindDailySettings, whenNext string) error
-	DeleteByUserUUID(userUUID string) error
-	DeleteByUserAndApp(userUUID string, appIdentifier string) error
-}
-
-type MobileRepository interface {
-	SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error)
 	DeleteByUser(userUUID string) error
-	DeleteByToken(token string) error
+	DeleteByApp(userUUID string, appIdentifier string) error
 }
 
 type UserPreference struct {

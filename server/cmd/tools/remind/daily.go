@@ -80,7 +80,7 @@ var dailyCMD = &cobra.Command{
 				return
 			}
 
-			manager.Write(moment)
+			manager.OnEvent(moment)
 			timer.Reset(d)
 		}
 

@@ -65,7 +65,12 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput)
+	deviceInfo := openapi.MobileDeviceInfo{
+		Token:         registerInput.Token,
+		UserUuid:      userUUID,
+		AppIdentifier: registerInput.AppIdentifier,
+	}
+	status, err := s.repo.SaveDeviceInfo(deviceInfo)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
@@ -89,11 +94,7 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		Kind: EventMobileDeviceRegistered,
 		Data: event.EventKV{
 			UUID: userUUID,
-			Data: DeviceInfo{
-				Token:         registerInput.Token,
-				UserUUID:      userUUID,
-				AppIdentifier: registerInput.AppIdentifier,
-			},
+			Data: deviceInfo,
 		},
 		Action: event.ActionUpsert,
 	})

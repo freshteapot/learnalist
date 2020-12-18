@@ -1,6 +1,10 @@
 package mobile
 
-import "github.com/freshteapot/learnalist-api/server/pkg/openapi"
+import (
+	"errors"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+)
 
 var (
 	EventMobileDeviceRegistered = "mobile.register"
@@ -9,12 +13,12 @@ var (
 )
 
 type MobileRepository interface {
-	SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error)
+	SaveDeviceInfo(deviceInfo openapi.MobileDeviceInfo) (int, error)
 	DeleteByUser(userUUID string) error
 	DeleteByToken(token string) error
+	GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error)
 }
-type DeviceInfo struct {
-	Token         string `json:"token"`
-	UserUUID      string `json:"user_uuid"`
-	AppIdentifier string `json:"app_identifier"`
-}
+
+var (
+	ErrNotFound = errors.New("not.found")
+)

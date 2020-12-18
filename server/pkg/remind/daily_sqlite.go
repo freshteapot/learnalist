@@ -2,16 +2,17 @@ package remind
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
 )
 
 var (
-	SqlSave        = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?`
-	SqlGetNext     = `SELECT * FROM daily_reminder_settings WHERE when_next=? ORDER BY when_next LIMIT 1`
-	SqlWhoToRemind = `
+	SqlDeleteByDeviceInfo = `DELETE FROM daily_reminder_settings WHERE user_uuid=? AND app_identifier=?`
+	SqlDeleteByUser       = `DELETE FROM daily_reminder_settings WHERE user_uuid=?`
+	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?`
+	SqlGetNext            = `SELECT * FROM daily_reminder_settings WHERE when_next=? ORDER BY when_next LIMIT 1`
+	SqlWhoToRemind        = `
 WITH _settings(user_uuid, app_identifier, settings) AS (
 	SELECT
 		user_uuid,
@@ -62,10 +63,18 @@ func (r remindDailySettingsSqliteRepository) Save(userUUID string, settings open
 	return nil
 }
 
-func (r remindDailySettingsSqliteRepository) DeleteByUserUUID(userUUID string) error {
-	return errors.New("TODO")
+func (r remindDailySettingsSqliteRepository) DeleteByUser(userUUID string) error {
+	_, err := r.db.Exec(SqlDeleteByUser, userUUID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r remindDailySettingsSqliteRepository) DeleteByUserAndApp(userUUID string, appIdentifier string) error {
-	return errors.New("TODO")
+func (r remindDailySettingsSqliteRepository) DeleteByApp(userUUID string, appIdentifier string) error {
+	_, err := r.db.Exec(SqlDeleteByDeviceInfo, userUUID, appIdentifier)
+	if err != nil {
+		return err
+	}
+	return nil
 }

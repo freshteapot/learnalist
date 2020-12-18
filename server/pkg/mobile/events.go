@@ -2,7 +2,6 @@ package mobile
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
@@ -25,15 +24,26 @@ func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 	b, _ := json.Marshal(entry.Data)
 	json.Unmarshal(b, &momentKV)
 	token := momentKV.Data.(string)
-	// Lookup device?
-	fmt.Printf("Remove token %s from device_table\n", token)
+
+	deviceInfo, err := s.repo.GetDeviceInfoByToken(token)
+	if err != nil {
+		if err == ErrNotFound {
+			return
+		}
+	}
+
+	err = s.repo.DeleteByToken(token)
+	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error": err,
+			"token": token,
+		}).Error("removing device token")
+		return
+	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventMobileDeviceRemoved,
-		Data: event.EventKV{
-			UUID: momentKV.UUID,
-			Data: token,
-		},
+		Kind:   EventMobileDeviceRemoved,
+		Data:   deviceInfo,
 		Action: event.ActionDeleted,
 	})
 }

@@ -1,4 +1,3 @@
-# uuid = {userUUID}:{appIdentifier}
 CREATE TABLE IF NOT EXISTS daily_reminder_settings (
   user_uuid CHARACTER(36) not null,
   app_identifier CHARACTER(36) not null,

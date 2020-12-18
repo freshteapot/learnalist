@@ -29,7 +29,7 @@ func NewOpenApiClient(server string) OpenApiClient {
 }
 
 func (c OpenApiClient) RegisterUser(input openapi.HttpUserRegisterInput) openapi.HttpUserRegisterResponse {
-	data, response, err := c.API.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+	data, response, err := c.API.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input, nil)
 
 	Expect(err).To(BeNil())
 	Expect(response.StatusCode).To(Equal(http.StatusCreated))

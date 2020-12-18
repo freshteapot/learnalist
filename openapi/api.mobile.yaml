@@ -17,7 +17,16 @@ components:
           enum:
             - plank:v1
             - remind:v1
-
+    MobileDeviceInfo:
+      description: Information linking a mobile device and app to a user
+      required:
+        - user_uuid
+      allOf:
+        - type: object
+          properties:
+            user_uuid:
+              type: string
+        - $ref: "#/components/schemas/HttpMobileRegisterInput"
 paths:
   /mobile/register-device:
     post:

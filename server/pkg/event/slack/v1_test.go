@@ -5,6 +5,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
@@ -88,9 +89,10 @@ var _ = Describe("Testing Events to Slack", func() {
 					Kind: mobile.EventMobileDeviceRegistered,
 					Data: event.EventKV{
 						UUID: userUUID,
-						Data: mobile.DeviceInfo{
-							UserUUID: userUUID,
-							Token:    "fake",
+						Data: openapi.MobileDeviceInfo{
+							UserUuid:      userUUID,
+							Token:         "fake",
+							AppIdentifier: "remind:v1",
 						},
 					},
 				},
