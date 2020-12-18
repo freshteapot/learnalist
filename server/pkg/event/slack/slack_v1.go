@@ -166,6 +166,13 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 
 		userUUID := moment.UserUuid
 		msg.Text = fmt.Sprintf(`user:%s registered mobile token for app:"%s"`, userUUID, moment.AppIdentifier)
+	case event.MobileDeviceRemove:
+		msg.Text = "Removing a token based on feedback from fcm, a follow up event should happen."
+	case event.MobileDeviceRemoved:
+		b, _ := json.Marshal(entry.Data)
+		var deviceInfo openapi.MobileDeviceInfo
+		json.Unmarshal(b, &deviceInfo)
+		msg.Text = fmt.Sprintf(`Removed token from user:%s app:"%s"`, deviceInfo.UserUuid, deviceInfo.AppIdentifier)
 	case remind.EventApiRemindDailySettings:
 		b, _ := json.Marshal(entry.Data)
 		var settings openapi.RemindDailySettings

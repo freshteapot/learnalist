@@ -1,8 +1,6 @@
 package mobile
 
 import (
-	"encoding/json"
-
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
@@ -11,7 +9,8 @@ func (s MobileService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
 		s.removeUser(entry)
-		return
+	case event.MobileDeviceRemove:
+		s.removeDeviceByToken(entry)
 	}
 }
 
@@ -24,10 +23,7 @@ func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 	logEvent := "removeDevice"
 	logContext := s.logContext.WithField("sub-context", logEvent)
 
-	var momentKV event.EventKV
-	b, _ := json.Marshal(entry.Data)
-	json.Unmarshal(b, &momentKV)
-	token := momentKV.Data.(string)
+	token := entry.Data.(string)
 
 	deviceInfo, err := s.repo.GetDeviceInfoByToken(token)
 	if err != nil {

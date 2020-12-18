@@ -16,7 +16,7 @@ var (
 	SqlSave               = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
 	SqlDeleteDeviceByUser = `DELETE FROM mobile_device WHERE user_uuid=?`
 	SqlDeleteDeviceByApp  = `DELETE FROM mobile_device WHERE user_uuid=? AND app_identifier=?`
-	SqlGetDeviceByToken   = `SELECT * FROM mobile_device WHERE token=?`
+	SqlGetDeviceByToken   = `SELECT user_uuid, app_identifier, token FROM mobile_device WHERE token=?`
 )
 
 type dbDeviceInfo struct {

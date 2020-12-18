@@ -147,6 +147,7 @@ go run main.go --config=../config/dev.config.yaml tools event-reader
 ## Run the challenge sync service
 ```sh
 TOPIC=lal.monolog \
+EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=challenges-sync \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
@@ -162,6 +163,7 @@ Topic where communications goto
 
 ```sh
 TOPIC=lal.monolog \
+EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=nats-reader \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \

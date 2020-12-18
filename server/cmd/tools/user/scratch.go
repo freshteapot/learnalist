@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -79,6 +80,14 @@ var scratchCMD = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dsn := viper.GetString("server.sqlite.database")
+
+		moment := event.Eventlog{
+			Kind: event.MobileDeviceRemove,
+			Data: "fake-token-123",
+		}
+		b, _ := json.Marshal(moment)
+		fmt.Println(string(b))
+		return
 
 		db := database.NewDB(dsn)
 		storage := userSqlite.NewSqliteManagementStorage(db)
