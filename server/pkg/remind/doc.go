@@ -21,6 +21,7 @@ type RemindDailySettingsRepository interface {
 	DeleteByUser(userUUID string) error
 	DeleteByApp(userUUID string, appIdentifier string) error
 	ActivityHappened(userUUID string, appIdentifier string) error
+	WhoToRemind() []RemindMe
 }
 
 type UserPreference struct {

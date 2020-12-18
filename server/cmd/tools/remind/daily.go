@@ -52,10 +52,10 @@ var dailyCMD = &cobra.Command{
 		databaseName := viper.GetString("remind.daily.sqlite.database")
 		db := database.NewDB(databaseName)
 
-		settingsRepo := remind.NewRemindDailySettingsSqliteRepository(db)
+		remindDailyRepo := remind.NewRemindDailySettingsSqliteRepository(db)
 		mobileRepo := mobile.NewSqliteRepository(db)
 
-		manager := remind.NewManager(db, settingsRepo, mobileRepo, logContext)
+		manager := remind.NewManager(remindDailyRepo, mobileRepo, logContext)
 		sc := event.GetBus().(*event.NatsBus).Connection()
 
 		allowed := manager.FilterKindsBy()

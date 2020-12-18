@@ -4,6 +4,7 @@ package mocks
 
 import (
 	openapi "github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	remind "github.com/freshteapot/learnalist-api/server/pkg/remind"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -63,6 +64,22 @@ func (_m *RemindDailySettingsRepository) Save(userUUID string, settings openapi.
 		r0 = rf(userUUID, settings, whenNext)
 	} else {
 		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// WhoToRemind provides a mock function with given fields:
+func (_m *RemindDailySettingsRepository) WhoToRemind() []remind.RemindMe {
+	ret := _m.Called()
+
+	var r0 []remind.RemindMe
+	if rf, ok := ret.Get(0).(func() []remind.RemindMe); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]remind.RemindMe)
+		}
 	}
 
 	return r0

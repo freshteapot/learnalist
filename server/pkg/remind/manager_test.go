@@ -9,8 +9,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
-	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/mock"
@@ -19,10 +17,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Testing Manager", func() {
+var _ = Describe("Testing Manager", func() {
 	var (
 		logger *logrus.Logger
-		dbCon  *sqlx.DB
 		//mockSql      sqlmock.Sqlmock
 		settingsRepo *mocks.RemindDailySettingsRepository
 		mobileRepo   *mocks.MobileRepository
@@ -34,8 +31,6 @@ var _ = FDescribe("Testing Manager", func() {
 
 	BeforeEach(func() {
 		logger, _ = test.NewNullLogger()
-		dbCon, _, _ = helper.GetMockDB()
-
 		settingsRepo = &mocks.RemindDailySettingsRepository{}
 		mobileRepo = &mocks.MobileRepository{}
 		userUUID = "fake-user-123"
@@ -67,7 +62,7 @@ var _ = FDescribe("Testing Manager", func() {
 		}
 
 		mobileRepo.On("DeleteByApp", userUUID, appIdentifier).Return(nil)
-		manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+		manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 		manager.OnEvent(moment)
 
 		Expect("A").To(Equal("A"))
@@ -81,7 +76,7 @@ var _ = FDescribe("Testing Manager", func() {
 		}
 
 		mobileRepo.On("SaveDeviceInfo", deviceInfo).Return(201, nil)
-		manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+		manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 		manager.OnEvent(moment)
 
 		Expect("A").To(Equal("A"))
@@ -96,7 +91,7 @@ var _ = FDescribe("Testing Manager", func() {
 				Action: event.ActionDeleted,
 			}
 			settingsRepo.On("DeleteByApp", userUUID, appIdentifier).Return(nil)
-			manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 
@@ -109,7 +104,7 @@ var _ = FDescribe("Testing Manager", func() {
 			}
 			// Test time outside fo this
 			settingsRepo.On("Save", userUUID, settings, mock.AnythingOfType("string")).Return(nil)
-			manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 	})
@@ -124,7 +119,7 @@ var _ = FDescribe("Testing Manager", func() {
 				},
 			}
 			settingsRepo.On("ActivityHappened", userUUID, apps.PlankV1).Return(nil)
-			manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 
@@ -141,7 +136,7 @@ var _ = FDescribe("Testing Manager", func() {
 			}
 
 			settingsRepo.On("ActivityHappened", userUUID, apps.RemindV1).Return(nil)
-			manager := remind.NewManager(dbCon, settingsRepo, mobileRepo, logger)
+			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 	})

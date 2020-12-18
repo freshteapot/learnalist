@@ -14,21 +14,21 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
 
 type manager struct {
-	db           *sqlx.DB
 	settingsRepo RemindDailySettingsRepository
 	mobileRepo   mobile.MobileRepository
 	logContext   logrus.FieldLogger
 	filterKinds  []string
 }
 
-func NewManager(db *sqlx.DB, settingsRepo RemindDailySettingsRepository, mobileRepo mobile.MobileRepository, logContext logrus.FieldLogger) *manager {
+func NewManager(
+	settingsRepo RemindDailySettingsRepository,
+	mobileRepo mobile.MobileRepository,
+	logContext logrus.FieldLogger) *manager {
 	return &manager{
-		db:           db,
 		settingsRepo: settingsRepo,
 		mobileRepo:   mobileRepo,
 		logContext:   logContext,
@@ -111,7 +111,7 @@ func (m *manager) SendNotifications() {
 	// Send
 	// Update + set event happened=0
 	// fmt.Println("looking for new notifications ", time.Now().UTC())
-	reminders := m.WhoToRemind()
+	reminders := m.settingsRepo.WhoToRemind()
 	if len(reminders) == 0 {
 		return
 	}
@@ -227,38 +227,4 @@ func (m *manager) processMobileDeviceRemoved(entry event.Eventlog) {
 	if err != nil {
 		m.logContext.Error("failed to remove mobile device")
 	}
-}
-
-func (m *manager) WhoToRemind() []RemindMe {
-	type dbItem struct {
-		UserUUID string `db:"user_uuid"`
-		Settings string `db:"settings"`
-		Medium   string `db:"medium"`
-		Activity bool   `db:"activity"`
-	}
-
-	dbItems := make([]dbItem, 0)
-	items := make([]RemindMe, 0)
-
-	now := time.Now().UTC()
-	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
-	whenNext := whenNextTime.Format(time.RFC3339Nano)
-
-	err := m.db.Select(&dbItems, SqlWhoToRemind, whenNext)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, item := range dbItems {
-		var settings openapi.RemindDailySettings
-		json.Unmarshal([]byte(item.Settings), &settings)
-
-		items = append(items, RemindMe{
-			UserUUID: item.UserUUID,
-			Settings: settings,
-			Medium:   item.Medium,
-			Activity: item.Activity,
-		})
-	}
-	return items
 }

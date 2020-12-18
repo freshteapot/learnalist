@@ -2,6 +2,7 @@ package remind
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
@@ -88,4 +89,38 @@ func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, a
 		return err
 	}
 	return nil
+}
+
+func (r remindDailySettingsSqliteRepository) WhoToRemind() []RemindMe {
+	type dbItem struct {
+		UserUUID string `db:"user_uuid"`
+		Settings string `db:"settings"`
+		Medium   string `db:"medium"`
+		Activity bool   `db:"activity"`
+	}
+
+	dbItems := make([]dbItem, 0)
+	items := make([]RemindMe, 0)
+
+	now := time.Now().UTC()
+	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
+	whenNext := whenNextTime.Format(time.RFC3339Nano)
+
+	err := r.db.Select(&dbItems, SqlWhoToRemind, whenNext)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, item := range dbItems {
+		var settings openapi.RemindDailySettings
+		json.Unmarshal([]byte(item.Settings), &settings)
+
+		items = append(items, RemindMe{
+			UserUUID: item.UserUUID,
+			Settings: settings,
+			Medium:   item.Medium,
+			Activity: item.Activity,
+		})
+	}
+	return items
 }
