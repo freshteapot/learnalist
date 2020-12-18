@@ -33,6 +33,12 @@ const (
 )
 
 var (
+	MobileDeviceRegistered = "mobile.registered"
+	MobileDeviceRemove     = "mobile.remove"
+	MobileDeviceRemoved    = "mobile.removed"
+)
+
+var (
 	bus EventlogPubSub
 )
 

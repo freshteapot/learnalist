@@ -33,8 +33,8 @@ func NewManager(
 		mobileRepo:   mobileRepo,
 		logContext:   logContext,
 		filterKinds: []string{
-			mobile.EventMobileDeviceRemoved,
-			mobile.EventMobileDeviceRegistered,
+			event.MobileDeviceRemoved,
+			event.MobileDeviceRegistered,
 			EventApiRemindDailySettings,
 			event.ApiSpacedRepetition,
 			event.ApiPlank,
@@ -50,9 +50,9 @@ func (m *manager) FilterKindsBy() []string {
 // TODO now we need display_name
 func (m *manager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
-	case mobile.EventMobileDeviceRemoved:
+	case event.MobileDeviceRemoved:
 		m.processMobileDeviceRemoved(entry)
-	case mobile.EventMobileDeviceRegistered:
+	case event.MobileDeviceRegistered:
 		m.processMobileDeviceRegistered(entry)
 	case event.ApiSpacedRepetition:
 		// Get settings

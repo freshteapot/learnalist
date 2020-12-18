@@ -92,7 +92,7 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		UUID:   userUUID,
-		Kind:   EventMobileDeviceRegistered,
+		Kind:   event.MobileDeviceRegistered,
 		Data:   deviceInfo,
 		Action: event.ActionUpsert,
 	})

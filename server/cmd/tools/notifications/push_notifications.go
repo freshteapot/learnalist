@@ -106,7 +106,11 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 			response, err := client.Send(ctx, message)
 			if err != nil {
 				if err.Error() == "The registration token is not a valid FCM registration token" {
-					// TODO send message to remove this token from the list
+					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+						Kind: event.MobileDeviceRemove,
+						Data: message.Token,
+					})
+
 					logContext.WithFields(logrus.Fields{
 						"event": "invalid",
 						"token": message.Token,
@@ -115,7 +119,11 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 				}
 
 				if err.Error() == "Requested entity was not found." {
-					// TODO send message to remove this token from the list
+					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+						Kind: event.MobileDeviceRemove,
+						Data: message.Token,
+					})
+
 					// Poor mans option
 					// cat events.ndjson | jq -r 'select(.event=="stale") | "DELETE FROM mobile_device WHERE token=\"\(.token)\";"'
 					logContext.WithFields(logrus.Fields{

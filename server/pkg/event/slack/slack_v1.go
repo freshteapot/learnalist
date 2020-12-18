@@ -6,7 +6,6 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
@@ -159,7 +158,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 
 		msg.Text = fmt.Sprintf("user:%s left challenge:%s", moment.UserUUID, moment.UUID)
-	case mobile.EventMobileDeviceRegistered:
+	case event.MobileDeviceRegistered:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.MobileDeviceInfo
 		json.Unmarshal(b, &moment)

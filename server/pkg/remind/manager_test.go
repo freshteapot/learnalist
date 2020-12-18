@@ -4,7 +4,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
@@ -53,7 +52,7 @@ var _ = Describe("Testing Manager", func() {
 	It("Remove device", func() {
 
 		moment := event.Eventlog{
-			Kind: mobile.EventMobileDeviceRemoved,
+			Kind: event.MobileDeviceRemoved,
 			Data: openapi.MobileDeviceInfo{
 				UserUuid:      userUUID,
 				AppIdentifier: appIdentifier,
@@ -70,7 +69,7 @@ var _ = Describe("Testing Manager", func() {
 
 	It("Register device", func() {
 		moment := event.Eventlog{
-			Kind:   mobile.EventMobileDeviceRegistered,
+			Kind:   event.MobileDeviceRegistered,
 			Data:   deviceInfo,
 			Action: event.ActionDeleted,
 		}
