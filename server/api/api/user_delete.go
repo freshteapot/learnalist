@@ -33,8 +33,8 @@ func (m *Manager) V1DeleteUser(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		UUID: userUUID,
 		Kind: event.ApiUserDelete,
+		UUID: userUUID,
 	})
 
 	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
