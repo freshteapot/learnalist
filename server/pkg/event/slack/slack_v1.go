@@ -179,10 +179,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		default:
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
-
 	default:
-		b, _ := json.Marshal(entry)
-		fmt.Println(string(b))
 		msg.Text = entry.Kind
 	}
 

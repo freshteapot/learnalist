@@ -34,6 +34,17 @@ var _ = Describe("Testing Events to Slack", func() {
 		}{
 			{
 				entry: event.Eventlog{
+					Kind: "TODO",
+					Data: "I am fake",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "TODO"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
 					Kind: challenge.EventChallengeCreated,
 					Data: event.EventKV{
 						UUID: challengeUUID,
