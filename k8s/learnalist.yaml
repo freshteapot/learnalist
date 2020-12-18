@@ -38,8 +38,8 @@ spec:
             - name: USER_REGISTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: userRegisterKey
-                  key: learnalist-sever
+                  name: learnalist-server
+                  key: userRegisterKey
 
           volumeMounts:
             - name: config-volume
