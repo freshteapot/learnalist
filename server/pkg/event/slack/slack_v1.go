@@ -7,7 +7,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
@@ -108,7 +107,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.Uuid)
 		}
 
-		if moment.Action == plank.EventKindDeleted {
+		if moment.Action == event.ActionDeleted {
 			msg.Text = fmt.Sprintf("user:%s deleted a plank:%s", moment.UserUUID, moment.Data.Uuid)
 		}
 	case challenge.EventChallengeDone:

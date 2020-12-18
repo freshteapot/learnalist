@@ -190,7 +190,7 @@ var _ = Describe("Testing API", func() {
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Data.(event.EventPlank).UserUUID).To(Equal(user.Uuid))
 				Expect(moment.Data.(event.EventPlank).Data).To(Equal(record))
-				Expect(moment.Data.(event.EventPlank).Action).To(Equal(plank.EventKindDeleted))
+				Expect(moment.Data.(event.EventPlank).Action).To(Equal(event.ActionDeleted))
 				return true
 			}))
 

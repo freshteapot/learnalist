@@ -151,7 +151,7 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiPlank,
 		Data: event.EventPlank{
-			Action:   EventKindDeleted,
+			Action:   event.ActionDeleted,
 			UserUUID: user.Uuid,
 			Data:     record,
 		},

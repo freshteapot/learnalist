@@ -28,7 +28,3 @@ type Entry struct {
 	Body     openapi.Plank `json:"body" db:"body"`
 	Created  time.Time     `json:"created" db:"created"`
 }
-
-var (
-	EventKindDeleted = "deleted"
-)
