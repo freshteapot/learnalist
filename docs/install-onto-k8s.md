@@ -293,7 +293,7 @@ nats-server --config /etc/nats-config/nats.conf -sl reload
 ```
 
 
-# Update secrets for learnalist_server
+# Update secret/learnalist-server
 
 ## Create
 ```sh

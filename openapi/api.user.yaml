@@ -74,6 +74,12 @@ paths:
         - user
       operationId: registerUserWithUsernameAndPassword
       description: Register a new user with username and password
+      parameters:
+        - in: header
+          name: x-user-register
+          description: Restrict access to this endpoint, if you add the header and it matches the key, you are in.
+          schema:
+            type: string
       requestBody:
         description: Username and password
         required: true
