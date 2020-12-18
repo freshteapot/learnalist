@@ -84,8 +84,9 @@ var deleteUserCmd = &cobra.Command{
 				fmt.Println(err)
 				return
 			}
+			// What can possibly go wrong if we send it thru the system?
 			fmt.Println("user not found")
-			return
+			//return
 		}
 
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{

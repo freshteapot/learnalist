@@ -14,6 +14,8 @@ import (
 func (s ChallengeService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
+		fallthrough
+	case event.CMDUserDelete:
 		s.removeUser(entry)
 		return
 	case EventChallengeDone:
@@ -27,9 +29,11 @@ func (s ChallengeService) OnEvent(entry event.Eventlog) {
 // removeUser when a user is deleted
 // Currently we only remove the users entries, not any entries they created.
 func (s ChallengeService) removeUser(entry event.Eventlog) {
-	if entry.Kind != event.ApiUserDelete {
+	allowed := []string{event.ApiUserDelete, event.CMDUserDelete}
+	if !utils.StringArrayContains(allowed, entry.Kind) {
 		return
 	}
+
 	userUUID := entry.UUID
 	_ = s.repo.DeleteUser(userUUID)
 	s.logContext.WithFields(logrus.Fields{

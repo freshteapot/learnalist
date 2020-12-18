@@ -37,6 +37,8 @@ func NewManager(
 			EventApiRemindDailySettings,
 			event.ApiSpacedRepetition,
 			event.ApiPlank,
+			event.CMDUserDelete,
+			event.ApiUserDelete,
 		},
 	}
 }
@@ -45,10 +47,44 @@ func (m *manager) FilterKindsBy() []string {
 	return m.filterKinds
 }
 
-// TODO now we need token
-// TODO now we need display_name
+// Future might want display_name
+// TODO we are not handling userDelete event
 func (m *manager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
+	case event.ApiUserDelete:
+		fallthrough
+	case event.CMDUserDelete:
+		// Delete from
+		userUUID := entry.UUID
+		logContext := m.logContext.WithFields(logrus.Fields{
+			"user_uuid": userUUID,
+			"event":     event.UserDeleted,
+		})
+
+		err := m.settingsRepo.DeleteByUser(userUUID)
+		if err != nil {
+			// Future worthy of an alert
+			// TODO should we use Fatal
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("settingsRepo.DeleteByUser")
+		}
+
+		err = m.mobileRepo.DeleteByUser(userUUID)
+		if err != nil {
+			// Future worthy of an alert
+			// TODO should we use Fatal
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("mobileRepo.DeleteByUser")
+		}
+
+		if err != nil {
+			// If one of the above is missing, it should stop reminders
+			return
+		}
+
+		logContext.Info("user removed")
 	case event.MobileDeviceRemoved:
 		m.processMobileDeviceRemoved(entry)
 	case event.MobileDeviceRegistered:
