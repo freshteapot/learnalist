@@ -113,9 +113,9 @@ var _ = Describe("Testing API", func() {
 		It("saved", func() {
 			repo.On("SaveEntry", mock.Anything).Return(nil)
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
-				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
-				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
-				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindNew))
+				Expect(moment.Data.(event.EventPlank).UserUUID).To(Equal(user.Uuid))
+				Expect(moment.Data.(event.EventPlank).Data).To(Equal(record))
+				Expect(moment.Data.(event.EventPlank).Action).To(Equal(event.ActionNew))
 				return true
 			}))
 
@@ -188,9 +188,9 @@ var _ = Describe("Testing API", func() {
 			repo.On("DeleteEntry", recordUUID, user.Uuid).Return(nil)
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
-				Expect(moment.Data.(plank.EventPlank).UserUUID).To(Equal(user.Uuid))
-				Expect(moment.Data.(plank.EventPlank).Data).To(Equal(record))
-				Expect(moment.Data.(plank.EventPlank).Kind).To(Equal(plank.EventKindDeleted))
+				Expect(moment.Data.(event.EventPlank).UserUUID).To(Equal(user.Uuid))
+				Expect(moment.Data.(event.EventPlank).Data).To(Equal(record))
+				Expect(moment.Data.(event.EventPlank).Action).To(Equal(plank.EventKindDeleted))
 				return true
 			}))
 

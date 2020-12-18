@@ -102,13 +102,13 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		}
 	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
-		var moment plank.EventPlank
+		var moment event.EventPlank
 		json.Unmarshal(b, &moment)
-		if moment.Kind == plank.EventKindNew {
+		if moment.Action == event.ActionNew {
 			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.Uuid)
 		}
 
-		if moment.Kind == plank.EventKindDeleted {
+		if moment.Action == plank.EventKindDeleted {
 			msg.Text = fmt.Sprintf("user:%s deleted a plank:%s", moment.UserUUID, moment.Data.Uuid)
 		}
 	case challenge.EventChallengeDone:

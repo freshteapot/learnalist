@@ -5,7 +5,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
@@ -112,8 +111,8 @@ var _ = Describe("Testing Manager", func() {
 		It("A plank", func() {
 			moment := event.Eventlog{
 				Kind: event.ApiPlank,
-				Data: plank.EventPlank{
-					Kind:     plank.EventKindNew,
+				Data: event.EventPlank{
+					Action:   event.ActionNew,
 					UserUUID: userUUID,
 				},
 			}

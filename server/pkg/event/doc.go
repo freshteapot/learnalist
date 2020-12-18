@@ -2,6 +2,7 @@ package event
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 const (
@@ -25,6 +26,7 @@ const (
 	KindUserLogoutSession            = "logout.session"
 	KindUserLogoutSessions           = "logout.sessions"
 	KindPushNotification             = "push-notification"
+	ActionNew                        = "new"
 	ActionCreated                    = "created"
 	ActionUpdated                    = "updated"
 	ActionDeleted                    = "deleted"
@@ -78,4 +80,10 @@ type EventList struct {
 type EventKV struct {
 	UUID string      `json:"uuid"`
 	Data interface{} `json:"data"`
+}
+
+type EventPlank struct {
+	Action   string        `json:"action"`
+	Data     openapi.Plank `json:"data"`
+	UserUUID string        `json:"user_uuid"`
 }

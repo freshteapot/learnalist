@@ -30,12 +30,5 @@ type Entry struct {
 }
 
 var (
-	EventKindNew     = "new"
 	EventKindDeleted = "deleted"
 )
-
-type EventPlank struct {
-	Kind     string        `json:"kind"`
-	Data     openapi.Plank `json:"data"`
-	UserUUID string        `json:"user_uuid"`
-}

@@ -12,7 +12,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
 )
@@ -68,10 +67,10 @@ func (m *manager) OnEvent(entry event.Eventlog) {
 		m.settingsRepo.ActivityHappened(moment.Data.UserUUID, apps.RemindV1)
 	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
-		var moment plank.EventPlank
+		var moment event.EventPlank
 		json.Unmarshal(b, &moment)
 
-		if moment.Kind != plank.EventKindNew {
+		if moment.Action != event.ActionNew {
 			return
 		}
 		m.settingsRepo.ActivityHappened(moment.UserUUID, apps.PlankV1)
