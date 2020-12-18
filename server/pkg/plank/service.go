@@ -163,17 +163,10 @@ func (s PlankService) monologSubscribe(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserDelete {
 		return
 	}
-
-	b, err := json.Marshal(entry.Data)
-	if err != nil {
-		return
-	}
-
-	var moment event.EventUser
-	json.Unmarshal(b, &moment)
-	s.repo.DeleteEntriesByUser(moment.UUID)
+	userUUID := entry.UUID
+	s.repo.DeleteEntriesByUser(userUUID)
 	s.logContext.WithFields(logrus.Fields{
-		"event":     "user-deleted",
-		"user_uuid": moment.UUID,
+		"user_uuid": userUUID,
+		"event":     event.UserDeleted,
 	}).Info("entries removed")
 }

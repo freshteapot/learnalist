@@ -58,7 +58,7 @@ type EventlogPubSub interface {
 type Eventlog struct {
 	UUID      string      `json:"uuid,omitempty"`
 	Kind      string      `json:"kind"`
-	Data      interface{} `json:"data"`
+	Data      interface{} `json:"data,omitempty"`
 	Timestamp int64       `json:"timestamp,omitempty"`
 	Action    string      `json:"action,omitempty"`
 }

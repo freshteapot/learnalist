@@ -129,10 +129,8 @@ var _ = Describe("Testing Events to Slack", func() {
 			},
 			{
 				entry: event.Eventlog{
+					UUID: userUUID,
 					Kind: event.ApiUserDelete,
-					Data: event.EventUser{
-						UUID: userUUID,
-					},
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
 					expect := "api.user.delete: user:fake-user-123 should be deleted"

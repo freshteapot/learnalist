@@ -89,10 +89,8 @@ var deleteUserCmd = &cobra.Command{
 		}
 
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-			Kind: event.ApiUserDelete,
-			Data: event.EventUser{
-				UUID: userUUID,
-			},
+			UUID: userUUID,
+			Kind: event.CMDUserDelete,
 		})
 
 		hugoHelper.WritePublicLists(dal.GetPublicLists())

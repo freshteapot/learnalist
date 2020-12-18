@@ -60,17 +60,10 @@ func (s MobileService) removeUser(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserDelete {
 		return
 	}
-
-	b, err := json.Marshal(entry.Data)
-	if err != nil {
-		return
-	}
-
-	var moment event.EventUser
-	json.Unmarshal(b, &moment)
-	s.repo.DeleteByUser(moment.UUID)
+	userUUID := entry.UUID
+	s.repo.DeleteByUser(userUUID)
 	s.logContext.WithFields(logrus.Fields{
-		"user_uuid": moment.UUID,
+		"user_uuid": userUUID,
 		"event":     event.UserDeleted,
 	}).Info("user removed")
 }
