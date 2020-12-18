@@ -24,7 +24,7 @@ server:
     idp:
       issuedTo:
         - "XXX"
-
+  userRegisterKey: ""
 tools:
   integrationTests:
     username: ""

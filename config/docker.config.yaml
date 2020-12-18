@@ -21,7 +21,10 @@ server:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "http://localhost:1234"
-
+    idp:
+      issuedTo:
+        - "XXX"
+  userRegisterKey: ""
 tools:
   integrationTests:
     username: ""
