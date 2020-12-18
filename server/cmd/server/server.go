@@ -44,8 +44,8 @@ var ServerCmd = &cobra.Command{
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
 
-		viper.SetDefault("server.user-register-key", "")
-		viper.BindEnv("server.user-register-key", "USER_REGISTER_KEY")
+		viper.SetDefault("server.userRegisterKey", "")
+		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
@@ -58,7 +58,7 @@ var ServerCmd = &cobra.Command{
 			Google: googleOauthConfig,
 		}
 
-		userRegisterKey := viper.GetString("server.user-register-key")
+		userRegisterKey := viper.GetString("server.userRegisterKey")
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
