@@ -5,7 +5,7 @@
 
 ```sh
 curl -i -XDELETE -H"Authorization: Bearer ${token}" \
-"http://localhost:1234/api/v1/user/${userUUID}"
+"http://127.0.0.1:1234/api/v1/user/${userUUID}"
 ```
 
 ## Response
@@ -30,6 +30,6 @@ response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 ')
 userUUID=$(echo $response | jq -r '.user_uuid')
 token=$(echo $response | jq -r '.token')
-curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v1/user/${userUUID}"
+curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://127.0.0.1:1234/api/v1/user/${userUUID}"
 ```
 

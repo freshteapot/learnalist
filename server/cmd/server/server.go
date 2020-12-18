@@ -44,6 +44,9 @@ var ServerCmd = &cobra.Command{
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
 
+		viper.SetDefault("server.userRegisterKey", "")
+		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
+
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:    viper.GetString("server.loginWith.google.clientID"),
 			Secret: viper.GetString("server.loginWith.google.clientSecret"),
@@ -55,6 +58,7 @@ var ServerCmd = &cobra.Command{
 			Google: googleOauthConfig,
 		}
 
+		userRegisterKey := viper.GetString("server.userRegisterKey")
 		databaseName := viper.GetString("server.sqlite.database")
 		port := viper.GetString("server.port")
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
@@ -124,7 +128,15 @@ var ServerCmd = &cobra.Command{
 			event.NewInsights(logger),
 		)
 
-		apiManager := api.NewManager(dal, userManagement, acl, "", hugoHelper, *oauthHandlers, logger)
+		apiManager := api.NewManager(
+			dal,
+			userManagement,
+			acl,
+			"",
+			hugoHelper,
+			*oauthHandlers,
+			userRegisterKey,
+			logger)
 
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionService := spaced_repetition.NewService(db)

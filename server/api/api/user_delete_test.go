@@ -51,7 +51,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 		oauthHandlers := oauth.Handlers{}
 		hugoHelper = &mocks.HugoSiteBuilder{}
 
-		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, logger)
+		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, "", logger)
 
 		userUUID = "fake-123"
 		session.Token = "fake-token"

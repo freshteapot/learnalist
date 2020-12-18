@@ -13,14 +13,15 @@ import (
 // m exposing the data abstraction layer
 
 type Manager struct {
-	Datastore      models.Datastore
-	UserManagement user.Management
-	Acl            acl.Acl
-	DatabaseName   string
-	HugoHelper     hugo.HugoSiteBuilder
-	OauthHandlers  oauth.Handlers
-	logger         logrus.FieldLogger
-	insights       event.Insights
+	Datastore       models.Datastore
+	UserManagement  user.Management
+	Acl             acl.Acl
+	DatabaseName    string
+	HugoHelper      hugo.HugoSiteBuilder
+	OauthHandlers   oauth.Handlers
+	logger          logrus.FieldLogger
+	insights        event.Insights
+	UserRegisterKey string
 }
 
 func NewManager(
@@ -30,17 +31,19 @@ func NewManager(
 	databaseName string,
 	hugoHelper hugo.HugoSiteBuilder,
 	oauthHandlers oauth.Handlers,
+	userRegisterKey string,
 	logger logrus.FieldLogger,
 ) *Manager {
 	return &Manager{
-		Datastore:      datastore,
-		UserManagement: userManagement,
-		Acl:            acl,
-		DatabaseName:   databaseName,
-		HugoHelper:     hugoHelper,
-		OauthHandlers:  oauthHandlers,
-		logger:         logger,
-		insights:       event.NewInsights(logger),
+		Datastore:       datastore,
+		UserManagement:  userManagement,
+		Acl:             acl,
+		DatabaseName:    databaseName,
+		HugoHelper:      hugoHelper,
+		OauthHandlers:   oauthHandlers,
+		logger:          logger,
+		insights:        event.NewInsights(logger),
+		UserRegisterKey: userRegisterKey,
 	}
 }
 

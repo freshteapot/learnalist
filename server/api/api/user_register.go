@@ -18,6 +18,16 @@ import (
 // When a user is created with the same username and password it returns a 200.
 // When a user is created with a username in the system it returns a 400.
 func (m *Manager) V1PostRegister(c echo.Context) error {
+
+	if m.UserRegisterKey != "" {
+		registerKey := c.Request().Header.Get("x-user-register")
+		if registerKey != m.UserRegisterKey {
+			return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+				Message: "User registration is locked down and requires key to add users",
+			})
+		}
+	}
+
 	var input api.HTTPUserRegisterInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)

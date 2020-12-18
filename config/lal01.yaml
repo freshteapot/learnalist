@@ -21,7 +21,10 @@ server:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "https://learnalist.net"
-
+    idp:
+      issuedTo:
+        - "XXX"
+  userRegisterKey: ""
 tools:
   integrationTests:
     username: ""
