@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remind-daily
+  labels:
+    app: remind-daily
+spec:
+  selector:
+    matchLabels:
+      app: remind-daily
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: remind-daily
+    spec:
+      containers:
+        - name: remind-daily
+          image: registry.devbox/learnalist:latest
+          args:
+            ["--config=/etc/learnalist/config.yaml", "tools", "remind", "daily"]
+          env:
+            - name: TOPIC
+              value: lal.monolog
+            - name: EVENTS_NATS_SERVER
+              value: "nats.default.svc.cluster.local"
+            - name: EVENTS_STAN_CLIENT_ID
+              value: "lal-remind-daily"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learnalist-config
