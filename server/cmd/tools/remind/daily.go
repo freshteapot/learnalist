@@ -67,6 +67,7 @@ var dailyCMD = &cobra.Command{
 		timer = time.AfterFunc(500*time.Millisecond, func() {
 			manager.StartSendNotifications()
 			timer.Stop()
+			timer = nil
 		})
 		defer timer.Stop()
 
@@ -76,12 +77,17 @@ var dailyCMD = &cobra.Command{
 
 			if !utils.StringArrayContains(allowed, moment.Kind) {
 
-				timer.Reset(d)
+				if timer != nil {
+					timer.Reset(d)
+				}
+
 				return
 			}
 
 			manager.OnEvent(moment)
-			timer.Reset(d)
+			if timer != nil {
+				timer.Reset(d)
+			}
 		}
 
 		durableName := "remind.daily"
