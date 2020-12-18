@@ -91,8 +91,8 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 	// TODO maybe add DeviceInfo to openapi
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		UUID:   userUUID,
 		Kind:   event.MobileDeviceRegistered,
+		UUID:   userUUID,
 		Data:   deviceInfo,
 		Action: event.ActionUpsert,
 	})

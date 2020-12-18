@@ -51,7 +51,6 @@ func (r SqliteRepository) DeleteByUser(userUUID string) error {
 	return nil
 }
 
-// I dont think I need this, nor the index
 func (r SqliteRepository) DeleteByApp(userUUID string, appIdentifier string) error {
 	_, err := r.db.Exec(SqlDeleteDeviceByApp, userUUID, appIdentifier)
 	if err != nil {
