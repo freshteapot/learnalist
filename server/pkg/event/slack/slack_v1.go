@@ -45,6 +45,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user:%s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogout:
+		fallthrough
 	case event.BrowserUserLogout:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser

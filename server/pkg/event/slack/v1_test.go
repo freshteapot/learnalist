@@ -45,6 +45,103 @@ var _ = Describe("Testing Events to Slack", func() {
 			},
 			{
 				entry: event.Eventlog{
+					Kind: event.ApiUserRegister,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserRegisterIDPGoogle,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.register: user:fake-user-123 registered via idp:google"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogin,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserRegisterIDPGoogle,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.login: user:fake-user-123 logged in via idp:google"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSession,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.logout: user:fake-user-123 logged out via api, clearing current session"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSessions,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.logout: user:fake-user-123 logged out via api, clearing all sessions"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.BrowserUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSession,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "browser.user.logout: user:fake-user-123 logged out via browser, clearing current session"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.BrowserUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSessions,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "browser.user.logout: user:fake-user-123 logged out via browser, clearing all sessions"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserDelete,
+					Data: event.EventUser{
+						UUID: userUUID,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
 					Kind: challenge.EventChallengeCreated,
 					Data: event.EventKV{
 						UUID: challengeUUID,
