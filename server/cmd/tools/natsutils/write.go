@@ -42,24 +42,14 @@ var writeCMD = &cobra.Command{
 
 		for {
 			switch line, err := reader.ReadString('\n'); err {
-
-			// If the read succeeded (the read `err` is nil),
-			// write out out the uppercased line. Check for an
-			// error on this write as we do on the read.
 			case nil:
 				line = strings.Trim(line, "\n")
 
 				if err := sc.Publish(topic, []byte(line)); err != nil {
 					logger.Fatal(err)
 				}
-
-			// The `EOF` error is expected when we reach the
-			// end of input, so exit gracefully in that case.
 			case io.EOF:
 				return
-
-			// Otherwise there's a problem; print the
-			// error and exit with non-zero status.
 			default:
 				fmt.Println(err)
 				os.Exit(1)
