@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,8 +28,8 @@ func NewSqliteRepository(db *sqlx.DB) PlankRepository {
 	}
 }
 
-func (r SqliteRepository) History(userUUID string) ([]HttpRequestInput, error) {
-	history := make([]HttpRequestInput, 0)
+func (r SqliteRepository) History(userUUID string) ([]openapi.Plank, error) {
+	history := make([]openapi.Plank, 0)
 	dbItems := make([]string, 0)
 	// When nothing is found, there is no error.
 	err := r.db.Select(&dbItems, SqlGetHistory, userUUID)
@@ -38,7 +39,7 @@ func (r SqliteRepository) History(userUUID string) ([]HttpRequestInput, error) {
 	}
 
 	for _, item := range dbItems {
-		var body HttpRequestInput
+		var body openapi.Plank
 		json.Unmarshal([]byte(item), &body)
 		history = append(history, body)
 	}
@@ -46,10 +47,10 @@ func (r SqliteRepository) History(userUUID string) ([]HttpRequestInput, error) {
 	return history, nil
 }
 
-func (r SqliteRepository) GetEntry(UUID string, userUUID string) (HttpRequestInput, error) {
+func (r SqliteRepository) GetEntry(UUID string, userUUID string) (openapi.Plank, error) {
 	var (
 		body   string
-		record HttpRequestInput
+		record openapi.Plank
 	)
 
 	err := r.db.Get(&body, SqlGetEntry, UUID, userUUID)

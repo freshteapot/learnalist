@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/labstack/echo/v4"
@@ -33,8 +34,8 @@ var _ = Describe("Testing API", func() {
 		req             *http.Request
 		rec             *httptest.ResponseRecorder
 		user            *uuid.User
-		records         []plank.HttpRequestInput
-		record          plank.HttpRequestInput
+		records         []openapi.Plank
+		record          openapi.Plank
 	)
 
 	BeforeEach(func() {
@@ -67,21 +68,21 @@ var _ = Describe("Testing API", func() {
 
 		It("Repo lookup failed", func() {
 			want := errors.New("Fail")
-			repo.On("History", user.Uuid).Return(make([]plank.HttpRequestInput, 0), want)
+			repo.On("History", user.Uuid).Return(make([]openapi.Plank, 0), want)
 			service.History(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
 
 		It("No history", func() {
-			repo.On("History", user.Uuid).Return(make([]plank.HttpRequestInput, 0), nil)
+			repo.On("History", user.Uuid).Return(make([]openapi.Plank, 0), nil)
 			service.History(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`[]`))
 		})
 
 		It("One entry", func() {
-			var expect []plank.HttpRequestInput
+			var expect []openapi.Plank
 			repo.On("History", user.Uuid).Return(records, nil)
 			service.History(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
@@ -160,14 +161,14 @@ var _ = Describe("Testing API", func() {
 
 		It("Issue saving to repo", func() {
 			want := errors.New("want")
-			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{}, want)
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(openapi.Plank{}, want)
 			service.DeletePlankRecord(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
 
 		It("Record not found", func() {
-			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{}, plank.ErrNotFound)
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(openapi.Plank{}, plank.ErrNotFound)
 			service.DeletePlankRecord(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.PlankRecordNotFound)
@@ -175,7 +176,7 @@ var _ = Describe("Testing API", func() {
 
 		It("Record found, but failed to delete", func() {
 			want := errors.New("want")
-			repo.On("GetEntry", recordUUID, user.Uuid).Return(plank.HttpRequestInput{UUID: recordUUID}, nil)
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(openapi.Plank{Uuid: recordUUID}, nil)
 			repo.On("DeleteEntry", recordUUID, user.Uuid).Return(want)
 			service.DeletePlankRecord(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))

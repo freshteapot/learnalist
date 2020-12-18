@@ -3,6 +3,8 @@ package plank
 import (
 	"errors"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 var (
@@ -11,31 +13,20 @@ var (
 )
 
 type PlankRepository interface {
-	GetEntry(UUID string, userUUID string) (HttpRequestInput, error)
+	GetEntry(UUID string, userUUID string) (openapi.Plank, error)
 	SaveEntry(entry Entry) error
 	// Return in time order, latest first
-	History(userUUID string) ([]HttpRequestInput, error)
+	History(userUUID string) ([]openapi.Plank, error)
 	DeleteEntry(UUID string, userUUID string) error
 	DeleteEntriesByUser(userUUID string) error
 }
 
-type HttpRequestInput struct {
-	UUID             string `json:"uuid,omitempty"`
-	ShowIntervals    bool   `json:"showIntervals"`
-	IntervalTime     int    `json:"intervalTime"`
-	BeginningTime    int64  `json:"beginningTime"`
-	CurrentTime      int64  `json:"currentTime"`
-	TimerNow         int    `json:"timerNow"`
-	IntervalTimerNow int    `json:"intervalTimerNow"`
-	Laps             int    `json:"laps"`
-}
-
 // Might need to evole this when I eventually move from sqlite
 type Entry struct {
-	UUID     string           `json:"uuid" db:"uuid"`
-	UserUUID string           `json:"user_uuid" db:"user_uuid"`
-	Body     HttpRequestInput `json:"body" db:"body"`
-	Created  time.Time        `json:"created" db:"created"`
+	UUID     string        `json:"uuid" db:"uuid"`
+	UserUUID string        `json:"user_uuid" db:"user_uuid"`
+	Body     openapi.Plank `json:"body" db:"body"`
+	Created  time.Time     `json:"created" db:"created"`
 }
 
 var (
@@ -44,7 +35,7 @@ var (
 )
 
 type EventPlank struct {
-	Kind     string           `json:"kind"`
-	Data     HttpRequestInput `json:"data"`
-	UserUUID string           `json:"user_uuid"`
+	Kind     string        `json:"kind"`
+	Data     openapi.Plank `json:"data"`
+	UserUUID string        `json:"user_uuid"`
 }
