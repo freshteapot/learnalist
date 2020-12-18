@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	ApiPlank                         = "api.plank"
 	CMDUserDelete                    = "cmd.user.delete"
 	ApiUserDelete                    = "api.user.delete"
 	ApiUserLogin                     = "api.user.login"
@@ -13,7 +14,7 @@ const (
 	ApiUserRegister                  = "api.user.register"
 	ApiListSaved                     = "api.list.saved"
 	ApiListDelete                    = "api.list.delete"
-	ApiSpacedRepetition              = "api.spacedrepetition" // TODO is this in use?
+	ApiSpacedRepetition              = "api.spacedrepetition"
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
 	KindUserRegisterUsername         = "username"

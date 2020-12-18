@@ -112,7 +112,7 @@ var _ = Describe("Testing Manager", func() {
 	When("Activity arrives", func() {
 		It("A plank", func() {
 			moment := event.Eventlog{
-				Kind: plank.EventApiPlank,
+				Kind: event.ApiPlank,
 				Data: plank.EventPlank{
 					Kind:     plank.EventKindNew,
 					UserUUID: userUUID,
@@ -126,7 +126,7 @@ var _ = Describe("Testing Manager", func() {
 		It("Spaced repetition item", func() {
 
 			moment := event.Eventlog{
-				Kind: spaced_repetition.EventApiSpacedRepetition,
+				Kind: event.ApiSpacedRepetition,
 				Data: spaced_repetition.EventSpacedRepetition{
 					Kind: spaced_repetition.EventKindNew,
 					Data: spaced_repetition.SpacedRepetitionEntry{

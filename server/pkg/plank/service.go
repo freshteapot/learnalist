@@ -81,7 +81,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiPlank,
+		Kind: event.ApiPlank,
 		Data: EventPlank{
 			Kind:     EventKindNew,
 			UserUUID: item.UserUUID,
@@ -148,7 +148,7 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiPlank,
+		Kind: event.ApiPlank,
 		Data: EventPlank{
 			Kind:     EventKindDeleted,
 			UserUUID: user.Uuid,

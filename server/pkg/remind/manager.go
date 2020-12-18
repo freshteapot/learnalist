@@ -37,7 +37,7 @@ func NewManager(
 			mobile.EventMobileDeviceRegistered,
 			EventApiRemindDailySettings,
 			event.ApiSpacedRepetition,
-			plank.EventApiPlank,
+			event.ApiPlank,
 		},
 	}
 }
@@ -54,7 +54,7 @@ func (m *manager) OnEvent(entry event.Eventlog) {
 		m.processMobileDeviceRemoved(entry)
 	case mobile.EventMobileDeviceRegistered:
 		m.processMobileDeviceRegistered(entry)
-	case spaced_repetition.EventApiSpacedRepetition:
+	case event.ApiSpacedRepetition:
 		// Get settings
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
@@ -66,7 +66,7 @@ func (m *manager) OnEvent(entry event.Eventlog) {
 			return
 		}
 		m.settingsRepo.ActivityHappened(moment.Data.UserUUID, apps.RemindV1)
-	case plank.EventApiPlank:
+	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment plank.EventPlank
 		json.Unmarshal(b, &moment)

@@ -39,7 +39,6 @@ type Entry struct {
 }
 
 var (
-	EventApiPlank    = "api.plank"
 	EventKindNew     = "new"
 	EventKindDeleted = "deleted"
 )

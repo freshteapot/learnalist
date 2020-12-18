@@ -78,7 +78,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var moment event.EventList
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
-	case spaced_repetition.EventApiSpacedRepetition:
+	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
 		json.Unmarshal(b, &moment)
@@ -102,7 +102,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if moment.Kind == spaced_repetition.EventKindDeleted {
 			msg.Text = fmt.Sprintf("user:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
 		}
-	case plank.EventApiPlank:
+	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment plank.EventPlank
 		json.Unmarshal(b, &moment)
