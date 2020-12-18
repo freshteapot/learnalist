@@ -103,13 +103,16 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventPlank
 		json.Unmarshal(b, &moment)
-		if moment.Action == event.ActionNew {
+
+		switch moment.Action {
+		case event.ActionNew:
 			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.Uuid)
+		case event.ActionDeleted:
+			msg.Text = fmt.Sprintf("user:%s deleted plank:%s", moment.UserUUID, moment.Data.Uuid)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
 
-		if moment.Action == event.ActionDeleted {
-			msg.Text = fmt.Sprintf("user:%s deleted a plank:%s", moment.UserUUID, moment.Data.Uuid)
-		}
 	case challenge.EventChallengeDone:
 		b, _ := json.Marshal(entry.Data)
 		var moment challenge.EventChallengeDoneEntry

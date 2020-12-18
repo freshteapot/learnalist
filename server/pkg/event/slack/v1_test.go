@@ -30,6 +30,7 @@ var _ = Describe("Testing Events to Slack", func() {
 		challengeUUID := "fake-challenge-123"
 		userUUID := "fake-user-123"
 		alistUUID := "fake-list-123"
+		plankUUID := "fake-plank-123"
 
 		tests := []struct {
 			entry event.Eventlog
@@ -137,6 +138,40 @@ var _ = Describe("Testing Events to Slack", func() {
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
 					expect := "api.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action:   event.ActionNew,
+						UserUUID: userUUID,
+						Data: openapi.Plank{
+							Uuid: plankUUID,
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "user:fake-user-123 added a plank:fake-plank-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action:   event.ActionDeleted,
+						UserUUID: userUUID,
+						Data: openapi.Plank{
+							Uuid: plankUUID,
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "user:fake-user-123 deleted plank:fake-plank-123"
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
