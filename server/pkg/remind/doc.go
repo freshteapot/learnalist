@@ -38,4 +38,5 @@ type RemindMe struct {
 	UserUUID string
 	Settings openapi.RemindDailySettings
 	Medium   string // Token or email
+	Activity bool
 }

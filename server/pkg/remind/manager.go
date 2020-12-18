@@ -2,7 +2,6 @@ package remind
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -111,7 +110,7 @@ func (m *manager) SendNotifications() {
 	// SELECT * FROM daily_reminders
 	// Send
 	// Update + set event happened=0
-	fmt.Println("looking for new notifications ", time.Now().UTC())
+	// fmt.Println("looking for new notifications ", time.Now().UTC())
 	reminders := m.WhoToRemind()
 	if len(reminders) == 0 {
 		return
@@ -120,14 +119,17 @@ func (m *manager) SendNotifications() {
 	title := "Daily Reminder"
 	var template string
 
-	template = "It's planking time!"
-	template = "What shall we learn today"
-	template = "Nice work!"
-	body := template
+	//template = "It's planking time!"
 	msgSent := 0
 	for _, remindMe := range reminders {
 		if remindMe.Settings.AppIdentifier == apps.RemindV1 &&
 			utils.StringArrayContains(remindMe.Settings.Medium, "push") {
+
+			template = "What shall we learn today"
+			if remindMe.Activity {
+				template = "Nice work!"
+			}
+			body := template
 			// Make message
 			message := &messaging.Message{
 				Notification: &messaging.Notification{
@@ -232,6 +234,7 @@ func (m *manager) WhoToRemind() []RemindMe {
 		UserUUID string `db:"user_uuid"`
 		Settings string `db:"settings"`
 		Medium   string `db:"medium"`
+		Activity bool   `db:"activity"`
 	}
 
 	dbItems := make([]dbItem, 0)
@@ -240,7 +243,7 @@ func (m *manager) WhoToRemind() []RemindMe {
 	now := time.Now().UTC()
 	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
 	whenNext := whenNextTime.Format(time.RFC3339Nano)
-	fmt.Println(whenNext)
+
 	err := m.db.Select(&dbItems, SqlWhoToRemind, whenNext)
 	if err != nil {
 		panic(err)
@@ -254,6 +257,7 @@ func (m *manager) WhoToRemind() []RemindMe {
 			UserUUID: item.UserUUID,
 			Settings: settings,
 			Medium:   item.Medium,
+			Activity: item.Activity,
 		})
 	}
 	return items

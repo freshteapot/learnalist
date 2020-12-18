@@ -14,22 +14,24 @@ var (
 	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?, activity=0`
 	SqlGetNext            = `SELECT * FROM daily_reminder_settings WHERE when_next=? ORDER BY when_next LIMIT 1`
 	SqlWhoToRemind        = `
-WITH _settings(user_uuid, app_identifier, settings) AS (
+WITH _settings(user_uuid, app_identifier, settings, activity) AS (
 	SELECT
 		user_uuid,
 		json_extract(body, '$.app_identifier') AS app_identifier,
-		body AS settings
+		body AS settings,
+		activity
 	FROM
 		daily_reminder_settings
 	WHERE
 		when_next <=?
 	ORDER BY when_next DESC
 ),
-_with_medium(user_uuid, settings, medium) AS (
+_with_medium(user_uuid, settings, medium, activity) AS (
 	SELECT
 		s.user_uuid,
 		s.settings,
-		md.token AS medium
+		md.token AS medium,
+		activity
 	FROM
 		_settings AS s
 	INNER JOIN mobile_device as md ON (md.user_uuid = s.user_uuid)
