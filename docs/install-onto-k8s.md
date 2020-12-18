@@ -26,7 +26,12 @@ mkdir -p /srv/learnalist/{bin,site-cache}
 cp -rf ./hugo/static/* /srv/learnalist/site-cache/
 cp -r ./hugo /srv/learnalist
 mkdir -p /srv/learnalist/hugo/{public,content/alist,data/alist,content/alistsbyuser,data/alistsbyuser,content/challenge,data/challenge}
-ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
+ls server/db/*.sql | sort | xargs cat | sqlite3 /srv/learnalist/server.db
+```
+
+# Setup tunnel to kubectl
+```sh
+ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
 ```
 
 # Add resources from k8s
@@ -49,19 +54,11 @@ helm template certs   --name certs   --values values.yaml   --output-dir=./outpu
 
 # Fire up the registry
 - make sure container-registry (docker-registry) is running
-- log onto the server and port-forward 5000
-
-```sh
-ssh $SSH_SERVER sudo kubectl port-forward deployment/container-registry 5000:5000 &
-```
-
-```sh
-ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
-```
+- Setup tunnel to the registry
 
 # Setup tunnel to the registry
 ```sh
-ssh $SSH_SERVER -L 5000:127.0.0.1:5000 -N &
+kubectl port-forward deployment/container-registry 5000:5000 &
 ```
 
 # Push new image
@@ -155,7 +152,6 @@ kubectl config use-context default
 kill -9 $(lsof -ti tcp:6443)
 kill -9 $(lsof -ti tcp:5000)
 ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
-ssh $SSH_SERVER -L 5000:127.0.0.1:5000 -N &
 ```
 
 ```sh
@@ -166,7 +162,7 @@ kill -9 $(lsof -ti tcp:5000)
 
 ```sh
 kubectl scale deployment/container-registry  --replicas=1
-ssh $SSH_SERVER sudo kubectl port-forward deployment/container-registry 5000:5000 &
+kubectl port-forward deployment/container-registry 5000:5000 &
 ```
 
 Push latest image and sync site-assets (js, css)
