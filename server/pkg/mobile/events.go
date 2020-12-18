@@ -15,11 +15,14 @@ func (s MobileService) OnEvent(entry event.Eventlog) {
 	}
 }
 
-// TODO remove device  based on token
 func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 	if entry.Kind != EventMobileDeviceRemove {
 		return
 	}
+
+	logEvent := "removeDevice"
+	logContext := s.logContext.WithField("sub-context", logEvent)
+
 	var momentKV event.EventKV
 	b, _ := json.Marshal(entry.Data)
 	json.Unmarshal(b, &momentKV)
@@ -30,14 +33,18 @@ func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 		if err == ErrNotFound {
 			return
 		}
+		logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("GetDeviceInfoByToken")
+		return
 	}
 
 	err = s.repo.DeleteByApp(deviceInfo.UserUuid, deviceInfo.AppIdentifier)
 	if err != nil {
-		s.logContext.WithFields(logrus.Fields{
+		logContext.WithFields(logrus.Fields{
 			"error": err,
 			"token": token,
-		}).Error("removing device token")
+		}).Error("DeleteByApp")
 		return
 	}
 

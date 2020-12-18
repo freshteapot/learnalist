@@ -167,7 +167,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		userUUID := moment.UserUuid
 		msg.Text = fmt.Sprintf(`user:%s registered mobile token for app:"%s"`, userUUID, moment.AppIdentifier)
 	case remind.EventApiRemindDailySettings:
-		// TODO test
 		b, _ := json.Marshal(entry.Data)
 		var settings openapi.RemindDailySettings
 		json.Unmarshal(b, &settings)
