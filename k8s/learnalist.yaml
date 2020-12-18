@@ -35,6 +35,11 @@ spec:
               value: "nats.default.svc.cluster.local"
             - name: EVENTS_STAN_CLIENT_ID
               value: "lal-02"
+            - name: USER_REGISTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: userRegisterKey
+                  key: learnalist-sever
 
           volumeMounts:
             - name: config-volume

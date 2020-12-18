@@ -291,3 +291,20 @@ kubectl create configmap nats-config --from-file=nats.conf=./k8s/nats-nats.conf 
 ```sh
 nats-server --config /etc/nats-config/nats.conf -sl reload
 ```
+
+
+# Update secrets for learnalist_server
+
+## Create
+```sh
+kubectl create secret generic learnalist-server \
+  --from-literal=userRegisterKey="XXX"
+```
+
+## Update
+```sh
+kubectl create secret generic learnalist-server \
+--from-literal=userRegisterKey="XXX" \
+--dry-run -o yaml |
+kubectl apply -f -
+```
