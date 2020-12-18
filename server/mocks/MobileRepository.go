@@ -12,6 +12,20 @@ type MobileRepository struct {
 	mock.Mock
 }
 
+// DeleteByApp provides a mock function with given fields: userUUID, appIdentifier
+func (_m *MobileRepository) DeleteByApp(userUUID string, appIdentifier string) error {
+	ret := _m.Called(userUUID, appIdentifier)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userUUID, appIdentifier)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteByUser provides a mock function with given fields: userUUID
 func (_m *MobileRepository) DeleteByUser(userUUID string) error {
 	ret := _m.Called(userUUID)
@@ -26,20 +40,41 @@ func (_m *MobileRepository) DeleteByUser(userUUID string) error {
 	return r0
 }
 
-// SaveDeviceInfo provides a mock function with given fields: userUUID, input
-func (_m *MobileRepository) SaveDeviceInfo(userUUID string, input openapi.HttpMobileRegisterInput) (int, error) {
-	ret := _m.Called(userUUID, input)
+// GetDeviceInfoByToken provides a mock function with given fields: token
+func (_m *MobileRepository) GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error) {
+	ret := _m.Called(token)
+
+	var r0 openapi.MobileDeviceInfo
+	if rf, ok := ret.Get(0).(func(string) openapi.MobileDeviceInfo); ok {
+		r0 = rf(token)
+	} else {
+		r0 = ret.Get(0).(openapi.MobileDeviceInfo)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SaveDeviceInfo provides a mock function with given fields: deviceInfo
+func (_m *MobileRepository) SaveDeviceInfo(deviceInfo openapi.MobileDeviceInfo) (int, error) {
+	ret := _m.Called(deviceInfo)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(string, openapi.HttpMobileRegisterInput) int); ok {
-		r0 = rf(userUUID, input)
+	if rf, ok := ret.Get(0).(func(openapi.MobileDeviceInfo) int); ok {
+		r0 = rf(deviceInfo)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, openapi.HttpMobileRegisterInput) error); ok {
-		r1 = rf(userUUID, input)
+	if rf, ok := ret.Get(1).(func(openapi.MobileDeviceInfo) error); ok {
+		r1 = rf(deviceInfo)
 	} else {
 		r1 = ret.Error(1)
 	}

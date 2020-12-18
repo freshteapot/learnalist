@@ -13,7 +13,7 @@ const (
 	ApiUserRegister                  = "api.user.register"
 	ApiListSaved                     = "api.list.saved"
 	ApiListDelete                    = "api.list.delete"
-	ApiSpacedRepetition              = "api.spacedrepetition"
+	ApiSpacedRepetition              = "api.spacedrepetition" // TODO is this in use?
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
 	KindUserRegisterUsername         = "username"

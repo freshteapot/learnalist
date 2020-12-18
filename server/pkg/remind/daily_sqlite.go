@@ -8,9 +8,10 @@ import (
 )
 
 var (
+	SqlSetActivity        = `UPDATE daily_reminder_settings SET activity=? WHERE user_uuid=? AND app_identifier=?`
 	SqlDeleteByDeviceInfo = `DELETE FROM daily_reminder_settings WHERE user_uuid=? AND app_identifier=?`
 	SqlDeleteByUser       = `DELETE FROM daily_reminder_settings WHERE user_uuid=?`
-	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?`
+	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?, activity=0`
 	SqlGetNext            = `SELECT * FROM daily_reminder_settings WHERE when_next=? ORDER BY when_next LIMIT 1`
 	SqlWhoToRemind        = `
 WITH _settings(user_uuid, app_identifier, settings) AS (
@@ -73,6 +74,14 @@ func (r remindDailySettingsSqliteRepository) DeleteByUser(userUUID string) error
 
 func (r remindDailySettingsSqliteRepository) DeleteByApp(userUUID string, appIdentifier string) error {
 	_, err := r.db.Exec(SqlDeleteByDeviceInfo, userUUID, appIdentifier)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, appIdentifier string) error {
+	_, err := r.db.Exec(SqlSetActivity, 1, userUUID, appIdentifier)
 	if err != nil {
 		return err
 	}

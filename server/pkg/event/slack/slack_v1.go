@@ -160,24 +160,19 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 
 		msg.Text = fmt.Sprintf("user:%s left challenge:%s", moment.UserUUID, moment.UUID)
 	case mobile.EventMobileDeviceRegistered:
-		var momentKV event.EventKV
 		b, _ := json.Marshal(entry.Data)
-		json.Unmarshal(b, &momentKV)
-		b, _ = json.Marshal(momentKV.Data)
 		var moment openapi.MobileDeviceInfo
 		json.Unmarshal(b, &moment)
 
 		userUUID := moment.UserUuid
 		msg.Text = fmt.Sprintf(`user:%s registered mobile token for app:"%s"`, userUUID, moment.AppIdentifier)
 	case remind.EventApiRemindDailySettings:
+		// TODO test
 		b, _ := json.Marshal(entry.Data)
-		var moment event.EventKV
-		json.Unmarshal(b, &moment)
-		b, _ = json.Marshal(moment.Data)
 		var settings openapi.RemindDailySettings
 		json.Unmarshal(b, &settings)
 
-		userUUID := moment.UUID
+		userUUID := entry.UUID
 		switch entry.Action {
 		case event.ActionDeleted:
 			msg.Text = fmt.Sprintf(`user:%s removed daily reminder for app:"%s"`, userUUID, settings.AppIdentifier)

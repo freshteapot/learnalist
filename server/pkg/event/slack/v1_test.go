@@ -86,18 +86,16 @@ var _ = Describe("Testing Events to Slack", func() {
 			},
 			{
 				entry: event.Eventlog{
+					UUID: userUUID,
 					Kind: mobile.EventMobileDeviceRegistered,
-					Data: event.EventKV{
-						UUID: userUUID,
-						Data: openapi.MobileDeviceInfo{
-							UserUuid:      userUUID,
-							Token:         "fake",
-							AppIdentifier: "remind:v1",
-						},
+					Data: openapi.MobileDeviceInfo{
+						UserUuid:      userUUID,
+						Token:         "fake",
+						AppIdentifier: "remind:v1",
 					},
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := "user:fake-user-123 registered mobile token"
+					expect := `user:fake-user-123 registered mobile token for app:"remind:v1"`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},

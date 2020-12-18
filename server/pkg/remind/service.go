@@ -90,11 +90,9 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiRemindDailySettings,
-		Data: event.EventKV{
-			UUID: userUUID,
-			Data: response,
-		},
+		UUID:   userUUID,
+		Kind:   EventApiRemindDailySettings,
+		Data:   response,
 		Action: event.ActionDeleted,
 	})
 
@@ -163,11 +161,9 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiRemindDailySettings,
-		Data: event.EventKV{
-			UUID: userUUID,
-			Data: input,
-		},
+		UUID:   userUUID,
+		Kind:   EventApiRemindDailySettings,
+		Data:   input,
 		Action: event.ActionUpsert,
 	})
 

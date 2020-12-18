@@ -32,7 +32,7 @@ func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
 		}
 	}
 
-	err = s.repo.DeleteByToken(token)
+	err = s.repo.DeleteByApp(deviceInfo.UserUuid, deviceInfo.AppIdentifier)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error": err,

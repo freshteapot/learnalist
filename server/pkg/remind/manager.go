@@ -14,6 +14,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
@@ -51,19 +52,30 @@ func (m *manager) FilterKindsBy() []string {
 func (m *manager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case mobile.EventMobileDeviceRemoved:
-		fmt.Println("remove token from daily_reminder_medium_push")
-		b, _ := json.Marshal(entry.Data)
-		var deviceInfo openapi.MobileDeviceInfo
-		json.Unmarshal(b, &deviceInfo)
-		// TODO use openapi
-		m.settingsRepo.DeleteByApp(deviceInfo.UserUuid, deviceInfo.AppIdentifier)
-
+		m.processMobileDeviceRemoved(entry)
 	case mobile.EventMobileDeviceRegistered:
 		m.processMobileDeviceRegistered(entry)
-	case event.ApiSpacedRepetition:
-		fmt.Println("Set event added happened=1")
+	case spaced_repetition.EventApiSpacedRepetition:
+		// Get settings
+		b, _ := json.Marshal(entry.Data)
+		var moment spaced_repetition.EventSpacedRepetition
+		json.Unmarshal(b, &moment)
+		// TODO there is the option for other messages here
+		// Ie viewed VS new
+		// If we want fine controlled we need a data from the client
+		if moment.Kind != spaced_repetition.EventKindNew {
+			return
+		}
+		m.settingsRepo.ActivityHappened(moment.Data.UserUUID, apps.RemindV1)
 	case plank.EventApiPlank:
-		fmt.Println("Set event added happened=1")
+		b, _ := json.Marshal(entry.Data)
+		var moment plank.EventPlank
+		json.Unmarshal(b, &moment)
+
+		if moment.Kind != plank.EventKindNew {
+			return
+		}
+		m.settingsRepo.ActivityHappened(moment.UserUUID, apps.PlankV1)
 	case EventApiRemindDailySettings:
 		m.processSettings(entry)
 	default:
@@ -167,18 +179,13 @@ func (m *manager) updateSettingsWithWhenNext(userUUID string, conf openapi.Remin
 }
 
 func (m *manager) processSettings(entry event.Eventlog) {
+	userUUID := entry.UUID
 	b, _ := json.Marshal(entry.Data)
-	var moment event.EventKV
-	json.Unmarshal(b, &moment)
-	b, _ = json.Marshal(moment.Data)
 	var settings openapi.RemindDailySettings
 	json.Unmarshal(b, &settings)
 
-	userUUID := moment.UUID
 	// action = delete = remove
 	if entry.Action == event.ActionDeleted {
-		fmt.Println("Remove settings from db")
-
 		err := m.settingsRepo.DeleteByApp(userUUID, settings.AppIdentifier)
 		if err != nil {
 			m.logContext.Error("failed to remove settings")
@@ -198,10 +205,7 @@ func (m *manager) processSettings(entry event.Eventlog) {
 }
 
 func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
-	var momentKV event.EventKV
 	b, _ := json.Marshal(entry.Data)
-	json.Unmarshal(b, &momentKV)
-	b, _ = json.Marshal(momentKV.Data)
 	var deviceInfo openapi.MobileDeviceInfo
 	json.Unmarshal(b, &deviceInfo)
 
@@ -209,6 +213,17 @@ func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
 
 	if err != nil {
 		m.logContext.Error("failed to save mobile device")
+	}
+}
+
+func (m *manager) processMobileDeviceRemoved(entry event.Eventlog) {
+	b, _ := json.Marshal(entry.Data)
+	var deviceInfo openapi.MobileDeviceInfo
+	json.Unmarshal(b, &deviceInfo)
+	err := m.mobileRepo.DeleteByApp(deviceInfo.UserUuid, deviceInfo.AppIdentifier)
+
+	if err != nil {
+		m.logContext.Error("failed to remove mobile device")
 	}
 }
 

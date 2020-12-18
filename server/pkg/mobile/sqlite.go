@@ -13,10 +13,10 @@ type SqliteRepository struct {
 }
 
 var (
-	SqlSave                = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
-	SqlDeleteDeviceByUser  = `DELETE FROM mobile_device WHERE user_uuid=?`
-	SqlDeleteDeviceByToken = `DELETE FROM mobile_device WHERE token=?`
-	SqlGetDeviceByToken    = `SELECT * FROM mobile_device WHERE token=?`
+	SqlSave               = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
+	SqlDeleteDeviceByUser = `DELETE FROM mobile_device WHERE user_uuid=?`
+	SqlDeleteDeviceByApp  = `DELETE FROM mobile_device WHERE user_uuid=? AND app_identifier=?`
+	SqlGetDeviceByToken   = `SELECT * FROM mobile_device WHERE token=?`
 )
 
 type dbDeviceInfo struct {
@@ -51,8 +51,9 @@ func (r SqliteRepository) DeleteByUser(userUUID string) error {
 	return nil
 }
 
-func (r SqliteRepository) DeleteByToken(token string) error {
-	_, err := r.db.Exec(SqlDeleteDeviceByToken, token)
+// I dont think I need this, nor the index
+func (r SqliteRepository) DeleteByApp(userUUID string, appIdentifier string) error {
+	_, err := r.db.Exec(SqlDeleteDeviceByApp, userUUID, appIdentifier)
 	if err != nil {
 		return err
 	}

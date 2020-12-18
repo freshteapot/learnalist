@@ -20,6 +20,7 @@ type RemindDailySettingsRepository interface {
 	Save(userUUID string, settings openapi.RemindDailySettings, whenNext string) error
 	DeleteByUser(userUUID string) error
 	DeleteByApp(userUUID string, appIdentifier string) error
+	ActivityHappened(userUUID string, appIdentifier string) error
 }
 
 type UserPreference struct {

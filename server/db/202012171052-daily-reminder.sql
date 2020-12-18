@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS daily_reminder_settings (
   app_identifier CHARACTER(36) not null,
   body text,
   when_next DATETIME not null,
+  activity not null default 0,
   created DATETIME not null default (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
   UNIQUE(user_uuid, app_identifier)
 );

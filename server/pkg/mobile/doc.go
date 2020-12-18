@@ -15,7 +15,7 @@ var (
 type MobileRepository interface {
 	SaveDeviceInfo(deviceInfo openapi.MobileDeviceInfo) (int, error)
 	DeleteByUser(userUUID string) error
-	DeleteByToken(token string) error
+	DeleteByApp(userUUID string, appIdentifier string) error
 	GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error)
 }
 

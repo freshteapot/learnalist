@@ -117,4 +117,35 @@ var _ = Describe("Testing Daily Sqlite", func() {
 			})
 		})
 	})
+
+	When("activity happens", func() {
+		var (
+			want          error
+			userUUID      string
+			appIdentifier string
+		)
+		BeforeEach(func() {
+			want = errors.New("fail")
+			userUUID = "fake-user-123"
+			appIdentifier = apps.RemindV1
+		})
+
+		It("fail", func() {
+			mockSql.ExpectExec(remind.SqlSetActivity).WillReturnError(want).WithArgs(
+				1,
+				userUUID,
+				appIdentifier,
+			)
+			err := repo.ActivityHappened(userUUID, appIdentifier)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(want))
+		})
+
+		It("success", func() {
+			mockSql.ExpectExec(remind.SqlSetActivity).WillReturnResult(sqlmock.NewResult(1, 1))
+			err := repo.ActivityHappened(userUUID, appIdentifier)
+			Expect(err).To(BeNil())
+		})
+	})
+
 })

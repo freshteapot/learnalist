@@ -229,7 +229,7 @@ var (
 
 // Event specific
 var (
-	EventApiSpacedRepetition = "api.spacedrepetition"
+	EventApiSpacedRepetition = "api.spacedrepetition" // TODO one of these need to die
 	EventKindNew             = "new"
 	EventKindViewed          = "viewed"
 	EventKindDeleted         = "deleted"
