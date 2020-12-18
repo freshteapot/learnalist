@@ -22,6 +22,7 @@ func SetDefaultSettingsForCMD() {
 func SetupEventBus(logContext logrus.FieldLogger) {
 	// This now works for the "application"
 	eventsVia := viper.GetString("server.events.via")
+
 	switch eventsVia {
 	case "memory":
 		SetBus(NewMemoryBus())

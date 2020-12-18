@@ -40,7 +40,7 @@ curl -i -XPOST \
 
 
 ## Add new token
-
+```sh
 curl -i -XPOST \
 -H"Authorization: Bearer ${token}" \
 'http://127.0.0.1:1234/api/v1/mobile/register-device' \
@@ -49,8 +49,9 @@ curl -i -XPOST \
   "token": "fake-token-123456",
   "app_identifier": "plank:v1"
 }'
-
+```
 # Other valid option
+```sh
 curl -i -XPOST \
 -H"Authorization: Bearer ${token}" \
 'http://127.0.0.1:1234/api/v1/mobile/register-device' \
@@ -59,5 +60,4 @@ curl -i -XPOST \
   "token": "fake-token-123456",
   "app_identifier": "remind:v1"
 }'
-
-
+```

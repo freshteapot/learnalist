@@ -106,7 +106,7 @@ func (m *manager) SendNotifications() {
 	template = "What shall we learn today"
 	template = "Nice work!"
 	body := template
-
+	msgSent := 0
 	for _, remindMe := range reminders {
 		if remindMe.Settings.AppIdentifier == apps.RemindV1 &&
 			utils.StringArrayContains(remindMe.Settings.Medium, "push") {
@@ -124,11 +124,15 @@ func (m *manager) SendNotifications() {
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
+			msgSent++
 		}
 
 		// Update settings when next
 		m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
 	}
+	m.logContext.WithFields(logrus.Fields{
+		"msg_sent": msgSent,
+	}).Info("messages sent")
 }
 
 func (m *manager) whenNext(from time.Time, to time.Time) time.Time {
@@ -161,16 +165,15 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	var moment event.EventKV
 	json.Unmarshal(b, &moment)
 	b, _ = json.Marshal(moment.Data)
-	var pref UserPreference
-	json.Unmarshal(b, &pref.DailyReminder)
+	var settings openapi.RemindDailySettings
+	json.Unmarshal(b, &settings)
 
 	userUUID := moment.UUID
-	conf := pref.DailyReminder.RemindV1
 	// action = delete = remove
 	if entry.Action == event.ActionDeleted {
 		fmt.Println("Remove settings from db")
 
-		err := m.settingsRepo.DeleteByUserAndApp(userUUID, conf.AppIdentifier)
+		err := m.settingsRepo.DeleteByUserAndApp(userUUID, settings.AppIdentifier)
 		if err != nil {
 			m.logContext.Error("failed to remove settings")
 		}
@@ -178,14 +181,7 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	}
 	// action = upsert = save
 	if entry.Action == event.ActionUpsert {
-		conf := pref.DailyReminder.RemindV1
-		err := m.updateSettingsWithWhenNext(userUUID,
-			openapi.RemindDailySettings{
-				TimeOfDay:     conf.TimeOfDay,
-				Tz:            conf.Tz,
-				Medium:        conf.Medium,
-				AppIdentifier: conf.AppIdentifier,
-			})
+		err := m.updateSettingsWithWhenNext(userUUID, settings)
 
 		if err != nil {
 			m.logContext.Error("failed to save settings")

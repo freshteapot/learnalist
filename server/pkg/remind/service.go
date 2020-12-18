@@ -166,7 +166,7 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 		Kind: EventApiRemindDailySettings,
 		Data: event.EventKV{
 			UUID: userUUID,
-			Data: info.DailyReminder,
+			Data: input,
 		},
 		Action: event.ActionUpsert,
 	})

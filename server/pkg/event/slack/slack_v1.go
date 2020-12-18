@@ -7,7 +7,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
+	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
@@ -161,10 +163,30 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var momentKV event.EventKV
 		b, _ := json.Marshal(entry.Data)
 		json.Unmarshal(b, &momentKV)
+		b, _ = json.Marshal(momentKV.Data)
+		var moment mobile.DeviceInfo
+		json.Unmarshal(b, &moment)
 
-		userUUID := momentKV.UUID
-		// TODO confirm app_identifier is added
-		msg.Text = fmt.Sprintf("user:%s registered mobile token", userUUID)
+		userUUID := moment.UserUUID
+		msg.Text = fmt.Sprintf(`user:%s registered mobile token for app:"%s"`, userUUID, moment.AppIdentifier)
+	case remind.EventApiRemindDailySettings:
+		b, _ := json.Marshal(entry.Data)
+		var moment event.EventKV
+		json.Unmarshal(b, &moment)
+		b, _ = json.Marshal(moment.Data)
+		var settings openapi.RemindDailySettings
+		json.Unmarshal(b, &settings)
+
+		userUUID := moment.UUID
+		switch entry.Action {
+		case event.ActionDeleted:
+			msg.Text = fmt.Sprintf(`user:%s removed daily reminder for app:"%s"`, userUUID, settings.AppIdentifier)
+		case event.ActionUpsert:
+			msg.Text = fmt.Sprintf(`user:%s setup daily reminder for app:"%s"`, userUUID, settings.AppIdentifier)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
+		}
+
 	default:
 		b, _ := json.Marshal(entry)
 		fmt.Println(string(b))

@@ -2,14 +2,10 @@ package remind
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
-	"log"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -43,28 +39,15 @@ var dailyCMD = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		logContext := logger.WithField("context", "remind-daily")
+
 		event.SetDefaultSettingsForCMD()
-		event.SetupEventBus(logger.WithField("context", "remind-daily"))
+		event.SetupEventBus(logContext)
 
-		viper.SetDefault("topic", "lal.monolog")
+		viper.SetDefault("topic", event.TopicMonolog)
 		viper.BindEnv("topic", "TOPIC")
+
 		subjectRead := viper.GetString("topic")
-
-		natsServer := viper.GetString("server.events.nats.server")
-		clusterID := viper.GetString("server.events.stan.clusterID")
-		clientID := viper.GetString("server.events.stan.clientID")
-		opts := []nats.Option{nats.Name("lal-go-server")}
-		nc, err := nats.Connect(natsServer, opts...)
-
-		if err != nil {
-			panic(err)
-		}
-
-		logContext := logger.WithFields(logrus.Fields{
-			"context":    "daily-in",
-			"cluster_id": clusterID,
-			"client_id":  clientID,
-		})
 
 		databaseName := viper.GetString("remind.daily.sqlite.database")
 		db := database.NewDB(databaseName)
@@ -73,22 +56,7 @@ var dailyCMD = &cobra.Command{
 		mobileRepo := mobile.NewSqliteRepository(db)
 
 		manager := remind.NewManager(db, settingsRepo, mobileRepo, logContext)
-		fmt.Println("mobileRepo", mobileRepo)
-		fmt.Println("settingsRepo", settingsRepo)
-
-		logContext.Info("Connecting to nats server...")
-		sc, err := stan.Connect(clusterID, clientID,
-			stan.NatsConn(nc),
-			stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
-				logContext.Fatalf("Connection lost, reason: %v", reason)
-			}),
-			stan.Pings(10, 5),
-		)
-
-		if err != nil {
-			logContext.Fatalf("Can't connect: %v.\nMake sure a NATS Streaming Server is running at: %s", err, nc.Opts.Url)
-		}
-		defer logCloser(sc)
+		sc := event.GetBus().(*event.NatsBus).Connection()
 
 		allowed := manager.FilterKindsBy()
 
@@ -117,13 +85,20 @@ var dailyCMD = &cobra.Command{
 		}
 
 		durableName := "remind.daily"
-		subscription, _ := sc.Subscribe(
+		subscription, err := sc.Subscribe(
 			subjectRead,
 			handle,
 			stan.DurableName(durableName),
 			stan.DeliverAllAvailable(),
 			stan.MaxInflight(1),
 		)
+
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"error":        err,
+				"durable_name": durableName,
+			}).Fatal("Failed to start subscriber")
+		}
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
@@ -138,15 +113,6 @@ var dailyCMD = &cobra.Command{
 			logContext.WithField("error", err).Error("closing subscription")
 		}
 
-		err = sc.Close()
-		if err != nil {
-			logContext.WithField("error", err).Error("closing stan")
-		}
+		event.GetBus().Close()
 	},
-}
-
-func logCloser(c io.Closer) {
-	if err := c.Close(); err != nil {
-		log.Printf("close error: %s", err)
-	}
 }
