@@ -51,14 +51,14 @@ func testRemindV1(userUUID string, storage user.ManagementStorage) {
 	var response openapi.RemindDailySettings
 	fmt.Println(response)
 
-	//storage.RemoveInfo(userUUID, `daily_notifications."plank:v1"`)
+	//storage.RemoveInfo(userUUID, `daily_notifications."plank_v1"`)
 	//storage.RemoveInfo(userUUID, `daily_notifications`)
 
 	rawJSON = `{
 		"time_of_day": "20:00",
 		"tz": "todo",
 		"medium": ["push"],
-		"app_identifier": "plank:v1"
+		"app_identifier": "plank_v1"
 	}
 	`
 
