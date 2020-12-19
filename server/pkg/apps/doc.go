@@ -1,6 +1,6 @@
 package apps
 
 const (
-	PlankV1  = "plank:v1"
-	RemindV1 = "remind:v1"
+	PlankV1  = "plank_v1"
+	RemindV1 = "remind_v1"
 )

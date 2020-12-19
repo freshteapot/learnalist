@@ -3,6 +3,7 @@ package event_test
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
@@ -281,11 +282,11 @@ var _ = Describe("Testing Events to Slack", func() {
 					Data: openapi.MobileDeviceInfo{
 						UserUuid:      userUUID,
 						Token:         "fake",
-						AppIdentifier: "remind:v1",
+						AppIdentifier: apps.RemindV1,
 					},
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `user:fake-user-123 registered mobile token for app:"remind:v1"`
+					expect := `user:fake-user-123 registered mobile token for app:"remind_v1"`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},

@@ -18,7 +18,7 @@ func testRemindV1(userUUID string, storage user.ManagementStorage) {
 	rawJSON := `
 	{
 		"daily_notifications": {
-			"remind:v1": {
+			"remind_v1": {
 				"time_of_day": "20:00",
 				"tz": "todo",
 				"medium": ["push"]
@@ -29,7 +29,7 @@ func testRemindV1(userUUID string, storage user.ManagementStorage) {
 		"time_of_day": "20:00",
 		"tz": "todo",
 		"medium": ["push"],
-		"app_identifier": "remind:v1"
+		"app_identifier": "remind_v1"
 	}
 	`
 	storage.RemoveInfo(userUUID, `daily_notifications`)
@@ -107,21 +107,21 @@ var scratchCMD = &cobra.Command{
 		rawJSON := `
 {
 	"app_settings": {
-		"plank:v1": {
+		"plank_v1": {
 			"showIntervals": true,
 			"intervalTime": 15
 		},
-		"remind:v1": {
+		"remind_v1": {
 			"time_of_day": "20:00:00",
 			"offset": "+2:00"
 		}
 	},
 	"daily_notifications": {
-		"plank:v1": {
+		"plank_v1": {
 			"time_of_day": "08:00:00",
 			"offset": "+2:00"
 		},
-		"remind:v1": {
+		"remind_v1": {
 			"time_of_day": "20:00:00",
 			"offset": "+2:00"
 		}
@@ -133,7 +133,7 @@ var scratchCMD = &cobra.Command{
 		fmt.Println(string(b))
 
 		// How to remove remind.v1
-		// storage.RemoveInfo(userUUID, `remind:v1`)
+		// storage.RemoveInfo(userUUID, `remind_v1`)
 		// storage.RemoveInfo(userUUID, `remind`)
 		storage.RemoveInfo(userUUID, `apps`)
 		b, _ = storage.GetInfo(userUUID)
@@ -147,7 +147,7 @@ var scratchCMD = &cobra.Command{
 		fmt.Println(obj.DailyNotifications.RemindV1.TimeOfDay)
 		fmt.Println(obj.DailyNotifications.PlankV1.TimeOfDay)
 		// notification/daily/{uuid}
-		// uuid = "user:remind:v1"
+		// uuid = "user:remind_v1"
 		// 1) Save to user info
 		// 2) Save to daily_reminder table
 		// 3) Remove from daily_reminder table
@@ -170,12 +170,12 @@ var scratchCMD = &cobra.Command{
 // Could add timesone
 type UserInfoExtra struct {
 	Apps struct {
-		RemindV1 RemindV1 `json:"remind:v1"` // Not needed yet
-		PlankV1  PlankV1  `json:"plank:v1"`  // Only nice to sync between app and web, not needed yet
+		RemindV1 RemindV1 `json:"remind_v1"` // Not needed yet
+		PlankV1  PlankV1  `json:"plank_v1"`  // Only nice to sync between app and web, not needed yet
 	} `json:"app_settings"` // TODO good to know, but lets not run with it yet
 	DailyNotifications struct {
-		RemindV1 RemindV1 `json:"remind:v1"` // Needed first :D
-		PlankV1  RemindV1 `json:"plank:v1"`
+		RemindV1 RemindV1 `json:"remind_v1"` // Needed first :D
+		PlankV1  RemindV1 `json:"plank_v1"`
 	} `json:"daily_notifications"`
 	LastActive struct {
 		Plank            string `json:"plank"`             // UTC int64? or string time.RFC3339Nano

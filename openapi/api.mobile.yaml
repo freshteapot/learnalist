@@ -15,8 +15,8 @@ components:
           description: A unique identifier to allow the system to link a user with an app and use the correct token.
           default: ""
           enum:
-            - plank:v1
-            - remind:v1
+            - plank_v1
+            - remind_v1
     MobileDeviceInfo:
       description: Information linking a mobile device and app to a user
       required:

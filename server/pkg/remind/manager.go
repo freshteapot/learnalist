@@ -139,7 +139,7 @@ func (m *manager) SendNotifications() {
 		return
 	}
 
-	// Hardcoded to only work for "remind:v1"
+	// Hardcoded to only work for apps.RemindV1
 	title := "Daily Reminder"
 	var template string
 

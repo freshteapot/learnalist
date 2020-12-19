@@ -26,8 +26,8 @@ type RemindDailySettingsRepository interface {
 
 type UserPreference struct {
 	DailyReminder struct {
-		RemindV1 *openapi.RemindDailySettings `json:"remind:v1,omitempty"` // Needed first :D
-		PlankV1  *openapi.RemindDailySettings `json:"plank:v1,omitempty"`
+		RemindV1 *openapi.RemindDailySettings `json:"remind_v1,omitempty"` // Needed first :D
+		PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
 	} `json:"daily_reminder,omitempty"`
 }
 
