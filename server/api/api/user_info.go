@@ -10,14 +10,15 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
 func (m *Manager) V1GetUserInfo(c echo.Context) error {
 	logger := m.logger
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {
@@ -37,21 +38,16 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	return c.JSONBlob(http.StatusOK, b)
-	var extra openapi.HttpUserInfoInput
-	err = json.Unmarshal(b, &extra)
-	extra.CreatedVia = ""
-	if extra.DisplayName == "" {
-		extra.DisplayName = userUUID
-	}
-
-	return c.JSON(http.StatusOK, extra)
+	var pref user.UserPreference
+	json.Unmarshal(b, &pref)
+	pref.UserUUID = userUUID
+	return c.JSON(http.StatusOK, pref)
 }
 
 func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	logger := m.logger
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {

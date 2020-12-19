@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 const (
@@ -89,3 +90,16 @@ type UserFromIDP interface {
 }
 
 var ErrNotFound = errors.New("user-not-found")
+
+type UserPreference struct {
+	UserUUID      string `json:"user_uuid"`
+	DisplayName   string `json:"display_name"`
+	CreatedVia    string `json:"created_via,omitempty"`
+	DailyReminder *struct {
+		RemindV1 *openapi.RemindDailySettings `json:"remind_v1,omitempty"` // Needed first :D
+		PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
+	} `json:"daily_reminder,omitempty"`
+	Apps *struct {
+		PlankV1 *openapi.MobilePlankAppV1Settings `json:"plank_v1"` // Only nice to sync between app and web, not needed yet
+	} `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
+}
