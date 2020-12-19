@@ -17,7 +17,6 @@ func (s MobileService) OnEvent(entry event.Eventlog) {
 }
 
 func (s MobileService) removeDeviceByToken(entry event.Eventlog) {
-	// TODO this event does not exist yet
 	if entry.Kind != event.MobileDeviceRemove {
 		return
 	}

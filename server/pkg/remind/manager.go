@@ -48,7 +48,6 @@ func (m *manager) FilterKindsBy() []string {
 }
 
 // Future might want display_name
-// TODO we are not handling userDelete event
 func (m *manager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -132,25 +131,15 @@ func (m *manager) StartSendNotifications() {
 			}
 		}
 	}()
-
-	//time.Sleep(1600 * time.Millisecond)
-	//ticker.Stop()
-	//done <- true
-	//fmt.Println("Ticker stopped")
 }
 
 func (m *manager) SendNotifications() {
-	// Process queue from oldeset to newest
-	// Lookup
-	// SELECT * FROM daily_reminders
-	// Send
-	// Update + set event happened=0
-	// fmt.Println("looking for new notifications ", time.Now().UTC())
 	reminders := m.settingsRepo.WhoToRemind()
 	if len(reminders) == 0 {
 		return
 	}
 
+	// Hardcoded to only work for "remind:v1"
 	title := "Daily Reminder"
 	var template string
 
@@ -185,6 +174,7 @@ func (m *manager) SendNotifications() {
 		// Update settings when next
 		m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
 	}
+
 	m.logContext.WithFields(logrus.Fields{
 		"msg_sent": msgSent,
 	}).Info("messages sent")
