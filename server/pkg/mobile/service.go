@@ -57,6 +57,12 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		registerInput.AppIdentifier = apps.PlankV1
 	}
 
+	// TODO Update plank app, reject if "", today, assume plank
+	if registerInput.AppIdentifier == "plank:v1" {
+		s.logContext.Warn("Will go away after the mobile is updated")
+		registerInput.AppIdentifier = "plank_v1"
+	}
+
 	allowed := []string{apps.PlankV1, apps.RemindV1}
 	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
 		response := api.HTTPResponseMessage{
