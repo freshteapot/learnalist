@@ -78,6 +78,12 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 	}
 	status, err := s.repo.SaveDeviceInfo(deviceInfo)
 	if err != nil {
+		if status == http.StatusUnprocessableEntity {
+			return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+				Message: err.Error(),
+			})
+		}
+
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
 			"input":     string(jsonBytes),

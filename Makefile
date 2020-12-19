@@ -53,6 +53,7 @@ run-nats-from-docker:
 run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
+	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=challenges-sync \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -62,6 +63,7 @@ run-challenges-sync:
 run-notifications-push-notifications:
 	cd server && \
 	TOPIC=notifications \
+	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -71,6 +73,16 @@ run-notifications-push-notifications:
 run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
+
+run-remind-daily:
+	cd server && \
+	TOPIC=lal.monolog \
+	EVENTS_VIA="nats" \
+	EVENTS_STAN_CLIENT_ID=remind-daily \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run --tags=json1 main.go --config=../config/dev.config.yaml \
+	tools remind daily
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost

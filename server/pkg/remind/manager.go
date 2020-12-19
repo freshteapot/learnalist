@@ -215,7 +215,11 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	if entry.Action == event.ActionDeleted {
 		err := m.settingsRepo.DeleteByApp(userUUID, settings.AppIdentifier)
 		if err != nil {
-			m.logContext.Error("failed to remove settings")
+			m.logContext.WithFields(logrus.Fields{
+				"error":     err,
+				"code_path": "manager.processSettings",
+				"action":    entry.Action,
+			}).Error("failed to save settings")
 		}
 		return
 	}
@@ -224,7 +228,11 @@ func (m *manager) processSettings(entry event.Eventlog) {
 		err := m.updateSettingsWithWhenNext(userUUID, settings)
 
 		if err != nil {
-			m.logContext.Error("failed to save settings")
+			m.logContext.WithFields(logrus.Fields{
+				"error":     err,
+				"code_path": "manager.processSettings",
+				"action":    entry.Action,
+			}).Error("failed to save settings")
 		}
 		return
 	}
@@ -239,7 +247,10 @@ func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
 	_, err := m.mobileRepo.SaveDeviceInfo(deviceInfo)
 
 	if err != nil {
-		m.logContext.Error("failed to save mobile device")
+		m.logContext.WithFields(logrus.Fields{
+			"error":     err,
+			"code_path": "manager.processMobileDeviceRegistered",
+		}).Error("failed to save mobile device")
 	}
 }
 
