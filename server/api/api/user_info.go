@@ -41,6 +41,10 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 	var pref user.UserPreference
 	json.Unmarshal(b, &pref)
 	pref.UserUUID = userUUID
+
+	if (user.UserPreferenceDailyReminder{}) == *pref.DailyReminder {
+		pref.DailyReminder = nil
+	}
 	return c.JSON(http.StatusOK, pref)
 }
 
@@ -70,6 +74,9 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 
 	// On purpose dont let these be set.
 	input.CreatedVia = ""
+	if input.DisplayName == "" {
+		input.DisplayName = userUUID
+	}
 
 	b, _ := json.Marshal(input)
 	err = m.UserManagement.SaveInfo(userUUID, b)

@@ -92,8 +92,8 @@ type UserFromIDP interface {
 var ErrNotFound = errors.New("user-not-found")
 
 type UserPreference struct {
-	UserUUID      string                       `json:"user_uuid"`
-	DisplayName   string                       `json:"display_name"`
+	UserUUID      string                       `json:"user_uuid,omitempty"`
+	DisplayName   string                       `json:"display_name,omitempty"`
 	CreatedVia    string                       `json:"created_via,omitempty"`
 	DailyReminder *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
 	Apps          *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet

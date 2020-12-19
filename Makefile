@@ -1,5 +1,5 @@
 GIT_COMMIT:=$(shell git rev-parse HEAD)
-GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y%m%dT%H%M%SZ' --format="%cd" ${GIT_COMMIT})
+GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%dT%H:%M:%SZ' --format="%cd" ${GIT_COMMIT})
 
 ###############################################################################
 #
