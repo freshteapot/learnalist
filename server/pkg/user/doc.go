@@ -97,6 +97,7 @@ type UserPreference struct {
 	CreatedVia    string                       `json:"created_via,omitempty"`
 	DailyReminder *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
 	Apps          *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
+	LastActive    *LastActive                  `json:"last_active,omitempty"`
 }
 
 type UserPreferenceDailyReminder struct {
@@ -104,6 +105,13 @@ type UserPreferenceDailyReminder struct {
 	PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
 }
 
+// TODO actually use
 type UserPreferenceApps struct {
 	PlankV1 *openapi.MobilePlankAppV1Settings `json:"plank_v1"` // Only nice to sync between app and web, not needed yet
+}
+
+// TODO actually use
+type LastActive struct {
+	Plank            string `json:"plank,omitempty"`             // UTC int64? or string time.RFC3339Nano
+	SpacedRepetition string `json:"spaced_repetition,omitempty"` // UTC int64? or string time.RFC3339Nano
 }
