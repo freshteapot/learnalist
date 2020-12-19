@@ -34,8 +34,8 @@ func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) RemindS
 }
 
 func (s RemindService) GetDailySettings(c echo.Context) error {
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 	appIdentifier := c.Param("appIdentifier")
 
 	allowed := []string{apps.RemindV1, apps.PlankV1}
@@ -60,8 +60,8 @@ func (s RemindService) GetDailySettings(c echo.Context) error {
 }
 
 func (s RemindService) DeleteDailySettings(c echo.Context) error {
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 	appIdentifier := c.Param("appIdentifier")
 
 	allowed := []string{apps.RemindV1, apps.PlankV1}
@@ -83,7 +83,7 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 	}
 
 	// This might break if we move from sqlite
-	key := fmt.Sprintf(`%s."%s"`, UserPreferenceKey, appIdentifier)
+	key := fmt.Sprintf(`%s.%s`, UserPreferenceKey, appIdentifier)
 	err = s.userRepo.RemoveInfo(userUUID, key)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
@@ -100,8 +100,8 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 }
 
 func (s RemindService) SetDailySettings(c echo.Context) error {
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 
 	defer c.Request().Body.Close()
 	var input openapi.RemindDailySettings
@@ -145,7 +145,10 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 		}
 	}
 
-	info := UserPreference{}
+	info := user.UserPreference{
+		DailyReminder: &user.UserPreferenceDailyReminder{},
+	}
+
 	switch input.AppIdentifier {
 	case apps.RemindV1:
 		info.DailyReminder.RemindV1 = &input
@@ -177,7 +180,7 @@ func (s RemindService) getPreferences(userUUID string, appIdentifier string) (op
 		return response, err
 	}
 
-	var pref UserPreference
+	var pref user.UserPreference
 	json.Unmarshal(b, &pref)
 
 	switch appIdentifier {

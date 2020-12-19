@@ -7,7 +7,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/spf13/cobra"
@@ -36,7 +35,7 @@ func testRemindV1(userUUID string, storage user.ManagementStorage) {
 	return
 	var remindInput openapi.RemindDailySettings
 	json.Unmarshal([]byte(rawJSON), &remindInput)
-	input := remind.UserPreference{}
+	input := user.UserPreference{}
 	input.DailyReminder.RemindV1 = &remindInput
 
 	b, _ := json.Marshal(input)
@@ -45,7 +44,7 @@ func testRemindV1(userUUID string, storage user.ManagementStorage) {
 
 	b, _ = storage.GetInfo(userUUID)
 	fmt.Println("get", string(b))
-	var obj remind.UserPreference
+	var obj user.UserPreference
 	json.Unmarshal(b, &obj)
 
 	var response openapi.RemindDailySettings

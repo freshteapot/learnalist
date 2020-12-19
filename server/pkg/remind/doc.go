@@ -2,7 +2,6 @@ package remind
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
@@ -22,17 +21,6 @@ type RemindDailySettingsRepository interface {
 	DeleteByApp(userUUID string, appIdentifier string) error
 	ActivityHappened(userUUID string, appIdentifier string) error
 	WhoToRemind() []RemindMe
-}
-
-type UserPreference struct {
-	DailyReminder struct {
-		RemindV1 *openapi.RemindDailySettings `json:"remind_v1,omitempty"` // Needed first :D
-		PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
-	} `json:"daily_reminder,omitempty"`
-}
-
-func RemidDailySettingsUUID(userUUID string, appIdentifier string) string {
-	return fmt.Sprintf("%s:%s", userUUID, appIdentifier)
 }
 
 type RemindMe struct {

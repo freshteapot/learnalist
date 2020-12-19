@@ -2,7 +2,6 @@ hugo:
   directory: "./../hugo"
   environment: "dev"
   external: "true"
-
 remind:
   daily:
     sqlite:
