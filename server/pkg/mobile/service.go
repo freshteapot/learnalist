@@ -76,6 +76,34 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		UserUuid:      userUUID,
 		AppIdentifier: registerInput.AppIdentifier,
 	}
+
+	current, err := s.repo.GetDeviceInfoByToken(registerInput.Token)
+	if err != nil {
+		if err != ErrNotFound {
+			return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
+				Message: i18n.InternalServerErrorFunny,
+			})
+		}
+	}
+	// We fall thru on not found, meaning this should be empty
+	if current.UserUuid != "" {
+		response := api.HTTPResponseMessage{
+			Message: "Token already registered",
+		}
+
+		if current.UserUuid != userUUID {
+			return c.JSON(http.StatusUnprocessableEntity, response)
+		}
+
+		if current.AppIdentifier != registerInput.AppIdentifier {
+			return c.JSON(http.StatusUnprocessableEntity, response)
+		}
+
+		return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+			Message: "Device registered",
+		})
+	}
+
 	status, err := s.repo.SaveDeviceInfo(deviceInfo)
 	if err != nil {
 		if status == http.StatusUnprocessableEntity {
