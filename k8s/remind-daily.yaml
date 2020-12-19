@@ -33,7 +33,17 @@ spec:
               mountPath: /etc/learnalist/config.yaml
               subPath: config.yaml
               readOnly: true
+            - name: db-schema-volume
+              mountPath: "/srv/db-schema/"
+            - name: srv-remind-daily-volume
+              mountPath: "/srv/remind-daily/"
       volumes:
         - name: config-volume
           configMap:
             name: learnalist-config
+        - name: db-schema-volume
+          configMap:
+            name: learnalist-db
+        - name: srv-remind-daily-volume
+          persistentVolumeClaim:
+            claimName: srv-remind-daily-pvc-01
