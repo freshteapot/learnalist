@@ -25,8 +25,7 @@ var pushNotificationsCMD = &cobra.Command{
 	Short: "Read events via nats",
 	Long: `
 
-ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
-ssh $SSH_SERVER sudo kubectl port-forward deployment/stan01 4222:4222 &
+kubectl port-forward svc/nats 4222:4222 &
 
 TOPIC=notifications \
 EVENTS_STAN_CLIENT_ID=push-notifications \
