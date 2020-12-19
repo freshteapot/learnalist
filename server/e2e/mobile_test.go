@@ -56,8 +56,8 @@ var _ = Describe("Smoke Mobile", func() {
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 		_, response, err = client.MobileApi.RegisterDevice(auth, mobileInput)
-		Expect(err).Should(HaveOccurred())
-		Expect(response.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+		Expect(err).To(BeNil())
+		Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 		// Delete user
 		_, response, err = client.UserApi.DeleteUser(auth, data1.Uuid)
