@@ -141,15 +141,26 @@ func (m *manager) SendNotifications() {
 
 	// Hardcoded to only work for apps.RemindV1
 	title := "Daily Reminder"
-	var template string
 
-	//template = "It's planking time!"
 	msgSent := 0
 	for _, remindMe := range reminders {
-		if remindMe.Settings.AppIdentifier == apps.RemindV1 &&
-			utils.StringArrayContains(remindMe.Settings.Medium, "push") {
+		process := true
+		// When empty, it means the device has not been registered
+		if remindMe.Medium == "" {
+			process = false
+		}
 
-			template = "What shall we learn today"
+		// RemindV1 specific rules
+		if remindMe.Settings.AppIdentifier != apps.RemindV1 {
+			process = false
+		}
+
+		if !utils.StringArrayContains(remindMe.Settings.Medium, "push") {
+			process = false
+		}
+
+		if process {
+			template := "What shall we learn today"
 			if remindMe.Activity {
 				template = "Nice work!"
 			}

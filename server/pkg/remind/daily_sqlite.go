@@ -24,7 +24,6 @@ WITH _settings(user_uuid, app_identifier, settings, activity) AS (
 		daily_reminder_settings
 	WHERE
 		when_next <=?
-	ORDER BY when_next DESC
 ),
 _with_medium(user_uuid, settings, medium, activity) AS (
 	SELECT
@@ -38,7 +37,10 @@ _with_medium(user_uuid, settings, medium, activity) AS (
 	WHERE
 		md.app_identifier=s.app_identifier
 )
+
 SELECT * FROM _with_medium
+UNION
+SELECT user_uuid, settings, "" AS medium, activity FROM _settings
 `
 )
 
@@ -90,6 +92,8 @@ func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, a
 	return nil
 }
 
+// WhoToRemind return users with remind set.
+// Medium can be empty, which means the mobile_device has not been registered yet
 func (r remindDailySettingsSqliteRepository) WhoToRemind() []RemindMe {
 	type dbItem struct {
 		UserUUID string `db:"user_uuid"`
