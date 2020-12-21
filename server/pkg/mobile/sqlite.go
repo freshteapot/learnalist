@@ -64,22 +64,28 @@ func (r SqliteRepository) DeleteByApp(userUUID string, appIdentifier string) err
 	return nil
 }
 
-func (r SqliteRepository) GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error) {
+func (r SqliteRepository) GetDevicesInfoByToken(token string) ([]openapi.MobileDeviceInfo, error) {
 	var (
-		dbItem     dbDeviceInfo
-		deviceInfo openapi.MobileDeviceInfo
+		dbItems []dbDeviceInfo
 	)
-
-	err := r.db.Get(&dbItem, SqlGetDeviceByToken, token)
+	devices := make([]openapi.MobileDeviceInfo, 0)
+	err := r.db.Select(&dbItems, SqlGetDeviceByToken, token)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = ErrNotFound
 		}
-		return deviceInfo, err
+		return devices, err
 	}
 
-	deviceInfo.AppIdentifier = dbItem.AppIdentifier
-	deviceInfo.Token = dbItem.Token
-	deviceInfo.UserUuid = dbItem.UserUUID
-	return deviceInfo, err
+	for _, dbItem := range dbItems {
+		device := openapi.MobileDeviceInfo{
+			AppIdentifier: dbItem.AppIdentifier,
+			Token:         dbItem.Token,
+			UserUuid:      dbItem.UserUUID,
+		}
+
+		devices = append(devices, device)
+	}
+
+	return devices, err
 }

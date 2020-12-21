@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS mobile_device (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS mobile_device_uniq ON mobile_device (user_uuid, app_identifier, token);
-CREATE UNIQUE INDEX IF NOT EXISTS mobile_device_uniq_token ON mobile_device (token);
+CREATE INDEX IF NOT EXISTS mobile_device_token ON mobile_device (token);
 CREATE INDEX IF NOT EXISTS mobile_device_user_uuid ON mobile_device (user_uuid);

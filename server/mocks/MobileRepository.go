@@ -40,15 +40,17 @@ func (_m *MobileRepository) DeleteByUser(userUUID string) error {
 	return r0
 }
 
-// GetDeviceInfoByToken provides a mock function with given fields: token
-func (_m *MobileRepository) GetDeviceInfoByToken(token string) (openapi.MobileDeviceInfo, error) {
+// GetDevicesInfoByToken provides a mock function with given fields: token
+func (_m *MobileRepository) GetDevicesInfoByToken(token string) ([]openapi.MobileDeviceInfo, error) {
 	ret := _m.Called(token)
 
-	var r0 openapi.MobileDeviceInfo
-	if rf, ok := ret.Get(0).(func(string) openapi.MobileDeviceInfo); ok {
+	var r0 []openapi.MobileDeviceInfo
+	if rf, ok := ret.Get(0).(func(string) []openapi.MobileDeviceInfo); ok {
 		r0 = rf(token)
 	} else {
-		r0 = ret.Get(0).(openapi.MobileDeviceInfo)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]openapi.MobileDeviceInfo)
+		}
 	}
 
 	var r1 error
