@@ -18,6 +18,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 var pushNotificationsCMD = &cobra.Command{
@@ -107,7 +108,11 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 				if err.Error() == "The registration token is not a valid FCM registration token" {
 					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 						Kind: event.MobileDeviceRemove,
-						Data: message.Token,
+						Data: openapi.MobileDeviceInfo{
+							UserUuid:      "",
+							AppIdentifier: "",
+							Token:         message.Token,
+						},
 					})
 
 					logContext.WithFields(logrus.Fields{
@@ -120,7 +125,11 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 				if err.Error() == "Requested entity was not found." {
 					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 						Kind: event.MobileDeviceRemove,
-						Data: message.Token,
+						Data: openapi.MobileDeviceInfo{
+							UserUuid:      "",
+							AppIdentifier: "",
+							Token:         message.Token,
+						},
 					})
 
 					// Poor mans option

@@ -1,7 +1,10 @@
 package mobile
 
 import (
+	"encoding/json"
+
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,20 +23,41 @@ func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 	if entry.Kind != event.MobileDeviceRemove {
 		return
 	}
+	var (
+		err        error
+		deviceInfo openapi.MobileDeviceInfo
+	)
 
+	// If this is an actual device, we can then have logic for "token" only
 	logEvent := "removeDevice"
 	logContext := s.logContext.WithField("sub-context", logEvent)
 
-	token := entry.Data.(string)
-	devices, err := s.repo.GetDevicesInfoByToken(token)
-	if err != nil {
-		if err == ErrNotFound {
+	b, _ := json.Marshal(entry.Data)
+	json.Unmarshal(b, &deviceInfo)
+
+	devices := make([]openapi.MobileDeviceInfo, 0)
+	devices = append(devices, deviceInfo)
+	if deviceInfo.AppIdentifier == "" && deviceInfo.UserUuid == "" {
+		// Delete by token
+		token := deviceInfo.Token
+
+		if token == "" {
+			logContext.WithFields(logrus.Fields{
+				"error": "token empty",
+			}).Error("Protection")
 			return
 		}
-		logContext.WithFields(logrus.Fields{
-			"error": err,
-		}).Error("GetDevicesInfoByToken")
-		return
+
+		devices, err = s.repo.GetDevicesInfoByToken(token)
+		if err != nil {
+			if err == ErrNotFound {
+				return
+			}
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("GetDevicesInfoByToken")
+			return
+		}
 	}
 
 	for _, deviceInfo := range devices {
@@ -41,7 +65,7 @@ func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 		if err != nil {
 			logContext.WithFields(logrus.Fields{
 				"error": err,
-				"token": token,
+				"token": deviceInfo.Token,
 			}).Error("DeleteByApp")
 			continue
 		}

@@ -77,6 +77,26 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		AppIdentifier: registerInput.AppIdentifier,
 	}
 
+	// If the app + token already exists, we want to replace it, as it is assumed to be a new user
+	devices, _ := s.repo.GetDevicesInfoByToken(deviceInfo.Token)
+	for _, device := range devices {
+		if device.AppIdentifier != deviceInfo.AppIdentifier {
+			continue
+		}
+
+		if device.UserUuid == userUUID {
+			return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+				Message: "Device registered",
+			})
+		}
+
+		s.repo.DeleteByApp(device.UserUuid, device.AppIdentifier)
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: event.MobileDeviceRemove,
+			Data: deviceInfo,
+		})
+	}
+
 	status, err := s.repo.SaveDeviceInfo(deviceInfo)
 	if err != nil {
 		if status == http.StatusUnprocessableEntity {
@@ -101,7 +121,6 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
-	// TODO maybe add DeviceInfo to openapi
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind:   event.MobileDeviceRegistered,
