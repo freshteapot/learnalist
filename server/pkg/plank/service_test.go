@@ -58,7 +58,7 @@ var _ = Describe("Testing API", func() {
 
 	When("Requesting history", func() {
 		BeforeEach(func() {
-			method := http.MethodPost
+			method := http.MethodGet
 			uri := "/api/v1/plank/history"
 			req, rec = testutils.SetupJSONEndpoint(method, uri, "")
 			c = e.NewContext(req, rec)

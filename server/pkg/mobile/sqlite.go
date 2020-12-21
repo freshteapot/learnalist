@@ -2,7 +2,6 @@ package mobile
 
 import (
 	"database/sql"
-	"errors"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -38,10 +37,6 @@ func (r SqliteRepository) SaveDeviceInfo(deviceInfo openapi.MobileDeviceInfo) (i
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: mobile_device.user_uuid, mobile_device.app_identifier, mobile_device.token" {
 			return http.StatusOK, nil
-		}
-
-		if err.Error() == "UNIQUE constraint failed: mobile_device.token" {
-			return http.StatusUnprocessableEntity, errors.New("token already in use")
 		}
 		return http.StatusInternalServerError, err
 	}

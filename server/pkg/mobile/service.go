@@ -78,7 +78,18 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 	}
 
 	// If the app + token already exists, we want to replace it, as it is assumed to be a new user
-	devices, _ := s.repo.GetDevicesInfoByToken(deviceInfo.Token)
+	devices, err := s.repo.GetDevicesInfoByToken(deviceInfo.Token)
+	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error":     err,
+			"user_uuid": userUUID,
+			"code_path": "GetDevicesInfoByToken",
+		}).Error("Register device")
+		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		})
+	}
+
 	for _, device := range devices {
 		if device.AppIdentifier != deviceInfo.AppIdentifier {
 			continue
@@ -97,27 +108,16 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		})
 	}
 
-	status, err := s.repo.SaveDeviceInfo(deviceInfo)
+	_, err = s.repo.SaveDeviceInfo(deviceInfo)
 	if err != nil {
-		if status == http.StatusUnprocessableEntity {
-			return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
-				Message: err.Error(),
-			})
-		}
-
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
-			"input":     string(jsonBytes),
+			"input":     deviceInfo,
 			"user_uuid": userUUID,
-		}).Error("Failed to register device")
+			"code_path": "SaveDeviceInfo",
+		}).Error("Register device")
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
-		})
-	}
-
-	if status == http.StatusOK {
-		return c.JSON(http.StatusOK, api.HTTPResponseMessage{
-			Message: "Device registered",
 		})
 	}
 
