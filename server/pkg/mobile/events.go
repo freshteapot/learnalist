@@ -28,7 +28,6 @@ func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 		deviceInfo openapi.MobileDeviceInfo
 	)
 
-	// If this is an actual device, we can then have logic for "token" only
 	logEvent := "removeDevice"
 	logContext := s.logContext.WithField("sub-context", logEvent)
 
@@ -37,6 +36,7 @@ func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 
 	devices := make([]openapi.MobileDeviceInfo, 0)
 	devices = append(devices, deviceInfo)
+	// When we only know the token
 	if deviceInfo.AppIdentifier == "" && deviceInfo.UserUuid == "" {
 		// Delete by token
 		token := deviceInfo.Token
