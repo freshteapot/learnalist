@@ -19,6 +19,45 @@ var _ = FDescribe("Testing mobile API", func() {
 	})
 
 	When("Register new device", func() {
+		It("Currently supported app plank:v1", func() {
+			// TODO this is going to be replace in the future.
+			// Register User
+			auth, loginInfo := RegisterAndLogin(client)
+
+			// Register Device
+			deviceInput := openapi.HttpMobileRegisterInput{
+				Token:         "fake-token-123",
+				AppIdentifier: "plank:v1",
+			}
+			msg, response, err := client.MobileApi.RegisterDevice(auth, deviceInput)
+
+			Expect(err).To(BeNil())
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+			Expect(msg.Message).To(Equal("Device registered"))
+
+			// Delete user
+			DeleteUser(client, auth, loginInfo.UserUuid)
+		})
+
+		It("Fail on invalid app", func() {
+			// Register User
+			auth, loginInfo := RegisterAndLogin(client)
+
+			// Register Device
+			deviceInput := openapi.HttpMobileRegisterInput{
+				Token:         "fake-token-123",
+				AppIdentifier: "fake-app",
+			}
+			_, response, err := client.MobileApi.RegisterDevice(auth, deviceInput)
+
+			Expect(err).To(HaveOccurred())
+			Expect(response.StatusCode).To(Equal(http.StatusUnprocessableEntity))
+			msg := err.(openapi.GenericOpenAPIError).Model().(openapi.HttpResponseMessage).Message
+			Expect(msg).To(Equal("App identifier is not supported: plank_v1,remind_v1"))
+			// Delete user
+			DeleteUser(client, auth, loginInfo.UserUuid)
+		})
+
 		It("Register single device", func() {
 			// Register User
 			auth, loginInfo := RegisterAndLogin(client)
