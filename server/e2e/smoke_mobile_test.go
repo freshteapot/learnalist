@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Testing mobile API", func() {
+var _ = Describe("Testing mobile API", func() {
 	var client *openapi.APIClient
 
 	BeforeEach(func() {
