@@ -119,16 +119,12 @@ HUGO_EXTERNAL=false \
 make develop
 ```
 ## Running slack events
-- Get slack secret from the cluster, checkout [api.events](./api.events.md)
+- Via [slack website](https://api.slack.com)
+- Get slack secret from the cluster ([api.events](./api.events.md))
 
 ```sh
-cd server
-EVENTS_VIA="nats" \
-EVENTS_STAN_CLUSTER_ID="test-cluster" \
-EVENTS_STAN_CLIENT_ID="lal-slack-events" \
-EVENTS_NATS_SERVER="127.0.0.1" \
 EVENTS_SLACK_WEBHOOK="XXX" \
-go run main.go --config=../config/dev.config.yaml tools slack-events
+scripts/run-slack.sh
 ```
 
 
