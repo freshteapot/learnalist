@@ -23,18 +23,14 @@ var dailyCMD = &cobra.Command{
 	Use:   "daily",
 	Short: "Consume for daily reminders",
 	Long: `
+kubectl port-forward svc/nats 4222:4222 &
 
-	kubectl port-forward svc/nats 4222:4222 &
-
-	TOPIC=lal.monolog \
-	EVENTS_STAN_CLIENT_ID=remind-daily-in \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
-	go run main.go --config=../config/dev.config.yaml \
-	tools remind daily
-
-
-	I can reuse mobile-device for daily_reminder_medium_push
+TOPIC=lal.monolog \
+EVENTS_STAN_CLIENT_ID=remind-daily-in \
+EVENTS_STAN_CLUSTER_ID=test-cluster \
+EVENTS_NATS_SERVER=127.0.0.1 \
+go run main.go --config=../config/dev.config.yaml \
+tools remind daily
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
