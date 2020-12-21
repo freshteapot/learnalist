@@ -121,7 +121,7 @@ func (m *manager) StartSendNotifications() {
 	m.logContext.Info("Sending notifications is active")
 	m.SendNotifications()
 	//ticker := time.NewTicker(1 * time.Minute)
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(5 * time.Second) // Might be too aggressive
 	go func() {
 
 		for {
