@@ -42,9 +42,13 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 	json.Unmarshal(b, &pref)
 	pref.UserUUID = userUUID
 
-	if (user.UserPreferenceDailyReminder{}) == *pref.DailyReminder {
-		pref.DailyReminder = nil
+	if pref.DailyReminder != nil {
+		// this is to remove {}
+		if (user.UserPreferenceDailyReminder{}) == *pref.DailyReminder {
+			pref.DailyReminder = nil
+		}
 	}
+
 	return c.JSON(http.StatusOK, pref)
 }
 

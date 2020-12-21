@@ -1,13 +1,27 @@
 package remind_test
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/mocks"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/stretchr/testify/mock"
 )
 
 func TimeIn(t time.Time, name string) (time.Time, error) {
@@ -19,7 +33,33 @@ func TimeIn(t time.Time, name string) (time.Time, error) {
 	return t, err
 }
 
-var _ = Describe("Testing Remind", func() {
+var _ = Describe("Testing Remind API", func() {
+	var (
+		eventMessageBus *mocks.EventlogPubSub
+		logger          *logrus.Logger
+		c               echo.Context
+		e               *echo.Echo
+		req             *http.Request
+		rec             *httptest.ResponseRecorder
+		service         remind.RemindService
+		repo            *mocks.ManagementStorage
+		user            *uuid.User
+	)
+
+	BeforeEach(func() {
+		user = &uuid.User{
+			Uuid: "fake-123",
+		}
+		eventMessageBus = &mocks.EventlogPubSub{}
+		event.SetBus(eventMessageBus)
+
+		e = echo.New()
+
+		logger, _ = test.NewNullLogger()
+		repo = &mocks.ManagementStorage{}
+		service = remind.NewService(repo, logger)
+	})
+
 	It("timezone fun", func() {
 		/*
 			- Load stream
@@ -48,6 +88,7 @@ var _ = Describe("Testing Remind", func() {
 			}
 		}
 	})
+
 	It("Validate time_of_day", func() {
 		want := errors.New("fail")
 		tests := []struct {
@@ -106,4 +147,208 @@ var _ = Describe("Testing Remind", func() {
 		}
 	})
 
+	When("Getting daily settings", func() {
+
+		It("Not valid app", func() {
+			appIdentifier := "remind:v1"
+			uri := "/api/v1/remind/daily/remind:v1"
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+			service.GetDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "appIdentifier is not valid")
+		})
+
+		It("Repo error getting data", func() {
+			want := errors.New("fail")
+			appIdentifier := "remind_v1"
+			uri := "/api/v1/remind/daily/remind_v1"
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+			repo.On("GetInfo", "fake-123").Return(nil, want)
+			service.GetDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Settings not found", func() {
+			appIdentifier := "remind_v1"
+			uri := "/api/v1/remind/daily/remind_v1"
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+			repo.On("GetInfo", "fake-123").Return([]byte(`{}`), nil)
+			service.GetDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Settings not found")
+		})
+
+		It("Remind V1 app found", func() {
+			appIdentifier := "remind_v1"
+			uri := "/api/v1/remind/daily/remind_v1"
+			userSettings := `
+{
+	"daily_reminder": {
+		"remind_v1": {
+		"time_of_day": "12:16",
+		"tz": "Europe/Oslo",
+		"app_identifier": "remind_v1",
+		"medium": [
+			"push"
+		]
+		}
+	}
+}
+`
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+
+			repo.On("GetInfo", "fake-123").Return([]byte(userSettings), nil)
+			service.GetDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			want := `{"time_of_day":"12:16","tz":"Europe/Oslo","app_identifier":"remind_v1","medium":["push"]}`
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(want))
+		})
+
+		It("Plank V1 app found", func() {
+			appIdentifier := "plank_v1"
+			uri := "/api/v1/remind/daily/plank_v1"
+			userSettings := `
+{
+	"daily_reminder": {
+		"plank_v1": {
+		"time_of_day": "12:16",
+		"tz": "Europe/Oslo",
+		"app_identifier": "plank_v1",
+		"medium": [
+			"push"
+		]
+		}
+	}
+}
+`
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+
+			repo.On("GetInfo", "fake-123").Return([]byte(userSettings), nil)
+			service.GetDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			want := `{"time_of_day":"12:16","tz":"Europe/Oslo","app_identifier":"plank_v1","medium":["push"]}`
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(want))
+		})
+	})
+
+	When("Deleting daily settings", func() {
+		var (
+			appIdentifier = "plank_v1"
+			uri           = "/api/v1/remind/daily/plank_v1"
+			userSettings  = `
+{
+	"daily_reminder": {
+		"plank_v1": {
+		"time_of_day": "12:16",
+		"tz": "Europe/Oslo",
+		"app_identifier": "plank_v1",
+		"medium": [
+			"push"
+		]
+		}
+	}
+}
+`
+		)
+
+		It("Not valid app", func() {
+			appIdentifier := "remind:v1"
+			uri := "/api/v1/remind/daily/remind:v1"
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+			service.DeleteDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "appIdentifier is not valid")
+		})
+
+		It("Repo error getting data", func() {
+			want := errors.New("fail")
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+			repo.On("GetInfo", "fake-123").Return(nil, want)
+			service.DeleteDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Delete failed due to repo issues on delete", func() {
+			want := errors.New("fail")
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+
+			repo.On("GetInfo", "fake-123").Return([]byte(userSettings), nil)
+			repo.On("RemoveInfo", "fake-123", "daily_reminder.plank_v1").Return(want)
+			service.DeleteDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Delete was succesful", func() {
+
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/api/v1/remind/daily/:appIdentifier")
+			c.SetParamNames("appIdentifier")
+			c.SetParamValues(appIdentifier)
+			c.Set("loggedInUser", *user)
+
+			repo.On("GetInfo", "fake-123").Return([]byte(userSettings), nil)
+			repo.On("RemoveInfo", "fake-123", "daily_reminder.plank_v1").Return(nil)
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(remind.EventApiRemindDailySettings))
+				Expect(moment.Action).To(Equal(event.ActionDeleted))
+				Expect(moment.UUID).To(Equal(user.Uuid))
+				b, _ := json.Marshal(moment.Data)
+				var settings openapi.RemindDailySettings
+				json.Unmarshal(b, &settings)
+
+				Expect(settings.AppIdentifier).To(Equal(apps.PlankV1))
+				Expect(settings.TimeOfDay).To(Equal("12:16"))
+				Expect(settings.Tz).To(Equal("Europe/Oslo"))
+				Expect(settings.Medium[0]).To(Equal("push"))
+				return true
+			}))
+
+			service.DeleteDailySettings(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+		})
+	})
 })

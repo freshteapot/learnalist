@@ -29,7 +29,6 @@ func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) RemindS
 		userRepo:   userRepo,
 		logContext: log,
 	}
-
 	return s
 }
 
@@ -181,7 +180,14 @@ func (s RemindService) getPreferences(userUUID string, appIdentifier string) (op
 	}
 
 	var pref user.UserPreference
-	json.Unmarshal(b, &pref)
+	err = json.Unmarshal(b, &pref)
+	if err != nil {
+		return response, nil
+	}
+
+	if pref.DailyReminder == nil {
+		return response, nil
+	}
 
 	switch appIdentifier {
 	case apps.RemindV1:
