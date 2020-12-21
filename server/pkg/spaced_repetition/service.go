@@ -72,7 +72,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 
 	if statusCode == http.StatusCreated {
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-			Kind: EventApiSpacedRepetition,
+			Kind: event.ApiSpacedRepetition,
 			Data: EventSpacedRepetition{
 				Kind: EventKindNew,
 				Data: item,
@@ -119,7 +119,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 
 	// This event fires, even if the entry doesnt exist
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiSpacedRepetition,
+		Kind: event.ApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind: EventKindDeleted,
 			Data: SpacedRepetitionEntry{
@@ -223,7 +223,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiSpacedRepetition,
+		Kind: event.ApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind:   EventKindViewed,
 			Action: input.Action,

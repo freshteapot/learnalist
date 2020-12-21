@@ -8,7 +8,9 @@ curl -H"Authorization: Bearer ${token}" \
 
 ## Add entry
 ```json
-curl -XPOST 'http://127.0.0.1:1234/api/v1/plank' -d'
+curl -XPOST \
+-H"Authorization: Bearer ${token}" \
+"http://127.0.0.1:1234/api/v1/plank/" -d'
 {
     "showIntervals": true,
     "intervalTime": 15,

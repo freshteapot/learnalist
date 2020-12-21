@@ -1,0 +1,13 @@
+components:
+  schemas:
+    MobilePlankAppV1Settings:
+      type: object
+      description: Settings for the plank app version 1
+      required:
+        - showIntervals
+        - intervalTime
+      properties:
+        showIntervals:
+          type: boolean
+        intervalTime:
+          type: integer

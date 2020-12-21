@@ -2,7 +2,10 @@ hugo:
   directory: "/srv/learnalist/hugo"
   environment: "docker"
   external: "true"
-
+remind:
+  daily:
+    sqlite:
+      database: /srv/remind-daily/remind-daily.db
 server:
   assets:
     directory: "/srv/learnalist/assets"

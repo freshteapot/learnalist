@@ -96,7 +96,7 @@ var _ = Describe("Testing user delete endpoint", func() {
 			eventMessageBus := &mocks.EventlogPubSub{}
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiUserDelete))
-				Expect(moment.Data.(event.EventUser).UUID).To(Equal(userUUID))
+				Expect(moment.UUID).To(Equal(userUUID))
 				return true
 			}))
 			event.SetBus(eventMessageBus)

@@ -35,15 +35,8 @@ func NewService(directory string, acl acl.AclAsset, repo Repository, logEntry *l
 		if entry.Kind != event.ApiUserDelete {
 			return
 		}
-
-		b, err := json.Marshal(entry.Data)
-		if err != nil {
-			return
-		}
-
-		var moment event.EventUser
-		json.Unmarshal(b, &moment)
-		s.DeleteUserAssets(moment.UUID)
+		userUUID := entry.UUID
+		s.DeleteUserAssets(userUUID)
 	})
 	return s
 }

@@ -1,5 +1,5 @@
 GIT_COMMIT:=$(shell git rev-parse HEAD)
-GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y%m%dT%H%M%SZ' --format="%cd" ${GIT_COMMIT})
+GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%dT%H:%M:%SZ' --format="%cd" ${GIT_COMMIT})
 
 ###############################################################################
 #
@@ -25,6 +25,11 @@ rebuild-db:
 	rm -f /tmp/learnalist/server.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
+rebuild-db-remind-daily:
+	mkdir -p /tmp/learnalist/
+	rm -f /tmp/learnalist/remind-daily.db
+	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
+
 test:
 	cd server && \
 	./cover.sh
@@ -48,6 +53,7 @@ run-nats-from-docker:
 run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
+	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=challenges-sync \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -57,6 +63,7 @@ run-challenges-sync:
 run-notifications-push-notifications:
 	cd server && \
 	TOPIC=notifications \
+	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -66,6 +73,16 @@ run-notifications-push-notifications:
 run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
+
+run-remind-daily:
+	cd server && \
+	TOPIC=lal.monolog \
+	EVENTS_VIA="nats" \
+	EVENTS_STAN_CLIENT_ID=remind-daily \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run --tags=json1 main.go --config=../config/dev.config.yaml \
+	tools remind daily
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
@@ -95,6 +112,8 @@ generate-openapi-one:
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.spaced_repetition.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.challenge.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.mobile.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.remind.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/apps.yaml && \
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g openapi-yaml -o /tmp/openapi/one
 
 generate-openapi-markdown: generate-openapi-one

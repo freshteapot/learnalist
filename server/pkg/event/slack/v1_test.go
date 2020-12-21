@@ -1,10 +1,13 @@
 package event_test
 
 import (
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
-	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
@@ -27,11 +30,200 @@ var _ = Describe("Testing Events to Slack", func() {
 	It("Event unwrapping", func() {
 		challengeUUID := "fake-challenge-123"
 		userUUID := "fake-user-123"
+		alistUUID := "fake-list-123"
+		plankUUID := "fake-plank-123"
 
 		tests := []struct {
 			entry event.Eventlog
 			post  eventReader.PostWebhook
 		}{
+			{
+				entry: event.Eventlog{
+					Kind: "TODO",
+					Data: "I am fake",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "TODO"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserRegister,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserRegisterIDPGoogle,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.register: user:fake-user-123 registered via idp:google"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogin,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserRegisterIDPGoogle,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.login: user:fake-user-123 logged in via idp:google"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSession,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.logout: user:fake-user-123 logged out via api, clearing current session"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSessions,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.logout: user:fake-user-123 logged out via api, clearing all sessions"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.BrowserUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSession,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "browser.user.logout: user:fake-user-123 logged out via browser, clearing current session"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.BrowserUserLogout,
+					Data: event.EventUser{
+						UUID: userUUID,
+						Kind: event.KindUserLogoutSessions,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "browser.user.logout: user:fake-user-123 logged out via browser, clearing all sessions"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiUserDelete,
+					UUID: userUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "api.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action:   event.ActionNew,
+						UserUUID: userUUID,
+						Data: openapi.Plank{
+							Uuid: plankUUID,
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "user:fake-user-123 added a plank:fake-plank-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action:   event.ActionDeleted,
+						UserUUID: userUUID,
+						Data: openapi.Plank{
+							Uuid: plankUUID,
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "user:fake-user-123 deleted plank:fake-plank-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.CMDUserDelete,
+					UUID: userUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "cmd.user.delete: user:fake-user-123 should be deleted"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiListSaved,
+					Data: event.EventList{
+						UUID:     alistUUID,
+						UserUUID: userUUID,
+						Action:   "created",
+						Data: alist.Alist{
+							Info: alist.AlistInfo{
+								ListType:   alist.SimpleList,
+								SharedWith: keys.SharedWithPublic,
+							},
+							Data: []string{},
+						},
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "list:fake-list-123 (public) created by user:fake-user-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiListDelete,
+					Data: event.EventList{
+						UUID:     alistUUID,
+						UserUUID: userUUID,
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "list:fake-list-123 deleted by user:fake-user-123"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
 			{
 				entry: event.Eventlog{
 					Kind: challenge.EventChallengeCreated,
@@ -85,17 +277,16 @@ var _ = Describe("Testing Events to Slack", func() {
 			},
 			{
 				entry: event.Eventlog{
-					Kind: mobile.EventMobileDeviceRegistered,
-					Data: event.EventKV{
-						UUID: userUUID,
-						Data: mobile.DeviceInfo{
-							UserUUID: userUUID,
-							Token:    "fake",
-						},
+					UUID: userUUID,
+					Kind: event.MobileDeviceRegistered,
+					Data: openapi.MobileDeviceInfo{
+						UserUuid:      userUUID,
+						Token:         "fake",
+						AppIdentifier: apps.RemindV1,
 					},
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := "user:fake-user-123 registered mobile token"
+					expect := `user:fake-user-123 registered mobile token for app:"remind_v1"`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},

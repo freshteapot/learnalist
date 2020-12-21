@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
+	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
@@ -20,6 +21,7 @@ func InitApi(
 	plankService plank.PlankService,
 	challengeService challenge.ChallengeService,
 	mobileService mobile.MobileService,
+	remindService remind.RemindService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -108,4 +110,11 @@ func InitApi(
 	mobileV1 := server.Group("/api/v1/mobile")
 	mobileV1.Use(authenticate.Auth(authConfig))
 	mobileV1.POST("/register-device", mobileService.RegisterDevice)
+
+	// Remind Service
+	remindV1 := server.Group("/api/v1/remind")
+	remindV1.Use(authenticate.Auth(authConfig))
+	remindV1.GET("/daily/:appIdentifier", remindService.GetDailySettings)
+	remindV1.DELETE("/daily/:appIdentifier", remindService.DeleteDailySettings)
+	remindV1.PUT("/daily/", remindService.SetDailySettings)
 }

@@ -84,15 +84,14 @@ var deleteUserCmd = &cobra.Command{
 				fmt.Println(err)
 				return
 			}
+			// What can possibly go wrong if we send it thru the system?
 			fmt.Println("user not found")
-			return
+			//return
 		}
 
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-			Kind: event.ApiUserDelete,
-			Data: event.EventUser{
-				UUID: userUUID,
-			},
+			Kind: event.CMDUserDelete,
+			UUID: userUUID,
 		})
 
 		hugoHelper.WritePublicLists(dal.GetPublicLists())

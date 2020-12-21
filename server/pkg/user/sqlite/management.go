@@ -171,9 +171,9 @@ func (m sqliteManagement) SaveInfo(userUUID string, info []byte) error {
 }
 
 // RemoveInfo remove key, regardless if it exists
+// Dont use ".", as it breaks, ":" works
 func (m sqliteManagement) RemoveInfo(userUUID string, key string) error {
 	_, err := m.db.Exec(SqlUserInfoRemove, fmt.Sprintf(`$.%s`, key), userUUID)
-	fmt.Println(err)
 	return err
 }
 

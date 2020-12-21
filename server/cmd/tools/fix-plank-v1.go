@@ -18,6 +18,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/fix"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
@@ -98,14 +99,14 @@ Step2: rebuild static site
 
 			// Loop over the string entries
 			for _, rawPlank := range rawData {
-				var record plank.HttpRequestInput
+				var record openapi.Plank
 
 				json.Unmarshal([]byte(rawPlank.(string)), &record)
 
-				record.UUID = ""
+				record.Uuid = ""
 				b, _ := json.Marshal(record)
 				hash := fmt.Sprintf("%x", sha1.Sum(b))
-				record.UUID = hash
+				record.Uuid = hash
 				created := time.Unix(0, int64(record.BeginningTime)*int64(1000000))
 
 				item := plank.Entry{

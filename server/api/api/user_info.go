@@ -10,14 +10,15 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
 func (m *Manager) V1GetUserInfo(c echo.Context) error {
 	logger := m.logger
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {
@@ -37,20 +38,24 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	var extra openapi.HttpUserInfoInput
-	err = json.Unmarshal(b, &extra)
-	extra.CreatedVia = ""
-	if extra.DisplayName == "" {
-		extra.DisplayName = userUUID
+	var pref user.UserPreference
+	json.Unmarshal(b, &pref)
+	pref.UserUUID = userUUID
+
+	if pref.DailyReminder != nil {
+		// this is to remove {}
+		if (user.UserPreferenceDailyReminder{}) == *pref.DailyReminder {
+			pref.DailyReminder = nil
+		}
 	}
 
-	return c.JSON(http.StatusOK, extra)
+	return c.JSON(http.StatusOK, pref)
 }
 
 func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	logger := m.logger
-	user := c.Get("loggedInUser").(uuid.User)
-	userUUID := user.Uuid
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	userUUID := loggedInUser.Uuid
 
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {
@@ -73,6 +78,9 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 
 	// On purpose dont let these be set.
 	input.CreatedVia = ""
+	if input.DisplayName == "" {
+		input.DisplayName = userUUID
+	}
 
 	b, _ := json.Marshal(input)
 	err = m.UserManagement.SaveInfo(userUUID, b)
@@ -86,5 +94,6 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
+	// TODO would need an event to get display name
 	return c.NoContent(http.StatusOK)
 }

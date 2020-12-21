@@ -105,7 +105,7 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 			UUID:     aList.Uuid,
 			UserUUID: user.Uuid,
 			Action:   action,
-			Data:     &aList,
+			Data:     aList,
 		},
 	})
 

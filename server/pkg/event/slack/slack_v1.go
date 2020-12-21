@@ -6,8 +6,8 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
-	"github.com/freshteapot/learnalist-api/server/pkg/plank"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
@@ -44,6 +44,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user:%s logged in via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogout:
+		fallthrough
 	case event.BrowserUserLogout:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventUser
@@ -62,10 +63,8 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 	case event.ApiUserDelete:
 		fallthrough
 	case event.CMDUserDelete:
-		b, _ := json.Marshal(entry.Data)
-		var moment event.EventUser
-		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("%s: user:%s should be deleted", entry.Kind, moment.UUID)
+		userUUID := entry.UUID
+		msg.Text = fmt.Sprintf("%s: user:%s should be deleted", entry.Kind, userUUID)
 	case event.ApiListSaved:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList
@@ -76,7 +75,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		var moment event.EventList
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
-	case spaced_repetition.EventApiSpacedRepetition:
+	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
 		json.Unmarshal(b, &moment)
@@ -100,26 +99,29 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if moment.Kind == spaced_repetition.EventKindDeleted {
 			msg.Text = fmt.Sprintf("user:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
 		}
-	case plank.EventApiPlank:
+	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
-		var moment plank.EventPlank
+		var moment event.EventPlank
 		json.Unmarshal(b, &moment)
-		if moment.Kind == plank.EventKindNew {
-			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.UUID)
+
+		switch moment.Action {
+		case event.ActionNew:
+			msg.Text = fmt.Sprintf("user:%s added a plank:%s", moment.UserUUID, moment.Data.Uuid)
+		case event.ActionDeleted:
+			msg.Text = fmt.Sprintf("user:%s deleted plank:%s", moment.UserUUID, moment.Data.Uuid)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
 
-		if moment.Kind == plank.EventKindDeleted {
-			msg.Text = fmt.Sprintf("user:%s deleted a plank:%s", moment.UserUUID, moment.Data.UUID)
-		}
 	case challenge.EventChallengeDone:
 		b, _ := json.Marshal(entry.Data)
 		var moment challenge.EventChallengeDoneEntry
 		json.Unmarshal(b, &moment)
 		if moment.Kind == challenge.EventKindPlank {
 			b, _ = json.Marshal(moment.Data)
-			var record plank.HttpRequestInput
+			var record openapi.Plank
 			json.Unmarshal(b, &record)
-			msg.Text = fmt.Sprintf("user:%s added a plank:%s to challenge:%s", moment.UserUUID, record.UUID, moment.UUID)
+			msg.Text = fmt.Sprintf("user:%s added a plank:%s to challenge:%s", moment.UserUUID, record.Uuid, moment.UUID)
 		} else {
 			return
 		}
@@ -157,16 +159,35 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 
 		msg.Text = fmt.Sprintf("user:%s left challenge:%s", moment.UserUUID, moment.UUID)
-	case mobile.EventMobileDeviceRegistered:
-		var momentKV event.EventKV
+	case event.MobileDeviceRegistered:
 		b, _ := json.Marshal(entry.Data)
-		json.Unmarshal(b, &momentKV)
+		var moment openapi.MobileDeviceInfo
+		json.Unmarshal(b, &moment)
 
-		userUUID := momentKV.UUID
-		msg.Text = fmt.Sprintf("user:%s registered mobile token", userUUID)
+		userUUID := moment.UserUuid
+		msg.Text = fmt.Sprintf(`user:%s registered mobile token for app:"%s"`, userUUID, moment.AppIdentifier)
+	case event.MobileDeviceRemove:
+		msg.Text = "Removing a token based on feedback from fcm, a follow up event should happen."
+	case event.MobileDeviceRemoved:
+		b, _ := json.Marshal(entry.Data)
+		var deviceInfo openapi.MobileDeviceInfo
+		json.Unmarshal(b, &deviceInfo)
+		msg.Text = fmt.Sprintf(`user:%s fcm token from app:"%s" has been removed`, deviceInfo.UserUuid, deviceInfo.AppIdentifier)
+	case remind.EventApiRemindDailySettings:
+		b, _ := json.Marshal(entry.Data)
+		var settings openapi.RemindDailySettings
+		json.Unmarshal(b, &settings)
+
+		userUUID := entry.UUID
+		switch entry.Action {
+		case event.ActionDeleted:
+			msg.Text = fmt.Sprintf(`user:%s removed daily reminder for app:"%s"`, userUUID, settings.AppIdentifier)
+		case event.ActionUpsert:
+			msg.Text = fmt.Sprintf(`user:%s setup daily reminder for app:"%s"`, userUUID, settings.AppIdentifier)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
+		}
 	default:
-		b, _ := json.Marshal(entry)
-		fmt.Println(string(b))
 		msg.Text = entry.Kind
 	}
 

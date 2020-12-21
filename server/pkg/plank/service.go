@@ -12,6 +12,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -47,15 +48,15 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 
 	defer c.Request().Body.Close()
 
-	var input HttpRequestInput
+	var input openapi.Plank
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
 	// Set to empty, to make sure the hash is the data not the hash
 	// Could one day let the user do it, and confirm hash = hash.
-	input.UUID = ""
+	input.Uuid = ""
 	b, _ := json.Marshal(input)
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
-	input.UUID = hash
+	input.Uuid = hash
 	created := time.Unix(0, int64(input.BeginningTime)*int64(1000000))
 	// TODO add validation
 
@@ -81,9 +82,9 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiPlank,
-		Data: EventPlank{
-			Kind:     EventKindNew,
+		Kind: event.ApiPlank,
+		Data: event.EventPlank{
+			Action:   event.ActionNew,
 			UserUUID: item.UserUUID,
 			Data:     item.Body,
 		},
@@ -148,9 +149,9 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventApiPlank,
-		Data: EventPlank{
-			Kind:     EventKindDeleted,
+		Kind: event.ApiPlank,
+		Data: event.EventPlank{
+			Action:   event.ActionDeleted,
 			UserUUID: user.Uuid,
 			Data:     record,
 		},
@@ -163,17 +164,10 @@ func (s PlankService) monologSubscribe(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserDelete {
 		return
 	}
-
-	b, err := json.Marshal(entry.Data)
-	if err != nil {
-		return
-	}
-
-	var moment event.EventUser
-	json.Unmarshal(b, &moment)
-	s.repo.DeleteEntriesByUser(moment.UUID)
+	userUUID := entry.UUID
+	s.repo.DeleteEntriesByUser(userUUID)
 	s.logContext.WithFields(logrus.Fields{
-		"event":     "user-deleted",
-		"user_uuid": moment.UUID,
+		"user_uuid": userUUID,
+		"event":     event.UserDeleted,
 	}).Info("entries removed")
 }

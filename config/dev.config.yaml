@@ -2,7 +2,10 @@ hugo:
   directory: "./../hugo"
   environment: "dev"
   external: "true"
-
+remind:
+  daily:
+    sqlite:
+      database: /tmp/learnalist/remind-daily.db
 server:
   assets:
     directory: "/tmp/learnalist/assets"

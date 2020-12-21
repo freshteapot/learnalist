@@ -8,14 +8,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type natsBus struct {
+type NatsBus struct {
 	sc            stan.Conn
 	subscriptions map[string]stan.Subscription
 	listeners     []eventlogPubSubListener
 	logContext    logrus.FieldLogger
 }
 
-func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.FieldLogger) *natsBus {
+func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.FieldLogger) *NatsBus {
 	logContext := log.WithFields(logrus.Fields{
 		"cluster_id": clusterID,
 		"client_id":  clientID,
@@ -35,14 +35,14 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 	}
 
 	logContext.Info("connected to nats server")
-	return &natsBus{
+	return &NatsBus{
 		sc:            sc,
 		subscriptions: make(map[string]stan.Subscription, 0),
 		logContext:    logContext,
 	}
 }
 
-func (b *natsBus) Publish(topic string, moment Eventlog) {
+func (b *NatsBus) Publish(topic string, moment Eventlog) {
 	mb, _ := json.Marshal(moment)
 
 	if err := b.sc.Publish(topic, mb); err != nil {
@@ -50,7 +50,7 @@ func (b *natsBus) Publish(topic string, moment Eventlog) {
 	}
 }
 
-func (b *natsBus) Close() {
+func (b *NatsBus) Close() {
 	for _, sub := range b.subscriptions {
 		err := sub.Close()
 		if err != nil {
@@ -70,7 +70,7 @@ func (b *natsBus) Close() {
 	nc.Close()
 }
 
-func (b *natsBus) Subscribe(topic string, key string, fn interface{}) {
+func (b *NatsBus) Subscribe(topic string, key string, fn interface{}) {
 	listener := eventlogPubSubListener{
 		topic: topic,
 		key:   key,
@@ -79,7 +79,7 @@ func (b *natsBus) Subscribe(topic string, key string, fn interface{}) {
 	b.listeners = append(b.listeners, listener)
 }
 
-func (b *natsBus) Start(topic string) {
+func (b *NatsBus) Start(topic string) {
 	var err error
 	mcb := func(msg *stan.Msg) {
 		var entryLog Eventlog
@@ -115,11 +115,15 @@ func (b *natsBus) Start(topic string) {
 	b.subscriptions[topic] = sub
 }
 
-func (b *natsBus) Unsubscribe(topic string, key string) {
+func (b *NatsBus) Unsubscribe(topic string, key string) {
 	for index, listener := range b.listeners {
 		if listener.topic == topic && listener.key == key {
 			b.listeners = append(b.listeners[:index], b.listeners[index+1:]...)
 			break
 		}
 	}
+}
+
+func (b *NatsBus) Connection() stan.Conn {
+	return b.sc
 }

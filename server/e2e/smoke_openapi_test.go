@@ -55,12 +55,12 @@ var _ = Describe("Testing openapi", func() {
 			Password: "test123",
 		}
 
-		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))
 
-		data2, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		data2, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		Expect(data2.Username).To(Equal(input.Username))
@@ -90,7 +90,7 @@ var _ = Describe("Testing openapi", func() {
 			Password: input.Password,
 		})
 
-		user, _, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input)
+		user, _, err := client.UserApi.RegisterUserWithUsernameAndPassword(context.Background(), input, nil)
 		Expect(err).To(BeNil())
 
 		uploadFile, _ := os.Open("./testdata/sample.png")

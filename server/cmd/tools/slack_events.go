@@ -20,13 +20,14 @@ var slackEventsCMD = &cobra.Command{
 		logger := logging.GetLogger()
 		logger.Info("Read events")
 		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
+		viper.SetDefault("server.events.slack.webhook", "")
+		viper.BindEnv("server.events.slack.webhook", "EVENTS_SLACK_WEBHOOK")
 		webhook := viper.GetString("server.events.slack.webhook")
 		if webhook == "" {
 			panic("Webhook shouldnt be empty")
 		}
-
-		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
 		reader := eventReader.NewSlackV1Events(slack.PostWebhook, webhook, logger.WithField("context", "slack-events"))
 		event.GetBus().Subscribe(event.TopicMonolog, "slack-listener", reader.Read)
@@ -39,9 +40,4 @@ var slackEventsCMD = &cobra.Command{
 		}
 		event.GetBus().Close()
 	},
-}
-
-func init() {
-	viper.SetDefault("server.events.slack.webhook", "")
-	viper.BindEnv("server.events.slack.webhook", "EVENTS_SLACK_WEBHOOK")
 }

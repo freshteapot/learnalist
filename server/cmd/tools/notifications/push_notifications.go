@@ -18,6 +18,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 var pushNotificationsCMD = &cobra.Command{
@@ -25,8 +26,7 @@ var pushNotificationsCMD = &cobra.Command{
 	Short: "Read events via nats",
 	Long: `
 
-ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
-ssh $SSH_SERVER sudo kubectl port-forward deployment/stan01 4222:4222 &
+kubectl port-forward svc/nats 4222:4222 &
 
 TOPIC=notifications \
 EVENTS_STAN_CLIENT_ID=push-notifications \
@@ -106,7 +106,15 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 			response, err := client.Send(ctx, message)
 			if err != nil {
 				if err.Error() == "The registration token is not a valid FCM registration token" {
-					// TODO send message to remove this token from the list
+					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+						Kind: event.MobileDeviceRemove,
+						Data: openapi.MobileDeviceInfo{
+							UserUuid:      "",
+							AppIdentifier: "",
+							Token:         message.Token,
+						},
+					})
+
 					logContext.WithFields(logrus.Fields{
 						"event": "invalid",
 						"token": message.Token,
@@ -115,7 +123,15 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 				}
 
 				if err.Error() == "Requested entity was not found." {
-					// TODO send message to remove this token from the list
+					event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+						Kind: event.MobileDeviceRemove,
+						Data: openapi.MobileDeviceInfo{
+							UserUuid:      "",
+							AppIdentifier: "",
+							Token:         message.Token,
+						},
+					})
+
 					// Poor mans option
 					// cat events.ndjson | jq -r 'select(.event=="stale") | "DELETE FROM mobile_device WHERE token=\"\(.token)\";"'
 					logContext.WithFields(logrus.Fields{

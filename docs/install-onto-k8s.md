@@ -177,6 +177,7 @@ kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
 kubectl apply -f k8s/event-reader.yaml
 kubectl apply -f k8s/notifications-push-notifications.yaml
+kubectl apply -f k8s/remind-daily.yaml
 ```
 
 Patch if only bumped latest version
@@ -189,6 +190,7 @@ kubectl patch deployment learnalist -p "${PATCH}"
 kubectl patch deployment event-reader -p "${PATCH}"
 kubectl patch deployment slack-events -p "${PATCH}"
 kubectl patch deployment notifications-push-notifications -p "${PATCH}"
+kubectl patch deployment remind-daily -p "${PATCH}"
 ```
 
 ```sh

@@ -57,6 +57,12 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		registerInput.AppIdentifier = apps.PlankV1
 	}
 
+	// TODO Update plank app, reject if "", today, assume plank
+	if registerInput.AppIdentifier == "plank:v1" {
+		s.logContext.Warn("Will go away after the mobile is updated")
+		registerInput.AppIdentifier = "plank_v1"
+	}
+
 	allowed := []string{apps.PlankV1, apps.RemindV1}
 	if !utils.StringArrayContains(allowed, registerInput.AppIdentifier) {
 		response := api.HTTPResponseMessage{
@@ -65,37 +71,62 @@ func (s MobileService) RegisterDevice(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	status, err := s.repo.SaveDeviceInfo(userUUID, registerInput)
+	deviceInfo := openapi.MobileDeviceInfo{
+		Token:         registerInput.Token,
+		UserUuid:      userUUID,
+		AppIdentifier: registerInput.AppIdentifier,
+	}
+
+	// If the app + token already exists, we want to replace it, as it is assumed to be a new user
+	devices, err := s.repo.GetDevicesInfoByToken(deviceInfo.Token)
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":     err,
-			"input":     string(jsonBytes),
 			"user_uuid": userUUID,
-		}).Error("Failed to register device")
+			"code_path": "GetDevicesInfoByToken",
+		}).Error("Register device")
 		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,
 		})
 	}
 
-	if status == http.StatusOK {
-		return c.JSON(http.StatusOK, api.HTTPResponseMessage{
-			Message: "Device registered",
+	for _, device := range devices {
+		if device.AppIdentifier != deviceInfo.AppIdentifier {
+			continue
+		}
+
+		if device.UserUuid == userUUID {
+			return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+				Message: "Device registered",
+			})
+		}
+
+		s.repo.DeleteByApp(device.UserUuid, device.AppIdentifier)
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: event.MobileDeviceRemove,
+			Data: deviceInfo,
 		})
 	}
 
-	// TODO do I actually need to send this today?
-	// TODO if yes, include app_identifier
-	// TODO maybe add DeviceInfo to openapi
+	_, err = s.repo.SaveDeviceInfo(deviceInfo)
+	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error":     err,
+			"input":     deviceInfo,
+			"user_uuid": userUUID,
+			"code_path": "SaveDeviceInfo",
+		}).Error("Register device")
+		return c.JSON(http.StatusInternalServerError, api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorFunny,
+		})
+	}
+
 	// Send a message to the log, that the device was registered
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		Kind: EventMobileDeviceRegistered,
-		Data: event.EventKV{
-			UUID: userUUID,
-			Data: DeviceInfo{
-				Token:    registerInput.Token,
-				UserUUID: userUUID,
-			},
-		},
+		Kind:   event.MobileDeviceRegistered,
+		UUID:   userUUID,
+		Data:   deviceInfo,
+		Action: event.ActionUpsert,
 	})
 
 	return c.JSON(http.StatusOK, api.HTTPResponseMessage{

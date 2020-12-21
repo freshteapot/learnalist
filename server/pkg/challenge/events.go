@@ -14,6 +14,8 @@ import (
 func (s ChallengeService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
+		fallthrough
+	case event.CMDUserDelete:
 		s.removeUser(entry)
 		return
 	case EventChallengeDone:
@@ -27,20 +29,14 @@ func (s ChallengeService) OnEvent(entry event.Eventlog) {
 // removeUser when a user is deleted
 // Currently we only remove the users entries, not any entries they created.
 func (s ChallengeService) removeUser(entry event.Eventlog) {
-	if entry.Kind != event.ApiUserDelete {
+	if !event.IsUserDeleteEvent(entry) {
 		return
 	}
 
-	b, err := json.Marshal(entry.Data)
-	if err != nil {
-		return
-	}
-
-	var moment event.EventUser
-	json.Unmarshal(b, &moment)
-	s.repo.DeleteUser(moment.UUID)
+	userUUID := entry.UUID
+	_ = s.repo.DeleteUser(userUUID)
 	s.logContext.WithFields(logrus.Fields{
-		"user_uuid": moment.UUID,
+		"user_uuid": userUUID,
 		"event":     event.UserDeleted,
 	}).Info("user removed")
 }
@@ -195,6 +191,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		}
 
 		event.GetBus().Publish("notifications", event.Eventlog{
+			UUID: userUUID,
 			Kind: event.KindPushNotification,
 			Data: message,
 		})

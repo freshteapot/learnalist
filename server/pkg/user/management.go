@@ -78,3 +78,7 @@ func (m management) SaveInfo(userUUID string, info []byte) error {
 func (m management) GetInfo(userUUID string) ([]byte, error) {
 	return m.storage.GetInfo(userUUID)
 }
+
+func (m management) RemoveInfo(userUUID string, key string) error {
+	return m.storage.RemoveInfo(userUUID, key)
+}

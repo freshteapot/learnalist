@@ -20,7 +20,7 @@ ALTER TABLE mobile_device RENAME TO mobile_device_prev;
 INSERT INTO
   mobile_device (user_uuid, app_identifier, token, created)
 SELECT
-  user_uuid, "plank:v1", token, created
+  user_uuid, "plank_v1", token, created
 FROM
   mobile_device_prev;
 ```

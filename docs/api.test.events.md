@@ -33,11 +33,12 @@ token=$(echo $response | jq -r '.token')
 
 
 response=$(curl -i -XPOST \
--H"Authorization: Bearer ${token}" \
+-H "Authorization: Bearer ${token}" \
 'http://127.0.0.1:1234/api/v1/mobile/register-device' \
 -d '
 {
-  "token": "fake-token-123"
+  "token": "fake-token-123",
+  "app_identifier": "remind_v1"
 }')
 ```
 

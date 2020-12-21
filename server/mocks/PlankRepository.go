@@ -3,6 +3,7 @@
 package mocks
 
 import (
+	openapi "github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	plank "github.com/freshteapot/learnalist-api/server/pkg/plank"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -41,14 +42,14 @@ func (_m *PlankRepository) DeleteEntry(UUID string, userUUID string) error {
 }
 
 // GetEntry provides a mock function with given fields: UUID, userUUID
-func (_m *PlankRepository) GetEntry(UUID string, userUUID string) (plank.HttpRequestInput, error) {
+func (_m *PlankRepository) GetEntry(UUID string, userUUID string) (openapi.Plank, error) {
 	ret := _m.Called(UUID, userUUID)
 
-	var r0 plank.HttpRequestInput
-	if rf, ok := ret.Get(0).(func(string, string) plank.HttpRequestInput); ok {
+	var r0 openapi.Plank
+	if rf, ok := ret.Get(0).(func(string, string) openapi.Plank); ok {
 		r0 = rf(UUID, userUUID)
 	} else {
-		r0 = ret.Get(0).(plank.HttpRequestInput)
+		r0 = ret.Get(0).(openapi.Plank)
 	}
 
 	var r1 error
@@ -62,15 +63,15 @@ func (_m *PlankRepository) GetEntry(UUID string, userUUID string) (plank.HttpReq
 }
 
 // History provides a mock function with given fields: userUUID
-func (_m *PlankRepository) History(userUUID string) ([]plank.HttpRequestInput, error) {
+func (_m *PlankRepository) History(userUUID string) ([]openapi.Plank, error) {
 	ret := _m.Called(userUUID)
 
-	var r0 []plank.HttpRequestInput
-	if rf, ok := ret.Get(0).(func(string) []plank.HttpRequestInput); ok {
+	var r0 []openapi.Plank
+	if rf, ok := ret.Get(0).(func(string) []openapi.Plank); ok {
 		r0 = rf(userUUID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]plank.HttpRequestInput)
+			r0 = ret.Get(0).([]openapi.Plank)
 		}
 	}
 

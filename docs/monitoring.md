@@ -5,8 +5,7 @@
 ## Read the challenges stream
 ### Setup a tunnel
 ```
-ssh $SSH_SERVER -L 4222:127.0.0.1:4222 -N &
-ssh $SSH_SERVER sudo kubectl port-forward deployment/stan01 4222:4222 &
+kubectl port-forward svc/nats 4222:4222 &
 ```
 
 ### Consume challenges stream

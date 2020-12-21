@@ -229,10 +229,9 @@ var (
 
 // Event specific
 var (
-	EventApiSpacedRepetition = "api.spacedrepetition"
-	EventKindNew             = "new"
-	EventKindViewed          = "viewed"
-	EventKindDeleted         = "deleted"
+	EventKindNew     = "new"
+	EventKindViewed  = "viewed"
+	EventKindDeleted = "deleted"
 )
 
 type EventSpacedRepetition struct {
