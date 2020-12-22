@@ -16,7 +16,7 @@ var (
 	SqlSave               = `INSERT INTO mobile_device(user_uuid, app_identifier, token) values(?, ?, ?)`
 	SqlDeleteDeviceByUser = `DELETE FROM mobile_device WHERE user_uuid=?`
 	SqlDeleteDeviceByApp  = `DELETE FROM mobile_device WHERE user_uuid=? AND app_identifier=?`
-	SqlGetDeviceByToken   = `SELECT user_uuid, app_identifier, token FROM mobile_device WHERE token=?`
+	SqlGetDevicesByToken  = `SELECT user_uuid, app_identifier, token FROM mobile_device WHERE token=?`
 )
 
 type dbDeviceInfo struct {
@@ -64,7 +64,7 @@ func (r SqliteRepository) GetDevicesInfoByToken(token string) ([]openapi.MobileD
 		dbItems []dbDeviceInfo
 	)
 	devices := make([]openapi.MobileDeviceInfo, 0)
-	err := r.db.Select(&dbItems, SqlGetDeviceByToken, token)
+	err := r.db.Select(&dbItems, SqlGetDevicesByToken, token)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = ErrNotFound
@@ -73,13 +73,11 @@ func (r SqliteRepository) GetDevicesInfoByToken(token string) ([]openapi.MobileD
 	}
 
 	for _, dbItem := range dbItems {
-		device := openapi.MobileDeviceInfo{
+		devices = append(devices, openapi.MobileDeviceInfo{
 			AppIdentifier: dbItem.AppIdentifier,
 			Token:         dbItem.Token,
 			UserUuid:      dbItem.UserUUID,
-		}
-
-		devices = append(devices, device)
+		})
 	}
 
 	return devices, err

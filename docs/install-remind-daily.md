@@ -1,4 +1,5 @@
-# Install remind daily
+# Install remind manager
+
 ## Setup volume
 ```sh
 kubectl apply -f k8s/remind-daily-data.yaml

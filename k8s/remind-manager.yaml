@@ -1,26 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: remind-daily
+  name: remind-manager
   labels:
-    app: remind-daily
+    app: remind-manager
 spec:
   selector:
     matchLabels:
-      app: remind-daily
+      app: remind-manager
   replicas: 1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: remind-daily
+        app: remind-manager
     spec:
       containers:
-        - name: remind-daily
+        - name: remind-manager
           image: registry.devbox/learnalist:latest
           args:
-            ["--config=/etc/learnalist/config.yaml", "tools", "remind", "daily"]
+            [
+              "--config=/etc/learnalist/config.yaml",
+              "tools",
+              "remind",
+              "manager",
+            ]
           env:
             - name: TOPIC
               value: lal.monolog
@@ -29,7 +34,7 @@ spec:
             - name: EVENTS_NATS_SERVER
               value: "nats.default.svc.cluster.local"
             - name: EVENTS_STAN_CLIENT_ID
-              value: "lal-remind-daily"
+              value: "lal-remind-manager"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/learnalist/config.yaml
@@ -37,8 +42,8 @@ spec:
               readOnly: true
             - name: db-schema-volume
               mountPath: "/srv/db-schema/"
-            - name: srv-remind-daily-volume
-              mountPath: "/srv/remind-daily/"
+            - name: srv-remind-manager-volume
+              mountPath: "/srv/remind-manager/"
       volumes:
         - name: config-volume
           configMap:
@@ -46,6 +51,6 @@ spec:
         - name: db-schema-volume
           configMap:
             name: learnalist-db
-        - name: srv-remind-daily-volume
+        - name: srv-remind-manager-volume
           persistentVolumeClaim:
-            claimName: remind-daily-01-pvc
+            claimName: remind-manager-01-pvc

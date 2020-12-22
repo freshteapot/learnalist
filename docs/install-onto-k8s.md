@@ -155,12 +155,6 @@ ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
 ```
 
 ```sh
-ssh $SSH_SERVER
-sudo su -
-kill -9 $(lsof -ti tcp:5000)
-```
-
-```sh
 kubectl scale deployment/container-registry  --replicas=1
 kubectl port-forward deployment/container-registry 5000:5000 &
 ```

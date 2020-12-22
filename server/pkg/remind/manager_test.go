@@ -60,7 +60,7 @@ var _ = Describe("Testing Manager", func() {
 		}
 
 		mobileRepo.On("DeleteByApp", userUUID, appIdentifier).Return(nil)
-		manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+		manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 		manager.OnEvent(moment)
 
 		Expect("A").To(Equal("A"))
@@ -74,7 +74,7 @@ var _ = Describe("Testing Manager", func() {
 		}
 
 		mobileRepo.On("SaveDeviceInfo", deviceInfo).Return(201, nil)
-		manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+		manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 		manager.OnEvent(moment)
 
 		Expect("A").To(Equal("A"))
@@ -89,7 +89,7 @@ var _ = Describe("Testing Manager", func() {
 				Action: event.ActionDeleted,
 			}
 			settingsRepo.On("DeleteByApp", userUUID, appIdentifier).Return(nil)
-			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+			manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 
@@ -102,7 +102,7 @@ var _ = Describe("Testing Manager", func() {
 			}
 			// Test time outside fo this
 			settingsRepo.On("Save", userUUID, settings, mock.AnythingOfType("string")).Return(nil)
-			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+			manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 	})
@@ -117,7 +117,7 @@ var _ = Describe("Testing Manager", func() {
 				},
 			}
 			settingsRepo.On("ActivityHappened", userUUID, apps.PlankV1).Return(nil)
-			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+			manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 
@@ -134,7 +134,7 @@ var _ = Describe("Testing Manager", func() {
 			}
 
 			settingsRepo.On("ActivityHappened", userUUID, apps.RemindV1).Return(nil)
-			manager := remind.NewManager(settingsRepo, mobileRepo, logger)
+			manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
 			manager.OnEvent(moment)
 		})
 	})

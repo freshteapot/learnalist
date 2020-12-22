@@ -2,6 +2,7 @@ package event
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
@@ -43,6 +44,10 @@ func NewNatsBus(clusterID string, clientID string, nc *nats.Conn, log logrus.Fie
 }
 
 func (b *NatsBus) Publish(topic string, moment Eventlog) {
+	if moment.Timestamp == 0 {
+		moment.Timestamp = time.Now().UTC().Unix()
+	}
+
 	mb, _ := json.Marshal(moment)
 
 	if err := b.sc.Publish(topic, mb); err != nil {

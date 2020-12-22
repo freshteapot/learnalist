@@ -82,7 +82,7 @@ run-remind-daily:
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags=json1 main.go --config=../config/dev.config.yaml \
-	tools remind daily
+	tools remind manager
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost

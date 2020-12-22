@@ -1,27 +1,24 @@
 package remind
 
 import (
-	"encoding/json"
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 )
 
-var dailyCMD = &cobra.Command{
-	Use:   "daily",
-	Short: "Consume for daily reminders",
+var managerCMD = &cobra.Command{
+	Use:   "manager",
+	Short: "Reminder manager",
 	Long: `
 kubectl port-forward svc/nats 4222:4222 &
 
@@ -30,11 +27,11 @@ EVENTS_STAN_CLIENT_ID=remind-daily-in \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
-tools remind daily
+tools remind manager
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		logContext := logger.WithField("context", "remind-daily")
+		logContext := logger.WithField("context", "remind")
 
 		event.SetDefaultSettingsForCMD()
 		event.SetupEventBus(logContext)
@@ -49,56 +46,31 @@ tools remind daily
 
 		remindDailyRepo := remind.NewRemindDailySettingsSqliteRepository(db)
 		mobileRepo := mobile.NewSqliteRepository(db)
+		dailyManager := remind.NewDaily(
+			remindDailyRepo,
+			mobileRepo,
+			logger.WithField("context", "daily-reminder"))
 
-		manager := remind.NewManager(remindDailyRepo, mobileRepo, logContext)
+		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
+		remindSpacedRepetitionRepo := remind.NewRemindSpacedRepetitionSqliteRepository(db)
+		spacedRepetitionManager := remind.NewSpacedRepetition(
+			spacedRepetitionRepo,
+			remindSpacedRepetitionRepo,
+			logger.WithField("context", "spaced-repetition-reminder"))
+
 		sc := event.GetBus().(*event.NatsBus).Connection()
 
-		allowed := manager.FilterKindsBy()
+		subscribers := make([]remind.NatsSubscriber, 0)
+		subscribers = append(subscribers, dailyManager)
+		subscribers = append(subscribers, spacedRepetitionManager)
 
-		d := 200 * time.Millisecond
-		// Initially we shall wait
-
-		var timer *time.Timer
-		timer = time.AfterFunc(500*time.Millisecond, func() {
-			manager.StartSendNotifications()
-			timer.Stop()
-			timer = nil
-		})
-		defer timer.Stop()
-
-		handle := func(msg *stan.Msg) {
-			var moment event.Eventlog
-			json.Unmarshal(msg.Data, &moment)
-
-			if !utils.StringArrayContains(allowed, moment.Kind) {
-
-				if timer != nil {
-					timer.Reset(d)
-				}
-
-				return
+		for _, subscriber := range subscribers {
+			err := subscriber.Subscribe(subjectRead, sc)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Failed to start subscriber in remind manager")
 			}
-
-			manager.OnEvent(moment)
-			if timer != nil {
-				timer.Reset(d)
-			}
-		}
-
-		durableName := "remind.daily"
-		subscription, err := sc.Subscribe(
-			subjectRead,
-			handle,
-			stan.DurableName(durableName),
-			stan.DeliverAllAvailable(),
-			stan.MaxInflight(1),
-		)
-
-		if err != nil {
-			logContext.WithFields(logrus.Fields{
-				"error":        err,
-				"durable_name": durableName,
-			}).Fatal("Failed to start subscriber")
 		}
 
 		signals := make(chan os.Signal, 1)
@@ -109,9 +81,8 @@ tools remind daily
 			break
 		}
 
-		err = subscription.Close()
-		if err != nil {
-			logContext.WithField("error", err).Error("closing subscription")
+		for _, subscriber := range subscribers {
+			subscriber.Close()
 		}
 
 		event.GetBus().Close()
