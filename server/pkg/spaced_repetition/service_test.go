@@ -2,6 +2,7 @@ package spaced_repetition_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 
@@ -45,9 +46,20 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		repo = &mocks.SpacedRepetitionRepository{}
 		service = spaced_repetition.NewService(repo, logger)
 	})
+
 	When("Saving an entry", func() {
+		var (
+			uri   = "/api/v1//api/v1/spaced-repetition"
+			input = `
+			{
+				"show": "Hello",
+				"data": "Hello",
+				"kind": "v1"
+			  }
+			`
+			entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
+		)
 		It("Not valid entry", func() {
-			uri := "/api/v1//api/v1/spaced-repetition"
 			input := `
 			{
 				"show": "",
@@ -65,57 +77,32 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		})
 
 		It("Entry already exists", func() {
-			uri := "/api/v1//api/v1/spaced-repetition"
-			input := `
-			{
-				"show": "Hello",
-				"data": "Hello",
-				"kind": "v1"
-			  }
-			`
 			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, input)
 			c = e.NewContext(req, rec)
 			c.SetPath(uri)
 			c.Set("loggedInUser", *user)
 
 			repo.On("SaveEntry", mock.Anything).Return(spaced_repetition.ErrSpacedRepetitionEntryExists)
-			expect := openapi.SpacedRepetitionV1{
-				Kind: alist.SimpleList,
-				Show: "Hello",
-				Data: "Hello",
-			}
-
-			repo.On("GetEntry", user.Uuid, "ba9277fc4c6190fb875ad8f9cee848dba699937f").Return(expect, nil)
-
 			service.SaveEntry(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
-			b, _ := json.Marshal(expect)
-			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
+			var entry openapi.SpacedRepetitionV1
+			json.Unmarshal(rec.Body.Bytes(), &entry)
+
+			Expect(entry.Uuid).To(Equal(entryUUID))
+			Expect(entry.Kind).To(Equal(alist.SimpleList))
+			Expect(entry.Show).To(Equal("Hello"))
+			Expect(entry.Settings.Level).To(Equal("0"))
 		})
 
 		It("New Entry", func() {
-			uri := "/api/v1//api/v1/spaced-repetition"
-			input := `
-			{
-				"show": "Hello",
-				"data": "Hello",
-				"kind": "v1"
-			  }
-			`
 			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, input)
 			c = e.NewContext(req, rec)
 			c.SetPath(uri)
 			c.Set("loggedInUser", *user)
 
 			repo.On("SaveEntry", mock.Anything).Return(nil)
-			expect := openapi.SpacedRepetitionV1{
-				Kind: alist.SimpleList,
-				Show: "Hello",
-				Data: "Hello",
-			}
-			entryUUID := "ba9277fc4c6190fb875ad8f9cee848dba699937f"
 			userUUID := user.Uuid
-			repo.On("GetEntry", userUUID, entryUUID).Return(expect, nil)
+
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
 				b, _ := json.Marshal(moment.Data)
@@ -130,8 +117,25 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 
 			service.SaveEntry(c)
 			Expect(rec.Code).To(Equal(http.StatusCreated))
-			b, _ := json.Marshal(expect)
-			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
+			var entry openapi.SpacedRepetitionV1
+			json.Unmarshal(rec.Body.Bytes(), &entry)
+
+			Expect(entry.Uuid).To(Equal(entryUUID))
+			Expect(entry.Kind).To(Equal(alist.SimpleList))
+			Expect(entry.Show).To(Equal("Hello"))
+			Expect(entry.Settings.Level).To(Equal("0"))
+		})
+
+		It("Failed to save entry", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, input)
+			c = e.NewContext(req, rec)
+			c.SetPath(uri)
+			c.Set("loggedInUser", *user)
+
+			want := errors.New("fail")
+			repo.On("SaveEntry", mock.Anything).Return(want)
+			service.SaveEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 		})
 	})
 })

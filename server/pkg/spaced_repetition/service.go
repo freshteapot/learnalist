@@ -71,14 +71,13 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		statusCode = http.StatusOK
 	}
 
-	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
+	var current interface{}
+	json.Unmarshal([]byte(entry.String()), &current)
 
 	if statusCode == http.StatusOK {
 		return c.JSON(statusCode, current)
 	}
+
 	// The entry is a new
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiSpacedRepetition,
