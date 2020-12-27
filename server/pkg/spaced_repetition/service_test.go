@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -54,6 +55,39 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		service = spaced_repetition.NewService(repo, logger)
 	})
 
+	When("Getting all entries", func() {
+		var (
+			uri = "/api/v1/api/v1/spaced-repetition/all"
+		)
+
+		It("Error looking up records", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+
+			repo.On("GetEntries", user.Uuid).Return(nil, want)
+
+			service.GetAll(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Records found, but empty", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+
+			repo.On("GetEntries", user.Uuid).Return(make([]interface{}, 0), nil)
+
+			service.GetAll(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+		})
+	})
+
 	When("Looking up the next entry", func() {
 		var (
 			uri = "/api/v1/api/v1/spaced-repetition/next"
@@ -70,7 +104,53 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 
 			service.GetNext(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
+		})
 
+		It("Found but in the future", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			whenNext := time.Now().UTC().Add(1 * time.Hour)
+
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+				WhenNext: whenNext,
+			}, nil)
+
+			service.GetNext(c)
+			Expect(rec.Code).To(Equal(http.StatusNoContent))
+		})
+
+		It("An error looking up in repo", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, want)
+			service.GetNext(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("Entry found and ready", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+				WhenNext: time.Now().UTC().Add(-1 * time.Hour),
+				Body:     `{"data":"Hello","kind":"v1","settings":{"created":"2020-12-27T16:57:31Z","level":"0","when_next":"2020-12-27T17:57:31Z"},"show":"Hello","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f"}`,
+			}, nil)
+
+			service.GetNext(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			var entry openapi.SpacedRepetitionV1
+			json.Unmarshal(rec.Body.Bytes(), &entry)
+			Expect(entry.Uuid).To(Equal(entryUUID))
 		})
 	})
 

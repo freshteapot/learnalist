@@ -169,7 +169,7 @@ func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	return c.JSON(http.StatusOK, body)
 }
 
-//GetAll Get all entries for spaced repetition learning
+// GetAll Get all entries for spaced repetition learning
 func (s SpacedRepetitionService) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
