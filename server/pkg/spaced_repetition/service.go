@@ -213,7 +213,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 
 	if input.UUID != item.UUID {
 		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
-			Message: "input uuid is not the uuid of what is next",
+			Message: "Input uuid is not the uuid of what is next",
 		})
 	}
 
@@ -228,18 +228,13 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		entry = V1FromDB(item.Body)
 	case alist.FromToList:
 		entry = V2FromDB(item.Body)
-	default:
-		// Defence, shouldnt happen
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	// increment level
-	// increment threshold
-	if input.Action == ActionIncrement {
+	// Based on the action, bubbles up when the entry will be scheduled for next viewing.
+	switch input.Action {
+	case ActionIncrement:
 		entry.IncrThreshold()
-	}
-
-	if input.Action == ActionDecrement {
+	case ActionDecrement:
 		entry.DecrThreshold()
 	}
 

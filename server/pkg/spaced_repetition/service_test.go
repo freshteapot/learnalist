@@ -55,6 +55,208 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		service = spaced_repetition.NewService(repo, logger)
 	})
 
+	When("Updating entry", func() {
+		var (
+			uri = "/api/v1/api/v1/spaced-repetition/viewed"
+		)
+		It("Check for invalid action", func() {
+			input := openapi.SpacedRepetitionEntryViewed{
+				Action: "fake",
+				Uuid:   entryUUID,
+			}
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			service.EntryViewed(c)
+			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Action not supported: incr,decr")
+		})
+
+		It("Not found", func() {
+			input := openapi.SpacedRepetitionEntryViewed{
+				Action: spaced_repetition.ActionIncrement,
+				Uuid:   entryUUID,
+			}
+
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, spaced_repetition.ErrNotFound)
+
+			service.EntryViewed(c)
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+			Expect(len(rec.Body.Bytes())).To(Equal(0))
+		})
+
+		It("Error talking to repo to get the next entry", func() {
+			input := openapi.SpacedRepetitionEntryViewed{
+				Action: spaced_repetition.ActionIncrement,
+				Uuid:   entryUUID,
+			}
+
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, want)
+			service.EntryViewed(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Entry found, but it is not the one currently being modified", func() {
+			input := openapi.SpacedRepetitionEntryViewed{
+				Action: spaced_repetition.ActionIncrement,
+				Uuid:   entryUUID,
+			}
+
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+				UUID: "something-else",
+			}, nil)
+
+			service.EntryViewed(c)
+			Expect(rec.Code).To(Equal(http.StatusForbidden))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "Input uuid is not the uuid of what is next")
+		})
+
+		When("updating entry based on action", func() {
+			It("Failed to update via the repo", func() {
+				input := openapi.SpacedRepetitionEntryViewed{
+					Action: spaced_repetition.ActionIncrement,
+					Uuid:   entryUUID,
+				}
+
+				b, _ := json.Marshal(input)
+				req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+				c = e.NewContext(req, rec)
+
+				c.Set("loggedInUser", *user)
+				c.SetPath(uri)
+				created, _ := time.Parse(time.RFC3339, "2020-12-27T17:04:59Z")
+				whenNext, _ := time.Parse(time.RFC3339, "2020-12-27T18:04:59Z")
+				repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+					UUID:     entryUUID,
+					UserUUID: userUUID,
+					Body:     `{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"0","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z"}}`,
+					Created:  created,
+					WhenNext: whenNext,
+				}, nil)
+
+				repo.On("UpdateEntry", mock.Anything).Return(want)
+
+				service.EntryViewed(c)
+				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+			})
+
+			When("Successful path", func() {
+				It("Increment", func() {
+					input := openapi.SpacedRepetitionEntryViewed{
+						Action: spaced_repetition.ActionIncrement,
+						Uuid:   entryUUID,
+					}
+
+					b, _ := json.Marshal(input)
+					req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+					c = e.NewContext(req, rec)
+
+					c.Set("loggedInUser", *user)
+					c.SetPath(uri)
+					created, _ := time.Parse(time.RFC3339, "2020-12-27T17:04:59Z")
+					whenNext, _ := time.Parse(time.RFC3339, "2020-12-27T18:04:59Z")
+					repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+						UUID:     entryUUID,
+						UserUUID: userUUID,
+						Body:     `{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"0","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z"}}`,
+						Created:  created,
+						WhenNext: whenNext,
+					}, nil)
+
+					repo.On("UpdateEntry", mock.Anything).Return(nil)
+					eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
+
+						b, _ := json.Marshal(moment.Data)
+						var data spaced_repetition.EventSpacedRepetition
+						json.Unmarshal(b, &data)
+
+						Expect(data.Kind).To(Equal(spaced_repetition.EventKindViewed))
+						Expect(data.Data.UserUUID).To(Equal(userUUID))
+						Expect(data.Data.UUID).To(Equal(entryUUID))
+
+						return true
+					}))
+
+					service.EntryViewed(c)
+					Expect(rec.Code).To(Equal(http.StatusOK))
+					var entry openapi.SpacedRepetitionV1
+					json.Unmarshal(rec.Body.Bytes(), &entry)
+					Expect(entry.Uuid).To(Equal(entryUUID))
+					Expect(entry.Settings.Level).To(Equal("1"))
+				})
+
+				It("Decrement", func() {
+					input := openapi.SpacedRepetitionEntryViewed{
+						Action: spaced_repetition.ActionDecrement,
+						Uuid:   entryUUID,
+					}
+
+					b, _ := json.Marshal(input)
+					req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+					c = e.NewContext(req, rec)
+
+					c.Set("loggedInUser", *user)
+					c.SetPath(uri)
+					created, _ := time.Parse(time.RFC3339, "2020-12-27T17:04:59Z")
+					whenNext, _ := time.Parse(time.RFC3339, "2020-12-27T18:04:59Z")
+					repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+						UUID:     entryUUID,
+						UserUUID: userUUID,
+						Body:     `{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"1","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z"}}`,
+						Created:  created,
+						WhenNext: whenNext,
+					}, nil)
+
+					repo.On("UpdateEntry", mock.Anything).Return(nil)
+					eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
+
+						b, _ := json.Marshal(moment.Data)
+						var data spaced_repetition.EventSpacedRepetition
+						json.Unmarshal(b, &data)
+
+						Expect(data.Kind).To(Equal(spaced_repetition.EventKindViewed))
+						Expect(data.Data.UserUUID).To(Equal(userUUID))
+						Expect(data.Data.UUID).To(Equal(entryUUID))
+
+						return true
+					}))
+
+					service.EntryViewed(c)
+					Expect(rec.Code).To(Equal(http.StatusOK))
+					var entry openapi.SpacedRepetitionV1
+					json.Unmarshal(rec.Body.Bytes(), &entry)
+					Expect(entry.Uuid).To(Equal(entryUUID))
+					Expect(entry.Settings.Level).To(Equal("0"))
+				})
+			})
+		})
+	})
+
 	When("Getting all entries", func() {
 		var (
 			uri = "/api/v1/api/v1/spaced-repetition/all"
