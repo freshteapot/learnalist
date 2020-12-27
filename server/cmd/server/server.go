@@ -140,7 +140,8 @@ var ServerCmd = &cobra.Command{
 			logger)
 
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
-		spacedRepetitionService := spaced_repetition.NewService(db)
+		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
+		spacedRepetitionService := spaced_repetition.NewService(spacedRepetitionRepo, logger.WithField("context", "spacedRepetition-service"))
 		plankService := plank.NewService(plank.NewSqliteRepository(db), logger.WithField("context", "plank-service"))
 		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
 		assetService.InitCheck()

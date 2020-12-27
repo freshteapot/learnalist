@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type HTTPRequestInputKind struct {
@@ -80,6 +80,9 @@ const (
 	THRESHOLD_7 = time.Duration(TIME_DAY * 30)
 	THRESHOLD_8 = time.Duration(TIME_DAY * 60)
 	THRESHOLD_9 = time.Duration(TIME_DAY * 120)
+
+	ActionIncrement = "incr"
+	ActionDecrement = "decr"
 
 	SQL_SAVE_ITEM              = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next, created) values(?, ?, ?, ?, ?)`
 	SQL_SAVE_ITEM_AUTO_UPDATED = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next) values(?, ?, ?, ?) ON CONFLICT (spaced_repetition.user_uuid, spaced_repetition.uuid) DO UPDATE SET body=?, when_next=?`
@@ -199,12 +202,13 @@ var decrThresholds = []struct {
 }
 
 type SpacedRepetitionService struct {
-	db   *sqlx.DB
-	repo Repository
+	repo       SpacedRepetitionRepository
+	logContext logrus.FieldLogger
 }
 
-type Repository interface {
-	GetNext(userUUID string) (interface{}, error)
+type SpacedRepetitionRepository interface {
+	CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error)
+	GetNext(userUUID string) (SpacedRepetitionEntry, error)
 	GetEntry(userUUID string, UUID string) (interface{}, error)
 	GetEntries(userUUID string) ([]interface{}, error)
 	SaveEntry(entry SpacedRepetitionEntry) error

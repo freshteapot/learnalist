@@ -3,6 +3,7 @@ package spaced_repetition
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,30 +14,43 @@ type SqliteRepository struct {
 	db *sqlx.DB
 }
 
-func NewSqliteRepository(db *sqlx.DB) Repository {
+func NewSqliteRepository(db *sqlx.DB) SpacedRepetitionRepository {
 	return SqliteRepository{
 		db: db,
 	}
 }
 
-func (r SqliteRepository) GetNext(userUUID string) (interface{}, error) {
-	var body interface{}
-	item := SpacedRepetitionEntry{}
+func (r SqliteRepository) GetNext(userUUID string) (SpacedRepetitionEntry, error) {
+	var item SpacedRepetitionEntry
+
 	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
 	err := r.db.Get(&item, SQL_GET_NEXT, userUUID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
+			return item, ErrNotFound
+		}
+		return item, err
+	}
+
+	return item, nil
+}
+
+// TODO does this need to be part of the struct / interface?
+func (r SqliteRepository) CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error) {
+	var body interface{}
+	if err != nil {
+		if err == ErrNotFound {
 			return body, ErrNotFound
 		}
 		return body, err
 	}
 
-	if !time.Now().UTC().After(item.WhenNext) {
+	if !time.Now().UTC().After(entry.WhenNext) {
 		return body, ErrFoundNotTime
 	}
 
-	json.Unmarshal([]byte(item.Body), &body)
+	json.Unmarshal([]byte(entry.Body), &body)
 	return body, nil
 }
 
@@ -80,8 +94,10 @@ func (r SqliteRepository) GetEntries(userUUID string) ([]interface{}, error) {
 func (r SqliteRepository) SaveEntry(entry SpacedRepetitionEntry) error {
 	whenNext := entry.WhenNext.Format(time.RFC3339)
 	created := entry.Created.Format(time.RFC3339)
+	// TODO Update SQL in production
 	_, err := r.db.Exec(SQL_SAVE_ITEM, entry.UUID, entry.Body, entry.UserUUID, whenNext, created)
 	if err != nil {
+		fmt.Println(err)
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
 			return ErrSpacedRepetitionEntryExists
 		}

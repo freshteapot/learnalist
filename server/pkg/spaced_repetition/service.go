@@ -1,24 +1,26 @@
 package spaced_repetition
 
 import (
-	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
-func NewService(db *sqlx.DB) SpacedRepetitionService {
+func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) SpacedRepetitionService {
 	return SpacedRepetitionService{
-		db:   db,
-		repo: NewSqliteRepository(db),
+		repo:       repo,
+		logContext: logContext,
 	}
 }
 
@@ -34,17 +36,21 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 
 	var what HTTPRequestInputKind
 	json.Unmarshal(raw, &what)
-	if !utils.StringArrayContains([]string{"v1", "v2"}, what.Kind) {
-		return c.NoContent(http.StatusBadRequest)
+	allowedKinds := []string{alist.SimpleList, alist.FromToList}
+	if !utils.StringArrayContains(allowedKinds, what.Kind) {
+		response := api.HTTPResponseMessage{
+			Message: fmt.Sprintf("Kind not supported: %s", strings.Join(allowedKinds, ",")),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	var entry ItemInput
 
-	if what.Kind == "v1" {
+	if what.Kind == alist.SimpleList {
 		entry = V1FromPOST(raw)
 	}
 
-	if what.Kind == "v2" {
+	if what.Kind == alist.FromToList {
 		entry = V2FromPOST(raw)
 	}
 
@@ -70,30 +76,32 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	if statusCode == http.StatusCreated {
+	if statusCode == http.StatusOK {
+		return c.JSON(statusCode, current)
+	}
+	// The entry is a new
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: event.ApiSpacedRepetition,
+		Data: EventSpacedRepetition{
+			Kind: EventKindNew,
+			Data: item,
+		},
+	})
+
+	// Baked the challenge system into the service
+	// VS
+	// UI needs more complexity
+	challengeUUID := c.Request().Header.Get("x-challenge")
+	if challengeUUID != "" {
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-			Kind: event.ApiSpacedRepetition,
-			Data: EventSpacedRepetition{
-				Kind: EventKindNew,
-				Data: item,
+			Kind: challenge.EventChallengeDone,
+			Data: challenge.EventChallengeDoneEntry{
+				UUID:     challengeUUID,
+				UserUUID: item.UserUUID,
+				Data:     item.Body,
+				Kind:     challenge.EventKindSpacedRepetition,
 			},
 		})
-
-		// Baked the challenge system into the service
-		// VS
-		// UI needs more complexity
-		challengeUUID := c.Request().Header.Get("x-challenge")
-		if challengeUUID != "" {
-			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-				Kind: challenge.EventChallengeDone,
-				Data: challenge.EventChallengeDoneEntry{
-					UUID:     challengeUUID,
-					UserUUID: item.UserUUID,
-					Data:     item.Body,
-					Kind:     challenge.EventKindSpacedRepetition,
-				},
-			})
-		}
 	}
 
 	return c.JSON(statusCode, current)
@@ -173,13 +181,12 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 
 	var input HTTPRequestViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
+	// TODO should we verify that this is what we think it is?
 
-	item := SpacedRepetitionEntry{}
 	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
-	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
-
+	item, err := s.repo.GetNext(user.Uuid)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == ErrNotFound {
 			return c.NoContent(http.StatusNotFound)
 		}
 
@@ -192,24 +199,36 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	json.Unmarshal([]byte(item.Body), &what)
 
 	var entry ItemInput
-	if what.Kind == "v1" {
+	if what.Kind == alist.SimpleList {
 		entry = V1FromDB(item.Body)
 	}
 
-	if what.Kind == "v2" {
+	if what.Kind == alist.FromToList {
 		entry = V2FromDB(item.Body)
 	}
 
-	// TODO we do not protect actions
+	if input.UUID != entry.UUID() {
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+			Message: "input uuid is not the uuid of what is next",
+		})
+	}
+
+	allowed := []string{ActionIncrement, ActionDecrement}
+	if !utils.StringArrayContains(allowed, input.Action) {
+		response := api.HTTPResponseMessage{
+			Message: fmt.Sprintf("Action not supported: %s", strings.Join(allowed, ",")),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 
 	// increment level
 	// increment threshold
 	// TODO change to const
-	if input.Action == "incr" {
+	if input.Action == ActionIncrement {
 		entry.IncrThreshold()
 	}
 
-	if input.Action == "decr" {
+	if input.Action == ActionDecrement {
 		entry.DecrThreshold()
 	}
 
