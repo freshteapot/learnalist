@@ -3,10 +3,12 @@ package spaced_repetition_test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -47,6 +49,63 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		service = spaced_repetition.NewService(repo, logger)
 	})
 
+	When("Deleting an entry", func() {
+		var (
+			uri   = "/api/v1/api/v1/spaced-repetition/ba9277fc4c6190fb875ad8f9cee848dba699937f"
+			input = `
+			{
+				"show": "Hello",
+				"data": "Hello",
+				"kind": "v1"
+			  }
+			`
+			entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
+		)
+
+		It("Missing the entry id", func() {
+			fmt.Printf(entryUUID)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath("/api/v1/api/v1/spaced-repetition/:uuid")
+			c.SetParamNames("uuid")
+			c.SetParamValues("")
+
+			service.DeleteEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusBadRequest))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InputMissingListUuid)
+		})
+
+		It("Entry not found", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath("/api/v1/api/v1/spaced-repetition/:uuid")
+			c.SetParamNames("uuid")
+			c.SetParamValues(entryUUID)
+
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, spaced_repetition.ErrNotFound)
+			service.DeleteEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+		})
+
+		It("Entry failed due to repo lookup", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath("/api/v1/api/v1/spaced-repetition/:uuid")
+			c.SetParamNames("uuid")
+			c.SetParamValues(entryUUID)
+
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, errors.New("fail"))
+			service.DeleteEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+	})
 	When("Saving an entry", func() {
 		var (
 			uri   = "/api/v1//api/v1/spaced-repetition"

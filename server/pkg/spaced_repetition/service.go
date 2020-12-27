@@ -110,6 +110,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
+	userUUID := user.Uuid
 
 	if UUID == "" {
 		response := api.HTTPResponseMessage{
@@ -118,20 +119,29 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	// TODO check if entry exsits
-	err := s.repo.DeleteEntry(user.Uuid, UUID)
+	// Confirm the entry exists
+	_, err := s.repo.GetEntry(userUUID, UUID)
+	if err != nil {
+		if err == ErrNotFound {
+			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
+				Message: "Entry not found",
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	err = s.repo.DeleteEntry(userUUID, UUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	// This event fires, even if the entry doesnt exist
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind: EventKindDeleted,
 			Data: SpacedRepetitionEntry{
 				UUID:     UUID,
-				UserUUID: user.Uuid,
+				UserUUID: userUUID,
 			},
 		},
 	})
