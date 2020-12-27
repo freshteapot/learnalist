@@ -192,36 +192,6 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	json.NewDecoder(c.Request().Body).Decode(&input)
 	// TODO should we verify that this is what we think it is?
 
-	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
-	item, err := s.repo.GetNext(user.Uuid)
-	if err != nil {
-		if err == ErrNotFound {
-			return c.NoContent(http.StatusNotFound)
-		}
-
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
-	// TODO could get this via the json_XXX functions in sqlite
-	// hmm maybe add kind to the table
-
-	var what HTTPRequestInputKind
-	json.Unmarshal([]byte(item.Body), &what)
-
-	var entry ItemInput
-	if what.Kind == alist.SimpleList {
-		entry = V1FromDB(item.Body)
-	}
-
-	if what.Kind == alist.FromToList {
-		entry = V2FromDB(item.Body)
-	}
-
-	if input.UUID != entry.UUID() {
-		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
-			Message: "input uuid is not the uuid of what is next",
-		})
-	}
-
 	allowed := []string{ActionIncrement, ActionDecrement}
 	if !utils.StringArrayContains(allowed, input.Action) {
 		response := api.HTTPResponseMessage{
@@ -230,9 +200,41 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
+	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
+	// TODO if I use GetEntry, then this is more generic and not locked to GetNext only
+	item, err := s.repo.GetNext(user.Uuid)
+	if err != nil {
+		if err == ErrNotFound {
+			return c.NoContent(http.StatusNotFound)
+		}
+
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	if input.UUID != item.UUID {
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+			Message: "input uuid is not the uuid of what is next",
+		})
+	}
+
+	// At this point, we are assuming the list is valid
+	var what HTTPRequestInputKind
+	json.Unmarshal([]byte(item.Body), &what)
+
+	var entry ItemInput
+
+	switch what.Kind {
+	case alist.SimpleList:
+		entry = V1FromDB(item.Body)
+	case alist.FromToList:
+		entry = V2FromDB(item.Body)
+	default:
+		// Defence, shouldnt happen
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
 	// increment level
 	// increment threshold
-	// TODO change to const
 	if input.Action == ActionIncrement {
 		entry.IncrThreshold()
 	}
@@ -259,9 +261,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		},
 	})
 
-	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
+	var current interface{}
+	json.Unmarshal([]byte(item.Body), &current)
 	return c.JSON(http.StatusOK, current)
 }
