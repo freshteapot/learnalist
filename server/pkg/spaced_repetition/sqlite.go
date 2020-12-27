@@ -97,7 +97,9 @@ func (r SqliteRepository) DeleteEntry(userUUID string, UUID string) error {
 
 func (r SqliteRepository) UpdateEntry(entry SpacedRepetitionEntry) error {
 	whenNext := entry.WhenNext.Format(time.RFC3339)
-	_, err := r.db.Exec(SQL_SAVE_ITEM_AUTO_UPDATED, entry.UUID, entry.Body, entry.UserUUID, whenNext, entry.Body, whenNext)
+	_, err := r.db.Exec(SQL_SAVE_ITEM_AUTO_UPDATED, //TODO why would this ever exist without insert?!
+		entry.UUID, entry.Body, entry.UserUUID, whenNext, // NEW
+		entry.Body, whenNext) // On conflict
 	if err != nil {
 		return err
 	}
