@@ -36,6 +36,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 
 	var what HTTPRequestInputKind
 	json.Unmarshal(raw, &what)
+
 	allowedKinds := []string{alist.SimpleList, alist.FromToList}
 	if !utils.StringArrayContains(allowedKinds, what.Kind) {
 		response := api.HTTPResponseMessage{
@@ -46,11 +47,10 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 
 	var entry ItemInput
 
-	if what.Kind == alist.SimpleList {
+	switch what.Kind {
+	case alist.SimpleList:
 		entry = V1FromPOST(raw)
-	}
-
-	if what.Kind == alist.FromToList {
+	case alist.FromToList:
 		entry = V2FromPOST(raw)
 	}
 
