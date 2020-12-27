@@ -3,7 +3,6 @@ package spaced_repetition
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -84,10 +83,8 @@ func (r SqliteRepository) GetEntries(userUUID string) ([]interface{}, error) {
 func (r SqliteRepository) SaveEntry(entry SpacedRepetitionEntry) error {
 	whenNext := entry.WhenNext.Format(time.RFC3339)
 	created := entry.Created.Format(time.RFC3339)
-	// TODO Update SQL in production
 	_, err := r.db.Exec(SqlSaveItem, entry.UUID, entry.Body, entry.UserUUID, whenNext, created)
 	if err != nil {
-		fmt.Println(err)
 		if strings.HasPrefix(err.Error(), "UNIQUE constraint failed") {
 			return ErrSpacedRepetitionEntryExists
 		}
