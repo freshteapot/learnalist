@@ -152,7 +152,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 // GetNext Get next entry for spaced based learning
 func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	body, err := s.repo.GetNext(user.Uuid)
+	body, err := CheckNext(s.repo.GetNext(user.Uuid))
 
 	if err != nil {
 		if err == ErrNotFound {

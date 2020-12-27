@@ -207,7 +207,6 @@ type SpacedRepetitionService struct {
 }
 
 type SpacedRepetitionRepository interface {
-	CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error)
 	GetNext(userUUID string) (SpacedRepetitionEntry, error)
 	GetEntry(userUUID string, UUID string) (interface{}, error)
 	GetEntries(userUUID string) ([]interface{}, error)

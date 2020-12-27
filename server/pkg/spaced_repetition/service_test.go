@@ -3,7 +3,6 @@ package spaced_repetition_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -25,21 +24,27 @@ import (
 
 var _ = Describe("Testing Spaced Repetition Service API", func() {
 	var (
-		eventMessageBus *mocks.EventlogPubSub
-		logger          *logrus.Logger
-		c               echo.Context
-		e               *echo.Echo
-		req             *http.Request
-		rec             *httptest.ResponseRecorder
-		service         spaced_repetition.SpacedRepetitionService
-		repo            *mocks.SpacedRepetitionRepository
-		user            *uuid.User
+		eventMessageBus     *mocks.EventlogPubSub
+		logger              *logrus.Logger
+		c                   echo.Context
+		e                   *echo.Echo
+		req                 *http.Request
+		rec                 *httptest.ResponseRecorder
+		service             spaced_repetition.SpacedRepetitionService
+		repo                *mocks.SpacedRepetitionRepository
+		user                *uuid.User
+		want                error
+		userUUID, entryUUID string
 	)
 
 	BeforeEach(func() {
+		entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
+		want = errors.New("fail")
 		user = &uuid.User{
 			Uuid: "fake-123",
 		}
+		userUUID = user.Uuid
+
 		eventMessageBus = &mocks.EventlogPubSub{}
 		event.SetBus(eventMessageBus)
 		e = echo.New()
@@ -47,6 +52,26 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 		logger, _ = test.NewNullLogger()
 		repo = &mocks.SpacedRepetitionRepository{}
 		service = spaced_repetition.NewService(repo, logger)
+	})
+
+	When("Looking up the next entry", func() {
+		var (
+			uri = "/api/v1/api/v1/spaced-repetition/next"
+		)
+
+		It("Not found, meaning the user has not added any entries", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, spaced_repetition.ErrNotFound)
+
+			service.GetNext(c)
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+
+		})
 	})
 
 	When("Deleting an entry", func() {
@@ -59,11 +84,9 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 				"kind": "v1"
 			  }
 			`
-			entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
 		)
 
 		It("Missing the entry id", func() {
-			fmt.Printf(entryUUID)
 			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
 			c = e.NewContext(req, rec)
 
@@ -100,12 +123,56 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			c.SetParamNames("uuid")
 			c.SetParamValues(entryUUID)
 
-			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, errors.New("fail"))
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, want)
 			service.DeleteEntry(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
+
+		It("Entry failed due to repo delete", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath("/api/v1/api/v1/spaced-repetition/:uuid")
+			c.SetParamNames("uuid")
+			c.SetParamValues(entryUUID)
+
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, nil)
+			repo.On("DeleteEntry", user.Uuid, entryUUID).Return(want)
+			service.DeleteEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("Entry deleted", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodDelete, uri, input)
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath("/api/v1/api/v1/spaced-repetition/:uuid")
+			c.SetParamNames("uuid")
+			c.SetParamValues(entryUUID)
+
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, nil)
+			repo.On("DeleteEntry", user.Uuid, entryUUID).Return(nil)
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
+				b, _ := json.Marshal(moment.Data)
+				var data spaced_repetition.EventSpacedRepetition
+				json.Unmarshal(b, &data)
+
+				Expect(data.Kind).To(Equal(spaced_repetition.EventKindDeleted))
+				Expect(data.Data.UserUUID).To(Equal(userUUID))
+				Expect(data.Data.UUID).To(Equal(entryUUID))
+				return true
+			}))
+
+			service.DeleteEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusNoContent))
+		})
 	})
+
 	When("Saving an entry", func() {
 		var (
 			uri   = "/api/v1//api/v1/spaced-repetition"
@@ -160,7 +227,6 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			c.Set("loggedInUser", *user)
 
 			repo.On("SaveEntry", mock.Anything).Return(nil)
-			userUUID := user.Uuid
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
@@ -191,7 +257,6 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			c.SetPath(uri)
 			c.Set("loggedInUser", *user)
 
-			want := errors.New("fail")
 			repo.On("SaveEntry", mock.Anything).Return(want)
 			service.SaveEntry(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))

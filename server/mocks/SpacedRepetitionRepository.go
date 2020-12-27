@@ -12,29 +12,6 @@ type SpacedRepetitionRepository struct {
 	mock.Mock
 }
 
-// CheckNext provides a mock function with given fields: entry, err
-func (_m *SpacedRepetitionRepository) CheckNext(entry spaced_repetition.SpacedRepetitionEntry, err error) (interface{}, error) {
-	ret := _m.Called(entry, err)
-
-	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(spaced_repetition.SpacedRepetitionEntry, error) interface{}); ok {
-		r0 = rf(entry, err)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interface{})
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(spaced_repetition.SpacedRepetitionEntry, error) error); ok {
-		r1 = rf(entry, err)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // DeleteEntry provides a mock function with given fields: userUUID, UUID
 func (_m *SpacedRepetitionRepository) DeleteEntry(userUUID string, UUID string) error {
 	ret := _m.Called(userUUID, UUID)
