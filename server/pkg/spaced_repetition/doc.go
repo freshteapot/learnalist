@@ -11,11 +11,6 @@ type HTTPRequestInputKind struct {
 	Kind string `json:"kind"`
 }
 
-type HTTPRequestViewed struct {
-	UUID   string `json:"uuid"`
-	Action string `json:"action"`
-}
-
 type HTTPRequestInput struct {
 	Show string `json:"show"`
 	Kind string `json:"kind"`
@@ -58,28 +53,28 @@ type SpacedRepetitionEntry struct {
 }
 
 const (
-	Level_0 = "0"
-	Level_1 = "1"
-	Level_2 = "2"
-	Level_3 = "3"
-	Level_4 = "4"
-	Level_5 = "5"
-	Level_6 = "6"
-	Level_7 = "7"
-	Level_8 = "8"
-	Level_9 = "9"
+	Level0 = "0"
+	Level1 = "1"
+	Level2 = "2"
+	Level3 = "3"
+	Level4 = "4"
+	Level5 = "5"
+	Level6 = "6"
+	Level7 = "7"
+	Level8 = "8"
+	Level9 = "9"
 
-	TIME_DAY    = 24 * time.Hour
-	THRESHOLD_0 = time.Duration(time.Hour * 1)
-	THRESHOLD_1 = time.Duration(time.Hour * 3)
-	THRESHOLD_2 = time.Duration(time.Hour * 8)
-	THRESHOLD_3 = time.Duration(TIME_DAY * 1)
-	THRESHOLD_4 = time.Duration(TIME_DAY * 3)
-	THRESHOLD_5 = time.Duration(TIME_DAY * 7)
-	THRESHOLD_6 = time.Duration(TIME_DAY * 14)
-	THRESHOLD_7 = time.Duration(TIME_DAY * 30)
-	THRESHOLD_8 = time.Duration(TIME_DAY * 60)
-	THRESHOLD_9 = time.Duration(TIME_DAY * 120)
+	TimeDay    = 24 * time.Hour
+	Threshold0 = time.Duration(time.Hour * 1)
+	Threshold1 = time.Duration(time.Hour * 3)
+	Threshold2 = time.Duration(time.Hour * 8)
+	Threshold3 = time.Duration(TimeDay * 1)
+	Threshold4 = time.Duration(TimeDay * 3)
+	Threshold5 = time.Duration(TimeDay * 7)
+	Threshold6 = time.Duration(TimeDay * 14)
+	Threshold7 = time.Duration(TimeDay * 30)
+	Threshold8 = time.Duration(TimeDay * 60)
+	Threshold9 = time.Duration(TimeDay * 120)
 
 	ActionIncrement = "incr"
 	ActionDecrement = "decr"
@@ -91,49 +86,49 @@ var incrThresholds = []struct {
 	Threshold time.Duration
 }{
 	{
-		Match:     Level_0,
-		Level:     Level_1,
-		Threshold: THRESHOLD_1,
+		Match:     Level0,
+		Level:     Level1,
+		Threshold: Threshold1,
 	},
 	{
-		Match:     Level_1,
-		Level:     Level_2,
-		Threshold: THRESHOLD_2,
+		Match:     Level1,
+		Level:     Level2,
+		Threshold: Threshold2,
 	},
 	{
-		Match:     Level_2,
-		Level:     Level_3,
-		Threshold: THRESHOLD_3,
+		Match:     Level2,
+		Level:     Level3,
+		Threshold: Threshold3,
 	},
 	{
-		Match:     Level_3,
-		Level:     Level_4,
-		Threshold: THRESHOLD_4,
+		Match:     Level3,
+		Level:     Level4,
+		Threshold: Threshold4,
 	},
 	{
-		Match:     Level_4,
-		Level:     Level_5,
-		Threshold: THRESHOLD_5,
+		Match:     Level4,
+		Level:     Level5,
+		Threshold: Threshold5,
 	},
 	{
-		Match:     Level_5,
-		Level:     Level_6,
-		Threshold: THRESHOLD_6,
+		Match:     Level5,
+		Level:     Level6,
+		Threshold: Threshold6,
 	},
 	{
-		Match:     Level_6,
-		Level:     Level_7,
-		Threshold: THRESHOLD_7,
+		Match:     Level6,
+		Level:     Level7,
+		Threshold: Threshold7,
 	},
 	{
-		Match:     Level_7,
-		Level:     Level_8,
-		Threshold: THRESHOLD_8,
+		Match:     Level7,
+		Level:     Level8,
+		Threshold: Threshold8,
 	},
 	{
-		Match:     Level_8,
-		Level:     Level_9,
-		Threshold: THRESHOLD_9,
+		Match:     Level8,
+		Level:     Level9,
+		Threshold: Threshold9,
 	},
 }
 
@@ -143,54 +138,54 @@ var decrThresholds = []struct {
 	Threshold time.Duration
 }{
 	{
-		Match:     Level_0,
-		Level:     Level_0,
-		Threshold: THRESHOLD_0,
+		Match:     Level0,
+		Level:     Level0,
+		Threshold: Threshold0,
 	},
 	{
-		Match:     Level_1,
-		Level:     Level_0,
-		Threshold: THRESHOLD_0,
+		Match:     Level1,
+		Level:     Level0,
+		Threshold: Threshold0,
 	},
 	{
-		Match:     Level_2,
-		Level:     Level_1,
-		Threshold: THRESHOLD_1,
+		Match:     Level2,
+		Level:     Level1,
+		Threshold: Threshold1,
 	},
 	{
-		Match:     Level_3,
-		Level:     Level_2,
-		Threshold: THRESHOLD_2,
+		Match:     Level3,
+		Level:     Level2,
+		Threshold: Threshold2,
 	},
 	{
-		Match:     Level_4,
-		Level:     Level_3,
-		Threshold: THRESHOLD_3,
+		Match:     Level4,
+		Level:     Level3,
+		Threshold: Threshold3,
 	},
 	{
-		Match:     Level_5,
-		Level:     Level_4,
-		Threshold: THRESHOLD_4,
+		Match:     Level5,
+		Level:     Level4,
+		Threshold: Threshold4,
 	},
 	{
-		Match:     Level_6,
-		Level:     Level_5,
-		Threshold: THRESHOLD_5,
+		Match:     Level6,
+		Level:     Level5,
+		Threshold: Threshold5,
 	},
 	{
-		Match:     Level_7,
-		Level:     Level_6,
-		Threshold: THRESHOLD_6,
+		Match:     Level7,
+		Level:     Level6,
+		Threshold: Threshold6,
 	},
 	{
-		Match:     Level_8,
-		Level:     Level_7,
-		Threshold: THRESHOLD_7,
+		Match:     Level8,
+		Level:     Level7,
+		Threshold: Threshold7,
 	},
 	{
-		Match:     Level_9,
-		Level:     Level_8,
-		Threshold: THRESHOLD_8,
+		Match:     Level9,
+		Level:     Level8,
+		Threshold: Threshold8,
 	},
 }
 

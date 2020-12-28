@@ -13,6 +13,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -188,7 +189,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	// Lookup uuid
 	defer c.Request().Body.Close()
 
-	var input HTTPRequestViewed
+	var input openapi.SpacedRepetitionEntryViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
 	// TODO should we verify that this is what we think it is?
 
@@ -211,7 +212,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	if input.UUID != item.UUID {
+	if input.Uuid != item.UUID {
 		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
 			Message: "Input uuid is not the uuid of what is next",
 		})
