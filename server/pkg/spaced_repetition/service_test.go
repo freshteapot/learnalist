@@ -25,20 +25,34 @@ import (
 
 var _ = Describe("Testing Spaced Repetition Service API", func() {
 	var (
-		eventMessageBus     *mocks.EventlogPubSub
-		logger              *logrus.Logger
-		c                   echo.Context
-		e                   *echo.Echo
-		req                 *http.Request
-		rec                 *httptest.ResponseRecorder
-		service             spaced_repetition.SpacedRepetitionService
-		repo                *mocks.SpacedRepetitionRepository
-		user                *uuid.User
-		want                error
-		userUUID, entryUUID string
+		eventMessageBus                  *mocks.EventlogPubSub
+		logger                           *logrus.Logger
+		c                                echo.Context
+		e                                *echo.Echo
+		req                              *http.Request
+		rec                              *httptest.ResponseRecorder
+		service                          spaced_repetition.SpacedRepetitionService
+		repo                             *mocks.SpacedRepetitionRepository
+		user                             *uuid.User
+		want                             error
+		userUUID, entryUUID, entryUUIDV2 string
+		inputV2                          = `
+{
+  "show": "Mars",
+  "data": {
+    "from": "March",
+    "to": "Mars"
+  },
+  "settings": {
+    "show": "to"
+  },
+  "kind": "v2"
+}
+`
 	)
 
 	BeforeEach(func() {
+		entryUUIDV2 = "75698c0f5a7b904f1799ceb68e2afe67ad987689"
 		entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
 		want = errors.New("fail")
 		user = &uuid.User{
@@ -253,6 +267,55 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 					Expect(entry.Uuid).To(Equal(entryUUID))
 					Expect(entry.Settings.Level).To(Equal("0"))
 				})
+
+				It("Decrement V2", func() {
+					input := openapi.SpacedRepetitionEntryViewed{
+						Action: spaced_repetition.ActionDecrement,
+						Uuid:   "75698c0f5a7b904f1799ceb68e2afe67ad987689",
+					}
+
+					b, _ := json.Marshal(input)
+					req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+					c = e.NewContext(req, rec)
+
+					c.Set("loggedInUser", *user)
+					c.SetPath(uri)
+					created, _ := time.Parse(time.RFC3339, "2020-12-28T11:44:33Z")
+					whenNext, _ := time.Parse(time.RFC3339, "2020-12-28T12:44:33Z")
+					repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+						UUID:     entryUUIDV2,
+						UserUUID: userUUID,
+						Body:     `{"data":{"from":"March","to":"Mars"},"kind":"v2","settings":{"created":"2020-12-28T11:44:33Z","level":"0","show":"to","when_next":"2020-12-28T12:44:33Z"},"show":"Mars","uuid":"75698c0f5a7b904f1799ceb68e2afe67ad987689"}`,
+						Created:  created,
+						WhenNext: whenNext,
+					}, nil)
+
+					repo.On("UpdateEntry", mock.Anything).Return(nil)
+					eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
+
+						b, _ := json.Marshal(moment.Data)
+						var data spaced_repetition.EventSpacedRepetition
+						json.Unmarshal(b, &data)
+
+						Expect(data.Kind).To(Equal(spaced_repetition.EventKindViewed))
+						Expect(data.Data.UserUUID).To(Equal(userUUID))
+						Expect(data.Data.UUID).To(Equal(entryUUIDV2))
+
+						return true
+					}))
+
+					service.EntryViewed(c)
+					Expect(rec.Code).To(Equal(http.StatusOK))
+					var entry openapi.SpacedRepetitionV2
+					json.Unmarshal(rec.Body.Bytes(), &entry)
+					Expect(entry.Uuid).To(Equal(entryUUIDV2))
+					Expect(entry.Kind).To(Equal(alist.FromToList))
+					Expect(entry.Show).To(Equal("Mars"))
+					Expect(entry.Data.From).To(Equal("March"))
+					Expect(entry.Data.To).To(Equal("Mars"))
+					Expect(entry.Settings.Level).To(Equal("0"))
+				})
 			})
 		})
 	})
@@ -463,8 +526,9 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 				"show": "Hello",
 				"data": "Hello",
 				"kind": "v1"
-			  }
+			}
 			`
+
 			entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
 		)
 		It("Not valid entry", func() {
@@ -502,7 +566,7 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			Expect(entry.Settings.Level).To(Equal("0"))
 		})
 
-		It("New Entry", func() {
+		It("New Entry V1", func() {
 			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, input)
 			c = e.NewContext(req, rec)
 			c.SetPath(uri)
@@ -530,6 +594,39 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			Expect(entry.Uuid).To(Equal(entryUUID))
 			Expect(entry.Kind).To(Equal(alist.SimpleList))
 			Expect(entry.Show).To(Equal("Hello"))
+			Expect(entry.Settings.Level).To(Equal("0"))
+		})
+
+		It("New Entry V2", func() {
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, inputV2)
+			c = e.NewContext(req, rec)
+			c.SetPath(uri)
+			c.Set("loggedInUser", *user)
+
+			repo.On("SaveEntry", mock.Anything).Return(nil)
+
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiSpacedRepetition))
+				b, _ := json.Marshal(moment.Data)
+				var data spaced_repetition.EventSpacedRepetition
+				json.Unmarshal(b, &data)
+
+				Expect(data.Kind).To(Equal(spaced_repetition.EventKindNew))
+				Expect(data.Data.UserUUID).To(Equal(userUUID))
+				Expect(data.Data.UUID).To(Equal("75698c0f5a7b904f1799ceb68e2afe67ad987689"))
+				return true
+			}))
+
+			service.SaveEntry(c)
+			Expect(rec.Code).To(Equal(http.StatusCreated))
+			var entry openapi.SpacedRepetitionV2
+			json.Unmarshal(rec.Body.Bytes(), &entry)
+
+			Expect(entry.Uuid).To(Equal(entryUUIDV2))
+			Expect(entry.Kind).To(Equal(alist.FromToList))
+			Expect(entry.Show).To(Equal("Mars"))
+			Expect(entry.Data.From).To(Equal("March"))
+			Expect(entry.Data.To).To(Equal("Mars"))
 			Expect(entry.Settings.Level).To(Equal("0"))
 		})
 

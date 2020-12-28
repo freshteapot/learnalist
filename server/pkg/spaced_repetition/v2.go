@@ -36,7 +36,6 @@ func V2FromDB(input string) ItemInputV2 {
 }
 
 func (item ItemInputV2) String() string {
-	fmt.Println(item.entry.Settings.WhenNext)
 	b, _ := json.Marshal(item.entry)
 	return string(b)
 }
