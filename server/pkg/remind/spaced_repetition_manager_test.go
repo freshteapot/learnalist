@@ -230,7 +230,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				spacedRepetitionRepo.On("DeleteByUser", userUUID).Return(nil)
 				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
 				manager.OnEvent(moment)
-				Expect(hook.LastEntry()).To(BeNil())
+				Expect(hook.LastEntry().Message).To(Equal("user removed"))
 			})
 		})
 	})
