@@ -19,6 +19,7 @@ const (
 	ApiSpacedRepetition              = "api.spacedrepetition"
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
+	TopicNotifications               = "notifications"
 	KindUserRegisterUsername         = "username"
 	KindUserRegisterIDPGoogle        = "idp:google"
 	KindUserLoginIDPGoogle           = "idp:google"

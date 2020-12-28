@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/mock"
@@ -232,4 +233,89 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 		})
 	})
 
+	When("Sending Notications", func() {
+		var (
+			eventMessageBus *mocks.EventlogPubSub
+		)
+		BeforeEach(func() {
+			eventMessageBus = &mocks.EventlogPubSub{}
+			event.SetBus(eventMessageBus)
+		})
+
+		It("No reminders found", func() {
+			remindRepo.On("GetReminders").Return(make([]remind.SpacedRepetitionReminder, 0))
+			manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+			manager.SendNotifications()
+		})
+
+		When("Reminders found", func() {
+			It("1 found, skip because the token has not been set", func() {
+				remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
+					{
+						Medium:   "",
+						UserUUID: userUUID,
+					},
+				})
+				remindRepo.On("UpdateSent", userUUID, remind.ReminderSkipped).Return(nil)
+				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+				manager.SendNotifications()
+
+				lastLog := hook.LastEntry()
+				Expect(lastLog.Data["msg_skipped"]).To(Equal(1))
+				Expect(lastLog.Data["msg_sent"]).To(Equal(0))
+			})
+
+			When("Send notification", func() {
+				It("Fails on updating user who has had a notification sent", func() {
+					remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
+						{
+							Medium:   "fake-token-123",
+							UserUUID: userUUID,
+						},
+					})
+					remindRepo.On("UpdateSent", userUUID, remind.ReminderSent).Return(errors.New("fail"))
+					eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.KindPushNotification))
+
+						return true
+					}))
+					testutils.SetLoggerToPanicOnFatal(logger)
+					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+					Expect(func() { manager.SendNotifications() }).Should(Panic())
+				})
+
+				It("Success", func() {
+					remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
+						{
+							Medium:   "fake-token-123",
+							UserUUID: userUUID,
+						},
+						{
+							Medium:   "",
+							UserUUID: "fake-user-456",
+						},
+					})
+					remindRepo.On("UpdateSent", userUUID, remind.ReminderSent).Return(nil)
+					remindRepo.On("UpdateSent", "fake-user-456", remind.ReminderSkipped).Return(nil)
+
+					eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.KindPushNotification))
+
+						return true
+					}))
+
+					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+					manager.SendNotifications()
+
+					lastLog := hook.LastEntry()
+					Expect(lastLog.Data["msg_skipped"]).To(Equal(1))
+					Expect(lastLog.Data["msg_sent"]).To(Equal(1))
+
+					mock.AssertExpectationsForObjects(GinkgoT())
+				})
+			})
+
+		})
+
+	})
 })

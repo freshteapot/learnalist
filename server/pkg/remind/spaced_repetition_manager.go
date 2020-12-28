@@ -247,7 +247,12 @@ func (m *spacedRepetitionManager) SendNotifications() {
 		}
 
 		if process {
-			m.remindRepo.UpdateSent(reminder.UserUUID, ReminderSent)
+			err := m.remindRepo.UpdateSent(reminder.UserUUID, ReminderSent)
+			if err != nil {
+				m.logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Trigger restart, as I am guessing issue with the database")
+			}
 			msgSent++
 		}
 
