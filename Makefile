@@ -25,7 +25,7 @@ rebuild-db:
 	rm -f /tmp/learnalist/server.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
-rebuild-db-remind-daily:
+rebuild-db-remind-manager:
 	mkdir -p /tmp/learnalist/
 	rm -f /tmp/learnalist/remind-daily.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
@@ -74,7 +74,7 @@ run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
-run-remind-daily:
+run-remind-manager:
 	cd server && \
 	TOPIC=lal.monolog \
 	EVENTS_VIA="nats" \

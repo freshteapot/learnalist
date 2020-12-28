@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	SqlSaveItem   = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next, created) values(?, ?, ?, ?, ?)`
-	SqlUpdateItem = `UPDATE spaced_repetition SET body=?, when_next=? WHERE user_uuid=? AND uuid=?`
-	SqlDeleteItem = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
-	SqlGetItem    = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
-	SqlGetAll     = `SELECT body FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next`
-	SqlGetNext    = `SELECT * FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next LIMIT 1`
+	SqlSaveItem     = `INSERT INTO spaced_repetition(uuid, body, user_uuid, when_next, created) values(?, ?, ?, ?, ?)`
+	SqlUpdateItem   = `UPDATE spaced_repetition SET body=?, when_next=? WHERE user_uuid=? AND uuid=?`
+	SqlDeleteItem   = `DELETE FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
+	SqlDeleteByUser = `DELETE FROM spaced_repetition WHERE user_uuid=?`
+	SqlGetItem      = `SELECT * FROM spaced_repetition WHERE uuid=? AND user_uuid=?`
+	SqlGetAll       = `SELECT body FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next`
+	SqlGetNext      = `SELECT * FROM spaced_repetition WHERE user_uuid=? ORDER BY when_next LIMIT 1`
 )
 
 type SqliteRepository struct {
@@ -105,4 +106,9 @@ func (r SqliteRepository) UpdateEntry(entry SpacedRepetitionEntry) error {
 		return err
 	}
 	return nil
+}
+
+func (r SqliteRepository) DeleteByUser(userUUID string) error {
+	_, err := r.db.Exec(SqlDeleteByUser, userUUID)
+	return err
 }

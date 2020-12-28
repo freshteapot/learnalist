@@ -66,6 +66,8 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 
 		logger, _ = test.NewNullLogger()
 		repo = &mocks.SpacedRepetitionRepository{}
+		eventMessageBus.On("Subscribe", event.TopicMonolog, "spacedRepetitionService", mock.Anything)
+
 		service = spaced_repetition.NewService(repo, logger)
 	})
 

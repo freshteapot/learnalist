@@ -19,10 +19,14 @@ import (
 )
 
 func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) SpacedRepetitionService {
-	return SpacedRepetitionService{
+	s := SpacedRepetitionService{
 		repo:       repo,
 		logContext: logContext,
 	}
+
+	event.GetBus().Subscribe(event.TopicMonolog, "spacedRepetitionService", s.OnEvent)
+	return s
+	// TODO handle user delete
 }
 
 // SaveEntry Add entry for spaced based learning
