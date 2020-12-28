@@ -194,6 +194,7 @@ func (m *dailyManager) SendNotifications() {
 	title := "Daily Reminder"
 
 	msgSent := 0
+	msgSkipped := 0
 	for _, remindMe := range reminders {
 		process := true
 		// When empty, it means the device has not been registered
@@ -230,15 +231,28 @@ func (m *dailyManager) SendNotifications() {
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
+		}
+
+		if process {
+			err := m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+			if err != nil {
+				m.logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Trigger restart, as I am guessing issue with the database")
+			}
 			msgSent++
 		}
 
-		// Update settings when next
-		m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+		if !process {
+			// We dont care if this fails, as no message would be sent
+			m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+			msgSkipped++
+		}
 	}
 
 	m.logContext.WithFields(logrus.Fields{
-		"msg_sent": msgSent,
+		"msg_sent":    msgSent,
+		"msg_skipped": msgSkipped,
 	}).Info("messages sent")
 }
 

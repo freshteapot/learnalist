@@ -278,6 +278,7 @@ func (m *spacedRepetitionManager) SendNotifications() {
 		}
 
 		if !process {
+			// We dont care if this fails, as no message would be sent
 			m.remindRepo.UpdateSent(reminder.UserUUID, ReminderSkipped)
 			msgSkipped++
 		}
