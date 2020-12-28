@@ -1,10 +1,14 @@
 package spaced_repetition_test
 
 import (
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 
@@ -139,6 +143,110 @@ var _ = Describe("Testing Spaced Repetitiion Repository Sqlite", func() {
 			err := repo.UpdateEntry(entry)
 			Expect(err).To(BeNil())
 		})
+	})
 
+	When("Getting all entries", func() {
+		It("Fail", func() {
+			mockSql.ExpectQuery(spaced_repetition.SqlGetAll).
+				WillReturnError(want).
+				WithArgs(userUUID)
+			_, err := repo.GetEntries(userUUID)
+			Expect(err).To(Equal(want))
+		})
+		It("Success", func() {
+			rs := sqlmock.NewRows([]string{
+				"body",
+			}).
+				AddRow(entry.Body)
+
+			mockSql.ExpectQuery(spaced_repetition.SqlGetAll).
+				WithArgs(userUUID).
+				WillReturnRows(rs)
+			items, err := repo.GetEntries(userUUID)
+			Expect(err).To(BeNil())
+			var entry openapi.SpacedRepetitionV1
+			b, _ := json.Marshal(items[0])
+			json.Unmarshal(b, &entry)
+			Expect(entry.Kind).To(Equal(alist.SimpleList))
+		})
+	})
+
+	When("Getting entry by user and uuid", func() {
+		It("Fail", func() {
+			mockSql.ExpectQuery(spaced_repetition.SqlGetItem).
+				WillReturnError(want).
+				WithArgs(entryUUID, userUUID)
+			_, err := repo.GetEntry(userUUID, entryUUID)
+			Expect(err).To(Equal(want))
+		})
+
+		It("Return correct not found", func() {
+			mockSql.ExpectQuery(spaced_repetition.SqlGetItem).
+				WillReturnError(sql.ErrNoRows).
+				WithArgs(entryUUID, userUUID)
+			_, err := repo.GetEntry(userUUID, entryUUID)
+			Expect(err).To(Equal(spaced_repetition.ErrNotFound))
+		})
+
+		It("Success", func() {
+			rs := sqlmock.NewRows([]string{
+				"uuid",
+				"body",
+				"user_uuid",
+				"when_next",
+				"created",
+			}).
+				AddRow(entry.UUID, entry.Body, entry.UserUUID, whenNext, created)
+
+			mockSql.ExpectQuery(spaced_repetition.SqlGetItem).
+				WithArgs(entryUUID, userUUID).
+				WillReturnRows(rs)
+			item, err := repo.GetEntry(userUUID, entryUUID)
+			Expect(err).To(BeNil())
+			var entry openapi.SpacedRepetitionV1
+			b, _ := json.Marshal(item)
+			json.Unmarshal(b, &entry)
+			Expect(entry.Kind).To(Equal(alist.SimpleList))
+			Expect(entry.Uuid).To(Equal(entryUUID))
+		})
+	})
+
+	When("Getting next entry for a user", func() {
+		It("Fail to lookup via the repo", func() {
+			mockSql.ExpectQuery(spaced_repetition.SqlGetNext).
+				WillReturnError(want).
+				WithArgs(userUUID)
+			_, err := repo.GetNext(userUUID)
+			Expect(err).To(Equal(want))
+		})
+
+		It("Return correct not found", func() {
+			mockSql.ExpectQuery(spaced_repetition.SqlGetNext).
+				WillReturnError(sql.ErrNoRows).
+				WithArgs(userUUID)
+			_, err := repo.GetNext(userUUID)
+			Expect(err).To(Equal(spaced_repetition.ErrNotFound))
+		})
+
+		It("Success", func() {
+			rs := sqlmock.NewRows([]string{
+				"uuid",
+				"body",
+				"user_uuid",
+				"when_next",
+				"created",
+			}).
+				AddRow(entry.UUID, entry.Body, entry.UserUUID, whenNext, created)
+
+			mockSql.ExpectQuery(spaced_repetition.SqlGetNext).
+				WithArgs(userUUID).
+				WillReturnRows(rs)
+			item, err := repo.GetNext(userUUID)
+			Expect(err).To(BeNil())
+			var entry openapi.SpacedRepetitionV1
+			json.Unmarshal([]byte(item.Body), &entry)
+			Expect(entry.Kind).To(Equal(alist.SimpleList))
+			Expect(entry.Uuid).To(Equal(entryUUID))
+		})
 	})
 })
