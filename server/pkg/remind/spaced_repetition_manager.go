@@ -20,7 +20,6 @@ type spacedRepetitionManager struct {
 	filterKinds          []string
 }
 
-// Change to NewSpacedRepetition
 func NewSpacedRepetition(
 	spacedRepetitionRepo spaced_repetition.SpacedRepetitionRepository,
 	remindRepo RemindSpacedRepetitionRepository,
@@ -139,11 +138,35 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			}
 			_ = m.remindRepo.SetReminder(userUUID, nextSrsItem.WhenNext, lastActive)
 		case spaced_repetition.EventKindDeleted:
-			m.spacedRepetitionRepo.DeleteEntry(userUUID, srsItem.UUID)
+			logContext := m.logContext.WithFields(logrus.Fields{
+				"event":     "spacedRepetitionManager.OnEvent",
+				"kind":      moment.Kind,
+				"user_uuid": userUUID,
+				"uuid":      srsItem.UUID,
+			})
+
+			err := m.spacedRepetitionRepo.DeleteEntry(userUUID, srsItem.UUID)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Error("Failed to delete entry")
+				return
+			}
+
 			nextSrsItem, err := m.spacedRepetitionRepo.GetNext(userUUID)
 			if err != nil {
-				if err == spaced_repetition.ErrNotFound {
-					m.remindRepo.DeleteByUser(userUUID)
+				if err != spaced_repetition.ErrNotFound {
+					logContext.WithFields(logrus.Fields{
+						"error": err,
+					}).Error("Unable to get next")
+					return
+				}
+
+				err := m.remindRepo.DeleteByUser(userUUID)
+				if err != nil {
+					logContext.WithFields(logrus.Fields{
+						"error": err,
+					}).Error("Failed to delete user from remind repo")
 				}
 				return
 			}
@@ -157,10 +180,16 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 		logContext := m.logContext.WithFields(logrus.Fields{
 			"user_uuid": userUUID,
 			"event":     event.UserDeleted,
+			"kind":      entry.Kind,
 		})
-		logContext.Info("TODO remove all from spaced_repetition_reminder by user_uuid")
+
 		// TODO How do we delete the user?
-		m.remindRepo.DeleteByUser(userUUID)
+		err := m.remindRepo.DeleteByUser(userUUID)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("Failed to delete user from remind repo")
+		}
 	default:
 		return
 	}
@@ -232,5 +261,4 @@ func (m *spacedRepetitionManager) SendNotifications() {
 		"msg_sent":    msgSent,
 		"msg_skipped": msgSkipped,
 	}).Info("messages sent")
-
 }
