@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-// TODO does this need to be part of the struct / interface?
 func CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error) {
 	var body interface{}
 	if err != nil {

@@ -191,7 +191,6 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 
 	var input openapi.SpacedRepetitionEntryViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
-	// TODO should we verify that this is what we think it is?
 
 	allowed := []string{ActionIncrement, ActionDecrement}
 	if !utils.StringArrayContains(allowed, input.Action) {
