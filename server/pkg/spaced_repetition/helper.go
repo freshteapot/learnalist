@@ -8,9 +8,6 @@ import (
 func CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error) {
 	var body interface{}
 	if err != nil {
-		if err == ErrNotFound {
-			return body, ErrNotFound
-		}
 		return body, err
 	}
 
