@@ -212,6 +212,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 			It("Failed to delete user", func() {
 				want := errors.New("fail")
 				remindRepo.On("DeleteByUser", userUUID).Return(want)
+				spacedRepetitionRepo.On("DeleteByUser", userUUID).Return(want)
 				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
 				manager.OnEvent(moment)
 
@@ -226,6 +227,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 
 			It("user removed", func() {
 				remindRepo.On("DeleteByUser", userUUID).Return(nil)
+				spacedRepetitionRepo.On("DeleteByUser", userUUID).Return(nil)
 				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
 				manager.OnEvent(moment)
 				Expect(hook.LastEntry()).To(BeNil())
