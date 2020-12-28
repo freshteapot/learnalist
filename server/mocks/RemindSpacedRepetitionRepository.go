@@ -28,20 +28,27 @@ func (_m *RemindSpacedRepetitionRepository) DeleteByUser(userUUID string) error 
 	return r0
 }
 
-// GetReminders provides a mock function with given fields:
-func (_m *RemindSpacedRepetitionRepository) GetReminders() []remind.SpacedRepetitionReminder {
-	ret := _m.Called()
+// GetReminders provides a mock function with given fields: whenNext, lastActive
+func (_m *RemindSpacedRepetitionRepository) GetReminders(whenNext string, lastActive string) ([]remind.SpacedRepetitionReminder, error) {
+	ret := _m.Called(whenNext, lastActive)
 
 	var r0 []remind.SpacedRepetitionReminder
-	if rf, ok := ret.Get(0).(func() []remind.SpacedRepetitionReminder); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string, string) []remind.SpacedRepetitionReminder); ok {
+		r0 = rf(whenNext, lastActive)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]remind.SpacedRepetitionReminder)
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(whenNext, lastActive)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // SetReminder provides a mock function with given fields: userUUID, whenNext, lastActive

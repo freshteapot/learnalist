@@ -242,20 +242,32 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 			event.SetBus(eventMessageBus)
 		})
 
+		It("Issue getting Reminders from the repo", func() {
+			want := errors.New("fail")
+			remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{}, want)
+
+			testutils.SetLoggerToPanicOnFatal(logger)
+			manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+			Expect(func() { manager.SendNotifications() }).Should(Panic())
+			lastLog := hook.LastEntry()
+			Expect(lastLog.Data["error"]).To(Equal(want))
+		})
+
 		It("No reminders found", func() {
-			remindRepo.On("GetReminders").Return(make([]remind.SpacedRepetitionReminder, 0))
+			remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+				Return(make([]remind.SpacedRepetitionReminder, 0), nil)
 			manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
 			manager.SendNotifications()
 		})
 
 		When("Reminders found", func() {
 			It("1 found, skip because the token has not been set", func() {
-				remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
+				remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{
 					{
 						Medium:   "",
 						UserUUID: userUUID,
 					},
-				})
+				}, nil)
 				remindRepo.On("UpdateSent", userUUID, remind.ReminderSkipped).Return(nil)
 				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
 				manager.SendNotifications()
@@ -267,12 +279,12 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 
 			When("Send notification", func() {
 				It("Fails on updating user who has had a notification sent", func() {
-					remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
+					remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{
 						{
 							Medium:   "fake-token-123",
 							UserUUID: userUUID,
 						},
-					})
+					}, nil)
 					remindRepo.On("UpdateSent", userUUID, remind.ReminderSent).Return(errors.New("fail"))
 					eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
 						Expect(moment.Kind).To(Equal(event.KindPushNotification))
@@ -285,16 +297,17 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				})
 
 				It("Success", func() {
-					remindRepo.On("GetReminders").Return([]remind.SpacedRepetitionReminder{
-						{
-							Medium:   "fake-token-123",
-							UserUUID: userUUID,
-						},
-						{
-							Medium:   "",
-							UserUUID: "fake-user-456",
-						},
-					})
+					remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+						Return([]remind.SpacedRepetitionReminder{
+							{
+								Medium:   "fake-token-123",
+								UserUUID: userUUID,
+							},
+							{
+								Medium:   "",
+								UserUUID: "fake-user-456",
+							},
+						}, nil)
 					remindRepo.On("UpdateSent", userUUID, remind.ReminderSent).Return(nil)
 					remindRepo.On("UpdateSent", "fake-user-456", remind.ReminderSkipped).Return(nil)
 

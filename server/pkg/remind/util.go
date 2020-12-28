@@ -4,7 +4,16 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 )
+
+func DefaultWhenNextWithLastActiveOffset() (string, string) {
+	now := time.Now().UTC()
+	whenNext := now.Format(time.RFC3339Nano)
+	count := 5
+	lastActive := now.Add(time.Duration(-count) * time.Minute).Format(time.RFC3339Nano)
+	return whenNext, lastActive
+}
 
 func ValidateTimeOfDay(input string) error {
 	fail := errors.New("fail")

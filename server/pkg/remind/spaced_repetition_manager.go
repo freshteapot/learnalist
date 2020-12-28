@@ -212,7 +212,13 @@ func (m *spacedRepetitionManager) StartSendNotifications() {
 }
 
 func (m *spacedRepetitionManager) SendNotifications() {
-	reminders := m.remindRepo.GetReminders()
+	reminders, err := m.remindRepo.GetReminders(DefaultWhenNextWithLastActiveOffset())
+	if err != nil {
+		m.logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Trigger restart, as I am guessing issue with the database")
+	}
+
 	if len(reminders) == 0 {
 		return
 	}

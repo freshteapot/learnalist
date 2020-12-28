@@ -35,7 +35,7 @@ _with_medium(user_uuid, when_next, last_active, medium) AS (
 		_base AS b
 	INNER JOIN mobile_device AS md ON (md.user_uuid = b.user_uuid)
 	WHERE
-		md.app_identifier="remind_v1"
+		md.app_identifier = "remind_v1"
 ),
 _with_or_without_medium(user_uuid, when_next, last_active, medium) AS (
 	SELECT user_uuid, when_next, last_active, "" AS medium FROM _base
@@ -49,8 +49,8 @@ _reduce(user_uuid, when_next, last_active, medium, rk) AS (
 		FROM _with_or_without_medium
 )
 
-SELECT user_uuid, when_next, last_active, medium FROM _reduce WHERE rk=1
-`  // WHY DOESNT MY UNION WORK
+SELECT user_uuid, when_next, last_active, medium FROM _reduce WHERE rk = 1
+`
 )
 
 type remindSpacedRepetitionSqliteRepository struct {
@@ -63,9 +63,7 @@ func NewRemindSpacedRepetitionSqliteRepository(db *sqlx.DB) remindSpacedRepetiti
 	}
 }
 
-/*
-GetNext(userUUID string) (spaced_repetition.SpacedRepetitionEntry, error)
-*/
+// SetReminder takes an upsert approach and adds a record to the system in non-sent mode
 func (r remindSpacedRepetitionSqliteRepository) SetReminder(userUUID string, whenNext time.Time, lastActive time.Time) error {
 	sWhenNext := whenNext.Format(time.RFC3339)
 	sLastActive := lastActive.Format(time.RFC3339)
@@ -75,6 +73,7 @@ func (r remindSpacedRepetitionSqliteRepository) SetReminder(userUUID string, whe
 		userUUID, sWhenNext, sLastActive, // New
 		sWhenNext, sLastActive, // On conflict
 	)
+
 	if err != nil {
 		return err
 	}
@@ -99,7 +98,7 @@ func (r remindSpacedRepetitionSqliteRepository) UpdateSent(userUUID string, sent
 
 // GetReminders return reminders
 // Medium can be empty, which means the mobile_device has not been registered yet
-func (r remindSpacedRepetitionSqliteRepository) GetReminders() []SpacedRepetitionReminder {
+func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, lastActive string) ([]SpacedRepetitionReminder, error) {
 	type dbItem struct {
 		UserUUID   string    `db:"user_uuid"`
 		WhenNext   time.Time `db:"when_next"`
@@ -110,13 +109,9 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders() []SpacedRepetitio
 	dbItems := make([]dbItem, 0)
 	items := make([]SpacedRepetitionReminder, 0)
 
-	now := time.Now().UTC()
-	whenNext := now.Format(time.RFC3339Nano)
-	count := 5
-	lastActive := now.Add(time.Duration(-count) * time.Minute).Format(time.RFC3339Nano)
 	err := r.db.Select(&dbItems, SpacedRepetitionSqlGetReminders, whenNext, lastActive)
 	if err != nil {
-		panic(err)
+		return items, err
 	}
 
 	for _, item := range dbItems {
@@ -128,5 +123,5 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders() []SpacedRepetitio
 			Sent:       0,
 		})
 	}
-	return items
+	return items, nil
 }

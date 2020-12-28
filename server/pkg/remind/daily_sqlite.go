@@ -41,7 +41,7 @@ _with_medium(user_uuid, settings, medium, activity) AS (
 SELECT * FROM _with_medium
 UNION
 SELECT user_uuid, settings, "" AS medium, activity FROM _settings
-`
+`  // TODO FIX THIS
 )
 
 type remindDailySettingsSqliteRepository struct {
