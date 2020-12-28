@@ -1,24 +1,27 @@
 package spaced_repetition
 
 import (
-	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/jmoiron/sqlx"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
-func NewService(db *sqlx.DB) SpacedRepetitionService {
+func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) SpacedRepetitionService {
 	return SpacedRepetitionService{
-		db:   db,
-		repo: NewSqliteRepository(db),
+		repo:       repo,
+		logContext: logContext,
 	}
 }
 
@@ -34,17 +37,21 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 
 	var what HTTPRequestInputKind
 	json.Unmarshal(raw, &what)
-	if !utils.StringArrayContains([]string{"v1", "v2"}, what.Kind) {
-		return c.NoContent(http.StatusBadRequest)
+
+	allowedKinds := []string{alist.SimpleList, alist.FromToList}
+	if !utils.StringArrayContains(allowedKinds, what.Kind) {
+		response := api.HTTPResponseMessage{
+			Message: fmt.Sprintf("Kind not supported: %s", strings.Join(allowedKinds, ",")),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	var entry ItemInput
 
-	if what.Kind == "v1" {
+	switch what.Kind {
+	case alist.SimpleList:
 		entry = V1FromPOST(raw)
-	}
-
-	if what.Kind == "v2" {
+	case alist.FromToList:
 		entry = V2FromPOST(raw)
 	}
 
@@ -65,35 +72,36 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		statusCode = http.StatusOK
 	}
 
-	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	var current interface{}
+	json.Unmarshal([]byte(entry.String()), &current)
+
+	if statusCode == http.StatusOK {
+		return c.JSON(statusCode, current)
 	}
 
-	if statusCode == http.StatusCreated {
+	// The entry is a new
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: event.ApiSpacedRepetition,
+		Data: EventSpacedRepetition{
+			Kind: EventKindNew,
+			Data: item,
+		},
+	})
+
+	// Baked the challenge system into the service
+	// VS
+	// UI needs more complexity
+	challengeUUID := c.Request().Header.Get("x-challenge")
+	if challengeUUID != "" {
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-			Kind: event.ApiSpacedRepetition,
-			Data: EventSpacedRepetition{
-				Kind: EventKindNew,
-				Data: item,
+			Kind: challenge.EventChallengeDone,
+			Data: challenge.EventChallengeDoneEntry{
+				UUID:     challengeUUID,
+				UserUUID: item.UserUUID,
+				Data:     item.Body,
+				Kind:     challenge.EventKindSpacedRepetition,
 			},
 		})
-
-		// Baked the challenge system into the service
-		// VS
-		// UI needs more complexity
-		challengeUUID := c.Request().Header.Get("x-challenge")
-		if challengeUUID != "" {
-			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-				Kind: challenge.EventChallengeDone,
-				Data: challenge.EventChallengeDoneEntry{
-					UUID:     challengeUUID,
-					UserUUID: item.UserUUID,
-					Data:     item.Body,
-					Kind:     challenge.EventKindSpacedRepetition,
-				},
-			})
-		}
 	}
 
 	return c.JSON(statusCode, current)
@@ -103,6 +111,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
+	userUUID := user.Uuid
 
 	if UUID == "" {
 		response := api.HTTPResponseMessage{
@@ -111,20 +120,29 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	// TODO check if entry exsits
-	err := s.repo.DeleteEntry(user.Uuid, UUID)
+	// Confirm the entry exists
+	_, err := s.repo.GetEntry(userUUID, UUID)
+	if err != nil {
+		if err == ErrNotFound {
+			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
+				Message: "Entry not found",
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	err = s.repo.DeleteEntry(userUUID, UUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	// This event fires, even if the entry doesnt exist
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiSpacedRepetition,
 		Data: EventSpacedRepetition{
 			Kind: EventKindDeleted,
 			Data: SpacedRepetitionEntry{
 				UUID:     UUID,
-				UserUUID: user.Uuid,
+				UserUUID: userUUID,
 			},
 		},
 	})
@@ -135,7 +153,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 // GetNext Get next entry for spaced based learning
 func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	body, err := s.repo.GetNext(user.Uuid)
+	body, err := CheckNext(s.repo.GetNext(user.Uuid))
 
 	if err != nil {
 		if err == ErrNotFound {
@@ -152,7 +170,7 @@ func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	return c.JSON(http.StatusOK, body)
 }
 
-//GetAll Get all entries for spaced repetition learning
+// GetAll Get all entries for spaced repetition learning
 func (s SpacedRepetitionService) GetAll(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
@@ -171,45 +189,52 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	// Lookup uuid
 	defer c.Request().Body.Close()
 
-	var input HTTPRequestViewed
+	var input openapi.SpacedRepetitionEntryViewed
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
-	item := SpacedRepetitionEntry{}
-	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
-	err := s.db.Get(&item, SQL_GET_NEXT, user.Uuid)
+	allowed := []string{ActionIncrement, ActionDecrement}
+	if !utils.StringArrayContains(allowed, input.Action) {
+		response := api.HTTPResponseMessage{
+			Message: fmt.Sprintf("Action not supported: %s", strings.Join(allowed, ",")),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 
+	// TODO might need to update all time stamps to DATETIME as time.Time gets sad when stirng
+	// TODO if I use GetEntry, then this is more generic and not locked to GetNext only
+	item, err := s.repo.GetNext(user.Uuid)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == ErrNotFound {
 			return c.NoContent(http.StatusNotFound)
 		}
 
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
-	// TODO could get this via the json_XXX functions in sqlite
-	// hmm maybe add kind to the table
 
+	if input.Uuid != item.UUID {
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+			Message: "Input uuid is not the uuid of what is next",
+		})
+	}
+
+	// At this point, we are assuming the list is valid
 	var what HTTPRequestInputKind
 	json.Unmarshal([]byte(item.Body), &what)
 
 	var entry ItemInput
-	if what.Kind == "v1" {
-		entry = V1FromDB(item.Body)
-	}
 
-	if what.Kind == "v2" {
+	switch what.Kind {
+	case alist.SimpleList:
+		entry = V1FromDB(item.Body)
+	case alist.FromToList:
 		entry = V2FromDB(item.Body)
 	}
 
-	// TODO we do not protect actions
-
-	// increment level
-	// increment threshold
-	// TODO change to const
-	if input.Action == "incr" {
+	// Based on the action, bubbles up when the entry will be scheduled for next viewing.
+	switch input.Action {
+	case ActionIncrement:
 		entry.IncrThreshold()
-	}
-
-	if input.Action == "decr" {
+	case ActionDecrement:
 		entry.DecrThreshold()
 	}
 
@@ -231,9 +256,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 		},
 	})
 
-	current, err := s.repo.GetEntry(item.UserUUID, item.UUID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
+	var current interface{}
+	json.Unmarshal([]byte(item.Body), &current)
 	return c.JSON(http.StatusOK, current)
 }

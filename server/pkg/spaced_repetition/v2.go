@@ -20,9 +20,9 @@ func V2FromPOST(input []byte) ItemInputV2 {
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
 
-	item.entry.Settings.Level = Level_0
+	item.entry.Settings.Level = Level0
 	now := time.Now().UTC()
-	whenNext := now.Add(THRESHOLD_0)
+	whenNext := now.Add(Threshold0)
 	item.entry.Settings.Created = now.Format(time.RFC3339)
 	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 	return item
@@ -36,7 +36,6 @@ func V2FromDB(input string) ItemInputV2 {
 }
 
 func (item ItemInputV2) String() string {
-	fmt.Println(item.entry.Settings.WhenNext)
 	b, _ := json.Marshal(item.entry)
 	return string(b)
 }
@@ -56,7 +55,6 @@ func (item ItemInputV2) Created() time.Time {
 }
 
 func (item ItemInputV2) DecrThreshold() {
-
 	for _, find := range decrThresholds {
 		if find.Match == item.entry.Settings.Level {
 			whenNext := time.Now().UTC().Add(find.Threshold)

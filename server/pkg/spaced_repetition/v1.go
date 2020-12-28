@@ -20,9 +20,9 @@ func V1FromPOST(input []byte) ItemInputV1 {
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
 
-	item.entry.Settings.Level = Level_0
+	item.entry.Settings.Level = Level0
 	now := time.Now().UTC()
-	whenNext := now.Add(THRESHOLD_0)
+	whenNext := now.Add(Threshold0)
 	item.entry.Settings.Created = now.Format(time.RFC3339)
 	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 	return item

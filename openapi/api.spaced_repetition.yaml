@@ -212,8 +212,8 @@ paths:
                   $ref: "#/components/examples/SpacedRepetitionV1"
                 v2:
                   $ref: "#/components/examples/SpacedRepetitionV2"
-        "400":
-          description: Bad request, requires correct kind
+        "422":
+          description: Something wrong with the payload
           content:
             application/json:
               schema:
@@ -242,6 +242,12 @@ paths:
           description: entry deleted
         "400":
           description: Bad request, missing uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: Entry doesnt exist.
           content:
             application/json:
               schema:
@@ -321,6 +327,12 @@ paths:
                 $ref: "#/components/schemas/SpacedRepetition"
         "404":
           description: Entry not found, no body
+        "422":
+          description: Something wrong with the payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
         "500":
           description: unexpected error
           content:
