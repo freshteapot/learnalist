@@ -95,10 +95,6 @@ func (m *dailyManager) Close() {
 	}
 }
 
-func (m *dailyManager) FilterKindsBy() []string {
-	return m.filterKinds
-}
-
 // Future might want display_name
 func (m *dailyManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
