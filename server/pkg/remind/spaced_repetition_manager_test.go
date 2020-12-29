@@ -21,16 +21,20 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 	var (
 		logger               *logrus.Logger
 		hook                 *test.Hook
+		userRepo             *mocks.ManagementStorage
 		spacedRepetitionRepo *mocks.SpacedRepetitionRepository
 		remindRepo           *mocks.RemindSpacedRepetitionRepository
 		userUUID             string
+		appSettingsEnabled   []byte
 	)
 
 	BeforeEach(func() {
 		logger, hook = test.NewNullLogger()
+		userRepo = &mocks.ManagementStorage{}
 		spacedRepetitionRepo = &mocks.SpacedRepetitionRepository{}
 		remindRepo = &mocks.RemindSpacedRepetitionRepository{}
 		userUUID = "fake-user-123"
+		appSettingsEnabled = []byte(`{"app_settings":{"remind_v1":{"spaced_repetition":{"push_enabled":1}}}}`)
 	})
 
 	When("OnEvent", func() {
@@ -93,12 +97,13 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				// A mess is born
 				spacedRepetitionRepo.On("SaveEntry", srsItem).Return(nil)
 				spacedRepetitionRepo.On("UpdateEntry", srsItem).Return(nil)
+				userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 				spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, nil)
 				remindRepo.On("SetReminder", userUUID, whenNext, whenNext).Return(nil)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 				manager.OnEvent(moment)
 
-				mock.AssertExpectationsForObjects(GinkgoT())
+				mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
 			})
 
 			It("Getting next failed, so silently stop", func() {
@@ -106,11 +111,14 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				// A mess is born
 				spacedRepetitionRepo.On("SaveEntry", srsItem).Return(nil)
 				spacedRepetitionRepo.On("UpdateEntry", srsItem).Return(nil)
+				userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 				spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, want)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
-				manager.OnEvent(moment)
+				testutils.SetLoggerToPanicOnFatal(logger)
 
-				mock.AssertExpectationsForObjects(GinkgoT())
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+				Expect(func() { manager.OnEvent(moment) }).Should(Panic())
+
+				mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
 			})
 		})
 
@@ -144,55 +152,79 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 			It("Failed to delete entry", func() {
 				want := errors.New("fail")
 				spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(want)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
-				manager.OnEvent(moment)
+				testutils.SetLoggerToPanicOnFatal(logger)
+
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+				Expect(func() { manager.OnEvent(moment) }).Should(Panic())
 
 				Expect(hook.LastEntry().Data["event"]).To(Equal("spacedRepetitionManager.OnEvent"))
+				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+				Expect(hook.LastEntry().Data["method"]).To(Equal("m.spacedRepetitionRepo.DeleteEntry"))
 
-				mock.AssertExpectationsForObjects(GinkgoT())
+				mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo)
 			})
 
 			When("Failed to get next after deleting the entry", func() {
 				It("Issue with the db", func() {
 					want := errors.New("fail")
 					spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
+					userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 					spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, want)
-					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
-					manager.OnEvent(moment)
+					testutils.SetLoggerToPanicOnFatal(logger)
+
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+					Expect(func() { manager.OnEvent(moment) }).Should(Panic())
 
 					Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+					Expect(hook.LastEntry().Data["method"]).To(Equal("m.spacedRepetitionRepo.GetNext"))
+					mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo)
 				})
 
 				When("User has no more entries, so we remove the user from the remind system", func() {
 					It("fails", func() {
 						want := errors.New("fail")
 						spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
+						userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, spaced_repetition.ErrNotFound)
 						remindRepo.On("DeleteByUser", userUUID).Return(want)
-						manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
-						manager.OnEvent(moment)
+						testutils.SetLoggerToPanicOnFatal(logger)
+
+						manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+						Expect(func() { manager.OnEvent(moment) }).Should(Panic())
 
 						Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+						Expect(hook.LastEntry().Data["method"]).To(Equal("m.remindRepo.DeleteByUser"))
+
+						mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
 					})
 
 					It("Success", func() {
 						spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
+						userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, spaced_repetition.ErrNotFound)
 						remindRepo.On("DeleteByUser", userUUID).Return(nil)
-						manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+						testutils.SetLoggerToPanicOnFatal(logger)
+
+						manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 						manager.OnEvent(moment)
 
 						Expect(hook.LastEntry()).To(BeNil())
+						mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
 					})
 				})
 
 				It("Item deleted, has another entry. Update the reminder", func() {
-					remindRepo.On("SetReminder", userUUID, whenNext, whenNext).Return(nil)
 					spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
+					userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
 					spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, nil)
-					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+					remindRepo.On("SetReminder", userUUID, whenNext, whenNext).Return(nil)
+
+					testutils.SetLoggerToPanicOnFatal(logger)
+
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 					manager.OnEvent(moment)
-					mock.AssertExpectationsForObjects(GinkgoT())
+
+					mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
 				})
 			})
 		})
@@ -213,24 +245,32 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				want := errors.New("fail")
 				remindRepo.On("DeleteByUser", userUUID).Return(want)
 				spacedRepetitionRepo.On("DeleteByUser", userUUID).Return(want)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
-				manager.OnEvent(moment)
+				testutils.SetLoggerToPanicOnFatal(logger)
+
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+				Expect(func() { manager.OnEvent(moment) }).Should(Panic())
 
 				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
 				Expect(hook.LastEntry().Data["kind"]).To(Equal(event.ApiUserDelete))
+				Expect(hook.LastEntry().Data["method"]).To(Equal("m.remindRepo.DeleteByUser"))
 
 				moment.Kind = event.CMDUserDelete
-				manager.OnEvent(moment)
+				Expect(func() { manager.OnEvent(moment) }).Should(Panic())
 				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
 				Expect(hook.LastEntry().Data["kind"]).To(Equal(event.CMDUserDelete))
+				Expect(hook.LastEntry().Data["method"]).To(Equal("m.remindRepo.DeleteByUser"))
+
+				mock.AssertExpectationsForObjects(GinkgoT(), remindRepo)
 			})
 
 			It("user removed", func() {
 				remindRepo.On("DeleteByUser", userUUID).Return(nil)
 				spacedRepetitionRepo.On("DeleteByUser", userUUID).Return(nil)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 				manager.OnEvent(moment)
 				Expect(hook.LastEntry().Message).To(Equal("user removed"))
+
+				mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, remindRepo)
 			})
 		})
 	})
@@ -249,7 +289,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 			remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{}, want)
 
 			testutils.SetLoggerToPanicOnFatal(logger)
-			manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+			manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 			Expect(func() { manager.SendNotifications() }).Should(Panic())
 			lastLog := hook.LastEntry()
 			Expect(lastLog.Data["error"]).To(Equal(want))
@@ -258,7 +298,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 		It("No reminders found", func() {
 			remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 				Return(make([]remind.SpacedRepetitionReminder, 0), nil)
-			manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+			manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 			manager.SendNotifications()
 		})
 
@@ -271,7 +311,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 					},
 				}, nil)
 				remindRepo.On("UpdateSent", userUUID, remind.ReminderSkipped).Return(nil)
-				manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 				manager.SendNotifications()
 
 				lastLog := hook.LastEntry()
@@ -294,7 +334,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 						return true
 					}))
 					testutils.SetLoggerToPanicOnFatal(logger)
-					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 					Expect(func() { manager.SendNotifications() }).Should(Panic())
 				})
 
@@ -319,7 +359,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 						return true
 					}))
 
-					manager := remind.NewSpacedRepetition(spacedRepetitionRepo, remindRepo, logger)
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
 					manager.SendNotifications()
 
 					lastLog := hook.LastEntry()

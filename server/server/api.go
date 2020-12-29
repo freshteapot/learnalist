@@ -22,7 +22,6 @@ func InitApi(
 	challengeService challenge.ChallengeService,
 	mobileService mobile.MobileService,
 	remindService remind.RemindService,
-	remindSpacedRepetitionService remind.RemindSpacedRepetitionService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -120,5 +119,7 @@ func InitApi(
 	remindV1.PUT("/daily/", remindService.SetDailySettings)
 
 	// Remind SpacedRepetition Service
-	remindV1.PUT("/spaced-repetition/remind_v1", remindSpacedRepetitionService.SetSpacedRepetition)
+	settingsV1 := server.Group("/api/v1/app-settings")
+	settingsV1.Use(authenticate.Auth(authConfig))
+	settingsV1.PUT("/remind_v1", remindService.SetSpacedRepetition) // TODO move once works
 }

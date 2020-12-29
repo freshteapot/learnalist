@@ -142,6 +142,17 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			return
 		}
 
+		if updatedSettings.SpacedRepetition.PushEnabled == 0 {
+			err := m.remindRepo.DeleteByUser(userUUID)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error":  err,
+					"method": "m.remindRepo.DeleteByUser",
+				}).Fatal("Failed to delete user from remind repo")
+			}
+			return
+		}
+
 		lastActive := time.Unix(entry.Timestamp, 0).UTC()
 		m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 	case event.ApiSpacedRepetition:
@@ -204,7 +215,8 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 		if err != nil {
 			pass = false
 			logContext.WithFields(logrus.Fields{
-				"error": err,
+				"error":  err,
+				"method": "m.remindRepo.DeleteByUser",
 			}).Fatal("Failed to delete user from remind repo")
 		}
 
@@ -232,7 +244,6 @@ func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext log
 			"error":  err,
 			"method": "app_settings.GetRemindV1",
 		}).Fatal("Failed talking to repo")
-		return
 	}
 
 	if settings.SpacedRepetition.PushEnabled == 0 {
@@ -243,7 +254,8 @@ func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext log
 	if err != nil {
 		if err != spaced_repetition.ErrNotFound {
 			logContext.WithFields(logrus.Fields{
-				"error": err,
+				"error":  err,
+				"method": "m.spacedRepetitionRepo.GetNext",
 			}).Fatal("Unable to get next")
 			return
 		}
@@ -251,7 +263,8 @@ func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext log
 		err := m.remindRepo.DeleteByUser(userUUID)
 		if err != nil {
 			logContext.WithFields(logrus.Fields{
-				"error": err,
+				"error":  err,
+				"method": "m.remindRepo.DeleteByUser",
 			}).Fatal("Failed to delete user from remind repo")
 		}
 		return

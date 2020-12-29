@@ -2,6 +2,7 @@ package app_settings
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -26,22 +27,28 @@ func GetAll(repo user.ManagementStorage, userUUID string) (interface{}, error) {
 
 func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSettingsRemindV1, error) {
 	data, err := repo.GetInfo(userUUID)
-	response := openapi.AppSettingsRemindV1{}
+	settings := openapi.AppSettingsRemindV1{}
 
 	if err != nil {
-		return response, err
+		if err != user.ErrNotFound {
+			return settings, err
+		}
+
+		// Assume not set, and default to true
+		settings.SpacedRepetition.PushEnabled = 1
+		return settings, nil
 	}
 
 	var pref user.UserPreference
 	err = json.Unmarshal(data, &pref)
 	if err != nil {
-		return response, nil
+		return settings, nil
 	}
 	if pref.Apps.RemindV1 != nil {
-		response = *pref.Apps.RemindV1
+		settings = *pref.Apps.RemindV1
 	}
 
-	return response, nil
+	return settings, nil
 }
 
 func SaveRemindV1(repo user.ManagementStorage, userUUID string, settings openapi.AppSettingsRemindV1) error {
@@ -52,5 +59,6 @@ func SaveRemindV1(repo user.ManagementStorage, userUUID string, settings openapi
 	}
 
 	b, _ := json.Marshal(pref)
+	fmt.Println(string(b))
 	return repo.SaveInfo(userUUID, b)
 }
