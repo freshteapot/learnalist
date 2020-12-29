@@ -154,7 +154,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 		}
 
 		lastActive := time.Unix(entry.Timestamp, 0).UTC()
-		m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
+		m.CheckForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
@@ -179,7 +179,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			})
 
 			// Check access if no
-			m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
+			m.CheckForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 		case spaced_repetition.EventKindDeleted:
 			logContext := m.logContext.WithFields(logrus.Fields{
 				"event":     "spacedRepetitionManager.OnEvent",
@@ -197,7 +197,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 				return
 			}
 
-			m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
+			m.CheckForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 		}
 	case event.ApiUserDelete:
 		fallthrough
@@ -237,7 +237,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	}
 }
 
-func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext logrus.FieldLogger, userUUID string, lastActive time.Time) {
+func (m *spacedRepetitionManager) CheckForNextEntryAndSetReminder(logContext logrus.FieldLogger, userUUID string, lastActive time.Time) {
 	settings, err := app_settings.GetRemindV1(m.userRepo, userUUID)
 	if err != nil {
 		logContext.WithFields(logrus.Fields{
