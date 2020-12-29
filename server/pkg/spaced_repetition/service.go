@@ -26,7 +26,6 @@ func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) 
 
 	event.GetBus().Subscribe(event.TopicMonolog, "spacedRepetitionService", s.OnEvent)
 	return s
-	// TODO handle user delete
 }
 
 // SaveEntry Add entry for spaced based learning
