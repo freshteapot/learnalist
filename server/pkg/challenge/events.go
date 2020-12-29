@@ -141,7 +141,6 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
-		fmt.Println(string(b))
 		template = "%s has left %s"
 	}
 

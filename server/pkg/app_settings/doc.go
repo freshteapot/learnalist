@@ -2,7 +2,6 @@ package app_settings
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -60,6 +59,5 @@ func SaveRemindV1(repo user.ManagementStorage, userUUID string, settings openapi
 	}
 
 	b, _ := json.Marshal(pref)
-	fmt.Println(string(b))
 	return repo.SaveInfo(userUUID, b)
 }
