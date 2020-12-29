@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	ApiAppSettingsRemindV1           = "api.appsettings.remind_v1"
 	ApiPlank                         = "api.plank"
 	CMDUserDelete                    = "cmd.user.delete"
 	ApiUserDelete                    = "api.user.delete"

@@ -199,7 +199,7 @@ func (s RemindService) SetSpacedRepetition(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		UUID:   userUUID,
-		Kind:   EventApiRemindAppSettingsRemindV1,
+		Kind:   event.ApiAppSettingsRemindV1,
 		Data:   input,
 		Action: event.ActionUpsert,
 	})

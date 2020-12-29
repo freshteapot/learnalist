@@ -38,7 +38,7 @@ func NewSpacedRepetition(
 			event.ApiSpacedRepetition,
 			event.CMDUserDelete,
 			event.ApiUserDelete,
-			EventApiRemindAppSettingsRemindV1,
+			event.ApiAppSettingsRemindV1,
 		},
 	}
 }
@@ -107,7 +107,7 @@ func (m *spacedRepetitionManager) Close() {
 		- event.MobileDeviceRegistered
 		- event.CMDUserDelete
 		- event.ApiUserDelete
-		- event."User app settings" /EventApiRemindAppSettingsRemindV1
+		- event.ApiAppSettingsRemindV1
 
 	This is like the remind table but the context is different.
 	GROUP BY (userUUID whenNext)
@@ -120,7 +120,7 @@ func (m *spacedRepetitionManager) Close() {
 
 func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
-	case EventApiRemindAppSettingsRemindV1:
+	case event.ApiAppSettingsRemindV1:
 		userUUID := entry.UUID
 		b, _ := json.Marshal(entry.Data)
 		var updatedSettings openapi.AppSettingsRemindV1

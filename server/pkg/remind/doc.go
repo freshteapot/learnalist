@@ -13,12 +13,11 @@ var (
 )
 
 var (
-	EventApiRemindAppSettingsRemindV1 = "api.remind.app.settings.remind_v1"
-	EventApiRemindDailySettings       = "api.remind.daily.settings"
-	UserPreferenceKey                 = "daily_reminder"
-	ReminderNotSentYet                = 0
-	ReminderSent                      = 1
-	ReminderSkipped                   = 2
+	EventApiRemindDailySettings = "api.remind.daily.settings"
+	UserPreferenceKey           = "daily_reminder"
+	ReminderNotSentYet          = 0
+	ReminderSent                = 1
+	ReminderSkipped             = 2
 )
 
 type NatsSubscriber interface {
