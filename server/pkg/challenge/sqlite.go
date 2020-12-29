@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/freshteapot/learnalist-api/server/api/utils"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -240,7 +240,7 @@ func (r SqliteRepository) Get(UUID string) (ChallengeInfo, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return challenge, ErrNotFound
+			return challenge, utils.ErrNotFound
 		}
 		return challenge, err
 	}

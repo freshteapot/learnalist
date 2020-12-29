@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -184,7 +184,7 @@ func (m sqliteManagement) GetInfo(userUUID string) ([]byte, error) {
 	err := m.db.Get(&info, SqlUserInfoGet, userUUID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = user.ErrNotFound
+			err = utils.ErrNotFound
 		}
 	}
 	return info, err

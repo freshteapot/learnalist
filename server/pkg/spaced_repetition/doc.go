@@ -214,7 +214,6 @@ type ItemInput interface {
 }
 
 var (
-	ErrNotFound                    = errors.New("not.found")
 	ErrFoundNotTime                = errors.New("found.not.time")
 	ErrSpacedRepetitionEntryExists = errors.New("item.exists")
 )

@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -134,7 +134,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 	challengeUUID := c.Param("uuid")
 	_, err := s.repo.Get(challengeUUID)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 				Message: i18n.ChallengeNotFound,
 			})
@@ -182,7 +182,7 @@ func (s ChallengeService) Leave(c echo.Context) error {
 
 	_, err := s.repo.Get(challengeUUID)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 				Message: i18n.ChallengeNotFound,
 			})
@@ -280,7 +280,7 @@ func (s ChallengeService) Get(c echo.Context) error {
 
 	challenge, err := s.repo.Get(challengeUUID)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 				Message: i18n.ChallengeNotFound,
 			})

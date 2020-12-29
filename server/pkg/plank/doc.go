@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	ErrNotFound    = errors.New("not.found")
 	ErrEntryExists = errors.New("item.exists")
 )
 

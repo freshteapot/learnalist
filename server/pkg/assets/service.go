@@ -10,13 +10,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -106,7 +106,7 @@ func (s *AssetService) DeleteEntry(c echo.Context) error {
 	// Loook up asset
 	asset, err := s.repo.GetEntry(UUID)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			response := api.HTTPResponseMessage{
 				Message: "Asset not found",
 			}

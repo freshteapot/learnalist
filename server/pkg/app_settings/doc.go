@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 func GetAll(repo user.ManagementStorage, userUUID string) (interface{}, error) {
@@ -30,7 +31,7 @@ func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSetti
 	settings := openapi.AppSettingsRemindV1{}
 
 	if err != nil {
-		if err != user.ErrNotFound {
+		if err != utils.ErrNotFound {
 			return settings, err
 		}
 

@@ -1,14 +1,9 @@
 package remind
 
 import (
-	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-)
-
-var (
-	ErrNotFound = errors.New("not.found")
 )
 
 var (

@@ -7,8 +7,8 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 func NewTypeV3() Alist {

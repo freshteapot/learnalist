@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"firebase.google.com/go/messaging"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 

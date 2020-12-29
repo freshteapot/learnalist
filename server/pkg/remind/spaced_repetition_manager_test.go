@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/mock"
@@ -185,7 +186,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 						want := errors.New("fail")
 						spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
 						userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
-						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, spaced_repetition.ErrNotFound)
+						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, utils.ErrNotFound)
 						remindRepo.On("DeleteByUser", userUUID).Return(want)
 						testutils.SetLoggerToPanicOnFatal(logger)
 
@@ -201,7 +202,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 					It("Success", func() {
 						spacedRepetitionRepo.On("DeleteEntry", userUUID, srsItem.UUID).Return(nil)
 						userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
-						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, spaced_repetition.ErrNotFound)
+						spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, utils.ErrNotFound)
 						remindRepo.On("DeleteByUser", userUUID).Return(nil)
 						testutils.SetLoggerToPanicOnFatal(logger)
 

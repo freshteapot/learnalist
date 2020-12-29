@@ -3,6 +3,7 @@ package assets
 import (
 	"database/sql"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -33,7 +34,7 @@ func (r SqliteRepository) GetEntry(UUID string) (AssetEntry, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return item, ErrNotFound
+			return item, utils.ErrNotFound
 		}
 
 		return item, err

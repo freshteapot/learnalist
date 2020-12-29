@@ -14,6 +14,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -168,7 +169,7 @@ var _ = Describe("Testing API", func() {
 		})
 
 		It("Record not found", func() {
-			repo.On("GetEntry", recordUUID, user.Uuid).Return(openapi.Plank{}, plank.ErrNotFound)
+			repo.On("GetEntry", recordUUID, user.Uuid).Return(openapi.Plank{}, utils.ErrNotFound)
 			service.DeletePlankRecord(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.PlankRecordNotFound)

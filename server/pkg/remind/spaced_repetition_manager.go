@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"firebase.google.com/go/messaging"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 )
@@ -252,7 +252,7 @@ func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext log
 
 	nextSrsItem, err := m.spacedRepetitionRepo.GetNext(userUUID)
 	if err != nil {
-		if err != spaced_repetition.ErrNotFound {
+		if err != utils.ErrNotFound {
 			logContext.WithFields(logrus.Fields{
 				"error":  err,
 				"method": "m.spacedRepetitionRepo.GetNext",

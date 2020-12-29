@@ -3,7 +3,7 @@ package sqlite
 import (
 	"database/sql"
 
-	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -53,7 +53,7 @@ func (store *UserFromIDP) Lookup(idp string, kind string, identifier string) (us
 	var item DatabaseUserFromIDP
 	err = store.db.Get(&item, UserFromIDPFindUserUUID, idp, kind, identifier)
 	if err == sql.ErrNoRows {
-		err = user.ErrNotFound
+		err = utils.ErrNotFound
 	}
 	return item.UserUUID, err
 }

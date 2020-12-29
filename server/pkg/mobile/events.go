@@ -5,6 +5,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,7 +51,7 @@ func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 
 		devices, err = s.repo.GetDevicesInfoByToken(token)
 		if err != nil {
-			if err == ErrNotFound {
+			if err == utils.ErrNotFound {
 				return
 			}
 			logContext.WithFields(logrus.Fields{

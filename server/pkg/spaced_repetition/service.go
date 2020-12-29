@@ -8,12 +8,12 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -127,7 +127,7 @@ func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	// Confirm the entry exists
 	_, err := s.repo.GetEntry(userUUID, UUID)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 				Message: "Entry not found",
 			})
@@ -160,7 +160,7 @@ func (s SpacedRepetitionService) GetNext(c echo.Context) error {
 	body, err := CheckNext(s.repo.GetNext(user.Uuid))
 
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.NoContent(http.StatusNotFound)
 		}
 
@@ -208,7 +208,7 @@ func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	// TODO if I use GetEntry, then this is more generic and not locked to GetNext only
 	item, err := s.repo.GetNext(user.Uuid)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.NoContent(http.StatusNotFound)
 		}
 

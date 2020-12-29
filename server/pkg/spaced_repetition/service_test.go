@@ -15,6 +15,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -103,7 +104,7 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 
 			c.Set("loggedInUser", *user)
 			c.SetPath(uri)
-			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, spaced_repetition.ErrNotFound)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, utils.ErrNotFound)
 
 			service.EntryViewed(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
@@ -367,7 +368,7 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			c.Set("loggedInUser", *user)
 			c.SetPath(uri)
 
-			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, spaced_repetition.ErrNotFound)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{}, utils.ErrNotFound)
 
 			service.GetNext(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
@@ -456,7 +457,7 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			c.SetParamNames("uuid")
 			c.SetParamValues(entryUUID)
 
-			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, spaced_repetition.ErrNotFound)
+			repo.On("GetEntry", user.Uuid, entryUUID).Return(nil, utils.ErrNotFound)
 			service.DeleteEntry(c)
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
 		})

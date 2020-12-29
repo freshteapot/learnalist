@@ -7,6 +7,7 @@ import (
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	storage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 
 	. "github.com/onsi/ginkgo"
@@ -73,7 +74,7 @@ var _ = Describe("Testing User from IDP", func() {
 			})
 
 			It("Nothing found", func() {
-				want := user.ErrNotFound
+				want := utils.ErrNotFound
 				mockSql.ExpectQuery(storage.UserFromIDPFindUserUUID).
 					WillReturnError(want)
 

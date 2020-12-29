@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -88,8 +87,6 @@ type UserFromIDP interface {
 	Register(idp string, kind string, identifier string, info []byte) (userUUID string, err error)
 	Lookup(idp string, kind string, identifier string) (userUUID string, err error)
 }
-
-var ErrNotFound = errors.New("user-not-found")
 
 type UserPreference struct {
 	UserUUID      string                       `json:"user_uuid,omitempty"`

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -37,7 +38,7 @@ func (r SqliteRepository) GetNext(userUUID string) (SpacedRepetitionEntry, error
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return item, ErrNotFound
+			return item, utils.ErrNotFound
 		}
 		return item, err
 	}
@@ -52,7 +53,7 @@ func (r SqliteRepository) GetEntry(userUUID string, UUID string) (interface{}, e
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return body, ErrNotFound
+			return body, utils.ErrNotFound
 		}
 
 		return body, err

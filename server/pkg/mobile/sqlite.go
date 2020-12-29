@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -67,7 +68,7 @@ func (r SqliteRepository) GetDevicesInfoByToken(token string) ([]openapi.MobileD
 	err := r.db.Select(&dbItems, SqlGetDevicesByToken, token)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = ErrNotFound
+			err = utils.ErrNotFound
 		}
 		return devices, err
 	}
