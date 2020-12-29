@@ -124,8 +124,10 @@ var ServerCmd = &cobra.Command{
 			storageAlist,
 			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
+		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
+
 		userManagement := user.NewManagement(
-			userStorage.NewSqliteManagementStorage(db),
+			userStorageRepo,
 			hugoHelper,
 			event.NewInsights(logger),
 		)
@@ -163,10 +165,11 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "mobile-service"))
 
 		remindService := remind.NewService(
-			userStorage.NewSqliteManagementStorage(db),
+			userStorageRepo,
 			logger.WithField("context", "remind-service"))
 
 		remindSpacedRepetitionService := remind.NewRemindSpacedRepetitionService(
+			userStorageRepo,
 			remind.NewRemindSpacedRepetitionSqliteRepository(db),
 			logger.WithField("context", "remind-spaced-repetition-service"))
 

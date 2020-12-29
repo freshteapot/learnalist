@@ -29,7 +29,6 @@ type RemindSpacedRepetitionRepository interface {
 	DeleteByUser(userUUID string) error
 	SetReminder(userUUID string, whenNext time.Time, lastActive time.Time) error
 	UpdateSent(userUUID string, sent int) error
-	SetPushEnabled(userUUID string, enabled int32) error
 	GetReminders(whenNext string, lastActive string) ([]SpacedRepetitionReminder, error)
 }
 

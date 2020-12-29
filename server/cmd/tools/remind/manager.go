@@ -14,6 +14,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 )
 
 var managerCMD = &cobra.Command{
@@ -51,9 +52,11 @@ tools remind manager
 			mobileRepo,
 			logger.WithField("context", "daily-reminder"))
 
+		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
 		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
 		remindSpacedRepetitionRepo := remind.NewRemindSpacedRepetitionSqliteRepository(db)
 		spacedRepetitionManager := remind.NewSpacedRepetition(
+			userStorageRepo,
 			spacedRepetitionRepo,
 			remindSpacedRepetitionRepo,
 			logger.WithField("context", "spaced-repetition-reminder"))

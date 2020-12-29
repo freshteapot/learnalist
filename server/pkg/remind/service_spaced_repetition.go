@@ -6,20 +6,24 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/sirupsen/logrus"
 
 	"github.com/labstack/echo/v4"
 )
 
 type RemindSpacedRepetitionService struct {
+	userRepo   user.ManagementStorage
 	remindRepo RemindSpacedRepetitionRepository
 	logContext logrus.FieldLogger
 }
 
-func NewRemindSpacedRepetitionService(remindRepo RemindSpacedRepetitionRepository, log logrus.FieldLogger) RemindSpacedRepetitionService {
+func NewRemindSpacedRepetitionService(userRepo user.ManagementStorage, remindRepo RemindSpacedRepetitionRepository, log logrus.FieldLogger) RemindSpacedRepetitionService {
 	s := RemindSpacedRepetitionService{
+		userRepo:   userRepo,
 		remindRepo: remindRepo,
 		logContext: log,
 	}
@@ -40,9 +44,24 @@ func (s RemindSpacedRepetitionService) SetSpacedRepetition(c echo.Context) error
 		})
 	}
 
-	enabled := input.SpacedRepetition.PushEnabled
-	err := s.remindRepo.SetPushEnabled(userUUID, enabled)
+	err := app_settings.SaveRemindV1(s.userRepo, userUUID, input)
+
 	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "s.userRepo.SaveInfo",
+		}).Error("Issue with repo")
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	// Might move this
+	enabled := input.SpacedRepetition.PushEnabled
+	err = s.remindRepo.SetPushEnabled(userUUID, enabled)
+	if err != nil {
+		s.logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "s.remindRepo.SetPushEnabled",
+		}).Error("Issue with repo")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 

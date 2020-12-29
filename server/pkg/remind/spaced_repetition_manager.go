@@ -6,14 +6,18 @@ import (
 
 	"firebase.google.com/go/messaging"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 )
 
 type spacedRepetitionManager struct {
 	subscription         stan.Subscription
+	userRepo             user.ManagementStorage
 	spacedRepetitionRepo spaced_repetition.SpacedRepetitionRepository
 	remindRepo           RemindSpacedRepetitionRepository
 	logContext           logrus.FieldLogger
@@ -21,10 +25,12 @@ type spacedRepetitionManager struct {
 }
 
 func NewSpacedRepetition(
+	userRepo user.ManagementStorage,
 	spacedRepetitionRepo spaced_repetition.SpacedRepetitionRepository,
 	remindRepo RemindSpacedRepetitionRepository,
 	logContext logrus.FieldLogger) *spacedRepetitionManager {
 	return &spacedRepetitionManager{
+		userRepo:             userRepo,
 		spacedRepetitionRepo: spacedRepetitionRepo,
 		remindRepo:           remindRepo,
 		logContext:           logContext,
@@ -32,6 +38,7 @@ func NewSpacedRepetition(
 			event.ApiSpacedRepetition,
 			event.CMDUserDelete,
 			event.ApiUserDelete,
+			EventApiRemindAppSettingsRemindV1,
 		},
 	}
 }
@@ -100,6 +107,7 @@ func (m *spacedRepetitionManager) Close() {
 		- event.MobileDeviceRegistered
 		- event.CMDUserDelete
 		- event.ApiUserDelete
+		- event."User app settings" /EventApiRemindAppSettingsRemindV1
 
 	This is like the remind table but the context is different.
 	GROUP BY (userUUID whenNext)
@@ -112,13 +120,36 @@ func (m *spacedRepetitionManager) Close() {
 
 func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
+	case EventApiRemindAppSettingsRemindV1:
+		userUUID := entry.UUID
+		b, _ := json.Marshal(entry.Data)
+		var updatedSettings openapi.AppSettingsRemindV1
+		json.Unmarshal(b, &updatedSettings)
+
+		logContext := m.logContext.WithFields(logrus.Fields{
+			"event":     "spacedRepetitionManager.OnEvent",
+			"kind":      entry.Kind,
+			"user_uuid": userUUID,
+		})
+
+		err := app_settings.SaveRemindV1(m.userRepo, userUUID, updatedSettings)
+		if err != nil {
+			// We might want this to be fatal
+			logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "app_settings.SaveRemindV1",
+			}).Fatal("Failed writing to repo")
+			return
+		}
+
+		lastActive := time.Unix(entry.Timestamp, 0).UTC()
+		m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
 		json.Unmarshal(b, &moment)
 
-		var lastActive time.Time
-		lastActive = time.Unix(entry.Timestamp, 0).UTC()
+		lastActive := time.Unix(entry.Timestamp, 0).UTC()
 		srsItem := moment.Data
 		userUUID := srsItem.UserUUID
 
@@ -128,15 +159,16 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			fallthrough
 		case spaced_repetition.EventKindViewed:
 			m.spacedRepetitionRepo.UpdateEntry(srsItem)
-			// Get when_next by user_uuid
-			nextSrsItem, err := m.spacedRepetitionRepo.GetNext(userUUID)
-			if err != nil {
-				m.logContext.WithFields(logrus.Fields{
-					"user_uuid": userUUID,
-				}).Error("Failed to get next, which means we were not able to set reminder")
-				return
-			}
-			_ = m.remindRepo.SetReminder(userUUID, nextSrsItem.WhenNext, lastActive)
+
+			logContext := m.logContext.WithFields(logrus.Fields{
+				"event":     "spacedRepetitionManager.OnEvent",
+				"kind":      moment.Kind,
+				"user_uuid": userUUID,
+				"uuid":      srsItem.UUID,
+			})
+
+			// Check access if no
+			m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 		case spaced_repetition.EventKindDeleted:
 			logContext := m.logContext.WithFields(logrus.Fields{
 				"event":     "spacedRepetitionManager.OnEvent",
@@ -148,29 +180,13 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			err := m.spacedRepetitionRepo.DeleteEntry(userUUID, srsItem.UUID)
 			if err != nil {
 				logContext.WithFields(logrus.Fields{
-					"error": err,
-				}).Error("Failed to delete entry")
+					"error":  err,
+					"method": "m.spacedRepetitionRepo.DeleteEntry",
+				}).Fatal("Failed to delete entry")
 				return
 			}
 
-			nextSrsItem, err := m.spacedRepetitionRepo.GetNext(userUUID)
-			if err != nil {
-				if err != spaced_repetition.ErrNotFound {
-					logContext.WithFields(logrus.Fields{
-						"error": err,
-					}).Error("Unable to get next")
-					return
-				}
-
-				err := m.remindRepo.DeleteByUser(userUUID)
-				if err != nil {
-					logContext.WithFields(logrus.Fields{
-						"error": err,
-					}).Error("Failed to delete user from remind repo")
-				}
-				return
-			}
-			_ = m.remindRepo.SetReminder(userUUID, nextSrsItem.WhenNext, lastActive)
+			m.checkForNextEntryAndSetReminder(logContext, userUUID, lastActive)
 		}
 	case event.ApiUserDelete:
 		fallthrough
@@ -183,14 +199,13 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			"kind":      entry.Kind,
 		})
 
-		// TODO How do we delete the user?
 		pass := true
 		err := m.remindRepo.DeleteByUser(userUUID)
 		if err != nil {
 			pass = false
 			logContext.WithFields(logrus.Fields{
 				"error": err,
-			}).Error("Failed to delete user from remind repo")
+			}).Fatal("Failed to delete user from remind repo")
 		}
 
 		// This is partly duplicated in the spaced repetition service
@@ -199,13 +214,55 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			pass = false
 			logContext.WithFields(logrus.Fields{
 				"error": err,
-			}).Error("Failed to delete user from spacedRepetitionRepo repo")
+			}).Fatal("Failed to delete user from spacedRepetitionRepo repo")
 		}
 
 		if pass {
 			logContext.Info("user removed")
 		}
 	default:
+		return
+	}
+}
+
+func (m *spacedRepetitionManager) checkForNextEntryAndSetReminder(logContext logrus.FieldLogger, userUUID string, lastActive time.Time) {
+	settings, err := app_settings.GetRemindV1(m.userRepo, userUUID)
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "app_settings.GetRemindV1",
+		}).Fatal("Failed talking to repo")
+		return
+	}
+
+	if settings.SpacedRepetition.PushEnabled == 0 {
+		return
+	}
+
+	nextSrsItem, err := m.spacedRepetitionRepo.GetNext(userUUID)
+	if err != nil {
+		if err != spaced_repetition.ErrNotFound {
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Fatal("Unable to get next")
+			return
+		}
+
+		err := m.remindRepo.DeleteByUser(userUUID)
+		if err != nil {
+			logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Fatal("Failed to delete user from remind repo")
+		}
+		return
+	}
+
+	err = m.remindRepo.SetReminder(userUUID, nextSrsItem.WhenNext, lastActive)
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "m.remindRepo.SetReminder",
+		}).Fatal("Failed talking to repo")
 		return
 	}
 }

@@ -105,9 +105,9 @@ type UserPreferenceDailyReminder struct {
 	PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
 }
 
-// TODO actually use
 type UserPreferenceApps struct {
-	PlankV1 *openapi.MobilePlankAppV1Settings `json:"plank_v1"` // Only nice to sync between app and web, not needed yet
+	PlankV1  *openapi.MobilePlankAppV1Settings `json:"plank_v1,omitempty"` // Only nice to sync between app and web, not needed yet
+	RemindV1 *openapi.AppSettingsRemindV1      `json:"remind_v1,omitempty"`
 }
 
 // TODO actually use
