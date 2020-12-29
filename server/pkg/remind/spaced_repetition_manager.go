@@ -210,10 +210,8 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			"kind":      entry.Kind,
 		})
 
-		pass := true
 		err := m.remindRepo.DeleteByUser(userUUID)
 		if err != nil {
-			pass = false
 			logContext.WithFields(logrus.Fields{
 				"error":  err,
 				"method": "m.remindRepo.DeleteByUser",
@@ -223,15 +221,12 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 		// This is partly duplicated in the spaced repetition service
 		err = m.spacedRepetitionRepo.DeleteByUser(userUUID)
 		if err != nil {
-			pass = false
 			logContext.WithFields(logrus.Fields{
 				"error": err,
 			}).Fatal("Failed to delete user from spacedRepetitionRepo repo")
 		}
 
-		if pass {
-			logContext.Info("user removed")
-		}
+		logContext.Info("user removed")
 	default:
 		return
 	}
