@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
-	"github.com/nats-io/stan.go"
 )
 
 var (
@@ -20,10 +19,6 @@ var (
 	ReminderSkipped             = 2
 )
 
-type NatsSubscriber interface {
-	Subscribe(topic string, sc stan.Conn) error
-	Close()
-}
 type RemindSpacedRepetitionRepository interface {
 	DeleteByUser(userUUID string) error
 	SetReminder(userUUID string, whenNext time.Time, lastActive time.Time) error

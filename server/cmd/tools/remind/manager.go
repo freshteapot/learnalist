@@ -63,7 +63,7 @@ tools remind manager
 
 		sc := event.GetBus().(*event.NatsBus).Connection()
 
-		subscribers := make([]remind.NatsSubscriber, 0)
+		subscribers := make([]event.NatsSubscriber, 0)
 		subscribers = append(subscribers, dailyManager)
 		subscribers = append(subscribers, spacedRepetitionManager)
 

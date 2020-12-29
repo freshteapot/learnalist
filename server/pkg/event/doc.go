@@ -4,6 +4,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/nats-io/stan.go"
 )
 
 const (
@@ -58,6 +59,11 @@ type EventlogPubSub interface {
 	Publish(topic string, moment Eventlog)
 	Subscribe(topic string, key string, fn interface{})
 	Unsubscribe(topic string, key string)
+}
+
+type NatsSubscriber interface {
+	Subscribe(topic string, sc stan.Conn) error
+	Close()
 }
 
 type Eventlog struct {
