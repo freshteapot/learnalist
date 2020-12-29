@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-func DefaultFuture() string {
-	now := time.Now().UTC()
-	return time.Date(2100, 12, 31, 23, 59, 59, 0, now.Location()).Format(time.RFC3339)
-}
-
 func DefaultWhenNextWithLastActiveOffset() (string, string) {
 	now := time.Now().UTC()
 	whenNext := now.Format(time.RFC3339Nano)
