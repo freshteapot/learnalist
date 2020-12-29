@@ -223,7 +223,7 @@ func (m *dailyManager) SendNotifications() {
 			}
 
 			// Send message
-			event.GetBus().Publish("notifications", event.Eventlog{
+			event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
 				Kind: event.KindPushNotification,
 				Data: message,
 			})

@@ -190,7 +190,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 			Token: user.Token,
 		}
 
-		event.GetBus().Publish("notifications", event.Eventlog{
+		event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
 			UUID: userUUID,
 			Kind: event.KindPushNotification,
 			Data: message,
