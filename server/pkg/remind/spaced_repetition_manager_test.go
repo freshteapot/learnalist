@@ -1,14 +1,17 @@
 package remind_test
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
@@ -20,6 +23,7 @@ import (
 
 var _ = Describe("Testing Spaced Repetition Manager", func() {
 	var (
+		want                 = errors.New("fail")
 		logger               *logrus.Logger
 		hook                 *test.Hook
 		userRepo             *mocks.ManagementStorage
@@ -67,6 +71,122 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				}
 			}
 		*/
+		When("App settings have changed for remind V1", func() {
+			var (
+				settings openapi.AppSettingsRemindV1
+				moment   event.Eventlog
+			)
+			BeforeEach(func() {
+				settings = openapi.AppSettingsRemindV1{
+					SpacedRepetition: openapi.AppSettingsRemindV1SpacedRepetition{
+						PushEnabled: 0,
+					},
+				}
+				moment = event.Eventlog{
+					UUID:   userUUID,
+					Kind:   event.ApiAppSettingsRemindV1,
+					Data:   settings,
+					Action: event.ActionUpsert,
+				}
+			})
+
+			It("Saving fails", func() {
+				pref := user.UserPreference{
+					Apps: &user.UserPreferenceApps{
+						RemindV1: &settings,
+					},
+				}
+
+				b, _ := json.Marshal(pref)
+				userRepo.On("SaveInfo", userUUID, b).Return(want)
+
+				testutils.SetLoggerToPanicOnFatal(logger)
+
+				manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+				Expect(func() { manager.OnEvent(moment) }).Should(Panic())
+
+				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+				Expect(hook.LastEntry().Data["method"]).To(Equal("app_settings.SaveRemindV1"))
+				mock.AssertExpectationsForObjects(GinkgoT(), spacedRepetitionRepo, userRepo, remindRepo)
+			})
+
+			When("Push is enabled", func() {
+				It("Success", func() {
+					whenNext, _ := time.Parse(time.RFC3339, "2020-12-23T12:58:21Z")
+					srsItem := spaced_repetition.SpacedRepetitionEntry{
+						UserUUID: userUUID,
+						UUID:     "ba9277fc4c6190fb875ad8f9cee848dba699937f",
+						Body:     "{\"show\":\"Hello\",\"kind\":\"v1\",\"uuid\":\"ba9277fc4c6190fb875ad8f9cee848dba699937f\",\"data\":\"Hello\",\"settings\":{\"level\":\"0\",\"when_next\":\"2020-12-23T12:58:21Z\",\"created\":\"2020-12-23T11:58:21Z\"}}",
+						WhenNext: whenNext,
+						Created:  whenNext,
+					}
+
+					nextSrsItem := srsItem
+
+					settings.SpacedRepetition.PushEnabled = 1
+					moment.Data = settings
+					moment.Timestamp = whenNext.UTC().Unix()
+
+					pref := user.UserPreference{
+						Apps: &user.UserPreferenceApps{
+							RemindV1: &settings,
+						},
+					}
+
+					b, _ := json.Marshal(pref)
+					userRepo.On("SaveInfo", userUUID, b).Return(nil)
+					userRepo.On("GetInfo", userUUID).Return(appSettingsEnabled, nil)
+					spacedRepetitionRepo.On("GetNext", userUUID).Return(nextSrsItem, nil)
+					remindRepo.On("SetReminder", userUUID, whenNext, whenNext).Return(nil)
+
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+					manager.OnEvent(moment)
+
+					Expect(hook.LastEntry()).To(BeNil())
+					mock.AssertExpectationsForObjects(GinkgoT(), userRepo, remindRepo)
+				})
+			})
+			When("Push enabled is set to 0", func() {
+				It("Fail to remove user from the reminder system", func() {
+					pref := user.UserPreference{
+						Apps: &user.UserPreferenceApps{
+							RemindV1: &settings,
+						},
+					}
+
+					b, _ := json.Marshal(pref)
+					userRepo.On("SaveInfo", userUUID, b).Return(nil)
+					remindRepo.On("DeleteByUser", userUUID).Return(want)
+					testutils.SetLoggerToPanicOnFatal(logger)
+
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+					Expect(func() { manager.OnEvent(moment) }).Should(Panic())
+
+					Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+					Expect(hook.LastEntry().Data["method"]).To(Equal("m.remindRepo.DeleteByUser"))
+					mock.AssertExpectationsForObjects(GinkgoT(), userRepo, remindRepo)
+				})
+
+				It("Success, user removed", func() {
+					pref := user.UserPreference{
+						Apps: &user.UserPreferenceApps{
+							RemindV1: &settings,
+						},
+					}
+
+					b, _ := json.Marshal(pref)
+					userRepo.On("SaveInfo", userUUID, b).Return(nil)
+					remindRepo.On("DeleteByUser", userUUID).Return(nil)
+
+					manager := remind.NewSpacedRepetition(userRepo, spacedRepetitionRepo, remindRepo, logger)
+					manager.OnEvent(moment)
+
+					Expect(hook.LastEntry()).To(BeNil())
+					mock.AssertExpectationsForObjects(GinkgoT(), userRepo, remindRepo)
+				})
+			})
+		})
+
 		When("We add or view an entry", func() {
 			var (
 				whenNext             time.Time

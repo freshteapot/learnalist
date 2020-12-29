@@ -103,12 +103,11 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, la
 		UserUUID   string    `db:"user_uuid"`
 		WhenNext   time.Time `db:"when_next"`
 		LastActive time.Time `db:"last_active"`
-		Medium     string    `db:"medium"` // Token or email
+		Medium     string    `db:"medium"` // Token
 	}
 
 	dbItems := make([]dbItem, 0)
 	items := make([]SpacedRepetitionReminder, 0)
-	// TODO How to make this ignore users who have declined events
 	err := r.db.Select(&dbItems, SpacedRepetitionSqlGetReminders, whenNext, lastActive)
 	if err != nil {
 		return items, err
