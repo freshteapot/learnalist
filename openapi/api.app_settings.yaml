@@ -1,0 +1,62 @@
+components:
+  schemas:
+    AppSettingsRemindV1:
+      type: object
+      required:
+        - spaced_repetition
+      properties:
+        spaced_repetition:
+          type: object
+          required:
+            - push_enabled
+          properties:
+            push_enabled:
+              description: Enable push notifications
+              type: integer
+              minimum: 0
+              maximum: 1
+    MobilePlankAppV1Settings:
+      type: object
+      description: Settings for the plank app version 1
+      required:
+        - showIntervals
+        - intervalTime
+      properties:
+        showIntervals:
+          type: boolean
+        intervalTime:
+          type: integer
+
+paths:
+  /app-settings/remind_v1:
+    put:
+      tags:
+        - appSettings
+      operationId: setRemindV1
+      description: Enable or disable push notifications for spaced repetition in remindV1
+      requestBody:
+        description: Settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppSettingsRemindV1"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettingsRemindV1"
+        "422":
+          description: Something wrong with the payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
