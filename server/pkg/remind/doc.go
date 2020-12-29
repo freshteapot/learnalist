@@ -13,11 +13,12 @@ var (
 )
 
 var (
-	EventApiRemindDailySettings = "api.remind.daily.settings"
-	UserPreferenceKey           = "daily_reminder"
-	ReminderNotSentYet          = 0
-	ReminderSent                = 1
-	ReminderSkipped             = 2
+	EventApiRemindAppSettingsRemindV1 = "api.remind.app.settings.remind_v1"
+	EventApiRemindDailySettings       = "api.remind.daily.settings"
+	UserPreferenceKey                 = "daily_reminder"
+	ReminderNotSentYet                = 0
+	ReminderSent                      = 1
+	ReminderSkipped                   = 2
 )
 
 type NatsSubscriber interface {
@@ -28,6 +29,7 @@ type RemindSpacedRepetitionRepository interface {
 	DeleteByUser(userUUID string) error
 	SetReminder(userUUID string, whenNext time.Time, lastActive time.Time) error
 	UpdateSent(userUUID string, sent int) error
+	SetPushEnabled(userUUID string, enabled int32) error
 	GetReminders(whenNext string, lastActive string) ([]SpacedRepetitionReminder, error)
 }
 
@@ -47,9 +49,9 @@ type RemindMe struct {
 }
 
 type SpacedRepetitionReminder struct {
-	UserUUID   string    `json:"user_uuid" db:"user_uuid"`
-	WhenNext   time.Time `json:"when_next" db:"when_next"`
-	LastActive time.Time `json:"last_active" db:"last_active"`
-	Sent       int       `json:"sent" db:"sent"`     // 0, 1, 2
-	Medium     string    `json:"medium" db:"medium"` // Token or email
+	UserUUID   string    `json:"user_uuid"`
+	WhenNext   time.Time `json:"when_next"`
+	LastActive time.Time `json:"last_active"`
+	Sent       int       `json:"sent"`   // 0, 1, 2
+	Medium     string    `json:"medium"` // Token or email
 }

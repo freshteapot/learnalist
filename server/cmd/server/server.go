@@ -166,6 +166,10 @@ var ServerCmd = &cobra.Command{
 			userStorage.NewSqliteManagementStorage(db),
 			logger.WithField("context", "remind-service"))
 
+		remindSpacedRepetitionService := remind.NewRemindSpacedRepetitionService(
+			remind.NewRemindSpacedRepetitionSqliteRepository(db),
+			logger.WithField("context", "remind-spaced-repetition-service"))
+
 		server.InitApi(
 			apiManager,
 			userService,
@@ -174,7 +178,9 @@ var ServerCmd = &cobra.Command{
 			plankService,
 			challengeService,
 			mobileService,
-			remindService)
+			remindService,
+			remindSpacedRepetitionService,
+		)
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

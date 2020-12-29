@@ -51,6 +51,20 @@ func (_m *RemindSpacedRepetitionRepository) GetReminders(whenNext string, lastAc
 	return r0, r1
 }
 
+// SetPushEnabled provides a mock function with given fields: userUUID, enabled
+func (_m *RemindSpacedRepetitionRepository) SetPushEnabled(userUUID string, enabled int32) error {
+	ret := _m.Called(userUUID, enabled)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, int32) error); ok {
+		r0 = rf(userUUID, enabled)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SetReminder provides a mock function with given fields: userUUID, whenNext, lastActive
 func (_m *RemindSpacedRepetitionRepository) SetReminder(userUUID string, whenNext time.Time, lastActive time.Time) error {
 	ret := _m.Called(userUUID, whenNext, lastActive)

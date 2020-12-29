@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	SpacedRepetitionSqlUpdateSent   = `UPDATE spaced_repetition_reminder SET sent=? WHERE user_uuid=?`
-	SpacedRepetitionSqlDeleteByUser = `DELETE FROM spaced_repetition_reminder WHERE user_uuid=?`
-	SpacedRepetitionSqlSave         = `INSERT INTO spaced_repetition_reminder(user_uuid, when_next, last_active) values(?, ?, ?) ON CONFLICT (spaced_repetition_reminder.user_uuid) DO UPDATE SET when_next=?, last_active=?, sent=0`
-	SpacedRepetitionSqlGetReminders = `
+	SpacedRepetitionSqlSetPushEnabled = `UPDATE spaced_repetition_reminder SET push_enabled=? WHERE user_uuid=?`
+	SpacedRepetitionSqlUpdateSent     = `UPDATE spaced_repetition_reminder SET sent=? WHERE user_uuid=?`
+	SpacedRepetitionSqlDeleteByUser   = `DELETE FROM spaced_repetition_reminder WHERE user_uuid=?`
+	SpacedRepetitionSqlSave           = `INSERT INTO spaced_repetition_reminder(user_uuid, when_next, last_active) values(?, ?, ?) ON CONFLICT (spaced_repetition_reminder.user_uuid) DO UPDATE SET when_next=?, last_active=?, sent=0`
+	SpacedRepetitionSqlGetReminders   = `
 WITH _base(user_uuid, when_next, last_active) AS (
 	SELECT
 		user_uuid,
@@ -20,6 +21,8 @@ WITH _base(user_uuid, when_next, last_active) AS (
 		spaced_repetition_reminder
 	WHERE
 		sent = 0
+	AND
+		push_enabled = 1
 	AND
 		when_next <= ?
 	AND
@@ -96,6 +99,16 @@ func (r remindSpacedRepetitionSqliteRepository) UpdateSent(userUUID string, sent
 	return nil
 }
 
+// SetPushEnabled specifically make it clear that we want to enable / disable push
+// This might need reviewing if we offer email / push etc
+func (r remindSpacedRepetitionSqliteRepository) SetPushEnabled(userUUID string, enabled int32) error {
+	_, err := r.db.Exec(SpacedRepetitionSqlSetPushEnabled, enabled, userUUID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetReminders return reminders
 // Medium can be empty, which means the mobile_device has not been registered yet
 func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, lastActive string) ([]SpacedRepetitionReminder, error) {
@@ -108,7 +121,7 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, la
 
 	dbItems := make([]dbItem, 0)
 	items := make([]SpacedRepetitionReminder, 0)
-
+	// TODO How to make this ignore users who have declined events
 	err := r.db.Select(&dbItems, SpacedRepetitionSqlGetReminders, whenNext, lastActive)
 	if err != nil {
 		return items, err

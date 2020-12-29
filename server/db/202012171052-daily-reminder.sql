@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS daily_reminder_settings (
 );
 
 CREATE INDEX IF NOT EXISTS daily_reminder_settings_when_next ON daily_reminder_settings (when_next);
-CREATE INDEX IF NOT EXISTS daily_reminder_settings_user_uuid ON mobile_device (user_uuid);
+CREATE INDEX IF NOT EXISTS daily_reminder_settings_user_uuid ON daily_reminder_settings (user_uuid);

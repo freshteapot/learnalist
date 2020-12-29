@@ -22,6 +22,7 @@ func InitApi(
 	challengeService challenge.ChallengeService,
 	mobileService mobile.MobileService,
 	remindService remind.RemindService,
+	remindSpacedRepetitionService remind.RemindSpacedRepetitionService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -117,4 +118,7 @@ func InitApi(
 	remindV1.GET("/daily/:appIdentifier", remindService.GetDailySettings)
 	remindV1.DELETE("/daily/:appIdentifier", remindService.DeleteDailySettings)
 	remindV1.PUT("/daily/", remindService.SetDailySettings)
+
+	// Remind SpacedRepetition Service
+	remindV1.PUT("/spaced-repetition/remind_v1", remindSpacedRepetitionService.SetSpacedRepetition)
 }
