@@ -120,7 +120,7 @@ func InitApi(
 	remindV1.DELETE("/daily/:appIdentifier", remindService.DeleteDailySettings)
 	remindV1.PUT("/daily/", remindService.SetDailySettings)
 
-	// Remind SpacedRepetition Service
+	// App Settings Service
 	settingsV1 := server.Group("/api/v1/app-settings")
 	settingsV1.Use(authenticate.Auth(authConfig))
 	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1)
