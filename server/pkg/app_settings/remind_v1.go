@@ -8,23 +8,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
-func GetAll(repo user.ManagementStorage, userUUID string) (interface{}, error) {
-	data, err := repo.GetInfo(userUUID)
-	var response interface{}
-
-	if err != nil {
-		return response, err
-	}
-
-	var pref user.UserPreference
-	err = json.Unmarshal(data, &pref)
-	if err != nil {
-		return response, nil
-	}
-
-	return pref.Apps, nil
-}
-
 func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSettingsRemindV1, error) {
 	data, err := repo.GetInfo(userUUID)
 	settings := openapi.AppSettingsRemindV1{}
@@ -44,6 +27,7 @@ func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSetti
 	if err != nil {
 		return settings, nil
 	}
+
 	if pref.Apps.RemindV1 != nil {
 		settings = *pref.Apps.RemindV1
 	}
