@@ -20,6 +20,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
@@ -167,6 +168,12 @@ var ServerCmd = &cobra.Command{
 		remindService := remind.NewService(
 			userStorageRepo,
 			logger.WithField("context", "remind-service"))
+
+		appSettingsService := app_settings.NewService(
+			userStorageRepo,
+			logger.WithField("context", "appSettings-service"),
+		)
+
 		server.InitApi(
 			apiManager,
 			userService,
@@ -176,7 +183,9 @@ var ServerCmd = &cobra.Command{
 			challengeService,
 			mobileService,
 			remindService,
+			appSettingsService,
 		)
+
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

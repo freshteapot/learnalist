@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	authenticateApi "github.com/freshteapot/learnalist-api/server/api/authenticate"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
@@ -22,6 +23,7 @@ func InitApi(
 	challengeService challenge.ChallengeService,
 	mobileService mobile.MobileService,
 	remindService remind.RemindService,
+	appSettingsService app_settings.AppSettingsService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -121,5 +123,5 @@ func InitApi(
 	// Remind SpacedRepetition Service
 	settingsV1 := server.Group("/api/v1/app-settings")
 	settingsV1.Use(authenticate.Auth(authConfig))
-	settingsV1.PUT("/remind_v1", remindService.SetSpacedRepetition) // TODO move once works
+	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1) // TODO move once works
 }
