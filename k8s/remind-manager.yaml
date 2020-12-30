@@ -43,7 +43,7 @@ spec:
             - name: db-schema-volume
               mountPath: "/srv/db-schema/"
             - name: srv-remind-manager-volume
-              mountPath: "/srv/remind-manager/"
+              mountPath: "/srv/remind-daily/"
       volumes:
         - name: config-volume
           configMap:
@@ -53,4 +53,4 @@ spec:
             name: learnalist-db
         - name: srv-remind-manager-volume
           persistentVolumeClaim:
-            claimName: remind-manager-01-pvc
+            claimName: remind-daily-01-pvc

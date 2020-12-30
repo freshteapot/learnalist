@@ -172,7 +172,7 @@ build-image-base:
 	cd server && \
 	docker build -f Dockerfile_prod_base -t learnalist-prod-base:latest .
 
-build-image:
+build-image: generate-openapi-go
 	cd server && \
 	docker build \
 	--build-arg GIT_COMMIT="${GIT_COMMIT}" \

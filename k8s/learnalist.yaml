@@ -46,7 +46,8 @@ spec:
               mountPath: /etc/learnalist/config.yaml
               subPath: config.yaml
               readOnly: true
-
+            - name: db-schema-volume
+              mountPath: "/srv/db-schema/"
             - name: srv-learnalist-volume
               mountPath: "/srv/learnalist/"
 
@@ -54,7 +55,9 @@ spec:
         - name: config-volume
           configMap:
             name: learnalist-config
-
+        - name: db-schema-volume
+          configMap:
+            name: learnalist-db
         - name: srv-learnalist-volume
           persistentVolumeClaim:
             claimName: srv-learnalist-pvc-01
