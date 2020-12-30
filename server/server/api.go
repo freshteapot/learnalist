@@ -123,5 +123,5 @@ func InitApi(
 	// Remind SpacedRepetition Service
 	settingsV1 := server.Group("/api/v1/app-settings")
 	settingsV1.Use(authenticate.Auth(authConfig))
-	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1) // TODO move once works
+	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1)
 }
