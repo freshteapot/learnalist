@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -28,7 +29,13 @@ func (s AppSettingsService) SaveRemindV1(c echo.Context) error {
 
 	defer c.Request().Body.Close()
 	var input openapi.AppSettingsRemindV1
-	json.NewDecoder(c.Request().Body).Decode(&input)
+	err := json.NewDecoder(c.Request().Body).Decode(&input)
+
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: "Look at the documentation for more help",
+		})
+	}
 
 	if input.SpacedRepetition.PushEnabled < 0 || input.SpacedRepetition.PushEnabled > 1 {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
@@ -36,12 +43,28 @@ func (s AppSettingsService) SaveRemindV1(c echo.Context) error {
 		})
 	}
 
-	err := SaveRemindV1(s.userRepo, userUUID, input)
+	current, err := GetRemindV1(s.userRepo, userUUID)
+	exists := true
+
+	if err != nil {
+		if err != utils.ErrNotFound {
+			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+		}
+		exists = false
+	}
+
+	if exists {
+		if current.SpacedRepetition.PushEnabled == input.SpacedRepetition.PushEnabled {
+			return c.JSON(http.StatusOK, input)
+		}
+	}
+
+	err = SaveRemindV1(s.userRepo, userUUID, input)
 
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{
 			"error":  err,
-			"method": "s.userRepo.SaveInfo",
+			"method": "SaveRemindV1",
 		}).Error("Issue with repo")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}

@@ -235,10 +235,12 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 func (m *spacedRepetitionManager) CheckForNextEntryAndSetReminder(logContext logrus.FieldLogger, userUUID string, lastActive time.Time) {
 	settings, err := app_settings.GetRemindV1(m.userRepo, userUUID)
 	if err != nil {
-		logContext.WithFields(logrus.Fields{
-			"error":  err,
-			"method": "app_settings.GetRemindV1",
-		}).Fatal("Failed talking to repo")
+		if err != utils.ErrNotFound {
+			logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "app_settings.GetRemindV1",
+			}).Fatal("Failed talking to repo")
+		}
 	}
 
 	if settings.SpacedRepetition.PushEnabled == 0 {

@@ -10,22 +10,28 @@ import (
 
 func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSettingsRemindV1, error) {
 	data, err := repo.GetInfo(userUUID)
-	settings := openapi.AppSettingsRemindV1{}
+
+	// Assume not set, and default to true
+	settings := openapi.AppSettingsRemindV1{
+		SpacedRepetition: openapi.AppSettingsRemindV1SpacedRepetition{
+			PushEnabled: 1,
+		},
+	}
 
 	if err != nil {
-		if err != utils.ErrNotFound {
-			return settings, err
-		}
-
-		// Assume not set, and default to true
-		settings.SpacedRepetition.PushEnabled = 1
-		return settings, nil
+		// Can return utils.ErrNotFound, based on repo.GetInfo
+		return settings, err
 	}
 
 	var pref user.UserPreference
 	err = json.Unmarshal(data, &pref)
 	if err != nil {
 		return settings, nil
+	}
+
+	// This was important
+	if pref.Apps == nil {
+		return settings, utils.ErrNotFound
 	}
 
 	if pref.Apps.RemindV1 != nil {
