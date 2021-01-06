@@ -204,6 +204,8 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	case event.CMDUserDelete:
 		// TODO verify delete
 		userUUID := entry.UUID
+		// TODO check if empty and skip
+		// Or check legacy
 		logContext := m.logContext.WithFields(logrus.Fields{
 			"user_uuid": userUUID,
 			"event":     event.UserDeleted,

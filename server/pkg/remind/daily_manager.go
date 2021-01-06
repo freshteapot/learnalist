@@ -103,6 +103,8 @@ func (m *dailyManager) OnEvent(entry event.Eventlog) {
 	case event.CMDUserDelete:
 		// Delete from
 		userUUID := entry.UUID
+		// TODO check if empty and skip
+		// Or check legacy
 		logContext := m.logContext.WithFields(logrus.Fields{
 			"user_uuid": userUUID,
 			"event":     event.UserDeleted,
