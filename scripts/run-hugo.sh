@@ -9,24 +9,55 @@ trap ctrl_c INT
 function ctrl_c() {
 	echo "** Trapped CTRL-C"
 	sleep 2
-	kill -9 $(lsof -ti tcp:1313) 2>/dev/null
-	kill -9 $(lsof -ti tcp:1234) 2>/dev/null
+	kill -9 $(lsof -ti tcp:1313) >/dev/null 2>&1
+	kill -9 $(lsof -ti tcp:1234) >/dev/null 2>&1
+}
+
+function check_installed() {
+	npm -v >/dev/null 2>&1
+	installed=$?
+	if [[ $installed != 0 ]]; then
+		echo "npm needs to be installed, make sure node is as well"
+		exit 1
+	fi
+
+	hugo version >/dev/null 2>&1
+	installed=$?
+	if [[ $installed != 0 ]]; then
+		echo "hugo needs to be installed"
+		exit 1
+	fi
+
+	yq --version >/dev/null 2>&1
+	installed=$?
+	if [[ $installed != 0 ]]; then
+		echo "yq needs to be installed"
+		exit 1
+	fi
+
+	go version >/dev/null 2>&1
+	installed=$?
+	if [[ $installed != 0 ]]; then
+		echo "go needs to be installed"
+		exit 1
+	fi
 }
 
 # Make sure the ports are killed before we start and hopefully catch them on close
-kill -9 $(lsof -ti tcp:1313) 2>/dev/null
-kill -9 $(lsof -ti tcp:1234) 2>/dev/null
+kill -9 $(lsof -ti tcp:1313) >/dev/null 2>&1
+kill -9 $(lsof -ti tcp:1234) >/dev/null 2>&1
+# Poor attempt at confirming we have the commands installed
+check_installed
 
 # Config setup
+_BIND="${LAL_BIND:-$(ipconfig getifaddr en0)}"
+_BASEURL="http://${_BIND}:1313"
+_APISERVER="http://${_BIND}:1234"
+
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TOP_LEVEL="${CWD}/../"
 HUGO_DIR="${CWD}/../hugo"
-SERVER_CONFIG="../config.dev_external.yaml"
 DEFAULT_SERVER_CONFIG="${CWD}/../config/dev.config.yaml"
-_BIND="${LAL_BIND:-$(ipconfig getifaddr en0)}"
-
-_BASEURL="http://${_BIND}:1313"
-_APISERVER="http://${_BIND}:1234"
 SERVER_CONFIG="${CWD}/../config/dev_external.config.yaml"
 HUGO_CONFIG_DIR="${HUGO_DIR}/config/dev_external"
 HUGO_CONFIG="${HUGO_CONFIG_DIR}/config.yaml"
@@ -34,6 +65,7 @@ HUGO_CONFIG="${HUGO_CONFIG_DIR}/config.yaml"
 # Notice
 echo "Running hugo on ${_APISERVER} with config from ${HUGO_CONFIG}."
 echo "Running server with config from ${SERVER_CONFIG}."
+# TODO This breaks if yq is not installed
 
 # Update config server
 rm -f $SERVER_CONFIG
