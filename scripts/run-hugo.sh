@@ -65,7 +65,6 @@ HUGO_CONFIG="${HUGO_CONFIG_DIR}/config.yaml"
 # Notice
 echo "Running hugo on ${_APISERVER} with config from ${HUGO_CONFIG}."
 echo "Running server with config from ${SERVER_CONFIG}."
-# TODO This breaks if yq is not installed
 
 # Update config server
 rm -f $SERVER_CONFIG
@@ -77,7 +76,7 @@ yq w -i $SERVER_CONFIG server.cookie.domain "${_BIND}"
 mkdir -p $HUGO_CONFIG_DIR
 rm -f $HUGO_CONFIG
 touch $HUGO_CONFIG
-yq w -i $HUGO_CONFIG baseURL  "${_BASEURL}"
+yq w -i $HUGO_CONFIG baseURL "${_BASEURL}"
 yq w -i $HUGO_CONFIG params.ApiServer "${_APISERVER}"
 
 # Clean up hugo output
@@ -94,7 +93,7 @@ cd $HUGO_DIR && \
 hugo server \
 -w \
 -e dev_external \
---disableFastRender  \
+--disableFastRender \
 --forceSyncStatic \
 --renderToDisk \
 --verbose \
