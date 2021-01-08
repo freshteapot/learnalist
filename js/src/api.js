@@ -124,7 +124,7 @@ async function deleteList(uuid) {
 }
 
 async function getServerVersion() {
-  const api = getApi(Services.SpacedRepetition);
+  const api = getApi(Services.Default);
   return await api.getServerVersion();
 }
 
