@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: hugo
-          image: klakegg/hugo:0.72.0
+          image: klakegg/hugo:0.80.0
           command: [hugo-official]
           args: ["--environment=lal01", "--verbose", "-w"]
           volumeMounts:

@@ -3,7 +3,7 @@
 - You will need to add registry.devbox to your /etc/hosts
 
 ```sh
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 ```
 
@@ -127,7 +127,7 @@ ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 ```sh
 make build-site-assets
 
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context
 kubectl config use-context default
@@ -145,7 +145,7 @@ make build-site-assets
 make build-image-base
 make build-image
 
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context
 kubectl config use-context default
