@@ -79,7 +79,7 @@ var deleteUserCmd = &cobra.Command{
 
 		err = userManagement.DeleteUser(userUUID)
 		if err != nil {
-			if err != user.ErrNotFound {
+			if err != utils.ErrNotFound {
 				fmt.Println("Issue deleting")
 				fmt.Println(err)
 				return

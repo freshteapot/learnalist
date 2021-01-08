@@ -8,9 +8,9 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -100,7 +100,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	extUserID := token.UserId
 	userUUID, err := userFromIDP.Lookup(input.Idp, IDPKindUserID, extUserID)
 	if err != nil {
-		if err != ErrNotFound {
+		if err != utils.ErrNotFound {
 			logContext.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
 				"idp":   input.Idp,

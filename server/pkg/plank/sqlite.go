@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -56,7 +57,7 @@ func (r SqliteRepository) GetEntry(UUID string, userUUID string) (openapi.Plank,
 	err := r.db.Get(&body, SqlGetEntry, UUID, userUUID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = ErrNotFound
+			err = utils.ErrNotFound
 		}
 		return record, err
 	}

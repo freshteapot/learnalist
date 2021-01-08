@@ -20,6 +20,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
@@ -31,6 +32,7 @@ import (
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
+
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -123,8 +125,10 @@ var ServerCmd = &cobra.Command{
 			storageAlist,
 			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
 
+		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
+
 		userManagement := user.NewManagement(
-			userStorage.NewSqliteManagementStorage(db),
+			userStorageRepo,
 			hugoHelper,
 			event.NewInsights(logger),
 		)
@@ -162,8 +166,13 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "mobile-service"))
 
 		remindService := remind.NewService(
-			userStorage.NewSqliteManagementStorage(db),
+			userStorageRepo,
 			logger.WithField("context", "remind-service"))
+
+		appSettingsService := app_settings.NewService(
+			userStorageRepo,
+			logger.WithField("context", "appSettings-service"),
+		)
 
 		server.InitApi(
 			apiManager,
@@ -173,7 +182,10 @@ var ServerCmd = &cobra.Command{
 			plankService,
 			challengeService,
 			mobileService,
-			remindService)
+			remindService,
+			appSettingsService,
+		)
+
 		server.InitAlists(acl, dal, hugoHelper)
 
 		go func() {

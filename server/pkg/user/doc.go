@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -89,8 +88,6 @@ type UserFromIDP interface {
 	Lookup(idp string, kind string, identifier string) (userUUID string, err error)
 }
 
-var ErrNotFound = errors.New("user-not-found")
-
 type UserPreference struct {
 	UserUUID      string                       `json:"user_uuid,omitempty"`
 	DisplayName   string                       `json:"display_name,omitempty"`
@@ -105,9 +102,9 @@ type UserPreferenceDailyReminder struct {
 	PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
 }
 
-// TODO actually use
 type UserPreferenceApps struct {
-	PlankV1 *openapi.MobilePlankAppV1Settings `json:"plank_v1"` // Only nice to sync between app and web, not needed yet
+	PlankV1  *openapi.MobilePlankAppV1Settings `json:"plank_v1,omitempty"` // Only nice to sync between app and web, not needed yet
+	RemindV1 *openapi.AppSettingsRemindV1      `json:"remind_v1,omitempty"`
 }
 
 // TODO actually use

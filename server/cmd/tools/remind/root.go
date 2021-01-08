@@ -10,5 +10,6 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(dailyCMD)
+	RootCmd.AddCommand(managerCMD)
+	RootCmd.AddCommand(rebuildSpacedRepetitionCMD)
 }

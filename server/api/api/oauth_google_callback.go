@@ -12,6 +12,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -82,7 +83,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	// Look up the user based on their email and association with google.
 	userUUID, err := userFromIDP.Lookup("google", user.IDPKindUserID, userInfo.ID)
 	if err != nil {
-		if err != user.ErrNotFound {
+		if err != utils.ErrNotFound {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
 				"error": err,

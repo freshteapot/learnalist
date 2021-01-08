@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"firebase.google.com/go/messaging"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -141,7 +141,6 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 		json.Unmarshal(b, &moment)
 		challengeUUID = moment.UUID
 		userUUID = moment.UserUUID
-		fmt.Println(string(b))
 		template = "%s has left %s"
 	}
 
@@ -190,7 +189,7 @@ func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 			Token: user.Token,
 		}
 
-		event.GetBus().Publish("notifications", event.Eventlog{
+		event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
 			UUID: userUUID,
 			Kind: event.KindPushNotification,
 			Data: message,

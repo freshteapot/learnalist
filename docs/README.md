@@ -1,7 +1,7 @@
 # Docs
 * [Setup for development](./setup-server-for-development.md)
 * [Run some end-to-end tests](./end-to-end-testing.md)
-* [Api Overview](./api.md)
+* [Api Overview](./api.auto.md)
 * [List types overview](./list.types.md)
 * [Question and Answers](./qa.md)
 * [Technical Debt](./technical-debt.md)

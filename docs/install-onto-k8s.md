@@ -3,7 +3,7 @@
 - You will need to add registry.devbox to your /etc/hosts
 
 ```sh
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 ```
 
@@ -127,7 +127,7 @@ ${SSH_SERVER}:/srv/learnalist/server.db prod-server.db
 ```sh
 make build-site-assets
 
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context
 kubectl config use-context default
@@ -145,19 +145,13 @@ make build-site-assets
 make build-image-base
 make build-image
 
-export KUBECONFIG="/Users/tinkerbell/.k3s/lal01.learnalist.net.yaml"
+export KUBECONFIG="/Users/freshteapot/.k3s/lal01.learnalist.net.yaml"
 export SSH_SERVER="lal01.learnalist.net"
 kubectl config unset current-context
 kubectl config use-context default
 kill -9 $(lsof -ti tcp:6443)
 kill -9 $(lsof -ti tcp:5000)
 ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
-```
-
-```sh
-ssh $SSH_SERVER
-sudo su -
-kill -9 $(lsof -ti tcp:5000)
 ```
 
 ```sh
@@ -177,7 +171,7 @@ kubectl apply -f k8s/learnalist.yaml
 kubectl apply -f k8s/slack-events.yaml
 kubectl apply -f k8s/event-reader.yaml
 kubectl apply -f k8s/notifications-push-notifications.yaml
-kubectl apply -f k8s/remind-daily.yaml
+kubectl apply -f k8s/remind-manager.yaml
 ```
 
 Patch if only bumped latest version
@@ -190,7 +184,7 @@ kubectl patch deployment learnalist -p "${PATCH}"
 kubectl patch deployment event-reader -p "${PATCH}"
 kubectl patch deployment slack-events -p "${PATCH}"
 kubectl patch deployment notifications-push-notifications -p "${PATCH}"
-kubectl patch deployment remind-daily -p "${PATCH}"
+kubectl patch deployment remind-manager -p "${PATCH}"
 ```
 
 ```sh

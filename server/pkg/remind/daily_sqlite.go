@@ -14,7 +14,7 @@ var (
 	SqlDeleteByUser       = `DELETE FROM daily_reminder_settings WHERE user_uuid=?`
 	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?, activity=0`
 	SqlWhoToRemind        = `
-WITH _settings(user_uuid, app_identifier, settings, activity) AS (
+WITH _base(user_uuid, app_identifier, settings, activity) AS (
 	SELECT
 		user_uuid,
 		json_extract(body, '$.app_identifier') AS app_identifier,
@@ -27,20 +27,29 @@ WITH _settings(user_uuid, app_identifier, settings, activity) AS (
 ),
 _with_medium(user_uuid, settings, medium, activity) AS (
 	SELECT
-		s.user_uuid,
-		s.settings,
+		b.user_uuid,
+		b.settings,
 		md.token AS medium,
 		activity
 	FROM
-		_settings AS s
-	INNER JOIN mobile_device as md ON (md.user_uuid = s.user_uuid)
+		_base AS b
+	INNER JOIN mobile_device AS md ON (md.user_uuid = b.user_uuid)
 	WHERE
-		md.app_identifier=s.app_identifier
+		md.app_identifier=b.app_identifier
+),
+_with_or_without_medium(user_uuid, settings, medium, activity) AS (
+	SELECT user_uuid, settings, "" AS medium, activity FROM _base
+	UNION
+	SELECT user_uuid, settings, medium, activity FROM _with_medium
+),
+_reduce(user_uuid, settings, medium, activity, rk) AS (
+	SELECT
+	*,
+	ROW_NUMBER() OVER(PARTITION BY user_uuid ORDER BY medium DESC) AS rk
+		FROM _with_or_without_medium
 )
 
-SELECT * FROM _with_medium
-UNION
-SELECT user_uuid, settings, "" AS medium, activity FROM _settings
+SELECT user_uuid, settings, medium, activity FROM _reduce WHERE rk = 1
 `
 )
 

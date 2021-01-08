@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
@@ -126,6 +127,23 @@ var _ = Describe("Testing Spaced Repetitiion Repository Sqlite", func() {
 		})
 	})
 
+	When("Deleting by user", func() {
+		It("Fail", func() {
+			mockSql.ExpectExec(spaced_repetition.SqlDeleteByUser).
+				WithArgs(userUUID).
+				WillReturnError(want)
+			err := repo.DeleteByUser(userUUID)
+			Expect(err).To(Equal(want))
+		})
+		It("Success", func() {
+			mockSql.ExpectExec(spaced_repetition.SqlDeleteByUser).
+				WithArgs(userUUID).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			err := repo.DeleteByUser(userUUID)
+			Expect(err).To(BeNil())
+		})
+	})
+
 	When("Updating", func() {
 		It("Fail", func() {
 			mockSql.ExpectExec(spaced_repetition.SqlUpdateItem).
@@ -185,7 +203,7 @@ var _ = Describe("Testing Spaced Repetitiion Repository Sqlite", func() {
 				WillReturnError(sql.ErrNoRows).
 				WithArgs(entryUUID, userUUID)
 			_, err := repo.GetEntry(userUUID, entryUUID)
-			Expect(err).To(Equal(spaced_repetition.ErrNotFound))
+			Expect(err).To(Equal(utils.ErrNotFound))
 		})
 
 		It("Success", func() {
@@ -225,7 +243,7 @@ var _ = Describe("Testing Spaced Repetitiion Repository Sqlite", func() {
 				WillReturnError(sql.ErrNoRows).
 				WithArgs(userUUID)
 			_, err := repo.GetNext(userUUID)
-			Expect(err).To(Equal(spaced_repetition.ErrNotFound))
+			Expect(err).To(Equal(utils.ErrNotFound))
 		})
 
 		It("Success", func() {

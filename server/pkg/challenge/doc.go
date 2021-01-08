@@ -1,7 +1,6 @@
 package challenge
 
 import (
-	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
@@ -132,7 +131,3 @@ type EventEntry struct {
 	Kind string                  `json:"kind"`
 	Data EventChallengeDoneEntry `json:"data"`
 }
-
-var (
-	ErrNotFound = errors.New("not.found")
-)

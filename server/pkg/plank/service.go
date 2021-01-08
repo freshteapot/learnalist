@@ -13,6 +13,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -125,7 +126,7 @@ func (s PlankService) DeletePlankRecord(c echo.Context) error {
 
 	record, err := s.repo.GetEntry(UUID, user.Uuid)
 	if err != nil {
-		if err == ErrNotFound {
+		if err == utils.ErrNotFound {
 			return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 				Message: i18n.PlankRecordNotFound,
 			})

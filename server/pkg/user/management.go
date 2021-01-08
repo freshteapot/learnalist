@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +33,7 @@ func (m management) FindUser(search string) ([]string, error) {
 func (m management) DeleteUser(userUUID string) error {
 	found, _ := m.storage.FindUserUUID(userUUID)
 	if len(found) == 0 {
-		return ErrNotFound
+		return utils.ErrNotFound
 	}
 
 	// This code is not deleting from the database

@@ -7,27 +7,29 @@ import (
 	"time"
 
 	"firebase.google.com/go/messaging"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
+	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 )
 
-type manager struct {
+type dailyManager struct {
+	subscription stan.Subscription
 	settingsRepo RemindDailySettingsRepository
 	mobileRepo   mobile.MobileRepository
 	logContext   logrus.FieldLogger
 	filterKinds  []string
 }
 
-func NewManager(
+func NewDaily(
 	settingsRepo RemindDailySettingsRepository,
 	mobileRepo mobile.MobileRepository,
-	logContext logrus.FieldLogger) *manager {
-	return &manager{
+	logContext logrus.FieldLogger) *dailyManager {
+	return &dailyManager{
 		settingsRepo: settingsRepo,
 		mobileRepo:   mobileRepo,
 		logContext:   logContext,
@@ -43,18 +45,66 @@ func NewManager(
 	}
 }
 
-func (m *manager) FilterKindsBy() []string {
-	return m.filterKinds
+func (m *dailyManager) Subscribe(topic string, sc stan.Conn) (err error) {
+	d := 200 * time.Millisecond
+	// Initially we shall wait
+
+	var timer *time.Timer
+	timer = time.AfterFunc(500*time.Millisecond, func() {
+		m.StartSendNotifications()
+		timer.Stop()
+		timer = nil
+	})
+
+	handle := func(msg *stan.Msg) {
+		var moment event.Eventlog
+		json.Unmarshal(msg.Data, &moment)
+		if !utils.StringArrayContains(m.filterKinds, moment.Kind) {
+
+			if timer != nil {
+				timer.Reset(d)
+			}
+
+			return
+		}
+
+		m.OnEvent(moment)
+		if timer != nil {
+			timer.Reset(d)
+		}
+	}
+
+	durableName := "remind.daily"
+	m.subscription, err = sc.Subscribe(
+		topic,
+		handle,
+		stan.DurableName(durableName),
+		stan.DeliverAllAvailable(),
+		stan.MaxInflight(1),
+	)
+	if err == nil {
+		m.logContext.Info("Running")
+	}
+	return err
+}
+
+func (m *dailyManager) Close() {
+	err := m.subscription.Close()
+	if err != nil {
+		m.logContext.WithField("error", err).Error("closing subscription")
+	}
 }
 
 // Future might want display_name
-func (m *manager) OnEvent(entry event.Eventlog) {
+func (m *dailyManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
 		fallthrough
 	case event.CMDUserDelete:
 		// Delete from
 		userUUID := entry.UUID
+		// TODO check if empty and skip
+		// Or check legacy
 		logContext := m.logContext.WithFields(logrus.Fields{
 			"user_uuid": userUUID,
 			"event":     event.UserDeleted,
@@ -116,14 +166,13 @@ func (m *manager) OnEvent(entry event.Eventlog) {
 	}
 }
 
-func (m *manager) StartSendNotifications() {
+func (m *dailyManager) StartSendNotifications() {
 	// TODO do we want to pass in context cancel?
 	m.logContext.Info("Sending notifications is active")
 	m.SendNotifications()
 	//ticker := time.NewTicker(1 * time.Minute)
 	ticker := time.NewTicker(5 * time.Second) // Might be too aggressive
 	go func() {
-
 		for {
 			select {
 			case <-ticker.C:
@@ -133,7 +182,7 @@ func (m *manager) StartSendNotifications() {
 	}()
 }
 
-func (m *manager) SendNotifications() {
+func (m *dailyManager) SendNotifications() {
 	reminders := m.settingsRepo.WhoToRemind()
 	if len(reminders) == 0 {
 		return
@@ -143,6 +192,7 @@ func (m *manager) SendNotifications() {
 	title := "Daily Reminder"
 
 	msgSent := 0
+	msgSkipped := 0
 	for _, remindMe := range reminders {
 		process := true
 		// When empty, it means the device has not been registered
@@ -175,23 +225,36 @@ func (m *manager) SendNotifications() {
 			}
 
 			// Send message
-			event.GetBus().Publish("notifications", event.Eventlog{
+			event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
+		}
+
+		if process {
+			err := m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+			if err != nil {
+				m.logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Trigger restart, as I am guessing issue with the database")
+			}
 			msgSent++
 		}
 
-		// Update settings when next
-		m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+		if !process {
+			// We dont care if this fails, as no message would be sent
+			m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+			msgSkipped++
+		}
 	}
 
 	m.logContext.WithFields(logrus.Fields{
-		"msg_sent": msgSent,
+		"msg_sent":    msgSent,
+		"msg_skipped": msgSkipped,
 	}).Info("messages sent")
 }
 
-func (m *manager) whenNext(from time.Time, to time.Time) time.Time {
+func (m *dailyManager) whenNext(from time.Time, to time.Time) time.Time {
 	whenNext := to
 	if to.Before(from) {
 		whenNext = to.Add(time.Duration(24 * time.Hour))
@@ -199,7 +262,7 @@ func (m *manager) whenNext(from time.Time, to time.Time) time.Time {
 	return whenNext
 }
 
-func (m *manager) updateSettingsWithWhenNext(userUUID string, conf openapi.RemindDailySettings) error {
+func (m *dailyManager) updateSettingsWithWhenNext(userUUID string, conf openapi.RemindDailySettings) error {
 	loc, _ := time.LoadLocation(conf.Tz)
 	parts := strings.Split(conf.TimeOfDay, ":")
 	hour, _ := strconv.Atoi(parts[0])
@@ -216,7 +279,7 @@ func (m *manager) updateSettingsWithWhenNext(userUUID string, conf openapi.Remin
 	)
 }
 
-func (m *manager) processSettings(entry event.Eventlog) {
+func (m *dailyManager) processSettings(entry event.Eventlog) {
 	userUUID := entry.UUID
 	b, _ := json.Marshal(entry.Data)
 	var settings openapi.RemindDailySettings
@@ -250,7 +313,7 @@ func (m *manager) processSettings(entry event.Eventlog) {
 	return
 }
 
-func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
+func (m *dailyManager) processMobileDeviceRegistered(entry event.Eventlog) {
 	b, _ := json.Marshal(entry.Data)
 	var deviceInfo openapi.MobileDeviceInfo
 	json.Unmarshal(b, &deviceInfo)
@@ -265,7 +328,7 @@ func (m *manager) processMobileDeviceRegistered(entry event.Eventlog) {
 	}
 }
 
-func (m *manager) processMobileDeviceRemoved(entry event.Eventlog) {
+func (m *dailyManager) processMobileDeviceRemoved(entry event.Eventlog) {
 	b, _ := json.Marshal(entry.Data)
 	var deviceInfo openapi.MobileDeviceInfo
 	json.Unmarshal(b, &deviceInfo)

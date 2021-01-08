@@ -201,6 +201,7 @@ type SpacedRepetitionRepository interface {
 	SaveEntry(entry SpacedRepetitionEntry) error
 	UpdateEntry(entry SpacedRepetitionEntry) error
 	DeleteEntry(userUUID string, UUID string) error
+	DeleteByUser(userUUID string) error
 }
 
 type ItemInput interface {
@@ -213,7 +214,6 @@ type ItemInput interface {
 }
 
 var (
-	ErrNotFound                    = errors.New("not.found")
 	ErrFoundNotTime                = errors.New("found.not.time")
 	ErrSpacedRepetitionEntryExists = errors.New("item.exists")
 )

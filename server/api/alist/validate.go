@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/gookit/validate"
 )
 

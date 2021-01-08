@@ -183,7 +183,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 		When("User lookup returns not found, we register the user", func() {
 			It("Failed to register user due to saving to storage", func() {
-				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", user.ErrNotFound)
+				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
 				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 				req, rec := setupFakeEndpoint(method, uri, "")
@@ -199,7 +199,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 				testHugoHelper := &mocks.HugoSiteBuilder{}
 				testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", user.ErrNotFound)
+				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
 				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
 				datastore.On("GetAllListsByUser", userUUID).Return(noLists)
 				userSession.On("Activate", mock.Anything).Return(nil)

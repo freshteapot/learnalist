@@ -1,8 +1,6 @@
 package mobile
 
 import (
-	"errors"
-
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
@@ -12,7 +10,3 @@ type MobileRepository interface {
 	DeleteByApp(userUUID string, appIdentifier string) error
 	GetDevicesInfoByToken(token string) ([]openapi.MobileDeviceInfo, error)
 }
-
-var (
-	ErrNotFound = errors.New("not.found")
-)

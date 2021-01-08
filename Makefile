@@ -25,7 +25,7 @@ rebuild-db:
 	rm -f /tmp/learnalist/server.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/server.db
 
-rebuild-db-remind-daily:
+rebuild-db-remind-manager:
 	mkdir -p /tmp/learnalist/
 	rm -f /tmp/learnalist/remind-daily.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
@@ -74,7 +74,7 @@ run-api-server:
 	cd server && \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
-run-remind-daily:
+run-remind-manager:
 	cd server && \
 	TOPIC=lal.monolog \
 	EVENTS_VIA="nats" \
@@ -82,7 +82,7 @@ run-remind-daily:
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags=json1 main.go --config=../config/dev.config.yaml \
-	tools remind daily
+	tools remind manager
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
@@ -113,7 +113,7 @@ generate-openapi-one:
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.challenge.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.mobile.yaml && \
 	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.remind.yaml && \
-	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/apps.yaml && \
+	yq m -i /tmp/openapi/one/learnalist.yaml ./openapi/api.app_settings.yaml && \
 	openapi-generator generate -i /tmp/openapi/one/learnalist.yaml -g openapi-yaml -o /tmp/openapi/one
 
 generate-openapi-markdown: generate-openapi-one
@@ -172,7 +172,7 @@ build-image-base:
 	cd server && \
 	docker build -f Dockerfile_prod_base -t learnalist-prod-base:latest .
 
-build-image:
+build-image: generate-openapi-go
 	cd server && \
 	docker build \
 	--build-arg GIT_COMMIT="${GIT_COMMIT}" \

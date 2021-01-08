@@ -7,10 +7,10 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/label"
 	apiUser "github.com/freshteapot/learnalist-api/server/api/user"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 // DB allowing us to build an abstraction layer

@@ -2,11 +2,13 @@ package event
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/api/utils"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
+	"github.com/nats-io/stan.go"
 )
 
 const (
+	ApiAppSettingsRemindV1           = "api.appsettings.remind_v1"
 	ApiPlank                         = "api.plank"
 	CMDUserDelete                    = "cmd.user.delete"
 	ApiUserDelete                    = "api.user.delete"
@@ -19,6 +21,7 @@ const (
 	ApiSpacedRepetition              = "api.spacedrepetition"
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
+	TopicNotifications               = "notifications"
 	KindUserRegisterUsername         = "username"
 	KindUserRegisterIDPGoogle        = "idp:google"
 	KindUserLoginIDPGoogle           = "idp:google"
@@ -56,6 +59,11 @@ type EventlogPubSub interface {
 	Publish(topic string, moment Eventlog)
 	Subscribe(topic string, key string, fn interface{})
 	Unsubscribe(topic string, key string)
+}
+
+type NatsSubscriber interface {
+	Subscribe(topic string, sc stan.Conn) error
+	Close()
 }
 
 type Eventlog struct {

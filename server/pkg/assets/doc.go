@@ -1,15 +1,10 @@
 package assets
 
 import (
-	"errors"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/sirupsen/logrus"
-)
-
-var (
-	ErrNotFound = errors.New("not.found")
 )
 
 type AssetEntry struct {

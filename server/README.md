@@ -21,7 +21,7 @@ staticcheck ./...
 ```
 
 # Some documentation
-* [Api](../doc/api.md)
+* [Api](../doc/api.auto.md)
 * [List types overview](../doc/list.types.md)
 * [Question and Answers](../doc/qa.md)
 * [manual install instructions for me](../doc/INSTALL.md)

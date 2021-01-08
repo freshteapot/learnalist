@@ -12,6 +12,20 @@ type SpacedRepetitionRepository struct {
 	mock.Mock
 }
 
+// DeleteByUser provides a mock function with given fields: userUUID
+func (_m *SpacedRepetitionRepository) DeleteByUser(userUUID string) error {
+	ret := _m.Called(userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteEntry provides a mock function with given fields: userUUID, UUID
 func (_m *SpacedRepetitionRepository) DeleteEntry(userUUID string, UUID string) error {
 	ret := _m.Called(userUUID, UUID)

@@ -40,7 +40,7 @@ var _ = Describe("Testing Processing push notifications", func() {
 
 		eventMessageBus.On("Subscribe", event.TopicMonolog, "challenge", mock.Anything)
 
-		eventMessageBus.On("Publish", "notifications", mock.MatchedBy(func(moment event.Eventlog) bool {
+		eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
 			Expect(moment.Kind).To(Equal(event.KindPushNotification))
 
 			var msg *messaging.Message
