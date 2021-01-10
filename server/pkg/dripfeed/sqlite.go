@@ -10,10 +10,11 @@ import (
 )
 
 const (
-	SqlDeleteByUser       = `DELETE FROM dripfeed_item WHERE user_uuid=?`
-	SqlDeleteByUserAndSRS = `DELETE FROM dripfeed_item WHERE user_uuid=? AND srs_uuid=?`
-	SqlExists             = `SELECT 1 FROM dripfeed_item WHERE dripfeed_uuid=?`
-	SqlGetNext            = `
+	SqlDeleteByUser                    = `DELETE FROM dripfeed_item WHERE user_uuid=?`
+	SqlDeleteByDripfeedUUIDAndUserUUID = `DELETE FROM dripfeed_item WHERE dripfeed_uuid=? AND user_uuid=?`
+	SqlDeleteByUserAndSRS              = `DELETE FROM dripfeed_item WHERE user_uuid=? AND srs_uuid=?`
+	SqlExists                          = `SELECT 1 FROM dripfeed_item WHERE dripfeed_uuid=?`
+	SqlGetNext                         = `
 SELECT
 	dripfeed_uuid,
 	srs_uuid,
@@ -125,5 +126,10 @@ func (r sqliteRepository) DeleteBySpacedRepetitionUUID(dripfeedUUID string, srsU
 
 func (r sqliteRepository) DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID string, srsUUID string) error {
 	_, err := r.db.Exec(SqlDeleteByUserAndSRS, userUUID, srsUUID)
+	return err
+}
+
+func (r sqliteRepository) DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error {
+	_, err := r.db.Exec(SqlDeleteByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
 	return err
 }

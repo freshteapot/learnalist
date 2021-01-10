@@ -30,8 +30,21 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 		item := moment.Data
 		err := s.repo.SaveEntry(item)
 		if err != nil {
-			// TODO might be too aggressive
-			panic(err)
+			if err != ErrSpacedRepetitionEntryExists {
+				// TODO might be too aggressive
+				panic(err)
+			}
+
+			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+				UUID: item.UUID,
+				Kind: event.SystemSpacedRepetition,
+				Data: EventSpacedRepetition{
+					Kind: EventKindAlreadyInSystem,
+					Data: item,
+				},
+				Action: EventKindAlreadyInSystem,
+			})
+			return
 		}
 
 		// The entry is a new
@@ -42,8 +55,6 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 				Data: item,
 			},
 		})
-
-		// Now tell dripfeed it is done
 	}
 }
 

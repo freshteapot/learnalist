@@ -147,6 +147,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		UUID:   dripfeedUUID,
 		Kind:   event.ApiDripfeed,
 		Data:   data,
 		Action: event.ActionCreated,
@@ -156,8 +157,80 @@ func (s DripfeedService) Create(c echo.Context) error {
 }
 
 func (s DripfeedService) Delete(c echo.Context) error {
-	// loggedInUser := c.Get("loggedInUser").(uuid.User)
-	return c.JSON(http.StatusOK, api.HTTPResponseMessage{
-		Message: "TODO",
+	loggedInUser := c.Get("loggedInUser").(uuid.User)
+	dripfeedUUID := c.Param("uuid")
+	userUUID := loggedInUser.Uuid
+
+	logContext := s.logContext.WithFields(logrus.Fields{
+		"entry":         "delete",
+		"dripfeed_uuid": dripfeedUUID,
+		"user_uuid":     userUUID,
 	})
+
+	defer c.Request().Body.Close()
+	var temp interface{}
+	json.NewDecoder(c.Request().Body).Decode(&temp)
+	raw, _ := json.Marshal(temp)
+
+	var input openapi.HttpDripfeedInputBase
+	json.Unmarshal(raw, &input)
+
+	if input.UserUuid != loggedInUser.Uuid {
+		logContext.WithFields(logrus.Fields{
+			"error": "user-match",
+			"input": input,
+		}).Error("input")
+
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+			Message: "User doesnt match",
+		})
+	}
+
+	inputDdripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
+
+	if inputDdripfeedUUID != dripfeedUUID {
+		logContext.WithFields(logrus.Fields{
+			"error": "dripfeed-not-correct-hash",
+			"input": input,
+		}).Error("input")
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
+			Message: "Dripfeed doesnt match",
+		})
+	}
+
+	if dripfeedUUID == "" {
+		response := api.HTTPResponseMessage{
+			Message: "Dripfeed uuid needs setting",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	exists, err := s.repo.Exists(dripfeedUUID)
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"event": "broken-state",
+			"error": err,
+		}).Error("s.repo.Exists")
+
+		response := api.HTTPResponseMessage{
+			Message: i18n.InternalServerErrorAclLookup,
+		}
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	if exists {
+		return c.NoContent(http.StatusOK)
+	}
+
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		UUID: dripfeedUUID,
+		Kind: event.ApiDripfeed,
+		Data: EventDripfeedDelete{
+			DripfeedUUID: dripfeedUUID,
+			UserUUID:     userUUID,
+		},
+		Action: event.ActionDeleted,
+	})
+
+	return c.NoContent(http.StatusOK)
 }

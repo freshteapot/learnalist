@@ -224,9 +224,10 @@ var (
 
 // Event specific
 var (
-	EventKindNew     = "new"
-	EventKindViewed  = "viewed"
-	EventKindDeleted = "deleted"
+	EventKindNew             = "new"
+	EventKindViewed          = "viewed"
+	EventKindDeleted         = "deleted"
+	EventKindAlreadyInSystem = "exists"
 )
 
 type EventSpacedRepetition struct {

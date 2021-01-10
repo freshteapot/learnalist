@@ -2,6 +2,7 @@ package dripfeed
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -20,69 +21,92 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 
 	case event.SystemSpacedRepetition:
 		// TODO needs adding
-		if entry.Action != "in-system" {
+		if entry.Action != spaced_repetition.EventKindAlreadyInSystem {
 			return
 		}
-		dripfeedUUID := entry.UUID
+
+		b, _ := json.Marshal(entry.Data)
+		var moment spaced_repetition.EventSpacedRepetition
+		json.Unmarshal(b, &moment)
+
+		srsItem := moment.Data
+
+		var settingsInfo SpacedRepetitionSettingsExtID
+		json.Unmarshal([]byte(srsItem.Body), &settingsInfo)
+		dripfeedUUID := settingsInfo.Settings.ExtID
+
+		if dripfeedUUID == "" {
+			return
+		}
+
 		s.checkForNext(dripfeedUUID)
 
 	case event.ApiDripfeed:
-		b, _ := json.Marshal(entry.Data)
-		var moment EventDripfeedInputInfo
-		json.Unmarshal(b, &moment)
+		switch entry.Action {
+		case event.ActionCreated:
+			b, _ := json.Marshal(entry.Data)
+			var moment EventDripfeedInputInfo
+			json.Unmarshal(b, &moment)
 
-		userUUID := moment.Info.UserUUID
-		alistUUID := moment.Info.AlistUUID
-		dripfeedUUID := UUID(userUUID, alistUUID)
-		items := make([]interface{}, 0)
+			userUUID := moment.Info.UserUUID
+			alistUUID := moment.Info.AlistUUID
+			dripfeedUUID := UUID(userUUID, alistUUID)
+			items := make([]interface{}, 0)
 
-		now := time.Now().UTC()
-		whenNext := now.Add(spaced_repetition.Threshold0)
-		settings := spaced_repetition.HTTPRequestInputSettings{
-			Level:    spaced_repetition.Level0,
-			Created:  now.Format(time.RFC3339),
-			WhenNext: whenNext.Format(time.RFC3339),
-			ExtID:    dripfeedUUID,
-		}
-
-		switch moment.Info.Kind {
-		case alist.SimpleList:
-			var input EventDripfeedInputV1
-			json.Unmarshal(b, &input)
-			for _, listItem := range input.Data {
-				item := spaced_repetition.HTTPRequestInputV1{
-					Data: listItem,
-				}
-				b, _ := json.Marshal(item)
-				srsItem := spaced_repetition.V1FromPOST(b, settings)
-				items = append(items, srsItem.String())
+			now := time.Now().UTC()
+			whenNext := now.Add(spaced_repetition.Threshold0)
+			settings := spaced_repetition.HTTPRequestInputSettings{
+				Level:    spaced_repetition.Level0,
+				Created:  now.Format(time.RFC3339),
+				WhenNext: whenNext.Format(time.RFC3339),
+				ExtID:    dripfeedUUID,
 			}
 
-		case alist.FromToList:
-			panic("TODO")
-			var input EventDripfeedInputV2
-			json.Unmarshal(b, &input)
-			for _, listItem := range input.Data {
-				item := spaced_repetition.HTTPRequestInputV2{}
-				item.Data = spaced_repetition.HTTPRequestInputV2Item{
-					From: listItem.From,
-					To:   listItem.To,
+			switch moment.Info.Kind {
+			case alist.SimpleList:
+				var input EventDripfeedInputV1
+				json.Unmarshal(b, &input)
+				for _, listItem := range input.Data {
+					item := spaced_repetition.HTTPRequestInputV1{
+						Data: listItem,
+					}
+					b, _ := json.Marshal(item)
+					srsItem := spaced_repetition.V1FromPOST(b, settings)
+					items = append(items, srsItem.String())
 				}
-				item.Settings.Show = input.Settings.Show
 
-				b, _ := json.Marshal(item)
-				srsItem := spaced_repetition.V1FromPOST(b, settings)
-				items = append(items, srsItem.String())
+			case alist.FromToList:
+				// TODO support V2
+				panic("TODO")
+				var input EventDripfeedInputV2
+				json.Unmarshal(b, &input)
+				for _, listItem := range input.Data {
+					item := spaced_repetition.HTTPRequestInputV2{}
+					item.Data = spaced_repetition.HTTPRequestInputV2Item{
+						From: listItem.From,
+						To:   listItem.To,
+					}
+					item.Settings.Show = input.Settings.Show
+
+					b, _ := json.Marshal(item)
+					srsItem := spaced_repetition.V1FromPOST(b, settings)
+					items = append(items, srsItem.String())
+				}
 			}
-		}
 
-		err := s.repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
-		if err != nil {
-			panic(err)
-		}
+			err := s.repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
+			if err != nil {
+				panic(err)
+			}
 
-		// GetNext
-		s.checkForNext(dripfeedUUID)
+			// GetNext
+			s.checkForNext(dripfeedUUID)
+		case event.ActionDeleted:
+			b, _ := json.Marshal(entry.Data)
+			var moment EventDripfeedDelete
+			json.Unmarshal(b, &moment)
+			_ = s.repo.DeleteByUUIDAndUserUUID(moment.DripfeedUUID, moment.UserUUID)
+		}
 	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
 		var moment spaced_repetition.EventSpacedRepetition
@@ -91,6 +115,8 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 		srsItem := moment.Data
 
 		switch moment.Kind {
+		case spaced_repetition.EventKindDeleted:
+			fmt.Println("TODO Do I need to handle this?")
 		case spaced_repetition.EventKindNew:
 			/*
 				var settingsInfo SpacedRepetitionSettingsExtID
@@ -163,9 +189,8 @@ func (s DripfeedService) checkForNext(dripfeedUUID string) {
 		entry = spaced_repetition.V2FromDB(string(nextUp.SrsBody))
 	}
 
+	// TODO we could pass time in based on the event time
 	entry.Reset(time.Now().UTC())
-	// TODO I think we don't need this anymore
-	// entry.SetExtID(dripfeedUUID)
 
 	// TODO should I check nextUP.UserUUID = userUUID?
 	item := spaced_repetition.SpacedRepetitionEntry{
@@ -176,11 +201,6 @@ func (s DripfeedService) checkForNext(dripfeedUUID string) {
 		Created:  entry.Created(),
 	}
 
-	// TODO how do I make sure the dripfeedUUID is not lost
-	// Is it simpler to just pass in the repo?
-	// Sleep on it
-	// Do I send this to spaced_repetition? YES
-	// Via the system we trust?
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.SystemSpacedRepetition,
 		Data: spaced_repetition.EventSpacedRepetition{
@@ -188,6 +208,5 @@ func (s DripfeedService) checkForNext(dripfeedUUID string) {
 			Data: item,
 		},
 	})
-
-	_ = s.repo.DeleteByPosition(nextUp.DripfeedUUID, nextUp.Position)
+	// We handle deletion of new entry via the new action event above
 }

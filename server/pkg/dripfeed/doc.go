@@ -13,6 +13,7 @@ import (
 
 type DripfeedRepository interface {
 	AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []interface{}) error
+	DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error
 	DeleteByUser(userUUID string) error
 	DeleteByPosition(dripfeedUUID string, position int) error
 	DeleteBySpacedRepetitionUUID(dripfeedUUID string, srsUUID string) error
@@ -42,6 +43,11 @@ type SpacedRepetitionSettingsBase struct {
 
 type SpacedRepetitionUUID struct {
 	UUID string `json:"uuid"`
+}
+
+type EventDripfeedDelete struct {
+	UserUUID     string `json:"user_uuid"`
+	DripfeedUUID string `json:"dripfeed_uuid"`
 }
 
 type EventDripfeedInputBase struct {
