@@ -65,7 +65,7 @@ func (r sqliteRepository) Exists(dripfeedUUID string) (bool, error) {
 	return true, nil
 }
 
-func (r sqliteRepository) GetNext(dripfeedUUID string) (repoItem, error) {
+func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 	type dbItem struct {
 		SrsUUID      string `db:"srs_uuid"`
 		SrsKind      string `db:"kind"`
@@ -83,7 +83,7 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (repoItem, error) {
 		panic(err)
 	}
 
-	return repoItem{
+	return RepoItem{
 		SrsUUID:      item.SrsUUID,
 		SrsKind:      item.SrsKind,
 		SrsBody:      item.SrsBody,

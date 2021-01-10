@@ -17,7 +17,7 @@ type DripfeedRepository interface {
 	DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID string, srsUUID string) error
 	Exists(dripfeedUUID string) (bool, error)
 	// GetNext return the next spaced entry (v1 or v2)
-	GetNext(dripfeedUUID string) (repoItem, error)
+	GetNext(dripfeedUUID string) (RepoItem, error)
 }
 
 type DripfeedService struct {
@@ -69,7 +69,7 @@ type EventDripfeedInputV2 struct {
 }
 
 // Used to map from db to spacedRepetition
-type repoItem struct {
+type RepoItem struct {
 	SrsUUID      string
 	SrsKind      string
 	SrsBody      []byte

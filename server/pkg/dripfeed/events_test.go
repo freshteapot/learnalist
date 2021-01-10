@@ -52,7 +52,7 @@ var _ = Describe("Testing Events", func() {
 		fmt.Println(moment.Data)
 	})
 
-	FIt("Check if new has dripfeed", func() {
+	It("Check if new has dripfeed", func() {
 		raw := `{"kind":"api.spacedrepetition","data":{"kind":"new","data":{"uuid":"bfe3cc8ad82c1e8282b53df0a7a78685042d9f5b","body":"{\"show\":\"monday\",\"kind\":\"v1\",\"uuid\":\"bfe3cc8ad82c1e8282b53df0a7a78685042d9f5b\",\"data\":\"monday\",\"settings\":{\"level\":\"0\",\"when_next\":\"2021-01-10T15:37:28Z\",\"created\":\"2021-01-10T14:37:28Z\",\"ext_id\":\"b17ef2deb2d1836dfe534de67e710e23c5b67e88\"}}","user_uuid":"4eccc98d-90ea-42ba-84d4-d0688b64d24e","when_next":"2021-01-10T15:37:28Z","created":"2021-01-10T14:37:28Z"}},"timestamp":1610289448}`
 		var entry event.Eventlog
 		json.Unmarshal([]byte(raw), &entry)
@@ -67,6 +67,5 @@ var _ = Describe("Testing Events", func() {
 
 		json.Unmarshal([]byte(srsItem.Body), &info)
 		fmt.Println(info.Settings.ExtID)
-
 	})
 })
