@@ -4,7 +4,7 @@
 - hugo to be installed (> v0.74.3)
 - golang (> go1.15.2)
 - nodejs
-- mockery
+- mockery (v2.5.1)
 
 ## How ugly is the code?
 
@@ -52,3 +52,5 @@ staticcheck ./...
 * [Like casting but not](https://golang.org/ref/spec#Type_assertions)
 * Interfaces http://go-book.appspot.com/interfaces.html
 * Pretty gopher badge at the top(https://github.com/jpoles1/gopherbadger).
+* [mockery on github](https://github.com/vektra/mockery)
+* [Add gutters to your vscode](https://dev.to/vuong/golang-in-vscode-show-code-coverage-of-after-saving-test-8g0)
