@@ -94,7 +94,7 @@ develop-localhost:
 	npm run dev
 
 build-mocks:
-	cd server && mockery -all -recursive
+	cd server && mockery --all --recursive
 
 run-e2e-tests:
 	cd server && \

@@ -4,6 +4,7 @@
 - hugo to be installed (> v0.74.3)
 - golang (> go1.15.2)
 - nodejs
+- mockery
 
 ## How ugly is the code?
 
@@ -51,4 +52,3 @@ staticcheck ./...
 * [Like casting but not](https://golang.org/ref/spec#Type_assertions)
 * Interfaces http://go-book.appspot.com/interfaces.html
 * Pretty gopher badge at the top(https://github.com/jpoles1/gopherbadger).
-
