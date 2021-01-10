@@ -58,7 +58,98 @@ EOF
 )
 ```
 
+```sh
+response=$(curl -XPOST \
+-H "Authorization: Bearer ${token}" \
+'http://127.0.0.1:1234/api/v1/alist' -d'
+{
+  "data": [
+    {
+      "from": "January",
+      "to": "Januar"
+    },
+    {
+      "from": "February",
+      "to": "Februar"
+    },
+    {
+      "from": "March",
+      "to": "Mars"
+    },
+    {
+      "from": "April",
+      "to": "April"
+    },
+    {
+      "from": "May",
+      "to": "Mai"
+    },
+    {
+      "from": "June",
+      "to": "Juni"
+    },
+    {
+      "from": "July",
+      "to": "Juli"
+    },
+    {
+      "from": "August",
+      "to": "August"
+    },
+    {
+      "from": "September",
+      "to": "September"
+    },
+    {
+      "from": "October",
+      "to": "Oktober"
+    },
+    {
+      "from": "November",
+      "to": "November"
+    },
+    {
+      "from": "December",
+      "to": "Desember"
+    }
+  ],
+  "info": {
+    "title": "Months from English to Norwegian",
+    "type": "v2",
+    "labels": [
+      "english",
+      "norwegian"
+    ]
+  }
+}
+')
+alistUUID=$(echo $response | jq -r '.uuid')
+curl -XPOST \
+-H "Authorization: Bearer ${token}" \
+'http://127.0.0.1:1234/api/v1/dripfeed/' -d@<(cat <<EOF
+{
+    "user_uuid": "${userUUID}",
+    "alist_uuid": "${alistUUID}",
+    "settings": {
+        "show": "from"
+    }
+}
+EOF
+)
+```
 
+
+```sh
+curl -XDELETE \
+-H "Authorization: Bearer ${token}" \
+'http://127.0.0.1:1234/api/v1/dripfeed/' -d@<(cat <<EOF
+{
+    "user_uuid": "${userUUID}",
+    "alist_uuid": "${alistUUID}"
+}
+EOF
+)
+```
 # Thoughts
 - Table could be of all.
 Ie

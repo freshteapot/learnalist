@@ -54,20 +54,6 @@ func (_m *DripfeedRepository) DeleteByPosition(dripfeedUUID string, position int
 	return r0
 }
 
-// DeleteBySpacedRepetitionUUID provides a mock function with given fields: dripfeedUUID, srsUUID
-func (_m *DripfeedRepository) DeleteBySpacedRepetitionUUID(dripfeedUUID string, srsUUID string) error {
-	ret := _m.Called(dripfeedUUID, srsUUID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(dripfeedUUID, srsUUID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // DeleteByUUIDAndUserUUID provides a mock function with given fields: dripfeedUUID, userUUID
 func (_m *DripfeedRepository) DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error {
 	ret := _m.Called(dripfeedUUID, userUUID)

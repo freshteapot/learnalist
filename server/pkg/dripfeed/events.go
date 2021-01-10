@@ -183,6 +183,11 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 	json.Unmarshal(b, &moment)
 
 	srsItem := moment.Data
+	// First we remove the entry from the system that already exists
+	err := s.repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(srsItem.UserUUID, srsItem.UUID)
+	if err != nil {
+		panic(err)
+	}
 
 	var settingsInfo SpacedRepetitionSettingsExtID
 	json.Unmarshal([]byte(srsItem.Body), &settingsInfo)

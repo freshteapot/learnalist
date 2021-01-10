@@ -13,7 +13,6 @@ type DripfeedRepository interface {
 	DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error
 	DeleteByUser(userUUID string) error
 	DeleteByPosition(dripfeedUUID string, position int) error
-	DeleteBySpacedRepetitionUUID(dripfeedUUID string, srsUUID string) error
 	DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID string, srsUUID string) error
 	Exists(dripfeedUUID string) (bool, error)
 	// GetNext return the next spaced entry (v1 or v2)

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -78,7 +79,12 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 	item := dbItem{}
 	err := r.db.Get(&item, SqlGetNext, dripfeedUUID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return RepoItem{}, utils.ErrNotFound
+		}
+		// TODO handle panic
 		panic(err)
+		return RepoItem{}, err
 	}
 
 	return RepoItem{
@@ -112,11 +118,6 @@ func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID
 }
 
 func (r sqliteRepository) DeleteByPosition(dripfeedUUID string, position int) error {
-	return errors.New("TODO")
-}
-
-// This could be all
-func (r sqliteRepository) DeleteBySpacedRepetitionUUID(dripfeedUUID string, srsUUID string) error {
 	return errors.New("TODO")
 }
 
