@@ -213,8 +213,7 @@ type ItemInput interface {
 	Created() time.Time
 	IncrThreshold()
 	DecrThreshold()
-	SetExtID(extID string) // TODO add this
-	Reset(now time.Time)   // TODO really? maybe pass in time
+	ResetToStart(now time.Time)
 }
 
 var (

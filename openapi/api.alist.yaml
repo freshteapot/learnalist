@@ -1,37 +1,6 @@
 components:
   examples:
   schemas:
-    DripfeedV1:
-      required:
-        - kind
-        - data
-      allOf:
-        - type: object
-          properties:
-            kind:
-              type: string
-        - $ref: "#/components/schemas/AlistDataV1"
-    DripfeedV2:
-      required:
-        - kind
-        - data
-      allOf:
-        - type: object
-          properties:
-            kind:
-              type: string
-        - $ref: "#/components/schemas/AlistDataV2"
-
-    #EventDripfeedInput:
-    #  oneOf:
-    #    - $ref: '#/components/schemas/DripfeedV1'
-    #    - $ref: '#/components/schemas/DripfeedV2'
-    #  discriminator:
-    #    propertyName: kind
-    #    mapping:
-    #      v1: '#/components/schemas/DripfeedV1'
-    #      v2: '#/components/schemas/DripfeedV2'
-
     HttpDripfeedInputBase:
       type: object
       required:

@@ -2,7 +2,6 @@ package dripfeed
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -20,7 +19,6 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 		return
 
 	case event.SystemSpacedRepetition:
-		// TODO needs adding
 		if entry.Action != spaced_repetition.EventKindAlreadyInSystem {
 			return
 		}
@@ -39,7 +37,8 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 			return
 		}
 
-		s.checkForNext(dripfeedUUID)
+		eventTime := time.Unix(entry.Timestamp, 0).UTC()
+		s.checkForNext(dripfeedUUID, eventTime)
 
 	case event.ApiDripfeed:
 		switch entry.Action {
@@ -100,7 +99,8 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 			}
 
 			// GetNext
-			s.checkForNext(dripfeedUUID)
+			eventTime := time.Unix(entry.Timestamp, 0).UTC()
+			s.checkForNext(dripfeedUUID, eventTime)
 		case event.ActionDeleted:
 			b, _ := json.Marshal(entry.Data)
 			var moment EventDripfeedDelete
@@ -115,28 +115,13 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 		srsItem := moment.Data
 
 		switch moment.Kind {
-		case spaced_repetition.EventKindDeleted:
-			fmt.Println("TODO Do I need to handle this?")
 		case spaced_repetition.EventKindNew:
-			/*
-				var settingsInfo SpacedRepetitionSettingsExtID
-
-				json.Unmarshal([]byte(srsItem.Body), &settingsInfo)
-
-				dripfeedUUID := settingsInfo.Settings.ExtID
-				if dripfeedUUID == "" {
-					return
-				}
-			*/
-			//lastActive := time.Unix(entry.Timestamp, 0).UTC()
-			// We could lookup by srs and remove all on the grounds they will not get added
 			srsItem := moment.Data
 			userUUID := srsItem.UserUUID
 			_ = s.repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID, srsItem.UUID)
 
 		case spaced_repetition.EventKindViewed:
 			// This can trigger more than one to be added, due to not keeping track of Decrement
-			// Only focus on new
 			if moment.Action != spaced_repetition.ActionIncrement {
 				return
 			}
@@ -150,12 +135,12 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 				return
 			}
 
-			// Check if level is 1
 			if settings.Level != spaced_repetition.Level1 {
 				return
 			}
 
-			s.checkForNext(dripfeedUUID)
+			eventTime := time.Unix(entry.Timestamp, 0).UTC()
+			s.checkForNext(dripfeedUUID, eventTime)
 		}
 	}
 }
@@ -174,14 +159,9 @@ func (s DripfeedService) removeUser(entry event.Eventlog) {
 	}).Info("user removed")
 }
 
-func (s DripfeedService) checkForNext(dripfeedUUID string) {
-	// GetNext
-	// This is not going to be as easy as I had hoped to access the settings
-	// I wonder why I have hidden them
-
+func (s DripfeedService) checkForNext(dripfeedUUID string, now time.Time) {
 	nextUp, _ := s.repo.GetNext(dripfeedUUID)
 	var entry spaced_repetition.ItemInput
-	// If body = spaced_repetition.SpacedRepetitionEntry
 	switch nextUp.SrsKind {
 	case alist.SimpleList:
 		entry = spaced_repetition.V1FromDB(string(nextUp.SrsBody))
@@ -189,10 +169,8 @@ func (s DripfeedService) checkForNext(dripfeedUUID string) {
 		entry = spaced_repetition.V2FromDB(string(nextUp.SrsBody))
 	}
 
-	// TODO we could pass time in based on the event time
-	entry.Reset(time.Now().UTC())
+	entry.ResetToStart(now)
 
-	// TODO should I check nextUP.UserUUID = userUUID?
 	item := spaced_repetition.SpacedRepetitionEntry{
 		UserUUID: nextUp.UserUUID,
 		UUID:     entry.UUID(),
@@ -207,6 +185,7 @@ func (s DripfeedService) checkForNext(dripfeedUUID string) {
 			Kind: spaced_repetition.EventKindNew,
 			Data: item,
 		},
+		Action: spaced_repetition.EventKindNew,
 	})
 	// We handle deletion of new entry via the new action event above
 }

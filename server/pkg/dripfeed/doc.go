@@ -67,7 +67,7 @@ type EventDripfeedInputV1 struct {
 
 type EventDripfeedInputV2 struct {
 	Info     EventDripfeedInputBase                   `json:"info"`
-	Settings openapi.HttpDripfeedInputV2AllOfSettings `json:"settings,omitempty"`
+	Settings openapi.HttpDripfeedInputV2AllOfSettings `json:"settings"`
 	Data     alist.TypeV2                             `json:"data"`
 }
 

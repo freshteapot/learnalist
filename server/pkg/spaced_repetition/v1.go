@@ -75,13 +75,9 @@ func (item ItemInputV1) IncrThreshold() {
 	}
 }
 
-func (item ItemInputV1) SetExtID(extID string) {
-	item.entry.Settings.ExtID = extID
-}
-
-func (item ItemInputV1) Reset(now time.Time) {
+func (item ItemInputV1) ResetToStart(now time.Time) {
 	item.entry.Settings.Level = Level0
-	//now := time.Now().UTC()
+
 	whenNext := now.Add(Threshold0)
 	item.entry.Settings.Created = now.Format(time.RFC3339)
 	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
