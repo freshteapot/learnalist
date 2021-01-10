@@ -1,9 +1,6 @@
 package dripfeed
 
 import (
-	"crypto/sha1"
-	"fmt"
-
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -69,12 +66,6 @@ type EventDripfeedInputV2 struct {
 	Info     EventDripfeedInputBase                   `json:"info"`
 	Settings openapi.HttpDripfeedInputV2AllOfSettings `json:"settings"`
 	Data     alist.TypeV2                             `json:"data"`
-}
-
-func UUID(userUUID string, alistUUID string) string {
-	b := []byte(fmt.Sprintf("%s/%s", userUUID, alistUUID))
-	hash := fmt.Sprintf("%x", sha1.Sum(b))
-	return hash
 }
 
 // Used to map from db to spacedRepetition
