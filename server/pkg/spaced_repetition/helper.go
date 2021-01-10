@@ -18,3 +18,14 @@ func CheckNext(entry SpacedRepetitionEntry, err error) (interface{}, error) {
 	json.Unmarshal([]byte(entry.Body), &body)
 	return body, nil
 }
+
+func DefaultSettingsV1() HTTPRequestInputSettings {
+	now := time.Now().UTC()
+	whenNext := now.Add(Threshold0)
+	return HTTPRequestInputSettings{
+		Level:    Level0,
+		Created:  now.Format(time.RFC3339),
+		WhenNext: whenNext.Format(time.RFC3339),
+		ExtID:    "",
+	}
+}
