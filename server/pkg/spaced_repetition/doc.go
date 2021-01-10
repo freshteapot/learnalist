@@ -34,10 +34,12 @@ type HTTPRequestInputV2Item struct {
 	To   string `json:"to"`
 }
 
+// Should we move this to openapi?
 type HTTPRequestInputSettings struct {
 	Level    string `json:"level"`
 	WhenNext string `json:"when_next"`
 	Created  string `json:"created"`
+	ExtID    string `json:"ext_id,omitempty"` // ext_id used by dripfeed, at first
 }
 type HTTPRequestInputSettingsV2 struct {
 	HTTPRequestInputSettings
@@ -211,6 +213,8 @@ type ItemInput interface {
 	Created() time.Time
 	IncrThreshold()
 	DecrThreshold()
+	SetExtID(extID string) // TODO add this
+	Reset(now time.Time)   // TODO really? maybe pass in time
 }
 
 var (

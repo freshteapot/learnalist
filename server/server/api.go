@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
+	"github.com/freshteapot/learnalist-api/server/pkg/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
@@ -24,6 +25,7 @@ func InitApi(
 	mobileService mobile.MobileService,
 	remindService remind.RemindService,
 	appSettingsService app_settings.AppSettingsService,
+	dripfeedService dripfeed.DripfeedService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -124,4 +126,10 @@ func InitApi(
 	settingsV1 := server.Group("/api/v1/app-settings")
 	settingsV1.Use(authenticate.Auth(authConfig))
 	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1)
+
+	// Dripfeed service
+	dripfeedV1 := server.Group("/api/v1/dripfeed")
+	dripfeedV1.Use(authenticate.Auth(authConfig))
+	dripfeedV1.POST("/", dripfeedService.Create)
+	dripfeedV1.DELETE("/", dripfeedService.Delete)
 }

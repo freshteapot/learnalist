@@ -1,6 +1,8 @@
 package spaced_repetition
 
 import (
+	"encoding/json"
+
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/sirupsen/logrus"
 )
@@ -12,6 +14,36 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 	case event.CMDUserDelete:
 		s.removeUser(entry)
 		return
+	case event.SystemSpacedRepetition:
+		s.logContext.WithFields(logrus.Fields{
+			"kind": entry.Kind,
+		}).Info("process event")
+
+		b, _ := json.Marshal(entry.Data)
+		var moment EventSpacedRepetition
+		json.Unmarshal(b, &moment)
+
+		if moment.Kind != EventKindNew {
+			return
+		}
+
+		item := moment.Data
+		err := s.repo.SaveEntry(item)
+		if err != nil {
+			// TODO might be too aggressive
+			panic(err)
+		}
+
+		// The entry is a new
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: event.ApiSpacedRepetition,
+			Data: EventSpacedRepetition{
+				Kind: EventKindNew,
+				Data: item,
+			},
+		})
+
+		// Now tell dripfeed it is done
 	}
 }
 

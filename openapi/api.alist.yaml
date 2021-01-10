@@ -1,6 +1,69 @@
 components:
   examples:
   schemas:
+    DripfeedV1:
+      required:
+        - kind
+        - data
+      allOf:
+        - type: object
+          properties:
+            kind:
+              type: string
+        - $ref: "#/components/schemas/AlistDataV1"
+    DripfeedV2:
+      required:
+        - kind
+        - data
+      allOf:
+        - type: object
+          properties:
+            kind:
+              type: string
+        - $ref: "#/components/schemas/AlistDataV2"
+
+    #EventDripfeedInput:
+    #  oneOf:
+    #    - $ref: '#/components/schemas/DripfeedV1'
+    #    - $ref: '#/components/schemas/DripfeedV2'
+    #  discriminator:
+    #    propertyName: kind
+    #    mapping:
+    #      v1: '#/components/schemas/DripfeedV1'
+    #      v2: '#/components/schemas/DripfeedV2'
+
+    HttpDripfeedInputBase:
+      type: object
+      required:
+        - alist_uuid
+        - user_uuid
+      properties:
+        alist_uuid:
+          type: string
+        user_uuid:
+          type: string
+
+    HttpDripfeedInputV1:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/HttpDripfeedInputBase"
+    HttpDripfeedInputV2:
+      type: object
+      required:
+        - settings
+        - kind
+      allOf:
+        - type: object
+          required:
+            - show
+          properties:
+            settings:
+              type: object
+              properties:
+                show:
+                  type: string
+        - $ref: "#/components/schemas/HttpDripfeedInputBase"
+
     AlistFrom:
       type: object
       description: "Give context of where this list was imported / synced from, if it is quizlet, cram, brainscape it is not possible to make this list public"

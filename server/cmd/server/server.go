@@ -25,6 +25,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/cron"
+	"github.com/freshteapot/learnalist-api/server/pkg/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
@@ -174,6 +175,13 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "appSettings-service"),
 		)
 
+		dripfeedService := dripfeed.NewService(
+			dripfeed.NewSqliteRepository(db),
+			acl,
+			storageAlist,
+			logger.WithField("context", "dripfeed-service"),
+		)
+
 		server.InitApi(
 			apiManager,
 			userService,
@@ -184,6 +192,7 @@ var ServerCmd = &cobra.Command{
 			mobileService,
 			remindService,
 			appSettingsService,
+			dripfeedService,
 		)
 
 		server.InitAlists(acl, dal, hugoHelper)

@@ -5,26 +5,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
 type ItemInputV2 struct {
 	entry *HTTPRequestInputV2
 }
 
-func V2FromPOST(input []byte) ItemInputV2 {
+// TODO change this
+func V2FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV2 {
 	item := ItemInputV2{}
-
+	// TODO set show
 	json.Unmarshal(input, &item.entry)
 
 	b, _ := json.Marshal(item.entry.Data)
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
 
-	item.entry.Settings.Level = Level0
-	now := time.Now().UTC()
-	whenNext := now.Add(Threshold0)
-	item.entry.Settings.Created = now.Format(time.RFC3339)
-	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
+	item.entry.HTTPRequestInput.Kind = alist.FromToList
+	//item.entry.HTTPRequestInput.Show = item.entry.Data
+
+	// TODO confirm show comes thru via the POST
+	item.entry.Settings.Level = settings.Level
+	item.entry.Settings.Created = settings.Created
+	item.entry.Settings.WhenNext = settings.WhenNext
+	item.entry.Settings.ExtID = settings.ExtID
+	/*
+		item.entry.Settings.Level = Level0
+		now := time.Now().UTC()
+		whenNext := now.Add(Threshold0)
+		item.entry.Settings.Created = now.Format(time.RFC3339)
+		item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
+		item.entry.Settings.ExtID = ""
+	*/
 	return item
 }
 
@@ -74,4 +88,16 @@ func (item ItemInputV2) IncrThreshold() {
 			break
 		}
 	}
+}
+
+func (item ItemInputV2) SetExtID(extID string) {
+	item.entry.Settings.ExtID = extID
+}
+
+func (item ItemInputV2) Reset(now time.Time) {
+	item.entry.Settings.Level = Level0
+	//now := time.Now().UTC()
+	whenNext := now.Add(Threshold0)
+	item.entry.Settings.Created = now.Format(time.RFC3339)
+	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 }
