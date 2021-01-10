@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -50,13 +51,12 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	}
 
 	var entry ItemInput
-
-	settings := DefaultSettingsV1()
+	now := time.Now().UTC()
 	switch what.Kind {
 	case alist.SimpleList:
-		entry = V1FromPOST(raw, settings)
+		entry = V1FromPOST(raw, DefaultSettingsV1(now))
 	case alist.FromToList:
-		entry = V2FromPOST(raw, settings)
+		entry = V2FromPOST(raw, DefaultSettingsV2(now))
 	}
 
 	item := SpacedRepetitionEntry{

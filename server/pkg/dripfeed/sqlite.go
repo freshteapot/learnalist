@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -77,7 +76,6 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 	}
 
 	item := dbItem{}
-	// json_extract(body, '$.display_name'
 	err := r.db.Get(&item, SqlGetNext, dripfeedUUID)
 	if err != nil {
 		panic(err)
@@ -94,12 +92,10 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 	}, nil
 }
 
-func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []interface{}) error {
-	for index, item := range items {
-		body := item.(string)
+func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error {
+	for index, body := range items {
 		var srs SpacedRepetitionUUID
 		json.Unmarshal([]byte(body), &srs)
-		fmt.Println("srsUUID", srs.UUID)
 		_, err := r.db.Exec(
 			SqlAddItem,
 			dripfeedUUID,

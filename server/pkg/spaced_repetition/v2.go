@@ -16,7 +16,7 @@ type ItemInputV2 struct {
 // TODO do we add error to this to validate?
 // TODO override show, confirm what we set it to is valid or reject
 // TODO valide settings.show
-func V2FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV2 {
+func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) ItemInputV2 {
 	item := ItemInputV2{}
 	// TODO set show
 	json.Unmarshal(input, &item.entry)
@@ -25,10 +25,18 @@ func V2FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV2 {
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
 
-	item.entry.HTTPRequestInput.Kind = alist.FromToList
-	//item.entry.HTTPRequestInput.Show = item.entry.Data
+	show := item.entry.Settings.Show
+	switch show {
+	case "from":
+		item.entry.Show = item.entry.Data.From
+	case "to":
+		item.entry.Show = item.entry.Data.To
+	default:
+		// errors.New("Not supported")
+	}
 
-	// TODO confirm show comes thru via the POST
+	item.entry.Kind = alist.FromToList
+	item.entry.Settings.Show = show
 	item.entry.Settings.Level = settings.Level
 	item.entry.Settings.Created = settings.Created
 	item.entry.Settings.WhenNext = settings.WhenNext

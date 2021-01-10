@@ -81,19 +81,14 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 		userUUID := moment.Info.UserUUID
 		alistUUID := moment.Info.AlistUUID
 		dripfeedUUID := UUID(userUUID, alistUUID)
-		items := make([]interface{}, 0)
+		items := make([]string, 0)
 
 		now := time.Now().UTC()
-		whenNext := now.Add(spaced_repetition.Threshold0)
-		settings := spaced_repetition.HTTPRequestInputSettings{
-			Level:    spaced_repetition.Level0,
-			Created:  now.Format(time.RFC3339),
-			WhenNext: whenNext.Format(time.RFC3339),
-			ExtID:    dripfeedUUID,
-		}
-
 		switch moment.Info.Kind {
 		case alist.SimpleList:
+			settings := spaced_repetition.DefaultSettingsV1(now)
+			settings.ExtID = dripfeedUUID
+
 			var input EventDripfeedInputV1
 			json.Unmarshal(b, &input)
 			for _, listItem := range input.Data {
@@ -106,8 +101,9 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 			}
 
 		case alist.FromToList:
-			// TODO support V2
-			panic("TODO")
+			settings := spaced_repetition.DefaultSettingsV2(now)
+			settings.ExtID = dripfeedUUID
+
 			var input EventDripfeedInputV2
 			json.Unmarshal(b, &input)
 			for _, listItem := range input.Data {
@@ -119,7 +115,7 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 				item.Settings.Show = input.Settings.Show
 
 				b, _ := json.Marshal(item)
-				srsItem := spaced_repetition.V1FromPOST(b, settings)
+				srsItem := spaced_repetition.V2FromPOST(b, settings)
 				items = append(items, srsItem.String())
 			}
 		}

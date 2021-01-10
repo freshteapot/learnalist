@@ -21,8 +21,8 @@ func V1FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV1 {
 	b, _ := json.Marshal(item.entry.Data)
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
-	item.entry.HTTPRequestInput.Kind = alist.SimpleList
-	item.entry.HTTPRequestInput.Show = item.entry.Data
+	item.entry.Kind = alist.SimpleList
+	item.entry.Show = item.entry.Data
 	item.entry.Settings = settings
 	return item
 }

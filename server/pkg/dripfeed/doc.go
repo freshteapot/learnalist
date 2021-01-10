@@ -9,7 +9,7 @@ import (
 )
 
 type DripfeedRepository interface {
-	AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []interface{}) error
+	AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error
 	DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error
 	DeleteByUser(userUUID string) error
 	DeleteByPosition(dripfeedUUID string, position int) error

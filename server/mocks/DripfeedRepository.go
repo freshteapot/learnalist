@@ -13,11 +13,11 @@ type DripfeedRepository struct {
 }
 
 // AddAll provides a mock function with given fields: dripfeedUUID, userUUID, alistUUID, items
-func (_m *DripfeedRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []interface{}) error {
+func (_m *DripfeedRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error {
 	ret := _m.Called(dripfeedUUID, userUUID, alistUUID, items)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string, string, []interface{}) error); ok {
+	if rf, ok := ret.Get(0).(func(string, string, string, []string) error); ok {
 		r0 = rf(dripfeedUUID, userUUID, alistUUID, items)
 	} else {
 		r0 = ret.Error(0)
