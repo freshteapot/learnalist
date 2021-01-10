@@ -13,7 +13,9 @@ type ItemInputV2 struct {
 	entry *HTTPRequestInputV2
 }
 
-// TODO change this
+// TODO do we add error to this to validate?
+// TODO override show, confirm what we set it to is valid or reject
+// TODO valide settings.show
 func V2FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV2 {
 	item := ItemInputV2{}
 	// TODO set show
@@ -31,14 +33,6 @@ func V2FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV2 {
 	item.entry.Settings.Created = settings.Created
 	item.entry.Settings.WhenNext = settings.WhenNext
 	item.entry.Settings.ExtID = settings.ExtID
-	/*
-		item.entry.Settings.Level = Level0
-		now := time.Now().UTC()
-		whenNext := now.Add(Threshold0)
-		item.entry.Settings.Created = now.Format(time.RFC3339)
-		item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
-		item.entry.Settings.ExtID = ""
-	*/
 	return item
 }
 
