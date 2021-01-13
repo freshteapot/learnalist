@@ -50,38 +50,6 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 		if topic == "" {
 			logger.Fatal("topic needs setting")
 		}
-		/*
-			natsServer := viper.GetString("server.events.nats.server")
-			clusterID := viper.GetString("server.events.stan.clusterID")
-			clientID := viper.GetString("server.events.stan.clientID")
-			pathToCredentials := viper.GetString("server.fcm.credentials")
-			opts := []nats.Option{nats.Name("lal-go-server")}
-			nc, err := nats.Connect(natsServer, opts...)
-
-			if err != nil {
-				panic(err)
-			}
-
-
-			logContext = logContext.WithFields(logrus.Fields{
-				"cluster_id": clusterID,
-				"client_id":  clientID,
-			})
-
-			logContext.Info("Connecting to nats server...")
-			sc, err := stan.Connect(clusterID, clientID,
-				stan.NatsConn(nc),
-				stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
-					logContext.Fatalf("Connection lost, reason: %v", reason)
-				}),
-				stan.Pings(10, 5),
-			)
-
-			if err != nil {
-				logContext.Fatalf("Can't connect: %v.\nMake sure a NATS Streaming Server is running at: %s", err, nc.Opts.Url)
-			}
-			defer logCloser(sc)
-		*/
 
 		pathToCredentials := viper.GetString("server.fcm.credentials")
 		sc := event.GetBus().(*event.NatsBus).Connection()
