@@ -295,6 +295,19 @@ func (m *spacedRepetitionManager) StartSendNotifications() {
 	}()
 }
 
+func (m *spacedRepetitionManager) shouldSendNotification(r SpacedRepetitionReminder) bool {
+	tokens := r.Medium
+	// If the user doesnt have any tokens one entry will still exist
+	// When empty, it means the device has not been registered
+	if len(tokens) == 1 {
+		if tokens[0] == "" {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (m *spacedRepetitionManager) SendNotifications() {
 	reminders, err := m.remindRepo.GetReminders(DefaultWhenNextWithLastActiveOffset())
 	if err != nil {
@@ -314,45 +327,47 @@ func (m *spacedRepetitionManager) SendNotifications() {
 	// TODO the updateSent is linked to more than one token, meaning 1 can work and 1 can fail
 	// We could build a new object that groups on userUUID?
 
-	for _, reminder := range reminders {
-		process := true
-		// When empty, it means the device has not been registered
-		if reminder.Medium == "" {
-			process = false
-		}
-		// This assumes push
-		if process {
-			body := `New entry is ready, baby steps.`
-			// Make message
-			message := &messaging.Message{
-				Notification: &messaging.Notification{
-					Title: title,
-					Body:  body,
-				},
-				Token: reminder.Medium,
-			}
-
-			// Send message
-			event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
-				Kind: event.KindPushNotification,
-				Data: message,
-			})
-		}
-
-		if process {
-			err := m.remindRepo.UpdateSent(reminder.UserUUID, ReminderSent)
-			if err != nil {
-				m.logContext.WithFields(logrus.Fields{
-					"error": err,
-				}).Fatal("Trigger restart, as I am guessing issue with the database")
-			}
-			msgSent++
-		}
+	for _, remind := range reminders {
+		process := m.shouldSendNotification(remind)
 
 		if !process {
 			// We dont care if this fails, as no message would be sent
-			m.remindRepo.UpdateSent(reminder.UserUUID, ReminderSkipped)
+			m.remindRepo.UpdateSent(remind.UserUUID, ReminderSkipped)
 			msgSkipped++
+			continue
+		}
+
+		// This assumes push
+		if process {
+			body := `New entry is ready, baby steps.`
+
+			for _, medium := range remind.Medium {
+				if medium == "" {
+					continue
+				}
+				// Make message
+				message := &messaging.Message{
+					Notification: &messaging.Notification{
+						Title: title,
+						Body:  body,
+					},
+					Token: medium,
+				}
+
+				// Send message
+				event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
+					Kind: event.KindPushNotification,
+					Data: message,
+				})
+				msgSent++
+			}
+		}
+
+		err := m.remindRepo.UpdateSent(remind.UserUUID, ReminderSent)
+		if err != nil {
+			m.logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Fatal("Trigger restart, as I am guessing issue with the database")
 		}
 	}
 

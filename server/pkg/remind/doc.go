@@ -32,8 +32,7 @@ type RemindDailySettingsRepository interface {
 type RemindMe struct {
 	UserUUID string                      `json:"user_uuid"`
 	Settings openapi.RemindDailySettings `json:"settings"`
-	Medium   string                      `json:"medium"` // Token or email
-	Tokens   []string                    `json:"tokens"`
+	Medium   []string                    `json:"medium"`
 	Activity bool                        `json:"activity"`
 }
 
@@ -41,6 +40,6 @@ type SpacedRepetitionReminder struct {
 	UserUUID   string    `json:"user_uuid"`
 	WhenNext   time.Time `json:"when_next"`
 	LastActive time.Time `json:"last_active"`
-	Sent       int       `json:"sent"`   // 0, 1, 2
-	Medium     string    `json:"medium"` // Token or email
+	Sent       int       `json:"sent"` // 0, 1, 2
+	Medium     []string  `json:"medium"`
 }

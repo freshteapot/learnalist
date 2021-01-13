@@ -183,7 +183,7 @@ func (m *dailyManager) StartSendNotifications() {
 }
 
 func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
-	tokens := r.Tokens
+	tokens := r.Medium
 	// If the user doesnt have any tokens one entry will still exist
 	// When empty, it means the device has not been registered
 	if len(tokens) == 1 {
@@ -204,6 +204,7 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 }
 
 func (m *dailyManager) SendNotifications() {
+	// reminders, err := m.remindRepo.GetReminders(DefaultWhenNextWithLastActiveOffset())
 	reminders := m.settingsRepo.WhoToRemind()
 	if len(reminders) == 0 {
 		return
@@ -214,31 +215,35 @@ func (m *dailyManager) SendNotifications() {
 
 	msgSent := 0
 	msgSkipped := 0
-	for _, remindMe := range reminders {
-		process := m.shouldSendNotification(remindMe)
+	for _, remind := range reminders {
+		process := m.shouldSendNotification(remind)
 
 		if !process {
 			// We dont care if this fails, as no message would be sent
-			m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+			m.updateSettingsWithWhenNext(remind.UserUUID, remind.Settings)
 			msgSkipped++
 			continue
 		}
 
 		template := "What shall we learn today"
-		if remindMe.Activity {
+		if remind.Activity {
 			template = "Nice work!"
 		}
 
 		body := template
 		// Loop over all the tokens attached to this user
-		for _, token := range remindMe.Tokens {
+		for _, medium := range remind.Medium {
+			if medium == "" {
+				continue
+			}
+
 			// Make message
 			message := &messaging.Message{
 				Notification: &messaging.Notification{
 					Title: title,
 					Body:  body,
 				},
-				Token: token,
+				Token: medium,
 			}
 
 			// Send message
@@ -246,15 +251,15 @@ func (m *dailyManager) SendNotifications() {
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
+			msgSent++
 		}
 
-		err := m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
+		err := m.updateSettingsWithWhenNext(remind.UserUUID, remind.Settings)
 		if err != nil {
 			m.logContext.WithFields(logrus.Fields{
 				"error": err,
 			}).Fatal("Trigger restart, as I am guessing issue with the database")
 		}
-		msgSent++
 	}
 
 	m.logContext.WithFields(logrus.Fields{

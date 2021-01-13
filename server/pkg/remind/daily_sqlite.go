@@ -46,7 +46,7 @@ _with_or_without_medium(user_uuid, settings, medium, activity) AS (
 SELECT
     JSON_OBJECT(
         'user_uuid', user_uuid,
-        'tokens', JSON_GROUP_ARRAY(medium),
+        'medium', JSON_GROUP_ARRAY(medium),
         'settings', JSON_EXTRACT(settings, '$'),
         'activity', activity
     )

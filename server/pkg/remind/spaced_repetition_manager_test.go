@@ -544,7 +544,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 			It("1 found, skip because the token has not been set", func() {
 				remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{
 					{
-						Medium:   "",
+						Medium:   []string{""},
 						UserUUID: userUUID,
 					},
 				}, nil)
@@ -561,7 +561,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 				It("Fails on updating user who has had a notification sent", func() {
 					remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return([]remind.SpacedRepetitionReminder{
 						{
-							Medium:   "fake-token-123",
+							Medium:   []string{"fake-token-123"},
 							UserUUID: userUUID,
 						},
 					}, nil)
@@ -580,11 +580,11 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 					remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 						Return([]remind.SpacedRepetitionReminder{
 							{
-								Medium:   "fake-token-123",
+								Medium:   []string{"fake-token-123"},
 								UserUUID: userUUID,
 							},
 							{
-								Medium:   "",
+								Medium:   []string{""},
 								UserUUID: "fake-user-456",
 							},
 						}, nil)
