@@ -580,7 +580,7 @@ var _ = Describe("Testing Spaced Repetition Manager", func() {
 					remindRepo.On("GetReminders", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 						Return([]remind.SpacedRepetitionReminder{
 							{
-								Medium:   []string{"fake-token-123"},
+								Medium:   []string{"", "fake-token-123"},
 								UserUUID: userUUID,
 							},
 							{
