@@ -311,6 +311,7 @@ func (m *spacedRepetitionManager) SendNotifications() {
 
 	msgSent := 0
 	msgSkipped := 0
+	// TODO the updateSent is linked to more than one token, meaning 1 can work and 1 can fail
 	for _, reminder := range reminders {
 		process := true
 		// When empty, it means the device has not been registered
