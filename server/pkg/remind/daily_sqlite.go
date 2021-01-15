@@ -2,7 +2,6 @@ package remind
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
@@ -13,8 +12,9 @@ var (
 	SqlDeleteByDeviceInfo = `DELETE FROM daily_reminder_settings WHERE user_uuid=? AND app_identifier=?`
 	SqlDeleteByUser       = `DELETE FROM daily_reminder_settings WHERE user_uuid=?`
 	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?, activity=0`
-	SqlWhoToRemind        = `
-WITH _base(user_uuid, app_identifier, settings, activity) AS (
+	SqlGetReminders       = `
+WITH
+_base(user_uuid, app_identifier, settings, activity) AS (
 	SELECT
 		user_uuid,
 		json_extract(body, '$.app_identifier') AS app_identifier,
@@ -41,15 +41,16 @@ _with_or_without_medium(user_uuid, settings, medium, activity) AS (
 	SELECT user_uuid, settings, "" AS medium, activity FROM _base
 	UNION
 	SELECT user_uuid, settings, medium, activity FROM _with_medium
-),
-_reduce(user_uuid, settings, medium, activity, rk) AS (
-	SELECT
-	*,
-	ROW_NUMBER() OVER(PARTITION BY user_uuid ORDER BY medium DESC) AS rk
-		FROM _with_or_without_medium
 )
-
-SELECT user_uuid, settings, medium, activity FROM _reduce WHERE rk = 1
+SELECT
+    JSON_OBJECT(
+        'user_uuid', user_uuid,
+        'medium', JSON_GROUP_ARRAY(medium),
+        'settings', JSON_EXTRACT(settings, '$'),
+        'activity', activity
+    )
+FROM
+    _with_or_without_medium
 `
 )
 
@@ -101,38 +102,27 @@ func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, a
 	return nil
 }
 
-// WhoToRemind return users with remind set.
+// GetReminders return users with remind set.
 // Medium can be empty, which means the mobile_device has not been registered yet
-func (r remindDailySettingsSqliteRepository) WhoToRemind() []RemindMe {
-	type dbItem struct {
-		UserUUID string `db:"user_uuid"`
-		Settings string `db:"settings"`
-		Medium   string `db:"medium"`
-		Activity bool   `db:"activity"`
-	}
-
-	dbItems := make([]dbItem, 0)
+func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) ([]RemindMe, error) {
+	dbItems := make([][]byte, 0)
 	items := make([]RemindMe, 0)
 
-	now := time.Now().UTC()
-	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
-	whenNext := whenNextTime.Format(time.RFC3339Nano)
-
-	err := r.db.Select(&dbItems, SqlWhoToRemind, whenNext)
+	err := r.db.Select(&dbItems, SqlGetReminders, whenNext)
 	if err != nil {
-		panic(err)
+		return items, err
 	}
 
 	for _, item := range dbItems {
-		var settings openapi.RemindDailySettings
-		json.Unmarshal([]byte(item.Settings), &settings)
 
-		items = append(items, RemindMe{
-			UserUUID: item.UserUUID,
-			Settings: settings,
-			Medium:   item.Medium,
-			Activity: item.Activity,
-		})
+		var r RemindMe
+		json.Unmarshal(item, &r)
+		// Seems to be needed as I am now returning a json object
+		if r.UserUUID == "" {
+			continue
+		}
+
+		items = append(items, r)
 	}
-	return items
+	return items, nil
 }

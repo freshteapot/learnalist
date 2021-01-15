@@ -55,6 +55,29 @@ func (_m *RemindDailySettingsRepository) DeleteByUser(userUUID string) error {
 	return r0
 }
 
+// GetReminders provides a mock function with given fields: whenNext
+func (_m *RemindDailySettingsRepository) GetReminders(whenNext string) ([]remind.RemindMe, error) {
+	ret := _m.Called(whenNext)
+
+	var r0 []remind.RemindMe
+	if rf, ok := ret.Get(0).(func(string) []remind.RemindMe); ok {
+		r0 = rf(whenNext)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]remind.RemindMe)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(whenNext)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Save provides a mock function with given fields: userUUID, settings, whenNext
 func (_m *RemindDailySettingsRepository) Save(userUUID string, settings openapi.RemindDailySettings, whenNext string) error {
 	ret := _m.Called(userUUID, settings, whenNext)
@@ -64,22 +87,6 @@ func (_m *RemindDailySettingsRepository) Save(userUUID string, settings openapi.
 		r0 = rf(userUUID, settings, whenNext)
 	} else {
 		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// WhoToRemind provides a mock function with given fields:
-func (_m *RemindDailySettingsRepository) WhoToRemind() []remind.RemindMe {
-	ret := _m.Called()
-
-	var r0 []remind.RemindMe
-	if rf, ok := ret.Get(0).(func() []remind.RemindMe); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]remind.RemindMe)
-		}
 	}
 
 	return r0

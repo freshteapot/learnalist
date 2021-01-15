@@ -1,6 +1,7 @@
 package remind
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -11,7 +12,8 @@ var (
 	SpacedRepetitionSqlDeleteByUser = `DELETE FROM spaced_repetition_reminder WHERE user_uuid=?`
 	SpacedRepetitionSqlSave         = `INSERT INTO spaced_repetition_reminder(user_uuid, when_next, last_active) values(?, ?, ?) ON CONFLICT (spaced_repetition_reminder.user_uuid) DO UPDATE SET when_next=?, last_active=?, sent=0`
 	SpacedRepetitionSqlGetReminders = `
-WITH _base(user_uuid, when_next, last_active) AS (
+WITH
+_base(user_uuid, when_next, last_active) AS (
 	SELECT
 		user_uuid,
 		when_next,
@@ -41,15 +43,18 @@ _with_or_without_medium(user_uuid, when_next, last_active, medium) AS (
 	SELECT user_uuid, when_next, last_active, "" AS medium FROM _base
 	UNION
 	SELECT user_uuid, when_next, last_active, medium FROM _with_medium
-),
-_reduce(user_uuid, when_next, last_active, medium, rk) AS (
-	SELECT
-	*,
-	ROW_NUMBER() OVER(PARTITION BY user_uuid ORDER BY medium DESC) AS rk
-		FROM _with_or_without_medium
 )
 
-SELECT user_uuid, when_next, last_active, medium FROM _reduce WHERE rk = 1
+SELECT
+    JSON_OBJECT(
+		'user_uuid', user_uuid,
+		'when_next', when_next,
+		'last_active', last_active,
+		'medium', JSON_GROUP_ARRAY(medium),
+		'sent', 0
+    )
+FROM
+	_with_or_without_medium
 `
 )
 
@@ -99,14 +104,7 @@ func (r remindSpacedRepetitionSqliteRepository) UpdateSent(userUUID string, sent
 // GetReminders return reminders
 // Medium can be empty, which means the mobile_device has not been registered yet
 func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, lastActive string) ([]SpacedRepetitionReminder, error) {
-	type dbItem struct {
-		UserUUID   string    `db:"user_uuid"`
-		WhenNext   time.Time `db:"when_next"`
-		LastActive time.Time `db:"last_active"`
-		Medium     string    `db:"medium"` // Token
-	}
-
-	dbItems := make([]dbItem, 0)
+	dbItems := make([][]byte, 0)
 	items := make([]SpacedRepetitionReminder, 0)
 	err := r.db.Select(&dbItems, SpacedRepetitionSqlGetReminders, whenNext, lastActive)
 	if err != nil {
@@ -114,13 +112,14 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, la
 	}
 
 	for _, item := range dbItems {
-		items = append(items, SpacedRepetitionReminder{
-			UserUUID:   item.UserUUID,
-			WhenNext:   item.WhenNext,
-			LastActive: item.LastActive,
-			Medium:     item.Medium,
-			Sent:       0,
-		})
+		var r SpacedRepetitionReminder
+		json.Unmarshal(item, &r)
+		// Seems to be needed as I am now returning a json object
+		if r.UserUUID == "" {
+			continue
+		}
+
+		items = append(items, r)
 	}
 	return items, nil
 }

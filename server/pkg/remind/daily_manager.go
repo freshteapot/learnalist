@@ -182,8 +182,36 @@ func (m *dailyManager) StartSendNotifications() {
 	}()
 }
 
+func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
+	tokens := r.Medium
+	// If the user doesnt have any tokens one entry will still exist
+	// When empty, it means the device has not been registered
+	if len(tokens) == 1 {
+		if tokens[0] == "" {
+			return false
+		}
+	}
+
+	// RemindV1 specific rules
+	if r.Settings.AppIdentifier != apps.RemindV1 {
+		return false
+	}
+
+	if !utils.StringArrayContains(r.Settings.Medium, "push") {
+		return false
+	}
+	return true
+}
+
 func (m *dailyManager) SendNotifications() {
-	reminders := m.settingsRepo.WhoToRemind()
+	reminders, err := m.settingsRepo.GetReminders(DefaultNowUTC())
+
+	if err != nil {
+		m.logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Trigger restart, as I am guessing issue with the database")
+	}
+
 	if len(reminders) == 0 {
 		return
 	}
@@ -193,35 +221,35 @@ func (m *dailyManager) SendNotifications() {
 
 	msgSent := 0
 	msgSkipped := 0
-	for _, remindMe := range reminders {
-		process := true
-		// When empty, it means the device has not been registered
-		if remindMe.Medium == "" {
-			process = false
+	for _, remind := range reminders {
+		process := m.shouldSendNotification(remind)
+
+		if !process {
+			// We dont care if this fails, as no message would be sent
+			m.updateSettingsWithWhenNext(remind.UserUUID, remind.Settings)
+			msgSkipped++
+			continue
 		}
 
-		// RemindV1 specific rules
-		if remindMe.Settings.AppIdentifier != apps.RemindV1 {
-			process = false
+		template := "What shall we learn today"
+		if remind.Activity {
+			template = "Nice work!"
 		}
 
-		if !utils.StringArrayContains(remindMe.Settings.Medium, "push") {
-			process = false
-		}
-
-		if process {
-			template := "What shall we learn today"
-			if remindMe.Activity {
-				template = "Nice work!"
+		body := template
+		// Loop over all the tokens attached to this user
+		for _, medium := range remind.Medium {
+			if medium == "" {
+				continue
 			}
-			body := template
+
 			// Make message
 			message := &messaging.Message{
 				Notification: &messaging.Notification{
 					Title: title,
 					Body:  body,
 				},
-				Token: remindMe.Medium,
+				Token: medium,
 			}
 
 			// Send message
@@ -229,22 +257,14 @@ func (m *dailyManager) SendNotifications() {
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
-		}
-
-		if process {
-			err := m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
-			if err != nil {
-				m.logContext.WithFields(logrus.Fields{
-					"error": err,
-				}).Fatal("Trigger restart, as I am guessing issue with the database")
-			}
 			msgSent++
 		}
 
-		if !process {
-			// We dont care if this fails, as no message would be sent
-			m.updateSettingsWithWhenNext(remindMe.UserUUID, remindMe.Settings)
-			msgSkipped++
+		err := m.updateSettingsWithWhenNext(remind.UserUUID, remind.Settings)
+		if err != nil {
+			m.logContext.WithFields(logrus.Fields{
+				"error": err,
+			}).Fatal("Trigger restart, as I am guessing issue with the database")
 		}
 	}
 

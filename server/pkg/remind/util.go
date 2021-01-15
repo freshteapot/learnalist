@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+func DefaultNowUTC() string {
+	return time.Now().UTC().Format(time.RFC3339Nano)
+}
+
 func DefaultWhenNextWithLastActiveOffset() (string, string) {
 	now := time.Now().UTC()
 	whenNext := now.Format(time.RFC3339Nano)

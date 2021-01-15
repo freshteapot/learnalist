@@ -26,20 +26,20 @@ type RemindDailySettingsRepository interface {
 	DeleteByUser(userUUID string) error
 	DeleteByApp(userUUID string, appIdentifier string) error
 	ActivityHappened(userUUID string, appIdentifier string) error
-	WhoToRemind() []RemindMe
+	GetReminders(whenNext string) ([]RemindMe, error)
 }
 
 type RemindMe struct {
-	UserUUID string
-	Settings openapi.RemindDailySettings
-	Medium   string // Token or email
-	Activity bool
+	UserUUID string                      `json:"user_uuid"`
+	Settings openapi.RemindDailySettings `json:"settings"`
+	Medium   []string                    `json:"medium"`
+	Activity bool                        `json:"activity"`
 }
 
 type SpacedRepetitionReminder struct {
 	UserUUID   string    `json:"user_uuid"`
 	WhenNext   time.Time `json:"when_next"`
 	LastActive time.Time `json:"last_active"`
-	Sent       int       `json:"sent"`   // 0, 1, 2
-	Medium     string    `json:"medium"` // Token or email
+	Sent       int       `json:"sent"` // 0, 1, 2
+	Medium     []string  `json:"medium"`
 }

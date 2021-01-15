@@ -2,6 +2,7 @@ package remind_test
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -49,7 +50,8 @@ var _ = Describe("Testing Spaced Repetition Sqlite", func() {
 		It("success, nothing found", func() {
 			whenNext, lastActive := remind.DefaultWhenNextWithLastActiveOffset()
 
-			rs := sqlmock.NewRows([]string{"user_uuid", "when_next", "last_active", "medium"})
+			rs := sqlmock.NewRows([]string{""})
+			rs.AddRow([]byte(`{"user_uuid":null,"when_next":null,"last_active":null,"medium":[],"sent":0}`))
 
 			mockSql.ExpectQuery(remind.SpacedRepetitionSqlGetReminders).
 				WithArgs(whenNext, lastActive).
@@ -62,12 +64,10 @@ var _ = Describe("Testing Spaced Repetition Sqlite", func() {
 
 		It("success, record found", func() {
 			whenNext, lastActive := remind.DefaultWhenNextWithLastActiveOffset()
-			tWhenNext, _ := time.Parse(time.RFC3339Nano, whenNext)
-			tLastActive, _ := time.Parse(time.RFC3339Nano, whenNext)
 
-			rs := sqlmock.NewRows([]string{"user_uuid", "when_next", "last_active", "medium"}).
-				AddRow("fake-user-123", tWhenNext, tLastActive, "").
-				AddRow("fake-user-456", tWhenNext, tLastActive, "fake-token")
+			rs := sqlmock.NewRows([]string{""}).
+				AddRow([]byte(fmt.Sprintf(`{"user_uuid":"fake-user-123","when_next":"%s","last_active":"%s","medium":["","fake-token-1"],"sent":0}`, whenNext, lastActive))).
+				AddRow([]byte(fmt.Sprintf(`{"user_uuid":"fake-user-456","when_next":"%s","last_active":"%s","medium":[""],"sent":0}`, whenNext, lastActive)))
 
 			mockSql.ExpectQuery(remind.SpacedRepetitionSqlGetReminders).
 				WithArgs(whenNext, lastActive).
@@ -77,9 +77,11 @@ var _ = Describe("Testing Spaced Repetition Sqlite", func() {
 			Expect(err).To(BeNil())
 			Expect(len(items)).To(Equal(2))
 			Expect(items[0].UserUUID).To(Equal("fake-user-123"))
-			Expect(items[0].Medium).To(Equal(""))
+			Expect(items[0].Medium[0]).To(Equal(""))
+			Expect(items[0].Medium[1]).To(Equal("fake-token-1"))
+
 			Expect(items[1].UserUUID).To(Equal("fake-user-456"))
-			Expect(items[1].Medium).To(Equal("fake-token"))
+			Expect(items[1].Medium[0]).To(Equal(""))
 		})
 	})
 	When("Setting a reminder", func() {

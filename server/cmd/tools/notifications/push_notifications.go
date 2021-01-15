@@ -9,7 +9,6 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	messaging "firebase.google.com/go/v4/messaging"
-	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -37,7 +36,13 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
+		logContext := logger.WithFields(logrus.Fields{
+			"context": "push-notifications",
+		})
+
 		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logContext)
+
 		// Leaving empty, but should be notifications
 		viper.SetDefault("topic", "")
 		viper.BindEnv("topic", "TOPIC")
@@ -46,36 +51,8 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 			logger.Fatal("topic needs setting")
 		}
 
-		natsServer := viper.GetString("server.events.nats.server")
-		clusterID := viper.GetString("server.events.stan.clusterID")
-		clientID := viper.GetString("server.events.stan.clientID")
 		pathToCredentials := viper.GetString("server.fcm.credentials")
-		opts := []nats.Option{nats.Name("lal-go-server")}
-		nc, err := nats.Connect(natsServer, opts...)
-
-		if err != nil {
-			panic(err)
-		}
-
-		logContext := logger.WithFields(logrus.Fields{
-			"context":    "push-notifications",
-			"cluster_id": clusterID,
-			"client_id":  clientID,
-		})
-
-		logContext.Info("Connecting to nats server...")
-		sc, err := stan.Connect(clusterID, clientID,
-			stan.NatsConn(nc),
-			stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
-				logContext.Fatalf("Connection lost, reason: %v", reason)
-			}),
-			stan.Pings(10, 5),
-		)
-
-		if err != nil {
-			logContext.Fatalf("Can't connect: %v.\nMake sure a NATS Streaming Server is running at: %s", err, nc.Opts.Url)
-		}
-		defer logCloser(sc)
+		sc := event.GetBus().(*event.NatsBus).Connection()
 
 		opt := option.WithCredentialsFile(pathToCredentials)
 		app, err := firebase.NewApp(context.Background(), nil, opt)
