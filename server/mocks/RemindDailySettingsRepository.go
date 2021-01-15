@@ -56,7 +56,7 @@ func (_m *RemindDailySettingsRepository) DeleteByUser(userUUID string) error {
 }
 
 // GetReminders provides a mock function with given fields: whenNext
-func (_m *RemindDailySettingsRepository) GetReminders(whenNext string) []remind.RemindMe {
+func (_m *RemindDailySettingsRepository) GetReminders(whenNext string) ([]remind.RemindMe, error) {
 	ret := _m.Called(whenNext)
 
 	var r0 []remind.RemindMe
@@ -68,7 +68,14 @@ func (_m *RemindDailySettingsRepository) GetReminders(whenNext string) []remind.
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(whenNext)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Save provides a mock function with given fields: userUUID, settings, whenNext

@@ -104,13 +104,13 @@ func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, a
 
 // GetReminders return users with remind set.
 // Medium can be empty, which means the mobile_device has not been registered yet
-func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) []RemindMe {
+func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) ([]RemindMe, error) {
 	dbItems := make([][]byte, 0)
 	items := make([]RemindMe, 0)
 
 	err := r.db.Select(&dbItems, SqlGetReminders, whenNext)
 	if err != nil {
-		panic(err)
+		return items, err
 	}
 
 	for _, item := range dbItems {
@@ -124,5 +124,5 @@ func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) []Rem
 
 		items = append(items, r)
 	}
-	return items
+	return items, nil
 }

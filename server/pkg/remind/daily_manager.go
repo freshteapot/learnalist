@@ -204,7 +204,13 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 }
 
 func (m *dailyManager) SendNotifications() {
-	reminders := m.settingsRepo.GetReminders(DefaultNowUTC())
+	reminders, err := m.settingsRepo.GetReminders(DefaultNowUTC())
+	if err != nil {
+		m.logContext.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Trigger restart, as I am guessing issue with the database")
+	}
+
 	if len(reminders) == 0 {
 		return
 	}
