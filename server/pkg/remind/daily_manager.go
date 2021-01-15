@@ -204,8 +204,7 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 }
 
 func (m *dailyManager) SendNotifications() {
-	// reminders, err := m.remindRepo.GetReminders(DefaultWhenNextWithLastActiveOffset())
-	reminders := m.settingsRepo.WhoToRemind()
+	reminders := m.settingsRepo.GetReminders(DefaultNowUTC())
 	if len(reminders) == 0 {
 		return
 	}

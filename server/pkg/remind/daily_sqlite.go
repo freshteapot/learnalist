@@ -2,7 +2,6 @@ package remind
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/jmoiron/sqlx"
@@ -13,7 +12,7 @@ var (
 	SqlDeleteByDeviceInfo = `DELETE FROM daily_reminder_settings WHERE user_uuid=? AND app_identifier=?`
 	SqlDeleteByUser       = `DELETE FROM daily_reminder_settings WHERE user_uuid=?`
 	SqlSave               = `INSERT INTO daily_reminder_settings(user_uuid, app_identifier, body, when_next) values(?, ?, ?, ?) ON CONFLICT (daily_reminder_settings.user_uuid, daily_reminder_settings.app_identifier) DO UPDATE SET body=?, when_next=?, activity=0`
-	SqlWhoToRemind        = `
+	SqlGetReminders       = `
 WITH
 _base(user_uuid, app_identifier, settings, activity) AS (
 	SELECT
@@ -103,17 +102,13 @@ func (r remindDailySettingsSqliteRepository) ActivityHappened(userUUID string, a
 	return nil
 }
 
-// WhoToRemind return users with remind set.
+// GetReminders return users with remind set.
 // Medium can be empty, which means the mobile_device has not been registered yet
-func (r remindDailySettingsSqliteRepository) WhoToRemind() []RemindMe {
+func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) []RemindMe {
 	dbItems := make([][]byte, 0)
 	items := make([]RemindMe, 0)
 
-	now := time.Now().UTC()
-	whenNextTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 59, 0, now.Location())
-	whenNext := whenNextTime.Format(time.RFC3339Nano)
-
-	err := r.db.Select(&dbItems, SqlWhoToRemind, whenNext)
+	err := r.db.Select(&dbItems, SqlGetReminders, whenNext)
 	if err != nil {
 		panic(err)
 	}
