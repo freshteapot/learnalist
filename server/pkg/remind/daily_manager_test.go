@@ -145,6 +145,7 @@ var _ = Describe("Testing Daily Manager", func() {
 	})
 
 	When("Sending notifications", func() {
+
 		var (
 			eventMessageBus *mocks.EventlogPubSub
 		)
@@ -153,7 +154,7 @@ var _ = Describe("Testing Daily Manager", func() {
 			event.SetBus(eventMessageBus)
 		})
 
-		FIt("Issue getting Reminders from the repo", func() {
+		It("Issue getting Reminders from the repo", func() {
 			want := errors.New("fail")
 			settingsRepo.On("GetReminders", mock.AnythingOfType("string")).Return([]remind.RemindMe{}, want)
 
@@ -164,5 +165,84 @@ var _ = Describe("Testing Daily Manager", func() {
 			Expect(lastLog.Data["error"]).To(Equal(want))
 		})
 
+		It("No reminders found", func() {
+			settingsRepo.On("GetReminders", mock.AnythingOfType("string")).Return([]remind.RemindMe{}, nil)
+			manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
+			manager.SendNotifications()
+		})
+
+		When("Reminders found", func() {
+			It("1 found, skip because the token has not been set", func() {
+				settingsRepo.On("GetReminders", mock.AnythingOfType("string")).Return([]remind.RemindMe{
+					{
+						UserUUID: userUUID,
+						Medium:   []string{""},
+						Settings: settings,
+					},
+				}, nil)
+
+				settingsRepo.On("Save", userUUID, settings, mock.AnythingOfType("string")).Return(nil)
+				manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
+				manager.SendNotifications()
+
+				lastLog := hook.LastEntry()
+				Expect(lastLog.Data["msg_skipped"]).To(Equal(1))
+				Expect(lastLog.Data["msg_sent"]).To(Equal(0))
+			})
+
+			When("Send notification", func() {
+				It("Fails on updating user who has had a notification sent", func() {
+					settingsRepo.On("GetReminders", mock.AnythingOfType("string")).Return([]remind.RemindMe{
+						{
+							UserUUID: userUUID,
+							Medium:   []string{"fake-token-123"},
+						},
+					}, nil)
+
+					eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.KindPushNotification))
+
+						return true
+					}))
+					testutils.SetLoggerToPanicOnFatal(logger)
+					manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
+					Expect(func() { manager.SendNotifications() }).Should(Panic())
+				})
+
+				It("Success", func() {
+					settingsRepo.On("GetReminders", mock.AnythingOfType("string")).Return([]remind.RemindMe{
+						{
+							Medium:   []string{"", "fake-token-123"},
+							UserUUID: userUUID,
+							Settings: settings,
+						},
+						{
+							Medium:   []string{""},
+							UserUUID: "fake-user-456",
+							Settings: settings,
+						},
+					}, nil)
+
+					settingsRepo.On("Save", userUUID, settings, mock.AnythingOfType("string")).Return(nil)
+					settingsRepo.On("Save", "fake-user-456", settings, mock.AnythingOfType("string")).Return(nil)
+
+					eventMessageBus.On("Publish", event.TopicNotifications, mock.MatchedBy(func(moment event.Eventlog) bool {
+						Expect(moment.Kind).To(Equal(event.KindPushNotification))
+
+						return true
+					}))
+
+					manager := remind.NewDaily(settingsRepo, mobileRepo, logger)
+					manager.SendNotifications()
+
+					lastLog := hook.LastEntry()
+					Expect(lastLog.Data["msg_skipped"]).To(Equal(1))
+					Expect(lastLog.Data["msg_sent"]).To(Equal(1))
+
+					mock.AssertExpectationsForObjects(GinkgoT())
+				})
+			})
+
+		})
 	})
 })

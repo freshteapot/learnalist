@@ -205,6 +205,7 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 
 func (m *dailyManager) SendNotifications() {
 	reminders, err := m.settingsRepo.GetReminders(DefaultNowUTC())
+
 	if err != nil {
 		m.logContext.WithFields(logrus.Fields{
 			"error": err,
