@@ -169,6 +169,52 @@ components:
       allOf:
         - $ref: "#/components/schemas/SpacedRepetitionBaseSettingsShow"
         - $ref: "#/components/schemas/SpacedRepetitionBaseSettings"
+
+    SpacedRepetitionOvertimeInputBase:
+      type: object
+      required:
+        - alist_uuid
+        - user_uuid
+      properties:
+        alist_uuid:
+          type: string
+        user_uuid:
+          type: string
+    SpacedRepetitionOvertimeInputV1:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SpacedRepetitionOvertimeInputBase"
+    SpacedRepetitionOvertimeInputV2:
+      type: object
+      required:
+        - settings
+        - kind
+      allOf:
+        - type: object
+          required:
+            - show
+          properties:
+            settings:
+              type: object
+              properties:
+                show:
+                  type: string
+        - $ref: "#/components/schemas/SpacedRepetitionOvertimeInputBase"
+    SpacedRepetitionOvertimeInfo:
+      type: object
+      required:
+        - dripfeed_uuid
+        - alist_uuid
+        - user_uuid
+      properties:
+        dripfeed_uuid:
+          type: string
+        alist_uuid:
+          type: string
+        user_uuid:
+          type: string
+
+
 paths:
   /spaced-repetition/:
     post:
@@ -329,6 +375,85 @@ paths:
           description: Entry not found, no body
         "422":
           description: Something wrong with the payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/overtime:
+    post:
+      tags:
+        - dripfeed
+      description: Add for dripfeed (Slowly add this list for spaced repetition learning).
+      operationId: addListToSpacedRepetitionOvertime
+      requestBody:
+        description: list to add to dripfeed
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            #examples:
+            #  - $ref: "#/components/schemas/SpacedRepetitionOvertimeInputV1"
+            #  - $ref: "#/components/schemas/SpacedRepetitionOvertimeInputV2"
+      responses:
+        "200":
+          description: Success, list added to dripfeed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpacedRepetitionOvertimeInfo"
+        "403":
+          description: You do not have access to read list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "404":
+          description: List not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Something wrong with the input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/overtime:
+    delete:
+      tags:
+        - dripfeed
+      description: Remove list from dripfeed.
+      operationId: removeListFromSpacedRepetitionOvertime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: "#/components/schemas/SpacedRepetitionOvertimeInputBase"
+      responses:
+        "200":
+          description: Success, list removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "403":
+          description: You do not have access to do this action
           content:
             application/json:
               schema:

@@ -33,7 +33,6 @@ func NewService(repo DripfeedRepository, aclRepo acl.AclReaderList, listRepo ali
 }
 
 func (s DripfeedService) Create(c echo.Context) error {
-	// 200, 422, 404, 403
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	logContext := s.logContext
 
@@ -43,7 +42,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 	json.NewDecoder(c.Request().Body).Decode(&temp)
 	raw, _ := json.Marshal(temp)
 
-	var input openapi.HttpDripfeedInputBase
+	var input openapi.SpacedRepetitionOvertimeInputBase
 	json.Unmarshal(raw, &input)
 
 	if input.UserUuid != loggedInUser.Uuid {
@@ -118,8 +117,14 @@ func (s DripfeedService) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	dripfeedResponse := openapi.SpacedRepetitionOvertimeInfo{
+		UserUuid:     loggedInUser.Uuid,
+		AlistUuid:    aList.Uuid,
+		DripfeedUuid: dripfeedUUID,
+	}
+
 	if exists {
-		return c.NoContent(http.StatusOK)
+		return c.JSON(http.StatusOK, dripfeedResponse)
 	}
 
 	info := EventDripfeedInputBase{
@@ -136,7 +141,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 			Data: aList.Data.(alist.TypeV1),
 		}
 	case alist.FromToList:
-		var extra openapi.HttpDripfeedInputV2
+		var extra openapi.SpacedRepetitionOvertimeInputV2
 		json.Unmarshal(raw, &extra)
 		data = EventDripfeedInputV2{
 			Info:     info,
@@ -152,7 +157,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 		Action: event.ActionCreated,
 	})
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, dripfeedResponse)
 }
 
 func (s DripfeedService) Delete(c echo.Context) error {
@@ -165,7 +170,7 @@ func (s DripfeedService) Delete(c echo.Context) error {
 	})
 
 	defer c.Request().Body.Close()
-	var input openapi.HttpDripfeedInputBase
+	var input openapi.SpacedRepetitionOvertimeInputBase
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
 	if input.UserUuid != loggedInUser.Uuid {
@@ -200,7 +205,9 @@ func (s DripfeedService) Delete(c echo.Context) error {
 	}
 
 	if !exists {
-		return c.NoContent(http.StatusOK)
+		return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+			Message: "List removed",
+		})
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
@@ -213,5 +220,7 @@ func (s DripfeedService) Delete(c echo.Context) error {
 		Action: event.ActionDeleted,
 	})
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, api.HTTPResponseMessage{
+		Message: "List removed",
+	})
 }

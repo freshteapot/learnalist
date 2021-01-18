@@ -92,6 +92,10 @@ func InitApi(
 	srs.POST("/", spacedRepetitionService.SaveEntry)
 	srs.POST("/viewed", spacedRepetitionService.EntryViewed)
 
+	// Dripfeed service
+	srs.POST("/overtime", dripfeedService.Create)
+	srs.DELETE("/overtime", dripfeedService.Delete)
+
 	// Plank
 	plank := server.Group("/api/v1/plank")
 	plank.Use(authenticate.Auth(authConfig))
@@ -126,10 +130,4 @@ func InitApi(
 	settingsV1 := server.Group("/api/v1/app-settings")
 	settingsV1.Use(authenticate.Auth(authConfig))
 	settingsV1.PUT("/remind_v1", appSettingsService.SaveRemindV1)
-
-	// Dripfeed service
-	dripfeedV1 := server.Group("/api/v1/dripfeed")
-	dripfeedV1.Use(authenticate.Auth(authConfig))
-	dripfeedV1.POST("/", dripfeedService.Create)
-	dripfeedV1.DELETE("/", dripfeedService.Delete)
 }
