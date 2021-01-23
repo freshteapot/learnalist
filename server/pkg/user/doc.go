@@ -89,12 +89,13 @@ type UserFromIDP interface {
 }
 
 type UserPreference struct {
-	UserUUID      string                       `json:"user_uuid,omitempty"`
-	DisplayName   string                       `json:"display_name,omitempty"`
-	CreatedVia    string                       `json:"created_via,omitempty"`
-	DailyReminder *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
-	Apps          *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
-	LastActive    *LastActive                  `json:"last_active,omitempty"`
+	UserUUID         string                       `json:"user_uuid,omitempty"`
+	DisplayName      string                       `json:"display_name,omitempty"`
+	CreatedVia       string                       `json:"created_via,omitempty"`
+	DailyReminder    *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
+	Apps             *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
+	LastActive       *LastActive                  `json:"last_active,omitempty"`
+	SpacedRepetition *SpacedRepetition            `json:"spaced_repetition,omitempty"`
 }
 
 type UserPreferenceDailyReminder struct {
@@ -111,4 +112,8 @@ type UserPreferenceApps struct {
 type LastActive struct {
 	Plank            string `json:"plank,omitempty"`             // UTC int64? or string time.RFC3339Nano
 	SpacedRepetition string `json:"spaced_repetition,omitempty"` // UTC int64? or string time.RFC3339Nano
+}
+
+type SpacedRepetition struct {
+	ListsOvertime []string `json:"lists_overtime"` // UTC int64? or string time.RFC3339Nano
 }

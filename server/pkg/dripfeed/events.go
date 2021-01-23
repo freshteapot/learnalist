@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -41,7 +42,16 @@ func (s DripfeedService) removeUser(entry event.Eventlog) {
 }
 
 func (s DripfeedService) checkForNext(dripfeedUUID string, now time.Time) {
-	nextUp, _ := s.repo.GetNext(dripfeedUUID)
+	nextUp, err := s.repo.GetNext(dripfeedUUID)
+
+	if err != nil {
+		if err == utils.ErrNotFound {
+			// Send event that dripfeedUUID doesnt exist =
+			return
+		}
+		panic(err)
+	}
+
 	var entry spaced_repetition.ItemInput
 	switch nextUp.SrsKind {
 	case alist.SimpleList:
@@ -196,6 +206,8 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 	if dripfeedUUID == "" {
 		return
 	}
+
+	// TODO check if more in system, if not fire event that dripfeed is finished
 
 	eventTime := time.Unix(entry.Timestamp, 0).UTC()
 	s.checkForNext(dripfeedUUID, eventTime)

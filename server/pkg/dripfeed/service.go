@@ -224,3 +224,31 @@ func (s DripfeedService) Delete(c echo.Context) error {
 		Message: "List removed",
 	})
 }
+
+func (s DripfeedService) ListActive(c echo.Context) error {
+	userUUID := c.Get("loggedInUser").(uuid.User).Uuid
+	alistUUID := c.Param("alistUUID")
+
+	dripfeedUUID := UUID(userUUID, alistUUID)
+
+	logContext := s.logContext.WithFields(logrus.Fields{
+		"entry":         "list-active",
+		"user_uuid":     userUUID,
+		"alist_uuid":    alistUUID,
+		"dripfeed_uuid": dripfeedUUID,
+	})
+
+	exists, err := s.repo.Exists(dripfeedUUID)
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"event": "broken-state",
+			"error": err,
+		}).Error("s.repo.Exists")
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	if !exists {
+		return c.NoContent(http.StatusNotFound)
+	}
+	return c.NoContent(http.StatusOK)
+}

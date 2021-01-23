@@ -1,10 +1,18 @@
 # Todo
 - [ ] Should I tackle UI as a different task.
 
+- On click, message if in system
+- Visually display already in the system
+- Overtime page, remove items (need title from ids)
+
+- Add dripfeed
+  - save
+  - on return load user/info
+- Make it work clunky than awesome.
 # Example
 
 ```sh
-curl -XPOST 'http://127.0.0.1:1234/api/v1/dripfeed/' -d'
+curl -XPOST 'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d'
 {
     "user_uuid":"user-123",
     "alist_uuid":"list-123"
@@ -52,7 +60,7 @@ alistUUID=$(echo $response | jq -r '.uuid')
 
 curl -XPOST \
 -H "Authorization: Bearer ${token}" \
-'http://127.0.0.1:1234/api/v1/dripfeed/' -d@<(cat <<EOF
+'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d@<(cat <<EOF
 {
     "user_uuid": "${userUUID}",
     "alist_uuid": "${alistUUID}"
@@ -129,7 +137,7 @@ response=$(curl -XPOST \
 alistUUID=$(echo $response | jq -r '.uuid')
 curl -XPOST \
 -H "Authorization: Bearer ${token}" \
-'http://127.0.0.1:1234/api/v1/dripfeed/' -d@<(cat <<EOF
+'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d@<(cat <<EOF
 {
     "user_uuid": "${userUUID}",
     "alist_uuid": "${alistUUID}",
@@ -145,7 +153,7 @@ EOF
 ```sh
 curl -XDELETE \
 -H "Authorization: Bearer ${token}" \
-'http://127.0.0.1:1234/api/v1/dripfeed/' -d@<(cat <<EOF
+'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d@<(cat <<EOF
 {
     "user_uuid": "${userUUID}",
     "alist_uuid": "${alistUUID}"

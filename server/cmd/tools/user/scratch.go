@@ -5,13 +5,45 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
-	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+func testSpacedRepetitionOvertime(userUUID string, storage user.ManagementStorage) {
+	fmt.Println(userUUID)
+	/*
+		pref := user.UserPreference{
+			SpacedRepetition: &user.SpacedRepetition{
+				ListsOvertime: []string{"1233", "456"},
+			},
+		}
+
+		pref.SpacedRepetition = &user.SpacedRepetition{}
+		b, _ := json.Marshal(pref)
+		storage.SaveInfo(userUUID, b)
+
+		b, _ = storage.GetInfo(userUUID)
+		fmt.Println(string(b))
+
+		key := "spaced_repetition"
+		storage.RemoveInfo(userUUID, key)
+	*/
+	err := app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
+		ListsOvertime: []string{"123", "456", "789"},
+	})
+
+	fmt.Println(err)
+	err = app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
+		ListsOvertime: []string{},
+	})
+	fmt.Println(err)
+	info, err := app_settings.GetSpacedRepetition(storage, userUUID)
+	fmt.Println(info, err)
+}
 
 func testRemindV1(userUUID string, storage user.ManagementStorage) {
 	rawJSON := `
@@ -80,14 +112,6 @@ var scratchCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		dsn := viper.GetString("server.sqlite.database")
 
-		moment := event.Eventlog{
-			Kind: event.MobileDeviceRemove,
-			Data: "fake-token-123",
-		}
-		b, _ := json.Marshal(moment)
-		fmt.Println(string(b))
-		return
-
 		db := database.NewDB(dsn)
 		storage := userSqlite.NewSqliteManagementStorage(db)
 
@@ -98,7 +122,7 @@ var scratchCMD = &cobra.Command{
 			return
 		}
 		userUUID := r[0]
-		testRemindV1(userUUID, storage)
+		testSpacedRepetitionOvertime(userUUID, storage)
 		return
 		b, err := storage.GetInfo(userUUID)
 		fmt.Println(string(b), err)
