@@ -93,7 +93,7 @@ func InitApi(
 	srs.POST("/viewed", spacedRepetitionService.EntryViewed)
 
 	// Dripfeed service
-	srs.GET("/overtime/:alistUUID", dripfeedService.ListActive) // Might be shit, need to pick one and go with it
+	srs.GET("/overtime/active/:alistUUID", dripfeedService.ListActive) // Might be shit, need to pick one and go with it
 	srs.POST("/overtime", dripfeedService.Create)
 	srs.DELETE("/overtime", dripfeedService.Delete)
 

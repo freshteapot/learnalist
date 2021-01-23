@@ -1,3 +1,5 @@
+<svelte:options tag={null} accessors={true} />
+
 <script>
   import { loggedIn } from "../../../shared.js";
   import { push } from "svelte-spa-router";
@@ -17,6 +19,26 @@
     window.location = "/login.html";
   }
 </script>
+
+{#if show}
+  <div class="modal-background" on:click={handleClose} />
+
+  <div class="modal" role="dialog" aria-modal="true">
+    {#if loggedIn()}
+      {#if state === "edit"}
+        <slot />
+        <button class="br3" on:click={() => dispatch("add")}>Add</button>
+      {/if}
+      {#if state === "feedback"}
+        <slot />
+      {/if}
+    {:else}
+      <p>You need to be logged in to use spaced repetition</p>
+      <button class="br3" on:click={handleLogin}>Login</button>
+    {/if}
+    <button class="br3" on:click={handleClose}>cancel</button>
+  </div>
+{/if}
 
 <style>
   @import "../../../../all.css";
@@ -44,25 +66,3 @@
     background: white;
   }
 </style>
-
-<svelte:options tag={null} accessors={true} />
-
-{#if show}
-  <div class="modal-background" on:click={handleClose} />
-
-  <div class="modal" role="dialog" aria-modal="true">
-    {#if loggedIn()}
-      {#if state === 'edit'}
-        <slot />
-        <button class="br3" on:click={() => dispatch('add')}>Add</button>
-      {/if}
-      {#if state === 'feedback'}
-        <slot />
-      {/if}
-    {:else}
-      <p>You need to be logged in to use spaced repetition</p>
-      <button class="br3" on:click={handleLogin}>Login</button>
-    {/if}
-    <button class="br3" on:click={handleClose}>cancel</button>
-  </div>
-{/if}

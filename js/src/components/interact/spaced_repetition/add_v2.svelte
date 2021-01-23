@@ -1,8 +1,13 @@
+<svelte:options tag={null} accessors={true} />
+
 <script>
   import { push } from "svelte-spa-router";
-  import { tap } from "@sveltejs/gestures";
+  import { onMount } from "svelte";
+  import OvertimeActive from "./overtime_active.svelte";
   import Modal from "./spaced_repetition_modal.svelte";
   import { addEntry } from "../../../spaced_repetition/api.js";
+  import { api } from "../../../shared";
+  import { KeyUserUuid, getConfiguration } from "../../../configuration";
 
   // {DomElement}
   export let playElement;
@@ -18,6 +23,15 @@
   let state = "edit";
   let showKey = "from";
   let show = false;
+
+  let overtimeActive = false;
+  let showAddingOvertime = false;
+  let userUuid = "";
+
+  onMount(async () => {
+    userUuid = getConfiguration(KeyUserUuid);
+    overtimeActive = await api.spacedRepetitionOvertimeIsActive(aList.uuid);
+  });
 
   function handleClose(event) {
     playElement.style.display = "none";
@@ -50,9 +64,9 @@
       show: data[showKey],
       data: data,
       settings: {
-        show: showKey
+        show: showKey,
       },
-      kind: aList.info.type
+      kind: aList.info.type,
     };
 
     const response = await addEntry(input);
@@ -70,60 +84,125 @@
         break;
     }
   }
+
+  async function addOvertime() {
+    const input = {
+      alist_uuid: aList.uuid,
+      user_uuid: userUuid,
+      settings: {
+        show: showKey,
+      },
+    };
+    const added = await api.spacedRepetitionAddListToOvertime(input);
+    // TODO maybe visualise it failed
+    overtimeActive = added;
+    closeOvertime();
+  }
+
+  function addingOvertime() {
+    data = aList.data[0];
+    showAddingOvertime = true;
+  }
+
+  function closeOvertime() {
+    showAddingOvertime = false;
+    close();
+  }
 </script>
+
+{#if overtimeActive}
+  <div class="flex flex-column">
+    <div class=" w-100 pa3 mr2">
+      <header>
+        <button class="br3" on:click={handleClose}>Close</button>
+        <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+        <OvertimeActive alistUuid={aList.uuid} {userUuid} bind:overtimeActive />
+      </header>
+    </div>
+  </div>
+{/if}
+
+{#if !overtimeActive}
+  <div class="flex flex-column">
+    <div class=" w-100 pa3 mr2">
+      <header>
+        <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+        <button class="br3" on:click={handleClose}>Close</button>
+        <p>
+          Click on the row you want to add or <a
+            href="#"
+            class="link underline"
+            on:click|once|preventDefault={addingOvertime}>add all overtime</a
+          >
+        </p>
+      </header>
+    </div>
+
+    <div id="list-data" class=" w-100 pa3 mr2">
+      <table class="w-100" cellspacing="0">
+        <thead>
+          <tr>
+            <th class="fw6 bb b--black-20 pb3 tl">From</th>
+            <th class="fw6 bb b--black-20 pb3 tl">To</th>
+          </tr>
+        </thead>
+        <tbody class="lh-copy">
+          {#each aList.data as item, index}
+            <tr data-index={index} on:click={edit}>
+              <td class="pv3 pr3 bb b--black-20">{item.from}</td>
+              <td class="pv3 pr3 bb b--black-20">{item.to}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {#if showAddingOvertime}
+    <Modal
+      show="true"
+      state="edit"
+      on:add={addOvertime}
+      on:close={closeOvertime}
+    >
+      <p>
+        <span>Which to show?</span>
+      </p>
+      <p>
+        <input type="radio" bind:group={showKey} value={"from"} />
+        from
+      </p>
+      <p>
+        <input type="radio" bind:group={showKey} value={"to"} />
+        to
+      </p>
+      <pre>{JSON.stringify(data, '', 2)}</pre>
+    </Modal>
+  {/if}
+
+  <Modal {show} {state} on:add={add} on:close={close}>
+    {#if state === "edit"}
+      <p>
+        <span>Which to show?</span>
+      </p>
+      <p>
+        <input type="radio" bind:group={showKey} value={"from"} />
+        from
+      </p>
+      <p>
+        <input type="radio" bind:group={showKey} value={"to"} />
+        to
+      </p>
+      <pre>{JSON.stringify(data, '', 2)}</pre>
+    {/if}
+
+    {#if state === "feedback"}
+      <p>Already in the system</p>
+      <p>You will be reminded on {data.settings.when_next}</p>
+    {/if}
+  </Modal>
+{/if}
 
 <style>
   @import "../../../../all.css";
 </style>
-
-<svelte:options tag={null} accessors={true} />
-
-<div class="flex flex-column">
-  <div class=" w-100 pa3 mr2">
-    <header>
-      <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
-      <button class="br3" on:click={handleClose}>Close</button>
-      <h3>Click on the row you want to add</h3>
-    </header>
-  </div>
-
-  <div id="list-data" class=" w-100 pa3 mr2">
-    <table class="w-100" cellspacing="0">
-      <thead>
-        <tr>
-          <th class="fw6 bb b--black-20 pb3 tl">From</th>
-          <th class="fw6 bb b--black-20 pb3 tl">To</th>
-        </tr>
-      </thead>
-      <tbody class="lh-copy">
-        {#each aList.data as item, index}
-          <tr data-index={index} on:click={edit}>
-            <td class="pv3 pr3 bb b--black-20">{item.from}</td>
-            <td class="pv3 pr3 bb b--black-20">{item.to}</td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
-</div>
-<Modal {show} {state} on:add={add} on:close={close}>
-  {#if state === 'edit'}
-    <p>
-      <span>Which to show?</span>
-    </p>
-    <p>
-      <input type="radio" bind:group={showKey} value={'from'} />
-      from
-    </p>
-    <p>
-      <input type="radio" bind:group={showKey} value={'to'} />
-      to
-    </p>
-    <pre>{JSON.stringify(data, '', 2)}</pre>
-  {/if}
-
-  {#if state === 'feedback'}
-    <p>Already in the system</p>
-    <p>You will be reminded on {data.settings.when_next}</p>
-  {/if}
-</Modal>

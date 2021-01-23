@@ -191,11 +191,11 @@ components:
         - kind
       allOf:
         - type: object
-          required:
-            - show
           properties:
             settings:
               type: object
+              required:
+                - show
               properties:
                 show:
                   type: string
@@ -385,12 +385,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+  /spaced-repetition/overtime/active/{uuid}:
+    get:
+      tags:
+        - spacedRepetition
+      description: Ugly light url to check if list active for this user.
+      operationId: spacedRepetitionOvertimeIsActive
+      parameters:
+        - name: uuid
+          in: path
+          description: List UUID to check
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List is active
+        "404":
+          description: List is not active
   /spaced-repetition/overtime:
     post:
       tags:
-        - dripfeed
+        - spacedRepetition
       description: Add for dripfeed (Slowly add this list for spaced repetition learning).
-      operationId: addListToSpacedRepetitionOvertime
+      operationId: spacedRepetitionAddListToOvertime
       requestBody:
         description: list to add to dripfeed
         required: true
@@ -432,12 +450,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
-  /spaced-repetition/overtime:
     delete:
       tags:
-        - dripfeed
+        - spacedRepetition
       description: Remove list from dripfeed.
-      operationId: removeListFromSpacedRepetitionOvertime
+      operationId: spacedRepetitionRemoveListFromOvertime
       requestBody:
         required: true
         content:
