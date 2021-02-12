@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"firebase.google.com/go/messaging"
+	"firebase.google.com/go/v4/messaging"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
