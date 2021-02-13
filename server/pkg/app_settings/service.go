@@ -20,6 +20,7 @@ func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) AppSett
 		userRepo:   userRepo,
 		logContext: log,
 	}
+	event.GetBus().Subscribe(event.TopicMonolog, "appSettingsService", s.OnEvent)
 	return s
 }
 

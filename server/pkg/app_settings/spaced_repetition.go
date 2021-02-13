@@ -50,7 +50,9 @@ func SaveSpacedRepetition(repo user.ManagementStorage, userUUID string, spacedRe
 func AppendAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string, alistUUID string) error {
 	info, err := GetSpacedRepetition(repo, userUUID)
 	if err != nil {
-		panic(err)
+		if err != utils.ErrNotFound {
+			panic(err)
+		}
 	}
 
 	if utils.StringArrayContains(info.ListsOvertime, alistUUID) {
