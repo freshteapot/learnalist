@@ -12,11 +12,12 @@ type DripfeedRepository interface {
 	AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error
 	DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error
 	DeleteByUser(userUUID string) error
-	DeleteByPosition(dripfeedUUID string, position int) error
 	DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID string, srsUUID string) error
 	Exists(dripfeedUUID string) (bool, error)
 	// GetNext return the next spaced entry (v1 or v2)
 	GetNext(dripfeedUUID string) (RepoItem, error)
+	GetInfo(dripfeedUUID string) (openapi.SpacedRepetitionOvertimeInfo, error)
+	SaveInfo(input openapi.SpacedRepetitionOvertimeInfo) error
 }
 
 type DripfeedService struct {
@@ -77,3 +78,11 @@ type RepoItem struct {
 	UserUUID     string
 	AlistUUID    string
 }
+
+var (
+	EventDripfeedAdded    = "dripfeed.added"
+	EventDripfeedRemoved  = "dripfeed.removed"
+	EventDripfeedFinished = "dripfeed.finished"
+)
+
+// openapi.SpacedRepetitionOvertimeInfo

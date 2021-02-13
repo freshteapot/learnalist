@@ -32,17 +32,23 @@ func testSpacedRepetitionOvertime(userUUID string, storage user.ManagementStorag
 		key := "spaced_repetition"
 		storage.RemoveInfo(userUUID, key)
 	*/
-	err := app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
-		ListsOvertime: []string{"123", "456", "789"},
-	})
+	/*
+		err := app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
+			ListsOvertime: []string{"123", "456", "789"},
+		})
 
-	fmt.Println(err)
-	err = app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
-		ListsOvertime: []string{},
-	})
-	fmt.Println(err)
-	info, err := app_settings.GetSpacedRepetition(storage, userUUID)
-	fmt.Println(info, err)
+		fmt.Println(err)
+		err = app_settings.SaveSpacedRepetition(storage, userUUID, user.SpacedRepetition{
+			ListsOvertime: []string{},
+		})
+		fmt.Println(err)
+		info, err := app_settings.GetSpacedRepetition(storage, userUUID)
+		fmt.Println(info, err)
+	*/
+	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	//app_settings.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
 }
 
 func testRemindV1(userUUID string, storage user.ManagementStorage) {

@@ -46,3 +46,32 @@ func SaveSpacedRepetition(repo user.ManagementStorage, userUUID string, spacedRe
 	b, _ := json.Marshal(pref)
 	return repo.SaveInfo(userUUID, b)
 }
+
+func AppendAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string, alistUUID string) error {
+	info, err := GetSpacedRepetition(repo, userUUID)
+	if err != nil {
+		panic(err)
+	}
+
+	if utils.StringArrayContains(info.ListsOvertime, alistUUID) {
+		return nil
+	}
+
+	info.ListsOvertime = append(info.ListsOvertime, alistUUID)
+	return SaveSpacedRepetition(repo, userUUID, info)
+}
+
+func RemoveAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string, alistUUID string) error {
+	info, err := GetSpacedRepetition(repo, userUUID)
+	if err != nil {
+		panic(err)
+	}
+
+	found := utils.StringArrayIndexOf(info.ListsOvertime, alistUUID)
+	if found == -1 {
+		return nil
+	}
+
+	info.ListsOvertime = utils.StringArrayRemoveAtIndex(info.ListsOvertime, found)
+	return SaveSpacedRepetition(repo, userUUID, info)
+}

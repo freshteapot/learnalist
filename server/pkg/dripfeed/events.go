@@ -6,6 +6,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/sirupsen/logrus"
@@ -41,12 +42,17 @@ func (s DripfeedService) removeUser(entry event.Eventlog) {
 	}).Info("user removed")
 }
 
-func (s DripfeedService) checkForNext(dripfeedUUID string, now time.Time) {
-	nextUp, err := s.repo.GetNext(dripfeedUUID)
+func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvertimeInfo, now time.Time) {
+	nextUp, err := s.repo.GetNext(dripfeedInfo.DripfeedUuid)
 
 	if err != nil {
 		if err == utils.ErrNotFound {
 			// Send event that dripfeedUUID doesnt exist =
+			// I wonder if this really means it has finished?
+			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+				Kind: EventDripfeedFinished,
+				Data: dripfeedInfo,
+			})
 			return
 		}
 		panic(err)
@@ -135,14 +141,35 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 			panic(err)
 		}
 
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: EventDripfeedAdded,
+			Data: openapi.SpacedRepetitionOvertimeInfo{
+				DripfeedUuid: dripfeedUUID,
+				UserUuid:     userUUID,
+				AlistUuid:    alistUUID,
+			},
+		})
+
+		// app_settings.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
 		// GetNext
 		eventTime := time.Unix(entry.Timestamp, 0).UTC()
-		s.checkForNext(dripfeedUUID, eventTime)
+
+		info := openapi.SpacedRepetitionOvertimeInfo{
+			DripfeedUuid: dripfeedUUID,
+			UserUuid:     userUUID,
+			AlistUuid:    alistUUID,
+		}
+		s.checkForNext(info, eventTime)
 	case event.ActionDeleted:
 		b, _ := json.Marshal(entry.Data)
 		var moment EventDripfeedDelete
 		json.Unmarshal(b, &moment)
-		_ = s.repo.DeleteByUUIDAndUserUUID(moment.DripfeedUUID, moment.UserUUID)
+		info, _ := s.repo.GetInfo(moment.DripfeedUUID)
+		_ = s.repo.DeleteByUUIDAndUserUUID(info.DripfeedUuid, info.UserUuid)
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: EventDripfeedRemoved,
+			Data: info,
+		})
 	}
 }
 
@@ -179,7 +206,8 @@ func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 		}
 
 		eventTime := time.Unix(entry.Timestamp, 0).UTC()
-		s.checkForNext(dripfeedUUID, eventTime)
+		info, _ := s.repo.GetInfo(dripfeedUUID)
+		s.checkForNext(info, eventTime)
 	}
 }
 
@@ -210,5 +238,6 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 	// TODO check if more in system, if not fire event that dripfeed is finished
 
 	eventTime := time.Unix(entry.Timestamp, 0).UTC()
-	s.checkForNext(dripfeedUUID, eventTime)
+	info, _ := s.repo.GetInfo(dripfeedUUID)
+	s.checkForNext(info, eventTime)
 }
