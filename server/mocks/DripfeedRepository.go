@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	dripfeed "github.com/freshteapot/learnalist-api/server/pkg/dripfeed"
+	dripfeed "github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	mock "github.com/stretchr/testify/mock"
 )
 

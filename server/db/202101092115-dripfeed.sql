@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS dripfeed_item (
   position integer(4) not null,
   UNIQUE(dripfeed_uuid, srs_uuid)
 );
+
 CREATE INDEX IF NOT EXISTS dripfeed_info_user ON dripfeed_info (user_uuid);
 CREATE INDEX IF NOT EXISTS dripfeed_item_user ON dripfeed_item (user_uuid);
 CREATE INDEX IF NOT EXISTS dripfeed_item_user_srs ON dripfeed_item (user_uuid, srs_uuid);

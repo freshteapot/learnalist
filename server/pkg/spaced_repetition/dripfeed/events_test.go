@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/mocks"
-	"github.com/freshteapot/learnalist-api/server/pkg/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"

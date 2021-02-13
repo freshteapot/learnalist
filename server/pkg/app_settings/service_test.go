@@ -47,6 +47,7 @@ var _ = Describe("Testing AppSettings API", func() {
 		}
 		userUUID = loggedInUser.Uuid
 		eventMessageBus = &mocks.EventlogPubSub{}
+		eventMessageBus.On("Subscribe", event.TopicMonolog, "appSettingsService", mock.Anything)
 		event.SetBus(eventMessageBus)
 
 		e = echo.New()
