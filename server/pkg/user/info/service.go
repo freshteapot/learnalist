@@ -1,4 +1,4 @@
-package api
+package info
 
 import (
 	"encoding/json"
@@ -12,11 +12,21 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
+
 	"github.com/sirupsen/logrus"
 )
 
-func (m *Manager) V1GetUserInfo(c echo.Context) error {
-	logger := m.logger
+func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) UserInfoService {
+	s := UserInfoService{
+		userRepo:   userRepo,
+		logContext: log,
+	}
+	event.GetBus().Subscribe(event.TopicMonolog, "userInfoService", s.OnEvent)
+	return s
+}
+
+func (s *UserInfoService) V1GetUserInfo(c echo.Context) error {
+	logger := s.logContext
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	userUUID := loggedInUser.Uuid
 
@@ -27,7 +37,7 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 		})
 	}
 
-	b, err := m.UserManagement.GetInfo(userUUID)
+	b, err := s.userRepo.GetInfo(userUUID)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"event":     event.UserInfo,
@@ -52,8 +62,8 @@ func (m *Manager) V1GetUserInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, pref)
 }
 
-func (m *Manager) V1PatchUserInfo(c echo.Context) error {
-	logger := m.logger
+func (s *UserInfoService) V1PatchUserInfo(c echo.Context) error {
+	logger := s.logContext
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	userUUID := loggedInUser.Uuid
 
@@ -83,7 +93,7 @@ func (m *Manager) V1PatchUserInfo(c echo.Context) error {
 	}
 
 	b, _ := json.Marshal(input)
-	err = m.UserManagement.SaveInfo(userUUID, b)
+	err = s.userRepo.SaveInfo(userUUID, b)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"event":     event.UserInfo,

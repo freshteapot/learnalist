@@ -1,4 +1,4 @@
-package app_settings
+package info
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 // @event.listen: dripfeed.EventDripfeedAdded
 // @event.listen: dripfeed.EventDripfeedRemoved
 // @event.listen: dripfeed.EventDripfeedFinished
-func (s AppSettingsService) OnEvent(entry event.Eventlog) {
+func (s UserInfoService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case dripfeed.EventDripfeedAdded:
 		b, _ := json.Marshal(entry.Data)

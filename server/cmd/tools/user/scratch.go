@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
-	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userInfo "github.com/freshteapot/learnalist-api/server/pkg/user/info"
 	userSqlite "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -45,10 +45,10 @@ func testSpacedRepetitionOvertime(userUUID string, storage user.ManagementStorag
 		info, err := app_settings.GetSpacedRepetition(storage, userUUID)
 		fmt.Println(info, err)
 	*/
-	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
 	//app_settings.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
-	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
-	app_settings.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
 }
 
 func testRemindV1(userUUID string, storage user.ManagementStorage) {
