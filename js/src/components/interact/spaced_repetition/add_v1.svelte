@@ -8,7 +8,8 @@
     addListToOvertime,
     overtimeIsActive,
   } from "../../../spaced_repetition/api.js";
-
+  import { loggedIn } from "../../../shared.js";
+  import LoginModal from "../../../components/login_modal.svelte";
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
   import { KeyUserUuid, getConfiguration } from "../../../configuration";
@@ -30,9 +31,16 @@
   let overtimeActive = false;
   let userUuid = "";
 
+  const loginNagMessageDefault =
+    "You need to be logged in so we can personalise your learning experience.";
+  let loginNagMessage = loginNagMessageDefault;
+  let loginNagClosed = true;
+
   onMount(async () => {
     userUuid = getConfiguration(KeyUserUuid);
-    overtimeActive = await overtimeIsActive(aList.uuid);
+    if (loggedIn()) {
+      overtimeActive = await overtimeIsActive(aList.uuid);
+    }
   });
 
   function handleClose(event) {
@@ -41,6 +49,11 @@
   }
 
   function edit(event) {
+    if (!loggedIn()) {
+      loginNagClosed = false;
+      return;
+    }
+
     const index = event.target
       .closest("[data-index]")
       .getAttribute("data-index");
@@ -83,7 +96,11 @@
   }
 
   async function addOvertime() {
-    console.log("Add overtime");
+    if (!loggedIn()) {
+      loginNagClosed = false;
+      return;
+    }
+
     const input = {
       alist_uuid: aList.uuid,
       user_uuid: userUuid,
@@ -110,7 +127,7 @@
       Click on the row you want to add or <a
         href="#"
         class="link underline"
-        on:click|once|preventDefault={addOvertime}>add all overtime</a
+        on:click|preventDefault={addOvertime}>add all overtime</a
       >
     </p>
   </header>
@@ -135,6 +152,12 @@
       <p>You will be reminded on {data.settings.when_next}</p>
     {/if}
   </Modal>
+{/if}
+
+{#if !loggedIn() && !loginNagClosed}
+  <LoginModal on:close={(e) => (loginNagClosed = true)}>
+    <p>{loginNagMessage}</p>
+  </LoginModal>
 {/if}
 
 <style>

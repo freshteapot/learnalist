@@ -2,7 +2,6 @@
 
 <script>
     import { removeListFromOvertime } from "../../../spaced_repetition/api.js";
-
     export let alistUuid;
     export let userUuid;
     export let overtimeActive;

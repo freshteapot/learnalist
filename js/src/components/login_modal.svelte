@@ -1,3 +1,5 @@
+<svelte:options tag={null} accessors={true} />
+
 <script>
   import { createEventDispatcher } from "svelte";
 
@@ -19,6 +21,13 @@
     window.location = `/login.html?${searchParams.toString()}`;
   }
 </script>
+
+<div class="modal-background" on:click={handleClose} />
+<div class="modal" role="dialog" aria-modal="true">
+  <slot />
+  <button class="br3" on:click={handleLogin}>Login</button>
+  <button class="br3" on:click={handleClose}>cancel</button>
+</div>
 
 <style>
   .modal-background {
@@ -44,12 +53,3 @@
     background: white;
   }
 </style>
-
-<svelte:options tag={null} accessors={true} />
-
-<div class="modal-background" on:click={handleClose} />
-<div class="modal" role="dialog" aria-modal="true">
-  <slot />
-  <button class="br3" on:click={handleLogin}>Login</button>
-  <button class="br3" on:click={handleClose}>cancel</button>
-</div>

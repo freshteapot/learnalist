@@ -21,7 +21,12 @@ async function addEntry(input) {
 }
 
 async function overtimeIsActive(uuid) {
-    return await api.spacedRepetitionOvertimeIsActive(uuid);
+    try {
+        return await api.spacedRepetitionOvertimeIsActive(uuid);
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
 }
 
 async function addListToOvertime(input) {
