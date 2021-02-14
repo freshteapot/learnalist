@@ -1,20 +1,14 @@
 <svelte:options tag={null} accessors={true} />
 
 <script>
-    import { api } from "../../../shared";
+    import { removeListFromOvertime } from "../../../spaced_repetition/api.js";
 
     export let alistUuid;
     export let userUuid;
     export let overtimeActive;
 
-    async function stopOvertime(event) {
-        console.log("Stop overtime");
-
-        const removed = await api.spacedRepetitionRemoveListFromOvertime(
-            userUuid,
-            alistUuid
-        );
-
+    async function stopOvertime() {
+        const removed = await removeListFromOvertime(userUuid, alistUuid);
         if (removed) {
             overtimeActive = false;
         }

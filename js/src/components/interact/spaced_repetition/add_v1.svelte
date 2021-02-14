@@ -3,13 +3,15 @@
 <script>
   import Modal from "./spaced_repetition_modal.svelte";
   import OvertimeActive from "./overtime_active.svelte";
-  import { addEntry } from "../../../spaced_repetition/api.js";
+  import {
+    addEntry,
+    addListToOvertime,
+    overtimeIsActive,
+  } from "../../../spaced_repetition/api.js";
 
   import { push } from "svelte-spa-router";
   import { onMount } from "svelte";
-  import { api } from "../../../shared";
   import { KeyUserUuid, getConfiguration } from "../../../configuration";
-  import { prevent_default } from "svelte/internal";
 
   // {DomElement}
   export let playElement;
@@ -30,7 +32,7 @@
 
   onMount(async () => {
     userUuid = getConfiguration(KeyUserUuid);
-    overtimeActive = await api.spacedRepetitionOvertimeIsActive(aList.uuid);
+    overtimeActive = await overtimeIsActive(aList.uuid);
   });
 
   function handleClose(event) {
@@ -86,7 +88,7 @@
       alist_uuid: aList.uuid,
       user_uuid: userUuid,
     };
-    const added = await api.spacedRepetitionAddListToOvertime(input);
+    const added = await addListToOvertime(input);
     // TODO maybe visualise it failed
     overtimeActive = added;
   }

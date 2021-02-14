@@ -5,8 +5,11 @@
   import { onMount } from "svelte";
   import OvertimeActive from "./overtime_active.svelte";
   import Modal from "./spaced_repetition_modal.svelte";
-  import { addEntry } from "../../../spaced_repetition/api.js";
-  import { api } from "../../../shared";
+  import {
+    addEntry,
+    addListToOvertime,
+    overtimeIsActive,
+  } from "../../../spaced_repetition/api.js";
   import { KeyUserUuid, getConfiguration } from "../../../configuration";
 
   // {DomElement}
@@ -30,7 +33,7 @@
 
   onMount(async () => {
     userUuid = getConfiguration(KeyUserUuid);
-    overtimeActive = await api.spacedRepetitionOvertimeIsActive(aList.uuid);
+    overtimeActive = await overtimeIsActive(aList.uuid);
   });
 
   function handleClose(event) {
@@ -93,7 +96,7 @@
         show: showKey,
       },
     };
-    const added = await api.spacedRepetitionAddListToOvertime(input);
+    const added = await addListToOvertime(input);
     // TODO maybe visualise it failed
     overtimeActive = added;
     closeOvertime();

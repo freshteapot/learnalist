@@ -20,9 +20,24 @@ async function addEntry(input) {
     return await api.addSpacedRepetitionEntry(input);
 }
 
+async function overtimeIsActive(uuid) {
+    return await api.spacedRepetitionOvertimeIsActive(uuid);
+}
+
+async function addListToOvertime(input) {
+    return await api.spacedRepetitionAddListToOvertime(input);
+}
+
+async function removeListFromOvertime(userUuid, alistUuid) {
+    return api.spacedRepetitionRemoveListFromOvertime(userUuid, alistUuid);
+}
+
 export {
     getEntries,
     getNext,
     viewed,
     addEntry,
+    overtimeIsActive,
+    addListToOvertime,
+    removeListFromOvertime
 };
