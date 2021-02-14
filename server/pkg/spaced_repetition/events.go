@@ -10,6 +10,7 @@ import (
 // @event.listen: event.ApiUserDelete
 // @event.listen: event.CMDUserDelete
 // @event.listen: event.SystemSpacedRepetition
+// @event.emit: event.ApiSpacedRepetition
 func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
