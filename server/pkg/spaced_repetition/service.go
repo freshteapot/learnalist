@@ -31,6 +31,8 @@ func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) 
 }
 
 // SaveEntry Add entry for spaced based learning
+// @event.emit: event.ApiSpacedRepetition
+// @event.emit: challenge.EventChallengeDone
 func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
@@ -113,6 +115,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 }
 
 // DeleteEntry Deletes a single entry based on the UUID
+// @event.emit: event.ApiSpacedRepetition
 func (s SpacedRepetitionService) DeleteEntry(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")
@@ -188,6 +191,7 @@ func (s SpacedRepetitionService) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, items)
 }
 
+// @event.emit: event.ApiSpacedRepetition
 func (s SpacedRepetitionService) EntryViewed(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 

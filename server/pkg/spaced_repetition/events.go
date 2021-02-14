@@ -7,6 +7,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: event.SystemSpacedRepetition
 func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -31,8 +34,10 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 		err := s.repo.SaveEntry(item)
 		if err != nil {
 			if err != ErrSpacedRepetitionEntryExists {
-				// TODO might be too aggressive
-				panic(err)
+				s.logContext.WithFields(logrus.Fields{
+					"error":  err,
+					"method": "s.OnEvent",
+				}).Fatal("issue with repo")
 			}
 
 			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
