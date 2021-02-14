@@ -53,13 +53,24 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	var entry ItemInput
+	var (
+		entry ItemInput
+		err   error
+	)
+
 	now := time.Now().UTC()
 	switch what.Kind {
 	case alist.SimpleList:
-		entry = V1FromPOST(raw, DefaultSettingsV1(now))
+		entry, err = V1FromPOST(raw, DefaultSettingsV1(now))
 	case alist.FromToList:
-		entry = V2FromPOST(raw, DefaultSettingsV2(now))
+		entry, err = V2FromPOST(raw, DefaultSettingsV2(now))
+	}
+
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
 	item := SpacedRepetitionEntry{
@@ -70,7 +81,7 @@ func (s SpacedRepetitionService) SaveEntry(c echo.Context) error {
 		Created:  entry.Created(),
 	}
 
-	err := s.repo.SaveEntry(item)
+	err = s.repo.SaveEntry(item)
 	statusCode := http.StatusCreated
 	if err != nil {
 		if err != ErrSpacedRepetitionEntryExists {

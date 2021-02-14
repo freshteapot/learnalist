@@ -13,7 +13,7 @@ type ItemInputV1 struct {
 	entry *HTTPRequestInputV1
 }
 
-func V1FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV1 {
+func V1FromPOST(input []byte, settings HTTPRequestInputSettings) (ItemInputV1, error) {
 	item := ItemInputV1{}
 
 	json.Unmarshal(input, &item.entry)
@@ -24,7 +24,7 @@ func V1FromPOST(input []byte, settings HTTPRequestInputSettings) ItemInputV1 {
 	item.entry.Kind = alist.SimpleList
 	item.entry.Show = item.entry.Data
 	item.entry.Settings = settings
-	return item
+	return item, nil
 }
 
 func V1FromDB(input string) ItemInputV1 {

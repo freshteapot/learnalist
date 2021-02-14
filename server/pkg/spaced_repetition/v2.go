@@ -3,6 +3,7 @@ package spaced_repetition
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,12 +14,9 @@ type ItemInputV2 struct {
 	entry *HTTPRequestInputV2
 }
 
-// TODO do we add error to this to validate?
 // TODO override show, confirm what we set it to is valid or reject
-// TODO valide settings.show
-func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) ItemInputV2 {
+func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) (ItemInputV2, error) {
 	item := ItemInputV2{}
-	// TODO set show
 	json.Unmarshal(input, &item.entry)
 
 	b, _ := json.Marshal(item.entry.Data)
@@ -32,7 +30,7 @@ func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) ItemInputV2 {
 	case "to":
 		item.entry.Show = item.entry.Data.To
 	default:
-		// errors.New("Not supported")
+		return item, errors.New("Show not supported")
 	}
 
 	item.entry.Kind = alist.FromToList
@@ -41,7 +39,7 @@ func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) ItemInputV2 {
 	item.entry.Settings.Created = settings.Created
 	item.entry.Settings.WhenNext = settings.WhenNext
 	item.entry.Settings.ExtID = settings.ExtID
-	return item
+	return item, nil
 }
 
 func V2FromDB(input string) ItemInputV2 {
