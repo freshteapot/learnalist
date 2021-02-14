@@ -62,7 +62,10 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 			})
 			return
 		}
-		panic(err)
+		s.logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "s.checkForNext",
+		}).Fatal("issue with repo")
 	}
 
 	var entry spaced_repetition.ItemInput
@@ -94,6 +97,7 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 	// We handle deletion of new entry via the new action event above
 }
 
+// TODO I wonder if we should be using SpaceRepetitionKind and not top level
 // @event.emit: dripfeed.EventDripfeedAdded
 // @event.emit: dripfeed.EventDripfeedRemoved
 func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
@@ -147,7 +151,10 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 
 		err := s.repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 		if err != nil {
-			panic(err)
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.handleDripfeedEvents",
+			}).Fatal("issue with repo")
 		}
 
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
@@ -235,7 +242,10 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 	// First we remove the entry from the system that already exists
 	err := s.repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(srsItem.UserUUID, srsItem.UUID)
 	if err != nil {
-		panic(err)
+		s.logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "s.handleSystemSpacedRepetitionEvents",
+		}).Fatal("issue with repo")
 	}
 
 	var settingsInfo SpacedRepetitionSettingsExtID
@@ -245,8 +255,6 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 	if dripfeedUUID == "" {
 		return
 	}
-
-	// TODO check if more in system, if not fire event that dripfeed is finished
 
 	eventTime := time.Unix(entry.Timestamp, 0).UTC()
 	info, _ := s.repo.GetInfo(dripfeedUUID)
