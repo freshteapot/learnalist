@@ -9,6 +9,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: event.MobileDeviceRemove
 func (s MobileService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -20,6 +23,7 @@ func (s MobileService) OnEvent(entry event.Eventlog) {
 	}
 }
 
+// @event.emit: event.MobileDeviceRemoved
 func (s MobileService) removeDevicesByToken(entry event.Eventlog) {
 	if entry.Kind != event.MobileDeviceRemove {
 		return

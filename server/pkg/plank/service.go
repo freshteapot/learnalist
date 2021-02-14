@@ -24,6 +24,7 @@ type PlankService struct {
 	logContext logrus.FieldLogger
 }
 
+// @openapi.path.tag: plank
 func NewService(repo PlankRepository, log logrus.FieldLogger) PlankService {
 	s := PlankService{
 		repo:       repo,
@@ -44,6 +45,8 @@ func (s PlankService) History(c echo.Context) error {
 }
 
 // RecordPlank Document the plank
+// @event.emit: event.ApiPlank
+// @event.emit: challenge.EventChallengeDone
 func (s PlankService) RecordPlank(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 
@@ -113,6 +116,7 @@ func (s PlankService) RecordPlank(c echo.Context) error {
 }
 
 // DeletePlankRecord Deletes a single entry based on the UUID
+// @event.emit: event.ApiPlank
 func (s PlankService) DeletePlankRecord(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	UUID := c.Param("uuid")

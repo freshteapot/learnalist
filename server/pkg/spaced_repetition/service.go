@@ -19,6 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @openapi.path.tag: spacedRepetition
 func NewService(repo SpacedRepetitionRepository, logContext logrus.FieldLogger) SpacedRepetitionService {
 	s := SpacedRepetitionService{
 		repo:       repo,

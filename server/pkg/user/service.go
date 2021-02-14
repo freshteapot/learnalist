@@ -42,6 +42,7 @@ type HTTPUserLoginIDPInput struct {
 	AccessToken string `json:"access_token"`
 }
 
+// @openapi.path.tag: user
 func NewService(db *sqlx.DB, issuedTo []string, userFromIDP UserFromIDP, userSession Session, hugoHelper hugo.HugoHelper, logContext logrus.FieldLogger) UserService {
 	return UserService{
 		db:          db,
@@ -53,6 +54,8 @@ func NewService(db *sqlx.DB, issuedTo []string, userFromIDP UserFromIDP, userSes
 	}
 }
 
+// @event.emit: event.ApiUserRegister
+// @event.emit: event.ApiUserLogin
 func (s UserService) LoginViaIDP(c echo.Context) error {
 	userFromIDP := s.userFromIDP
 	userSession := s.userSession

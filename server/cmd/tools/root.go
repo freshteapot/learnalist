@@ -4,6 +4,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/api"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/challenges"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/docs"
+	"github.com/freshteapot/learnalist-api/server/cmd/tools/experimental"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/natsutils"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/notifications"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/remind"
@@ -31,5 +32,5 @@ func init() {
 	RootCmd.AddCommand(remind.RootCmd)
 	RootCmd.AddCommand(eventReaderCMD)
 	RootCmd.AddCommand(slackEventsCMD)
-
+	RootCmd.AddCommand(experimental.RootCmd)
 }

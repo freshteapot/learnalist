@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 )
 
+// @event.listen: event.ApiUserRegister
 func (m management) eventUserRegister(entry event.Eventlog) {
 	if entry.Kind != event.ApiUserRegister {
 		return

@@ -20,6 +20,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @openapi.path.tag: spacedRepetition
 func NewService(repo DripfeedRepository, aclRepo acl.AclReaderList, listRepo alist.DatastoreAlists, logContext logrus.FieldLogger) DripfeedService {
 	s := DripfeedService{
 		repo:       repo,
@@ -32,6 +33,7 @@ func NewService(repo DripfeedRepository, aclRepo acl.AclReaderList, listRepo ali
 	return s
 }
 
+// @event.emit: event.ApiDripfeed
 func (s DripfeedService) Create(c echo.Context) error {
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	logContext := s.logContext
@@ -160,6 +162,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, dripfeedResponse)
 }
 
+// @event.emit: event.ApiDripfeed
 func (s DripfeedService) Delete(c echo.Context) error {
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	userUUID := loggedInUser.Uuid

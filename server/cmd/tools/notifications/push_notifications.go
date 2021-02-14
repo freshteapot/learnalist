@@ -20,6 +20,14 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
+type fake struct{}
+
+// @event.emit: event.MobileDeviceRemove
+// @event.listen: event.KindPushNotification
+func (f fake) handlePush() {
+
+}
+
 var pushNotificationsCMD = &cobra.Command{
 	Use:   "push-notifications",
 	Short: "Read events via nats",
@@ -65,7 +73,7 @@ go run main.go --config=../config/dev.config.yaml tools notifications push-notif
 		if err != nil {
 			log.Fatalf("error getting Messaging client: %v\n", err)
 		}
-
+		//handlePush()
 		handle := func(msg *stan.Msg) {
 			var moment event.Eventlog
 			json.Unmarshal(msg.Data, &moment)

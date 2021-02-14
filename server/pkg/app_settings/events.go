@@ -8,6 +8,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 )
 
+// @event.listen: dripfeed.EventDripfeedAdded
+// @event.listen: dripfeed.EventDripfeedRemoved
+// @event.listen: dripfeed.EventDripfeedFinished
 func (s AppSettingsService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case dripfeed.EventDripfeedAdded:

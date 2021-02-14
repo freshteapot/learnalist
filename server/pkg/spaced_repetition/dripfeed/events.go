@@ -12,6 +12,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: event.SystemSpacedRepetition
+// @event.listen: event.ApiDripfeed
+// @event.listen: event.ApiSpacedRepetition
 func (s DripfeedService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -42,6 +47,8 @@ func (s DripfeedService) removeUser(entry event.Eventlog) {
 	}).Info("user removed")
 }
 
+// @event.emit: dripfeed.EventDripfeedFinished
+// @event.emit: spaced_repetition.EventKindNew
 func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvertimeInfo, now time.Time) {
 	nextUp, err := s.repo.GetNext(dripfeedInfo.DripfeedUuid)
 
@@ -87,6 +94,8 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 	// We handle deletion of new entry via the new action event above
 }
 
+// @event.emit: dripfeed.EventDripfeedAdded
+// @event.emit: dripfeed.EventDripfeedRemoved
 func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 	switch entry.Action {
 	case event.ActionCreated:
@@ -173,6 +182,8 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 	}
 }
 
+// @event.listen: spaced_repetition.EventKindNew
+// @event.listen: spaced_repetition.EventKindViewed
 func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 	b, _ := json.Marshal(entry.Data)
 	var moment spaced_repetition.EventSpacedRepetition

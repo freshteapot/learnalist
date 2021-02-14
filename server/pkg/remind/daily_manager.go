@@ -96,6 +96,12 @@ func (m *dailyManager) Close() {
 }
 
 // Future might want display_name
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: event.MobileDeviceRemoved
+// @event.listen: event.MobileDeviceRegistered
+// @event.listen: event.ApiSpacedRepetition
+// @event.listen: event.ApiPlank
 func (m *dailyManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -203,6 +209,7 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 	return true
 }
 
+// @event.emit: event.KindPushNotification
 func (m *dailyManager) SendNotifications() {
 	reminders, err := m.settingsRepo.GetReminders(DefaultNowUTC())
 

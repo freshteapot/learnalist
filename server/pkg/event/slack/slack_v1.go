@@ -29,6 +29,18 @@ func NewSlackV1Events(post PostWebhook, webhook string, logContext logrus.FieldL
 	}
 }
 
+// @event.listen: event.ApiUserRegister
+// @event.listen: event.ApiUserLogin
+// @event.listen: event.ApiUserLogout
+// @event.listen: event.BrowserUserLogout
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: event.ApiListSaved
+// @event.listen: event.ApiListDelete
+// @event.listen: event.ApiSpacedRepetition
+// @event.listen: event.ApiPlank
+// @event.listen: challenge.EventChallengeDone
+// @event.listen: challenge.EventChallengeNewRecord
 func (s SlackEvents) Read(entry event.Eventlog) {
 	var msg slack.WebhookMessage
 

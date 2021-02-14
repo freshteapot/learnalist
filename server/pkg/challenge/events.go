@@ -11,6 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
+// @event.listen: challenge.EventChallengeDone
 func (s ChallengeService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserDelete:
@@ -41,6 +44,7 @@ func (s ChallengeService) removeUser(entry event.Eventlog) {
 	}).Info("user removed")
 }
 
+// @event.emit: event.KindPushNotification
 func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 	if entry.Kind != EventChallengeDone {
 		return
@@ -89,6 +93,7 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 	})
 }
 
+// @event.emit: challenge.EventChallengeDone
 func (s ChallengeService) eventChallengePushNotification(entry event.Eventlog) {
 	allowed := []string{
 		EventChallengeNewRecord,

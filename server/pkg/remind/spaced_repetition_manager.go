@@ -117,7 +117,10 @@ func (m *spacedRepetitionManager) Close() {
 // Send message
 // Update message sent
 // On SRS viewed remove unsent.
-
+// @event.listen: event.ApiAppSettingsRemindV1
+// @event.listen: event.ApiSpacedRepetition
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
 func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiAppSettingsRemindV1:
