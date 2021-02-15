@@ -87,7 +87,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 			service.Create(c)
-			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(rec.Code).To(Equal(http.StatusForbidden))
 			testutils.CheckMessageResponseFromResponseRecorder(rec, "User doesnt match")
 		})
 
@@ -169,7 +169,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			testutils.CheckMessageResponseFromResponseRecorder(rec, "Kind not supported: v1,v2")
 		})
 
-		It("Issue looking upto see if dripfeed exists", func() {
+		It("Issue looking up to see if dripfeed exists", func() {
 			b, _ := json.Marshal(input)
 			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
 			c = e.NewContext(req, rec)
@@ -323,7 +323,6 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 						Expect(data.Info.AlistUUID).To(Equal(input.AlistUuid))
 						Expect(data.Info.UserUUID).To(Equal(input.UserUuid))
 						Expect(data.Info.Kind).To(Equal(alist.FromToList))
-						fmt.Println(data.Settings)
 						return true
 					}))
 
@@ -334,5 +333,171 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 				})
 			})
 		})
+	})
+
+	When("Delete", func() {
+		var (
+			uri              = "/api/v1/api/v1/spaced-repetition/overtime"
+			inputFake, input openapi.SpacedRepetitionOvertimeInputBase
+		)
+
+		BeforeEach(func() {
+			//dripfeedHTTPResponse = `{"dripfeed_uuid":"f29a45249551ae992a8edc6526ca7421094c8883","alist_uuid":"fake-list-123","user_uuid":"fake-user-123"}`
+			inputFake = openapi.SpacedRepetitionOvertimeInputBase{
+				AlistUuid: "fake-list-123",
+				UserUuid:  "fake-user-456",
+			}
+			input = openapi.SpacedRepetitionOvertimeInputBase{
+				AlistUuid: "fake-list-123",
+				UserUuid:  userUUID,
+			}
+			fmt.Println(input)
+		})
+
+		It("User is not the one logged in", func() {
+			b, _ := json.Marshal(inputFake)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetPath(uri)
+			service.Delete(c)
+			Expect(rec.Code).To(Equal(http.StatusForbidden))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "User doesnt match")
+		})
+
+		It("Issue looking up to see if dripfeed exists", func() {
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetPath(uri)
+
+			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
+			aList := alist.Alist{}
+			aList.Uuid = input.AlistUuid
+			aList.Info.ListType = alist.SimpleList
+
+			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
+			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, want)
+
+			service.Delete(c)
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("No list to delete", func() {
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetPath(uri)
+
+			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
+			aList := alist.Alist{}
+			aList.Uuid = input.AlistUuid
+			aList.Info.ListType = alist.SimpleList
+
+			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
+			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
+
+			service.Delete(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List removed")
+		})
+
+		It("list queued for removal", func() {
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetPath(uri)
+
+			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
+			aList := alist.Alist{}
+			aList.Uuid = input.AlistUuid
+			aList.Info.ListType = alist.SimpleList
+
+			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
+			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
+
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+				Expect(moment.Kind).To(Equal(event.ApiDripfeed))
+				Expect(moment.Action).To(Equal(event.ActionDeleted))
+				Expect(moment.Data.(dripfeed.EventDripfeedDelete).DripfeedUUID).To(Equal(dripfeedUUID))
+				Expect(moment.Data.(dripfeed.EventDripfeedDelete).UserUUID).To(Equal(userUUID))
+				return true
+			}))
+
+			service.Delete(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, "List removed")
+		})
+	})
+
+	When("ListActive", func() {
+		It("Issue looking up to see if dripfeed exists", func() {
+			alistUUID := "fake-list-123"
+			uri := fmt.Sprintf("/overtime/active/%s", alistUUID)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/overtime/active/:alistUUID")
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetParamNames("alistUUID")
+			c.SetParamValues(alistUUID)
+
+			dripfeedUUID := dripfeed.UUID(loggedInUser.Uuid, alistUUID)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, want)
+
+			service.ListActive(c)
+
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
+		})
+
+		It("List cant be found", func() {
+			alistUUID := "fake-list-123"
+			uri := fmt.Sprintf("/overtime/active/%s", alistUUID)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/overtime/active/:alistUUID")
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetParamNames("alistUUID")
+			c.SetParamValues(alistUUID)
+
+			dripfeedUUID := dripfeed.UUID(loggedInUser.Uuid, alistUUID)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
+
+			service.ListActive(c)
+
+			Expect(rec.Code).To(Equal(http.StatusNotFound))
+			Expect(rec.Body.Len()).To(Equal(0))
+		})
+
+		It("List found", func() {
+			alistUUID := "fake-list-123"
+			uri := fmt.Sprintf("/overtime/active/%s", alistUUID)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodGet, uri, "")
+			c = e.NewContext(req, rec)
+			c.SetPath("/overtime/active/:alistUUID")
+			c.Set("loggedInUser", *loggedInUser)
+			c.SetParamNames("alistUUID")
+			c.SetParamValues(alistUUID)
+
+			dripfeedUUID := dripfeed.UUID(loggedInUser.Uuid, alistUUID)
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
+
+			service.ListActive(c)
+
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			Expect(rec.Body.Len()).To(Equal(0))
+		})
+
 	})
 })

@@ -48,7 +48,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 	json.Unmarshal(raw, &input)
 
 	if input.UserUuid != loggedInUser.Uuid {
-		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
 			Message: "User doesnt match",
 		})
 	}
@@ -112,11 +112,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 			"input": input,
 			"error": err,
 		}).Error("s.repo.Exists")
-
-		response := api.HTTPResponseMessage{
-			Message: i18n.InternalServerErrorFunny,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	dripfeedResponse := openapi.SpacedRepetitionOvertimeInfo{
@@ -209,11 +205,7 @@ func (s DripfeedService) Delete(c echo.Context) error {
 			"event": "broken-state",
 			"error": err,
 		}).Error("s.repo.Exists")
-
-		response := api.HTTPResponseMessage{
-			Message: i18n.InternalServerErrorAclLookup,
-		}
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	if !exists {
