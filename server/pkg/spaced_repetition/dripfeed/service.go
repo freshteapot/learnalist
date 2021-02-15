@@ -103,6 +103,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
+
 	// TODO maybe move this further up
 	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
 	exists, err := s.repo.Exists(dripfeedUUID)
