@@ -104,7 +104,6 @@ func (s DripfeedService) Create(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	// TODO maybe move this further up
 	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
 	exists, err := s.repo.Exists(dripfeedUUID)
 	if err != nil {
@@ -115,7 +114,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 		}).Error("s.repo.Exists")
 
 		response := api.HTTPResponseMessage{
-			Message: i18n.InternalServerErrorAclLookup,
+			Message: i18n.InternalServerErrorFunny,
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
@@ -151,6 +150,15 @@ func (s DripfeedService) Create(c echo.Context) error {
 			Settings: extra.Settings,
 			Data:     aList.Data.(alist.TypeV2),
 		}
+
+		allowed := []string{"from", "to"}
+		if !utils.StringArrayContains(allowed, extra.Settings.Show) {
+			response := api.HTTPResponseMessage{
+				Message: fmt.Sprintf("settings.show is not supported: %s", strings.Join(allowed, ",")),
+			}
+			return c.JSON(http.StatusUnprocessableEntity, response)
+		}
+
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
