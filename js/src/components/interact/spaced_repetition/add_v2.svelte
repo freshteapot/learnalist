@@ -150,10 +150,9 @@
         <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
         <button class="br3" on:click={handleClose}>Close</button>
         <p>
-          Click on the row you want to add or <a
-            href="#"
-            class="link underline"
-            on:click|preventDefault={addingOvertime}>add all overtime</a
+          Click on the row you want to add or <button
+            class="br3"
+            on:click|preventDefault={addOvertime}>add all overtime</button
           >
         </p>
       </header>

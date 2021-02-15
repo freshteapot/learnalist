@@ -16,6 +16,13 @@ Add somehting  <a class="link underline" href="/spaced-repetition.html#/add">rig
 ### Add via a list
 Click on the list menu option <button class="br3">🧠 + 💪</button> to add an entry for spaced repetition learning.
 
+### Add list over time
+- Click on the list
+- Click on <button class="br3">🧠 + 💪</button>
+- Click on <button class="br3">add all overtime</button>
+- Wait for the system to slowly add the list overtime.
+- <a class="link underline" href="/faq/add-a-list-overtime-for-spaced-learning.html">read more</a>
+
 ### Add via a browser extension
 Coming soon
 

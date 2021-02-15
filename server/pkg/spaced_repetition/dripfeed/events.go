@@ -125,7 +125,7 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 					Data: listItem,
 				}
 				b, _ := json.Marshal(item)
-				srsItem := spaced_repetition.V1FromPOST(b, settings)
+				srsItem, _ := spaced_repetition.V1FromPOST(b, settings)
 				items = append(items, srsItem.String())
 			}
 
@@ -144,7 +144,7 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 				item.Settings.Show = input.Settings.Show
 
 				b, _ := json.Marshal(item)
-				srsItem := spaced_repetition.V2FromPOST(b, settings)
+				srsItem, _ := spaced_repetition.V2FromPOST(b, settings)
 				items = append(items, srsItem.String())
 			}
 		}
