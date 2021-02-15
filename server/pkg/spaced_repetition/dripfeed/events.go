@@ -53,19 +53,19 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 	nextUp, err := s.repo.GetNext(dripfeedInfo.DripfeedUuid)
 
 	if err != nil {
-		if err == utils.ErrNotFound {
-			// Send event that dripfeedUUID doesnt exist =
-			// I wonder if this really means it has finished?
-			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-				Kind: EventDripfeedFinished,
-				Data: dripfeedInfo,
-			})
-			return
+		if err != utils.ErrNotFound {
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.checkForNext",
+			}).Fatal("issue with repo")
 		}
-		s.logContext.WithFields(logrus.Fields{
-			"error":  err,
-			"method": "s.checkForNext",
-		}).Fatal("issue with repo")
+		// Send event that dripfeedUUID doesnt exist =
+		// I wonder if this really means it has finished?
+		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+			Kind: EventDripfeedFinished,
+			Data: dripfeedInfo,
+		})
+		return
 	}
 
 	var entry spaced_repetition.ItemInput
@@ -97,7 +97,6 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 	// We handle deletion of new entry via the new action event above
 }
 
-// TODO I wonder if we should be using SpaceRepetitionKind and not top level
 // @event.emit: dripfeed.EventDripfeedAdded
 // @event.emit: dripfeed.EventDripfeedRemoved
 func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
@@ -157,6 +156,8 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 			}).Fatal("issue with repo")
 		}
 
+		// This is partly used to trigger update in user/info but also
+		// makes it clear it was added for future data mining (if I ever care)
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: EventDripfeedAdded,
 			Data: openapi.SpacedRepetitionOvertimeInfo{
@@ -166,8 +167,6 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 			},
 		})
 
-		// app_settings.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
-		// GetNext
 		eventTime := time.Unix(entry.Timestamp, 0).UTC()
 
 		info := openapi.SpacedRepetitionOvertimeInfo{
