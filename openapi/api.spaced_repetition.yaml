@@ -103,6 +103,9 @@ components:
           type: string
           format: date-time
           description: Set to UTC
+        ext_id:
+          type: string
+          description: Usually a reference to something meaningful to the creator of it
 
     SpacedRepetitionBaseSettingsShow:
       type: object

@@ -76,7 +76,6 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 		SrsUUID      string `db:"srs_uuid"`
 		SrsKind      string `db:"kind"`
 		SrsBody      []byte `db:"body"`
-		Position     int    `db:"position"`
 		DripfeedUUID string `db:"dripfeed_uuid"`
 		UserUUID     string `db:"user_uuid"`
 		AlistUUID    string `db:"alist_uuid"`
@@ -97,7 +96,6 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 		SrsUUID:      item.SrsUUID,
 		SrsKind:      item.SrsKind,
 		SrsBody:      item.SrsBody,
-		Position:     item.Position,
 		DripfeedUUID: item.DripfeedUUID,
 		UserUUID:     item.UserUUID,
 		AlistUUID:    item.AlistUUID,

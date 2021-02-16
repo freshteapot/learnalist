@@ -3,8 +3,8 @@ package dripfeed_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/mocks"
@@ -207,7 +207,6 @@ var _ = Describe("Testing Events", func() {
 				}
 
 				dripfeedRepo.On("AddAll", dripfeedUUID, userUUID, alistUUID, mock.MatchedBy(func(data []string) bool {
-					fmt.Println(data)
 					Expect(len(data)).To(Equal(1))
 					// Check for proof of hash
 					Expect(strings.Contains(data[0], `"uuid":"7c3d3151cb6d7f21549c9ecd2976e745eb3ef852"`)).To(BeTrue())
@@ -225,9 +224,8 @@ var _ = Describe("Testing Events", func() {
 		})
 
 		When("Success", func() {
-
+			var whenNext time.Time
 			BeforeEach(func() {
-				testutils.SetLoggerToPanicOnFatal(logger)
 				aList := alist.Alist{}
 				aList.Uuid = alistUUID
 				aList.Info.ListType = alist.FromToList
@@ -237,6 +235,8 @@ var _ = Describe("Testing Events", func() {
 					To:   "car",
 				})
 
+				whenNext = time.Now().UTC()
+				moment.Timestamp = whenNext.Unix()
 				moment.Data = dripfeed.EventDripfeedInputV2{
 					Info: dripfeed.EventDripfeedInputBase{
 						UserUUID:  userUUID,
@@ -250,7 +250,6 @@ var _ = Describe("Testing Events", func() {
 				}
 
 				dripfeedRepo.On("AddAll", dripfeedUUID, userUUID, alistUUID, mock.MatchedBy(func(data []string) bool {
-					fmt.Println(data)
 					Expect(len(data)).To(Equal(1))
 					// Check for proof of hash
 					Expect(strings.Contains(data[0], `"uuid":"7c3d3151cb6d7f21549c9ecd2976e745eb3ef852"`)).To(BeTrue())
@@ -259,8 +258,24 @@ var _ = Describe("Testing Events", func() {
 					return true
 				})).Return(nil)
 
-				//aList.Data = append(aList.Data.(alist.TypeV1), "hello")
+			})
 
+			It("Error looking for next item", func() {
+				testutils.SetLoggerToPanicOnFatal(logger)
+				expectedEvents := []string{}
+				verify := func(args mock.Arguments) {
+					moment := args[1].(event.Eventlog)
+					expectedEvents = append(expectedEvents, moment.Kind)
+				}
+
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything).Times(2).Run(verify)
+				dripfeedRepo.On("GetNext", dripfeedUUID).Return(dripfeed.RepoItem{}, want)
+
+				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+				Expect(func() { service.OnEvent(moment) }).Should(Panic())
+				Expect(expectedEvents).To(Equal([]string{dripfeed.EventDripfeedAdded}))
+				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+				Expect(hook.LastEntry().Data["method"]).To(Equal("s.checkForNext"))
 			})
 
 			It("List was empty, so nothing found", func() {
@@ -278,44 +293,82 @@ var _ = Describe("Testing Events", func() {
 				Expect(expectedEvents).To(Equal([]string{dripfeed.EventDripfeedAdded, dripfeed.EventDripfeedFinished}))
 				mock.AssertExpectationsForObjects(GinkgoT(), eventMessageBus)
 			})
+
+			It("V1 entry has been found", func() {
+				entry := dripfeed.RepoItem{
+					SrsUUID:      "ba9277fc4c6190fb875ad8f9cee848dba699937f",
+					SrsKind:      "v1",
+					SrsBody:      []byte(`{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"0","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z","ext_id":"f29a45249551ae992a8edc6526ca7421094c8883"}}`),
+					DripfeedUUID: dripfeedUUID,
+					UserUUID:     userUUID,
+					AlistUUID:    alistUUID,
+				}
+
+				expectedEvents := []string{}
+				verify := func(args mock.Arguments) {
+					moment := args[1].(event.Eventlog)
+					expectedEvents = append(expectedEvents, moment.Kind)
+
+					if moment.Kind == event.SystemSpacedRepetition {
+						Expect(moment.Action).To(Equal(spaced_repetition.EventKindNew))
+						srsItem := moment.Data.(spaced_repetition.EventSpacedRepetition).Data
+						Expect(srsItem.UUID).To(Equal("ba9277fc4c6190fb875ad8f9cee848dba699937f"))
+						// Confirm the time set in the event, is the one used to decide when to reset from
+						// Confirm dripfeedUUID is being set as the ext_id
+						var expectedSrsItem openapi.SpacedRepetitionV1
+						json.Unmarshal([]byte(srsItem.Body), &expectedSrsItem)
+						Expect(expectedSrsItem.Settings.ExtId).To(Equal(dripfeedUUID))
+
+						// Confirm the time set in the event, is the one used to decide when to reset from
+						Expect(whenNext.Add(spaced_repetition.Threshold0).Format(time.RFC3339)).To(Equal(srsItem.WhenNext.Format(time.RFC3339)))
+					}
+				}
+
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything).Times(2).Run(verify)
+				dripfeedRepo.On("GetNext", dripfeedUUID).Return(entry, nil)
+
+				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+				service.OnEvent(moment)
+				Expect(expectedEvents).To(Equal([]string{dripfeed.EventDripfeedAdded, event.SystemSpacedRepetition}))
+			})
+
+			It("V2 entry has been found", func() {
+				entry := dripfeed.RepoItem{
+					SrsUUID:      "75698c0f5a7b904f1799ceb68e2afe67ad987689",
+					SrsKind:      "v2",
+					SrsBody:      []byte(`{"data":{"from":"March","to":"Mars"},"kind":"v2","settings":{"created":"2020-12-28T11:44:33Z","level":"0","show":"to","when_next":"2020-12-28T12:44:33Z","ext_id":"f29a45249551ae992a8edc6526ca7421094c8883"},"show":"Mars","uuid":"75698c0f5a7b904f1799ceb68e2afe67ad987689"}`),
+					DripfeedUUID: dripfeedUUID,
+					UserUUID:     userUUID,
+					AlistUUID:    alistUUID,
+				}
+
+				expectedEvents := []string{}
+				verify := func(args mock.Arguments) {
+					moment := args[1].(event.Eventlog)
+					expectedEvents = append(expectedEvents, moment.Kind)
+
+					if moment.Kind == event.SystemSpacedRepetition {
+						Expect(moment.Action).To(Equal(spaced_repetition.EventKindNew))
+						srsItem := moment.Data.(spaced_repetition.EventSpacedRepetition).Data
+						Expect(srsItem.UUID).To(Equal(entry.SrsUUID))
+
+						// Confirm dripfeedUUID is being set as the ext_id
+						var expectedSrsItem openapi.SpacedRepetitionV2
+						json.Unmarshal([]byte(srsItem.Body), &expectedSrsItem)
+						Expect(expectedSrsItem.Settings.ExtId).To(Equal(dripfeedUUID))
+
+						// Confirm the time set in the event, is the one used to decide when to reset from
+						Expect(whenNext.Add(spaced_repetition.Threshold0).Format(time.RFC3339)).To(Equal(srsItem.WhenNext.Format(time.RFC3339)))
+					}
+				}
+
+				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything).Times(2).Run(verify)
+				dripfeedRepo.On("GetNext", dripfeedUUID).Return(entry, nil)
+
+				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+				service.OnEvent(moment)
+				Expect(expectedEvents).To(Equal([]string{dripfeed.EventDripfeedAdded, event.SystemSpacedRepetition}))
+			})
 		})
-	})
-
-	It("REMOVE", func() {
-		Expect("1").To(Equal("1"))
-	})
-
-	It("Making sure things work", func() {
-		type eventDripfeedInput struct {
-			UserUUID string      `json:"user_uuid"`
-			Kind     string      `json:"kind"` // This is the list_type, at some point I will drop list_type :P
-			Data     interface{} `json:"data"` // TODO I think with openapi-generator we might be able to move to something else.
-		}
-		raw := `{"kind":"api.dripfeed","data":{"user_uuid":"7197b389-cfe6-4fa8-9aea-98d49b305039","kind":"v1","data":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]},"timestamp":1610273658,"action":"created"}`
-
-		var entry event.Eventlog
-		json.Unmarshal([]byte(raw), &entry)
-		b, _ := json.Marshal(entry.Data)
-
-		var moment dripfeed.EventDripfeedInputV1
-		json.Unmarshal(b, &moment)
-		fmt.Println(moment.Data)
-	})
-
-	It("Check if new has dripfeed", func() {
-		raw := `{"kind":"api.spacedrepetition","data":{"kind":"new","data":{"uuid":"bfe3cc8ad82c1e8282b53df0a7a78685042d9f5b","body":"{\"show\":\"monday\",\"kind\":\"v1\",\"uuid\":\"bfe3cc8ad82c1e8282b53df0a7a78685042d9f5b\",\"data\":\"monday\",\"settings\":{\"level\":\"0\",\"when_next\":\"2021-01-10T15:37:28Z\",\"created\":\"2021-01-10T14:37:28Z\",\"ext_id\":\"b17ef2deb2d1836dfe534de67e710e23c5b67e88\"}}","user_uuid":"4eccc98d-90ea-42ba-84d4-d0688b64d24e","when_next":"2021-01-10T15:37:28Z","created":"2021-01-10T14:37:28Z"}},"timestamp":1610289448}`
-		var entry event.Eventlog
-		json.Unmarshal([]byte(raw), &entry)
-
-		b, _ := json.Marshal(entry.Data)
-		var moment spaced_repetition.EventSpacedRepetition
-		json.Unmarshal(b, &moment)
-
-		srsItem := moment.Data
-
-		var info dripfeed.SpacedRepetitionSettingsExtID
-
-		json.Unmarshal([]byte(srsItem.Body), &info)
-		fmt.Println(info.Settings.ExtID)
 	})
 })
