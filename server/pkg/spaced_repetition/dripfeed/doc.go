@@ -73,6 +73,7 @@ type RepoItem struct {
 	SrsUUID      string
 	SrsKind      string
 	SrsBody      []byte
+	Position     int
 	DripfeedUUID string
 	UserUUID     string
 	AlistUUID    string

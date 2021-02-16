@@ -34,6 +34,7 @@ type HTTPRequestInputV2Item struct {
 	To   string `json:"to"`
 }
 
+// TODO this could almost be the same as what is openapi.
 // Should we move this to openapi?
 type HTTPRequestInputSettings struct {
 	Level    string `json:"level"`

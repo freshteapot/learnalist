@@ -296,9 +296,11 @@ var _ = Describe("Testing Events", func() {
 
 			It("V1 entry has been found", func() {
 				entry := dripfeed.RepoItem{
-					SrsUUID:      "ba9277fc4c6190fb875ad8f9cee848dba699937f",
-					SrsKind:      "v1",
+					SrsUUID: "ba9277fc4c6190fb875ad8f9cee848dba699937f",
+					SrsKind: "v1",
+					// TODO get a real example
 					SrsBody:      []byte(`{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"0","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z","ext_id":"f29a45249551ae992a8edc6526ca7421094c8883"}}`),
+					Position:     0,
 					DripfeedUUID: dripfeedUUID,
 					UserUUID:     userUUID,
 					AlistUUID:    alistUUID,
@@ -334,9 +336,11 @@ var _ = Describe("Testing Events", func() {
 
 			It("V2 entry has been found", func() {
 				entry := dripfeed.RepoItem{
-					SrsUUID:      "75698c0f5a7b904f1799ceb68e2afe67ad987689",
-					SrsKind:      "v2",
+					SrsUUID: "75698c0f5a7b904f1799ceb68e2afe67ad987689",
+					SrsKind: "v2",
+					// TODO get a real example
 					SrsBody:      []byte(`{"data":{"from":"March","to":"Mars"},"kind":"v2","settings":{"created":"2020-12-28T11:44:33Z","level":"0","show":"to","when_next":"2020-12-28T12:44:33Z","ext_id":"f29a45249551ae992a8edc6526ca7421094c8883"},"show":"Mars","uuid":"75698c0f5a7b904f1799ceb68e2afe67ad987689"}`),
+					Position:     0,
 					DripfeedUUID: dripfeedUUID,
 					UserUUID:     userUUID,
 					AlistUUID:    alistUUID,

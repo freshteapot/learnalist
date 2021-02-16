@@ -40,7 +40,8 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 					"method": "s.OnEvent",
 				}).Fatal("issue with repo")
 			}
-
+			// This I believe is used to trigger a new dripfeed
+			// TODO do I handle this?
 			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 				UUID: item.UUID,
 				Kind: event.SystemSpacedRepetition,
@@ -53,6 +54,11 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 			return
 		}
 
+		// TODO
+		// I am wondering why we trigger this publish after the system
+		// Is this a mistake?
+		// Is this a feature
+		// Why do I end up with identical events (time potenitally off)
 		// The entry is a new
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiSpacedRepetition,
@@ -60,6 +66,7 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 				Kind: EventKindNew,
 				Data: item,
 			},
+			Action: event.ActionCreated,
 		})
 	}
 }
