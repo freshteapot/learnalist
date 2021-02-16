@@ -25,19 +25,21 @@ import (
 
 var _ = Describe("Testing Dripfeed Service API", func() {
 	var (
-		aclRepo         *mocks.Acl
 		eventMessageBus *mocks.EventlogPubSub
 		logger          *logrus.Logger
 		c               echo.Context
 		e               *echo.Echo
 		req             *http.Request
 		rec             *httptest.ResponseRecorder
-		service         dripfeed.DripfeedService
-		dripfeedRepo    *mocks.DripfeedRepository
-		listRepo        *mocks.DatastoreAlists
-		loggedInUser    *uuid.User
-		userUUID        string
-		want            error
+
+		service      dripfeed.DripfeedService
+		dripfeedRepo *mocks.DripfeedRepository
+		listRepo     *mocks.DatastoreAlists
+		aclRepo      *mocks.Acl
+
+		loggedInUser *uuid.User
+		userUUID     string
+		want         error
 	)
 
 	BeforeEach(func() {

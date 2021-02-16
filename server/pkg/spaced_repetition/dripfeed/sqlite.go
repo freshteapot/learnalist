@@ -138,6 +138,7 @@ func (r sqliteRepository) DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID st
 }
 
 func (r sqliteRepository) DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error {
+	// TODO should this be commit?
 	_, err := r.db.Exec(SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
 	_, err = r.db.Exec(SqlDeleteInfoByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
 	return err
@@ -158,8 +159,7 @@ func (r sqliteRepository) GetInfo(dripfeedUUID string) (openapi.SpacedRepetition
 		if err == sql.ErrNoRows {
 			return response, utils.ErrNotFound
 		}
-		// TODO handle panic
-		panic(err)
+		return response, err
 	}
 
 	response.AlistUuid = item.AlistUUID

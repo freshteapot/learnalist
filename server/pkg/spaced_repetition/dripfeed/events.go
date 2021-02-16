@@ -179,8 +179,23 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment EventDripfeedDelete
 		json.Unmarshal(b, &moment)
-		info, _ := s.repo.GetInfo(moment.DripfeedUUID)
-		_ = s.repo.DeleteByUUIDAndUserUUID(info.DripfeedUuid, info.UserUuid)
+
+		info, err := s.repo.GetInfo(moment.DripfeedUUID)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.repo.GetInfo",
+			}).Fatal("issue with repo")
+		}
+
+		err = s.repo.DeleteByUUIDAndUserUUID(info.DripfeedUuid, info.UserUuid)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.repo.DeleteByUUIDAndUserUUID",
+			}).Fatal("issue with repo")
+		}
+
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: EventDripfeedRemoved,
 			Data: info,
