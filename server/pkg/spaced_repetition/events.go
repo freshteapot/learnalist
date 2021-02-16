@@ -60,13 +60,15 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 		// Is this a feature
 		// Why do I end up with identical events (time potenitally off)
 		// The entry is a new
+		// This event, raises the question of event tracing
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiSpacedRepetition,
 			Data: EventSpacedRepetition{
 				Kind: EventKindNew,
 				Data: item,
 			},
-			Action: event.ActionCreated,
+			Action:    event.ActionCreated,
+			Timestamp: entry.Timestamp,
 		})
 	}
 }
