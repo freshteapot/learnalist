@@ -246,7 +246,6 @@ func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 			return
 		}
 
-		// TODO this actually needs to check for not found
 		info, err := s.repo.GetInfo(dripfeedUUID)
 		if err != nil {
 			if err == utils.ErrNotFound {
@@ -291,7 +290,18 @@ func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog
 		return
 	}
 
+	info, err := s.repo.GetInfo(dripfeedUUID)
+	if err != nil {
+		if err == utils.ErrNotFound {
+			return
+		}
+
+		s.logContext.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "s.handleSystemSpacedRepetitionEvents",
+		}).Fatal("issue with repo")
+	}
+
 	eventTime := time.Unix(entry.Timestamp, 0).UTC()
-	info, _ := s.repo.GetInfo(dripfeedUUID)
 	s.checkForNext(info, eventTime)
 }

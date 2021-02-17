@@ -561,7 +561,136 @@ var _ = Describe("Testing Events", func() {
 			})
 
 			It("Look up for next", func() {
+				// TODO or remove
+			})
+		})
+	})
 
+	When("The system triggers a spaced repetition event", func() {
+		var (
+			whenNext time.Time
+			srsItem  spaced_repetition.SpacedRepetitionEntry
+			moment   event.Eventlog
+			entry    openapi.SpacedRepetitionV1
+		)
+
+		BeforeEach(func() {
+			created, _ := time.Parse(time.RFC3339, "2020-12-23T11:58:21Z")
+			whenNext, _ = time.Parse(time.RFC3339, "2020-12-23T12:58:21Z")
+			entry = openapi.SpacedRepetitionV1{
+				Show: "Hello",
+				Kind: alist.SimpleList,
+				Uuid: "ba9277fc4c6190fb875ad8f9cee848dba699937f",
+				Data: "Hello",
+				Settings: openapi.SpacedRepetitionBaseSettings{
+					Level:    "0",
+					Created:  created,
+					WhenNext: whenNext,
+				},
+			}
+		})
+
+		It("Skip if not already in the system", func() {
+			moment = event.Eventlog{
+				Kind:   event.SystemSpacedRepetition,
+				Action: event.ActionCreated,
+			}
+			service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+			service.OnEvent(moment)
+		})
+
+		It("Issue when trying to remove entry via the repo", func() {
+			entryB, _ := json.Marshal(entry)
+			srsItem = spaced_repetition.SpacedRepetitionEntry{
+				UserUUID: userUUID,
+				UUID:     entry.Uuid,
+				Body:     string(entryB),
+				WhenNext: whenNext,
+				Created:  whenNext,
+			}
+
+			moment = event.Eventlog{
+				Kind: event.SystemSpacedRepetition,
+				Data: spaced_repetition.EventSpacedRepetition{
+					Data: srsItem,
+				},
+				Action:    spaced_repetition.EventKindAlreadyInSystem,
+				Timestamp: whenNext.UTC().Unix(),
+			}
+			dripfeedRepo.On("DeleteAllByUserUUIDAndSpacedRepetitionUUID", userUUID, srsItem.UUID).Return(want).Times(1)
+
+			testutils.SetLoggerToPanicOnFatal(logger)
+			service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+			Expect(func() { service.OnEvent(moment) }).Should(Panic())
+			Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+		})
+
+		It("SRS Entry doesnt have ext_id", func() {
+			entry.Settings.ExtId = ""
+			entryB, _ := json.Marshal(entry)
+			srsItem = spaced_repetition.SpacedRepetitionEntry{
+				UserUUID: userUUID,
+				UUID:     entry.Uuid,
+				Body:     string(entryB),
+				WhenNext: whenNext,
+				Created:  whenNext,
+			}
+
+			moment = event.Eventlog{
+				Kind: event.SystemSpacedRepetition,
+				Data: spaced_repetition.EventSpacedRepetition{
+					Data: srsItem,
+				},
+				Action:    spaced_repetition.EventKindAlreadyInSystem,
+				Timestamp: whenNext.UTC().Unix(),
+			}
+			dripfeedRepo.On("DeleteAllByUserUUIDAndSpacedRepetitionUUID", userUUID, srsItem.UUID).Return(nil).Times(1)
+
+			service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+			service.OnEvent(moment)
+		})
+
+		Context("ExtID / DripfeedUUID is not found", func() {
+
+			BeforeEach(func() {
+				dripfeedUUID = "fake-dripfeed-123"
+				entry.Settings.ExtId = dripfeedUUID
+				entry.Settings.Level = "1"
+
+				entryB, _ := json.Marshal(entry)
+				srsItem = spaced_repetition.SpacedRepetitionEntry{
+					UserUUID: userUUID,
+					UUID:     entry.Uuid,
+					Body:     string(entryB),
+					WhenNext: whenNext,
+					Created:  whenNext,
+				}
+
+				moment = event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Data: srsItem,
+					},
+					Action:    spaced_repetition.EventKindAlreadyInSystem,
+					Timestamp: whenNext.UTC().Unix(),
+				}
+				dripfeedRepo.On("DeleteAllByUserUUIDAndSpacedRepetitionUUID", userUUID, srsItem.UUID).Return(nil).Times(1)
+			})
+
+			It("Issue talking to repo", func() {
+				dripfeedRepo.On("GetInfo", dripfeedUUID).Return(openapi.SpacedRepetitionOvertimeInfo{}, want).Once()
+				testutils.SetLoggerToPanicOnFatal(logger)
+
+				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+				Expect(func() { service.OnEvent(moment) }).Should(Panic())
+
+				Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+			})
+
+			It("Success", func() {
+				dripfeedRepo.On("GetInfo", dripfeedUUID).Return(openapi.SpacedRepetitionOvertimeInfo{}, utils.ErrNotFound).Once()
+				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+				service.OnEvent(moment)
 			})
 		})
 	})
