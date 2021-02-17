@@ -214,10 +214,17 @@ func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 
 	switch moment.Kind {
 	case spaced_repetition.EventKindNew:
+		// When a new entry lands, we want to make sure we remove this entry from being queued.
 		srsItem := moment.Data
 		userUUID := srsItem.UserUUID
-		_ = s.repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID, srsItem.UUID)
-
+		err := s.repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID, srsItem.UUID)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.handleAPISpacedRepetitionEvents",
+			}).Fatal("issue with repo")
+		}
+		return
 	case spaced_repetition.EventKindViewed:
 		// This can trigger more than one to be added, due to not keeping track of Decrement
 		if moment.Action != spaced_repetition.ActionIncrement {
@@ -229,16 +236,30 @@ func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 		json.Unmarshal([]byte(srsItem.Body), &temp)
 		settings := temp.Settings
 		dripfeedUUID := settings.ExtID
+		// Skip if not linked to dripfeed
 		if dripfeedUUID == "" {
 			return
 		}
 
+		// Skip if not Level1
 		if settings.Level != spaced_repetition.Level1 {
 			return
 		}
 
+		// TODO this actually needs to check for not found
+		info, err := s.repo.GetInfo(dripfeedUUID)
+		if err != nil {
+			if err == utils.ErrNotFound {
+				return
+			}
+
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.handleAPISpacedRepetitionEvents",
+			}).Fatal("issue with repo")
+		}
+
 		eventTime := time.Unix(entry.Timestamp, 0).UTC()
-		info, _ := s.repo.GetInfo(dripfeedUUID)
 		s.checkForNext(info, eventTime)
 	}
 }
