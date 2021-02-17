@@ -91,6 +91,10 @@ func (s ChallengeService) eventChallengeDone(entry event.Eventlog) {
 		Kind: EventChallengeNewRecord,
 		Data: moment,
 	})
+	// TODO could this be where we fire event.ChangesetChallenge?
+	// TODO https://github.com/freshteapot/learnalist-api/issues/198
+	// Possible solution
+	// s.updateStaticSite(ChallengeInfo{UUID: challengeUUID}, true, event.ActionUpdated)
 }
 
 // @event.emit: challenge.EventChallengeDone
