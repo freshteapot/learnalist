@@ -65,9 +65,6 @@ func (r sqliteRepository) Exists(dripfeedUUID string) (bool, error) {
 		return true, err
 	}
 
-	if id != 1 {
-		return false, nil
-	}
 	return true, nil
 }
 
@@ -88,8 +85,6 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 		if err == sql.ErrNoRows {
 			return RepoItem{}, utils.ErrNotFound
 		}
-		// TODO handle panic
-		panic(err)
 		return RepoItem{}, err
 	}
 
