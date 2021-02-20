@@ -122,19 +122,28 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 }
 
 func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error {
-	err := r.SaveInfo(openapi.SpacedRepetitionOvertimeInfo{
-		DripfeedUuid: dripfeedUUID,
-		UserUuid:     userUUID,
-		AlistUuid:    alistUUID,
-	})
+	tx, err := r.db.Beginx()
 	if err != nil {
-		panic(err)
+		return err
+	}
+
+	_, err = tx.Exec(
+		SqlSaveDripfeedInfo,
+		dripfeedUUID,
+		userUUID,
+		alistUUID,
+	)
+
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	for index, body := range items {
 		var srs SpacedRepetitionUUID
 		json.Unmarshal([]byte(body), &srs)
-		_, err = r.db.Exec(
+
+		_, err = tx.Exec(
 			SqlDripfeedItemAddItem,
 			dripfeedUUID,
 			srs.UUID,
@@ -142,10 +151,19 @@ func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID
 			alistUUID,
 			body,
 			index)
+
 		if err != nil {
-			panic(err)
+			tx.Rollback()
+			return err
 		}
 	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return nil
 }
 

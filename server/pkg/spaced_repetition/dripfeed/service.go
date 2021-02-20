@@ -104,6 +104,22 @@ func (s DripfeedService) Create(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
+	dataSize := 0
+	// TODO Reject if list is empty
+	switch aList.Info.ListType {
+	case alist.SimpleList:
+		dataSize = len(aList.Data.(alist.TypeV1))
+	case alist.FromToList:
+		dataSize = len(aList.Data.(alist.TypeV2))
+	}
+
+	if dataSize == 0 {
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: "The list is empty, therefore nothing to add over time",
+		})
+	}
+
+	// TODO move this further up and fix the tests
 	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
 	exists, err := s.repo.Exists(dripfeedUUID)
 	if err != nil {
@@ -154,7 +170,6 @@ func (s DripfeedService) Create(c echo.Context) error {
 			}
 			return c.JSON(http.StatusUnprocessableEntity, response)
 		}
-
 	}
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{

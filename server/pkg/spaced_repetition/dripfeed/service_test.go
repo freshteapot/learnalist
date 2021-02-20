@@ -180,9 +180,9 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.SetPath(uri)
 
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
+			aList := alist.NewTypeV1()
 			aList.Uuid = input.AlistUuid
-			aList.Info.ListType = alist.SimpleList
+			aList.Data = append(aList.Data.(alist.TypeV1), "hello")
 
 			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
@@ -202,17 +202,15 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.SetPath(uri)
 
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
+			aList := alist.NewTypeV1()
 			aList.Uuid = input.AlistUuid
-			aList.Info.ListType = alist.SimpleList
+			aList.Data = append(aList.Data.(alist.TypeV1), "hello")
 
 			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
 
 			service.Create(c)
-
-			Expect(rec.Code).To(Equal(http.StatusOK))
 			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(dripfeedHTTPResponse))
 		})
 
@@ -274,10 +272,12 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 					c.SetPath(uri)
 
 					aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-					aList := alist.Alist{}
+					aList := alist.NewTypeV2()
 					aList.Uuid = input.AlistUuid
-					aList.Info.ListType = alist.FromToList
-					aList.Data = make(alist.TypeV2, 0)
+					aList.Data = append(aList.Data.(alist.TypeV2), alist.TypeV2Item{
+						From: "car",
+						To:   "bil",
+					})
 
 					dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 					listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
@@ -305,10 +305,12 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 					c.SetPath(uri)
 
 					aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-					aList := alist.Alist{}
+					aList := alist.NewTypeV2()
 					aList.Uuid = input.AlistUuid
-					aList.Info.ListType = alist.FromToList
-					aList.Data = make(alist.TypeV2, 0)
+					aList.Data = append(aList.Data.(alist.TypeV2), alist.TypeV2Item{
+						From: "car",
+						To:   "bil",
+					})
 
 					dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 					listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
