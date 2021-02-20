@@ -111,7 +111,6 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 					Expect(err).To(HaveOccurred())
 					Expect(err).To(Equal(want))
 				})
-
 			})
 
 			It("Commit", func() {
@@ -144,6 +143,77 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 			mockSql.ExpectCommit()
 
 			err := repo.DeleteByUser(userUUID)
+			Expect(err).To(BeNil())
+		})
+	})
+
+	When("Deleting by dripfeed", func() {
+		When("Transaction fails", func() {
+			It("Begin", func() {
+				mockSql.ExpectBegin().WillReturnError(want)
+				err := repo.DeleteByUUIDAndUserUUID(dripfeedUUID, userUUID)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(want))
+			})
+
+			When("Rollback", func() {
+				It("Fails on removing items", func() {
+					mockSql.ExpectBegin()
+					mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID).
+						WithArgs(dripfeedUUID, userUUID).
+						WillReturnError(want)
+
+					err := repo.DeleteByUUIDAndUserUUID(dripfeedUUID, userUUID)
+					Expect(err).To(HaveOccurred())
+					Expect(err).To(Equal(want))
+				})
+
+				It("Fails on removing info", func() {
+					mockSql.ExpectBegin()
+					mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID).
+						WithArgs(dripfeedUUID, userUUID).
+						WillReturnResult(sqlmock.NewResult(1, 1))
+
+					mockSql.ExpectExec(dripfeed.SqlDeleteInfoByDripfeedUUIDAndUserUUID).
+						WithArgs(dripfeedUUID, userUUID).
+						WillReturnError(want)
+
+					err := repo.DeleteByUUIDAndUserUUID(dripfeedUUID, userUUID)
+					Expect(err).To(HaveOccurred())
+					Expect(err).To(Equal(want))
+				})
+			})
+
+			It("Commit", func() {
+				mockSql.ExpectBegin()
+				mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID).
+					WithArgs(dripfeedUUID, userUUID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+
+				mockSql.ExpectExec(dripfeed.SqlDeleteInfoByDripfeedUUIDAndUserUUID).
+					WithArgs(dripfeedUUID, userUUID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+
+				mockSql.ExpectCommit().WillReturnError(want)
+
+				err := repo.DeleteByUUIDAndUserUUID(dripfeedUUID, userUUID)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(want))
+			})
+		})
+		Specify("Successfully removed", func() {
+			mockSql.ExpectBegin()
+			mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID).
+				WithArgs(dripfeedUUID, userUUID).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+
+			mockSql.ExpectExec(dripfeed.SqlDeleteInfoByDripfeedUUIDAndUserUUID).
+				WithArgs(dripfeedUUID, userUUID).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+
+			mockSql.ExpectCommit()
+
+			err := repo.DeleteByUUIDAndUserUUID(dripfeedUUID, userUUID)
 			Expect(err).To(BeNil())
 		})
 	})
