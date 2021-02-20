@@ -3,9 +3,9 @@ package dripfeed_test
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 
@@ -29,7 +29,6 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 		userUUID = "fake-user-123"
 
 		want = errors.New("fail")
-		fmt.Println(userUUID)
 	})
 
 	AfterEach(func() {
@@ -47,9 +46,9 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 		})
 
 		It("Issue", func() {
-			sqlExpect.WillReturnError(want).WithArgs(
-				dripfeedUUID,
-			)
+			sqlExpect.
+				WithArgs(dripfeedUUID).
+				WillReturnError(want)
 			exists, err := repo.Exists(dripfeedUUID)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(want))
@@ -57,9 +56,9 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 		})
 
 		It("Not found", func() {
-			sqlExpect.WillReturnError(sql.ErrNoRows).WithArgs(
-				dripfeedUUID,
-			)
+			sqlExpect.
+				WithArgs(dripfeedUUID).
+				WillReturnError(sql.ErrNoRows)
 			exists, err := repo.Exists(dripfeedUUID)
 			Expect(err).To(BeNil())
 			Expect(exists).To(BeFalse())
@@ -67,9 +66,10 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 
 		It("Exists", func() {
 			rs := sqlmock.NewRows([]string{""}).AddRow("1")
-			sqlExpect.WillReturnRows(rs).WithArgs(
-				dripfeedUUID,
-			)
+			sqlExpect.
+				WithArgs(dripfeedUUID).
+				WillReturnRows(rs)
+
 			exists, err := repo.Exists(dripfeedUUID)
 			Expect(err).To(BeNil())
 			Expect(exists).To(BeTrue())
@@ -217,4 +217,63 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 			Expect(err).To(BeNil())
 		})
 	})
+
+	When("Deleting spaced repetition item from dripfeed", func() {
+		var (
+			srsUUID   string
+			sqlExpect *sqlmock.ExpectedExec
+		)
+
+		BeforeEach(func() {
+			srsUUID = "fake-srs-item-123"
+			sqlExpect = mockSql.
+				ExpectExec(dripfeed.SqlDeleteDripfeedItemByUserAndSRS).
+				WithArgs(userUUID, srsUUID)
+		})
+
+		It("Fails", func() {
+			sqlExpect.WillReturnError(want)
+			err := repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID, srsUUID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(want))
+		})
+
+		It("Success", func() {
+			sqlExpect.WillReturnResult(sqlmock.NewResult(1, 1))
+			err := repo.DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID, srsUUID)
+			Expect(err).To(BeNil())
+		})
+	})
+
+	When("Saving info", func() {
+		var (
+			input     openapi.SpacedRepetitionOvertimeInfo
+			sqlExpect *sqlmock.ExpectedExec
+		)
+
+		BeforeEach(func() {
+			input.AlistUuid = "fake-list-123"
+			input.UserUuid = userUUID
+			input.DripfeedUuid = dripfeedUUID
+			sqlExpect = mockSql.
+				ExpectExec(dripfeed.SqlSaveDripfeedInfo).
+				WithArgs(input.DripfeedUuid, input.UserUuid, input.AlistUuid)
+		})
+
+		It("Fails", func() {
+			sqlExpect.
+				WillReturnError(want)
+			err := repo.SaveInfo(input)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(want))
+		})
+
+		It("Success", func() {
+			sqlExpect.
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			err := repo.SaveInfo(input)
+			Expect(err).To(BeNil())
+		})
+	})
+
 })
