@@ -33,7 +33,6 @@ func (store *Sqlite) ShareKindWithPublic(kind string, extUUID string) error {
 
 	tx, err := store.db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -71,7 +70,6 @@ func (store *Sqlite) MakeKindPrivate(kind string, extUUID string, userUUID strin
 
 	tx, err := store.db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -115,7 +113,6 @@ func (store *Sqlite) ShareKindWithFriends(kind string, extUUID string) error {
 
 	tx, err := store.db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 

@@ -49,11 +49,33 @@ func NewSqliteRepository(db *sqlx.DB) DripfeedRepository {
 }
 
 func (r sqliteRepository) DeleteByUser(userUUID string) error {
-	_, err := r.db.Exec(SqlDeleteDripfeedItemByUser, userUUID)
-	r.db.Exec(SqlDeleteInfoByUser, userUUID)
-	return err
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteDripfeedItemByUser, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteInfoByUser, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
 }
 
+// Exists
+// True false or error
 func (r sqliteRepository) Exists(dripfeedUUID string) (bool, error) {
 	var id int
 	err := r.db.Get(&id, SqlDripfeedItemExists, dripfeedUUID)
@@ -133,10 +155,30 @@ func (r sqliteRepository) DeleteAllByUserUUIDAndSpacedRepetitionUUID(userUUID st
 }
 
 func (r sqliteRepository) DeleteByUUIDAndUserUUID(dripfeedUUID string, userUUID string) error {
-	// TODO should this be commit?
-	_, err := r.db.Exec(SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
-	_, err = r.db.Exec(SqlDeleteInfoByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
-	return err
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteDripfeedItemByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(SqlDeleteInfoByDripfeedUUIDAndUserUUID, dripfeedUUID, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
 }
 
 func (r sqliteRepository) GetInfo(dripfeedUUID string) (openapi.SpacedRepetitionOvertimeInfo, error) {
