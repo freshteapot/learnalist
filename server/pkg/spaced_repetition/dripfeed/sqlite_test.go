@@ -7,6 +7,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
@@ -348,4 +349,114 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 		})
 	})
 
+	When("GetNext", func() {
+		var (
+			alistUUID   string
+			srsItemUUID string
+			srsItemBody string
+			sqlExpect   *sqlmock.ExpectedQuery
+		)
+
+		BeforeEach(func() {
+			dripfeedUUID = "1222536f4d7febb5cceb00138fe6d9792ab55101"
+			alistUUID = "311d3938-fe9f-5da4-a181-c79572108927"
+			srsItemUUID = "9c05511a31375a8a278a75207331bb1714e69dd1"
+			// This would be actual srs json objects
+
+			srsItemBody = `{"show":"hello world","kind":"v1","uuid":"9c05511a31375a8a278a75207331bb1714e69dd1","data":"hello world","settings":{"level":"0","when_next":"2021-02-20T13:06:47Z","created":"2021-02-20T12:06:47Z","ext_id":"1222536f4d7febb5cceb00138fe6d9792ab55101"}}`
+
+			sqlExpect = mockSql.ExpectQuery(dripfeed.SqlDripfeedItemGetNext).WithArgs(dripfeedUUID)
+		})
+
+		It("Not found", func() {
+			sqlExpect.WillReturnError(sql.ErrNoRows)
+			_, err := repo.GetNext(dripfeedUUID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(utils.ErrNotFound))
+		})
+
+		It("Issue talking to db", func() {
+			sqlExpect.WillReturnError(want)
+			_, err := repo.GetNext(dripfeedUUID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(want))
+		})
+
+		It("Success", func() {
+			rs := sqlmock.NewRows([]string{
+				"dripfeed_uuid",
+				"srs_uuid",
+				"user_uuid",
+				"alist_uuid",
+				"body",
+				"position",
+				"kind"}).AddRow(
+				dripfeedUUID,
+				srsItemUUID,
+				userUUID,
+				alistUUID,
+				srsItemBody,
+				0,
+				"v1",
+			)
+			sqlExpect.WillReturnRows(rs)
+			next, err := repo.GetNext(dripfeedUUID)
+
+			Expect(err).To(BeNil())
+			Expect(next.DripfeedUUID).To(Equal(dripfeedUUID))
+			Expect(next.AlistUUID).To(Equal(alistUUID))
+			Expect(next.Position).To(Equal(0))
+			Expect(next.SrsBody).To(Equal([]byte(srsItemBody)))
+			Expect(next.SrsUUID).To(Equal(srsItemUUID))
+			Expect(next.SrsKind).To(Equal("v1"))
+			Expect(next.UserUUID).To(Equal(userUUID))
+		})
+	})
+
+	When("GetInfo", func() {
+		var (
+			alistUUID string
+			sqlExpect *sqlmock.ExpectedQuery
+		)
+
+		BeforeEach(func() {
+			dripfeedUUID = "1222536f4d7febb5cceb00138fe6d9792ab55101"
+			alistUUID = "311d3938-fe9f-5da4-a181-c79572108927"
+
+			sqlExpect = mockSql.ExpectQuery(dripfeed.SqlGetDripfeedInfo).WithArgs(dripfeedUUID)
+		})
+
+		It("Not found", func() {
+			sqlExpect.WillReturnError(sql.ErrNoRows)
+			_, err := repo.GetInfo(dripfeedUUID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(utils.ErrNotFound))
+		})
+
+		It("Issue talking to db", func() {
+			sqlExpect.WillReturnError(want)
+			_, err := repo.GetInfo(dripfeedUUID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(want))
+		})
+
+		It("Success", func() {
+			rs := sqlmock.NewRows([]string{
+				"dripfeed_uuid",
+				"user_uuid",
+				"alist_uuid",
+			}).AddRow(
+				dripfeedUUID,
+				userUUID,
+				alistUUID,
+			)
+			sqlExpect.WillReturnRows(rs)
+			info, err := repo.GetInfo(dripfeedUUID)
+
+			Expect(err).To(BeNil())
+			Expect(info.DripfeedUuid).To(Equal(dripfeedUUID))
+			Expect(info.AlistUuid).To(Equal(alistUUID))
+			Expect(info.UserUuid).To(Equal(userUUID))
+		})
+	})
 })
