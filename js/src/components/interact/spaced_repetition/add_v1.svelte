@@ -27,6 +27,7 @@
   let data;
   let state = "edit";
   let show = false;
+  // TODO add logic to not show add overtime if the list is empty
   // Check to see if list is already added over time
   let overtimeActive = false;
   let userUuid = "";
