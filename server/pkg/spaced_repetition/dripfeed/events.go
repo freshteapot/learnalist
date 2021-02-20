@@ -30,6 +30,17 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 		s.handleDripfeedEvents(entry)
 	case event.ApiSpacedRepetition:
 		s.handleAPISpacedRepetitionEvents(entry)
+	case EventDripfeedFinished:
+		b, _ := json.Marshal(entry.Data)
+		var dripfeedInfo openapi.SpacedRepetitionOvertimeInfo
+		json.Unmarshal(b, &dripfeedInfo)
+		err := s.repo.DeleteByUUIDAndUserUUID(dripfeedInfo.DripfeedUuid, dripfeedInfo.UserUuid)
+		if err != nil {
+			s.logContext.WithFields(logrus.Fields{
+				"error":  err,
+				"method": "s.repo.DeleteByUUIDAndUserUUID",
+			}).Fatal("issue with repo")
+		}
 	}
 }
 

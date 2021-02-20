@@ -35,6 +35,7 @@ test:
 	./cover.sh
 
 run-nats-from-docker:
+	docker rm -f lal-nats &>/dev/null && \
 	rm -rf /tmp/nats-store/ && \
 	mkdir -p /tmp/nats-store/ && \
 	docker run \
