@@ -38,8 +38,11 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 		aclRepo      *mocks.Acl
 
 		loggedInUser *uuid.User
-		userUUID     string
 		want         error
+
+		userUUID     string
+		alistUUID    string
+		dripfeedUUID string
 	)
 
 	BeforeEach(func() {
@@ -47,7 +50,10 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 		loggedInUser = &uuid.User{
 			Uuid: "fake-user-123",
 		}
+
+		alistUUID = "fake-list-123"
 		userUUID = loggedInUser.Uuid
+		dripfeedUUID = dripfeed.UUID(userUUID, alistUUID)
 
 		eventMessageBus = &mocks.EventlogPubSub{}
 		event.SetBus(eventMessageBus)
@@ -101,6 +107,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(false, want)
 			service.Create(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
@@ -115,6 +122,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(false, nil)
 			service.Create(c)
 			Expect(rec.Code).To(Equal(http.StatusForbidden))
@@ -129,6 +137,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
 			listRepo.On("GetAlist", input.AlistUuid).Return(alist.Alist{}, want)
 
@@ -145,6 +154,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
 			listRepo.On("GetAlist", input.AlistUuid).Return(alist.Alist{}, i18n.ErrorListNotFound)
 
@@ -161,9 +171,11 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
+			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
-			aList.Info.ListType = alist.Concept2
+			aList := alist.NewTypeV3()
+			aList.Uuid = alistUUID
+
 			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			service.Create(c)
 			Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
@@ -179,13 +191,6 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
-			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.NewTypeV1()
-			aList.Uuid = input.AlistUuid
-			aList.Data = append(aList.Data.(alist.TypeV1), "hello")
-
-			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
-			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, want)
 
 			service.Create(c)
@@ -201,17 +206,44 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
-			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.NewTypeV1()
-			aList.Uuid = input.AlistUuid
-			aList.Data = append(aList.Data.(alist.TypeV1), "hello")
-
-			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
-			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
-
 			service.Create(c)
 			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(dripfeedHTTPResponse))
+		})
+
+		When("List found but is empty", func() {
+			BeforeEach(func() {
+				b, _ := json.Marshal(input)
+				req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+				c = e.NewContext(req, rec)
+
+				c.Set("loggedInUser", *loggedInUser)
+				c.SetPath(uri)
+
+				dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
+				aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
+			})
+
+			It("v1", func() {
+				aList := alist.NewTypeV1()
+				aList.Uuid = alistUUID
+
+				listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
+				service.Create(c)
+				Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.SpacedRepetitionOvertimeEmptyList)
+			})
+
+			It("v2", func() {
+				aList := alist.NewTypeV2()
+				aList.Uuid = alistUUID
+
+				listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
+				service.Create(c)
+				Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
+				testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.SpacedRepetitionOvertimeEmptyList)
+			})
+
 		})
 
 		When("We will add over time", func() {
@@ -223,16 +255,13 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 				c.Set("loggedInUser", *loggedInUser)
 				c.SetPath(uri)
 
+				dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 				aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-				aList := alist.Alist{}
+				aList := alist.NewTypeV1()
 				aList.Uuid = input.AlistUuid
-				aList.Info.ListType = alist.SimpleList
-				aList.Data = make(alist.TypeV1, 0)
 				aList.Data = append(aList.Data.(alist.TypeV1), "hello")
 
-				dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 				listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
-				dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 
 				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					Expect(moment.Kind).To(Equal(event.ApiDripfeed))
@@ -271,6 +300,8 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 					c.Set("loggedInUser", *loggedInUser)
 					c.SetPath(uri)
 
+					dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
+
 					aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
 					aList := alist.NewTypeV2()
 					aList.Uuid = input.AlistUuid
@@ -279,9 +310,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 						To:   "bil",
 					})
 
-					dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 					listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
-					dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 
 					service.Create(c)
 
@@ -304,6 +333,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 					c.Set("loggedInUser", *loggedInUser)
 					c.SetPath(uri)
 
+					dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 					aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
 					aList := alist.NewTypeV2()
 					aList.Uuid = input.AlistUuid
@@ -312,9 +342,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 						To:   "bil",
 					})
 
-					dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
 					listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
-					dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 
 					eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 						Expect(moment.Kind).To(Equal(event.ApiDripfeed))
@@ -348,11 +376,11 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 		BeforeEach(func() {
 			//dripfeedHTTPResponse = `{"dripfeed_uuid":"f29a45249551ae992a8edc6526ca7421094c8883","alist_uuid":"fake-list-123","user_uuid":"fake-user-123"}`
 			inputFake = openapi.SpacedRepetitionOvertimeInputBase{
-				AlistUuid: "fake-list-123",
+				AlistUuid: alistUUID,
 				UserUuid:  "fake-user-456",
 			}
 			input = openapi.SpacedRepetitionOvertimeInputBase{
-				AlistUuid: "fake-list-123",
+				AlistUuid: alistUUID,
 				UserUuid:  userUUID,
 			}
 			fmt.Println(input)
@@ -378,13 +406,6 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
-			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
-			aList.Uuid = input.AlistUuid
-			aList.Info.ListType = alist.SimpleList
-
-			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
-			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, want)
 
 			service.Delete(c)
@@ -400,13 +421,6 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
-			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
-			aList.Uuid = input.AlistUuid
-			aList.Info.ListType = alist.SimpleList
-
-			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
-			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(false, nil)
 
 			service.Delete(c)
@@ -422,13 +436,6 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			c.Set("loggedInUser", *loggedInUser)
 			c.SetPath(uri)
 
-			aclRepo.On("HasUserListReadAccess", input.AlistUuid, input.UserUuid).Return(true, nil)
-			aList := alist.Alist{}
-			aList.Uuid = input.AlistUuid
-			aList.Info.ListType = alist.SimpleList
-
-			dripfeedUUID := dripfeed.UUID(input.UserUuid, input.AlistUuid)
-			listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {

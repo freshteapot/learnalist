@@ -55,6 +55,7 @@ const (
 	ApiUserLoginError                           = "Please refer to the api documentation regarding /user/login"
 	PlankRecordNotFound                         = "Plank record cant be found, terribly sorry"
 	ChallengeNotFound                           = "Challenge cant be found, terribly sorry"
+	SpacedRepetitionOvertimeEmptyList           = "The list is empty, therefore nothing to add over time"
 )
 
 var (

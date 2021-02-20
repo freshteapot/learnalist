@@ -53,6 +53,27 @@ func (s DripfeedService) Create(c echo.Context) error {
 		})
 	}
 
+	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
+	exists, err := s.repo.Exists(dripfeedUUID)
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"event": "broken-state",
+			"input": input,
+			"error": err,
+		}).Error("s.repo.Exists")
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	dripfeedResponse := openapi.SpacedRepetitionOvertimeInfo{
+		UserUuid:     loggedInUser.Uuid,
+		AlistUuid:    input.AlistUuid,
+		DripfeedUuid: dripfeedUUID,
+	}
+
+	if exists {
+		return c.JSON(http.StatusOK, dripfeedResponse)
+	}
+
 	allow, err := s.aclRepo.HasUserListReadAccess(input.AlistUuid, input.UserUuid)
 
 	if err != nil {
@@ -115,30 +136,8 @@ func (s DripfeedService) Create(c echo.Context) error {
 
 	if dataSize == 0 {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
-			Message: "The list is empty, therefore nothing to add over time",
+			Message: i18n.SpacedRepetitionOvertimeEmptyList,
 		})
-	}
-
-	// TODO move this further up and fix the tests
-	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
-	exists, err := s.repo.Exists(dripfeedUUID)
-	if err != nil {
-		logContext.WithFields(logrus.Fields{
-			"event": "broken-state",
-			"input": input,
-			"error": err,
-		}).Error("s.repo.Exists")
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
-	}
-
-	dripfeedResponse := openapi.SpacedRepetitionOvertimeInfo{
-		UserUuid:     loggedInUser.Uuid,
-		AlistUuid:    aList.Uuid,
-		DripfeedUuid: dripfeedUUID,
-	}
-
-	if exists {
-		return c.JSON(http.StatusOK, dripfeedResponse)
 	}
 
 	info := EventDripfeedInputBase{
