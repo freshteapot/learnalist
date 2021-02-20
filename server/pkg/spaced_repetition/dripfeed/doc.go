@@ -17,7 +17,6 @@ type DripfeedRepository interface {
 	// GetNext return the next spaced entry (v1 or v2)
 	GetNext(dripfeedUUID string) (RepoItem, error)
 	GetInfo(dripfeedUUID string) (openapi.SpacedRepetitionOvertimeInfo, error)
-	SaveInfo(input openapi.SpacedRepetitionOvertimeInfo) error
 }
 
 type DripfeedService struct {

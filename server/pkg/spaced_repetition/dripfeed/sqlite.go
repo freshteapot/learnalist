@@ -222,12 +222,3 @@ func (r sqliteRepository) GetInfo(dripfeedUUID string) (openapi.SpacedRepetition
 	response.UserUuid = item.UserUUID
 	return response, nil
 }
-
-func (r sqliteRepository) SaveInfo(input openapi.SpacedRepetitionOvertimeInfo) error {
-	_, err := r.db.Exec(
-		SqlSaveDripfeedInfo,
-		input.DripfeedUuid,
-		input.UserUuid,
-		input.AlistUuid)
-	return err
-}

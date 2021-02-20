@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 
@@ -245,76 +244,59 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 		})
 	})
 
-	// TODO remove this
-	When("Saving info", func() {
-		var (
-			input     openapi.SpacedRepetitionOvertimeInfo
-			sqlExpect *sqlmock.ExpectedExec
-		)
-
-		BeforeEach(func() {
-			input.AlistUuid = "fake-list-123"
-			input.UserUuid = userUUID
-			input.DripfeedUuid = dripfeedUUID
-			sqlExpect = mockSql.
-				ExpectExec(dripfeed.SqlSaveDripfeedInfo).
-				WithArgs(input.DripfeedUuid, input.UserUuid, input.AlistUuid)
-		})
-
-		It("Fails", func() {
-			sqlExpect.
-				WillReturnError(want)
-			err := repo.SaveInfo(input)
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(want))
-		})
-
-		It("Success", func() {
-			sqlExpect.
-				WillReturnResult(sqlmock.NewResult(1, 1))
-			err := repo.SaveInfo(input)
-			Expect(err).To(BeNil())
-		})
-	})
-
 	When("Adding all", func() {
-		// TODO when list is empty, should we even bother adding it?
-		// I think we should respond 422
-		When("List is empty", func() {
-
+		var (
+			alistUUID   string
+			srsItemUUID string
+			items       []string
+		)
+		BeforeEach(func() {
+			dripfeedUUID = "1222536f4d7febb5cceb00138fe6d9792ab55101"
+			alistUUID = "311d3938-fe9f-5da4-a181-c79572108927"
+			srsItemUUID = "9c05511a31375a8a278a75207331bb1714e69dd1"
+			// This would be actual srs json objects
+			items = []string{
+				`{"show":"hello world","kind":"v1","uuid":"9c05511a31375a8a278a75207331bb1714e69dd1","data":"hello world","settings":{"level":"0","when_next":"2021-02-20T13:06:47Z","created":"2021-02-20T12:06:47Z","ext_id":"1222536f4d7febb5cceb00138fe6d9792ab55101"}}`,
+			}
 		})
 
 		When("Transaction fails", func() {
 			It("Begin", func() {
 				mockSql.ExpectBegin().WillReturnError(want)
-				err := repo.DeleteByUser(userUUID)
+				err := repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
 
 			When("Rollback", func() {
-				It("Fails on removing items", func() {
+				It("Fails on saving info", func() {
 					mockSql.ExpectBegin()
-					mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByUser).
-						WithArgs(userUUID).
+					mockSql.ExpectExec(dripfeed.SqlSaveDripfeedInfo).
+						WithArgs(dripfeedUUID, userUUID, alistUUID).
 						WillReturnError(want)
 
-					err := repo.DeleteByUser(userUUID)
+					err := repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 					Expect(err).To(HaveOccurred())
 					Expect(err).To(Equal(want))
 				})
 
-				It("Fails on removing info", func() {
+				It("Fails on saving item", func() {
 					mockSql.ExpectBegin()
-					mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByUser).
-						WithArgs(userUUID).
+					mockSql.ExpectExec(dripfeed.SqlSaveDripfeedInfo).
+						WithArgs(dripfeedUUID, userUUID, alistUUID).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 
-					mockSql.ExpectExec(dripfeed.SqlDeleteInfoByUser).
-						WithArgs(userUUID).
+					mockSql.ExpectExec(dripfeed.SqlDripfeedItemAddItem).
+						WithArgs(
+							dripfeedUUID,
+							srsItemUUID,
+							userUUID,
+							alistUUID,
+							items[0],
+							0).
 						WillReturnError(want)
 
-					err := repo.DeleteByUser(userUUID)
+					err := repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 					Expect(err).To(HaveOccurred())
 					Expect(err).To(Equal(want))
 				})
@@ -322,34 +304,46 @@ var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func()
 
 			It("Commit", func() {
 				mockSql.ExpectBegin()
-				mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByUser).
-					WithArgs(userUUID).
+				mockSql.ExpectExec(dripfeed.SqlSaveDripfeedInfo).
+					WithArgs(dripfeedUUID, userUUID, alistUUID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
-				mockSql.ExpectExec(dripfeed.SqlDeleteInfoByUser).
-					WithArgs(userUUID).
+				mockSql.ExpectExec(dripfeed.SqlDripfeedItemAddItem).
+					WithArgs(
+						dripfeedUUID,
+						srsItemUUID,
+						userUUID,
+						alistUUID,
+						items[0],
+						0).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mockSql.ExpectCommit().WillReturnError(want)
 
-				err := repo.DeleteByUser(userUUID)
+				err := repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(want))
 			})
 		})
 		Specify("Successfully removed", func() {
 			mockSql.ExpectBegin()
-			mockSql.ExpectExec(dripfeed.SqlDeleteDripfeedItemByUser).
-				WithArgs(userUUID).
+			mockSql.ExpectExec(dripfeed.SqlSaveDripfeedInfo).
+				WithArgs(dripfeedUUID, userUUID, alistUUID).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 
-			mockSql.ExpectExec(dripfeed.SqlDeleteInfoByUser).
-				WithArgs(userUUID).
+			mockSql.ExpectExec(dripfeed.SqlDripfeedItemAddItem).
+				WithArgs(
+					dripfeedUUID,
+					srsItemUUID,
+					userUUID,
+					alistUUID,
+					items[0],
+					0).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 
 			mockSql.ExpectCommit()
 
-			err := repo.DeleteByUser(userUUID)
+			err := repo.AddAll(dripfeedUUID, userUUID, alistUUID, items)
 			Expect(err).To(BeNil())
 		})
 	})
