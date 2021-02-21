@@ -24,9 +24,9 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 		}).Info("process event")
 
 		b, _ := json.Marshal(entry.Data)
+
 		var moment EventSpacedRepetition
 		json.Unmarshal(b, &moment)
-
 		if moment.Kind != EventKindNew {
 			return
 		}

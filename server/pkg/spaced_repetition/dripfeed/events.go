@@ -75,6 +75,7 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: EventDripfeedFinished,
 			Data: dripfeedInfo,
+			UUID: dripfeedInfo.DripfeedUuid,
 		})
 		return
 	}
@@ -104,6 +105,7 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 			Data: item,
 		},
 		Action: spaced_repetition.EventKindNew,
+		UUID:   item.UUID,
 	})
 	// We handle deletion of new entry via the new action event above
 }
@@ -176,6 +178,7 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 				UserUuid:     userUUID,
 				AlistUuid:    alistUUID,
 			},
+			UUID: dripfeedUUID,
 		})
 
 		eventTime := time.Unix(entry.Timestamp, 0).UTC()
@@ -210,6 +213,7 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: EventDripfeedRemoved,
 			Data: info,
+			UUID: info.DripfeedUuid,
 		})
 	}
 }

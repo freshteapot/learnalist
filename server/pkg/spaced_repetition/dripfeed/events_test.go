@@ -375,6 +375,7 @@ var _ = Describe("Testing Events", func() {
 			})
 		})
 	})
+
 	When("Spaced Repetition triggers event", func() {
 		var (
 			whenNext time.Time
@@ -692,6 +693,36 @@ var _ = Describe("Testing Events", func() {
 				service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
 				service.OnEvent(moment)
 			})
+		})
+	})
+
+	When("Adding overtime is finished", func() {
+		BeforeEach(func() {
+			moment = event.Eventlog{
+				Kind: dripfeed.EventDripfeedFinished,
+				Data: openapi.SpacedRepetitionOvertimeInfo{
+					DripfeedUuid: dripfeedUUID,
+					UserUuid:     userUUID,
+					AlistUuid:    "fake-list-123",
+				},
+
+				UUID: dripfeedUUID,
+			}
+		})
+
+		It("failed to remove info, issue talking to repo", func() {
+			testutils.SetLoggerToPanicOnFatal(logger)
+			dripfeedRepo.On("DeleteByUUIDAndUserUUID", dripfeedUUID, userUUID).Return(want).Once()
+			service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+
+			Expect(func() { service.OnEvent(moment) }).Should(Panic())
+			Expect(hook.LastEntry().Data["error"]).To(Equal(want))
+		})
+
+		It("Info removed", func() {
+			dripfeedRepo.On("DeleteByUUIDAndUserUUID", dripfeedUUID, userUUID).Return(nil).Once()
+			service = dripfeed.NewService(dripfeedRepo, aclRepo, listRepo, logger)
+			service.OnEvent(moment)
 		})
 	})
 })
