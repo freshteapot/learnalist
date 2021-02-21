@@ -146,6 +146,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					return nil
 				},
 			},
+			// start:event.ApiPlank
 			{
 				entry: event.Eventlog{
 					Kind: event.ApiPlank,
@@ -180,6 +181,20 @@ var _ = Describe("Testing Events to Slack", func() {
 					return nil
 				},
 			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action: "not-supported",
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "not-supported action not supported api.plank"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			// finish:event.ApiPlank
 			{
 				entry: event.Eventlog{
 					Kind: event.CMDUserDelete,
@@ -405,6 +420,38 @@ var _ = Describe("Testing Events to Slack", func() {
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
 					expect := `spaced repetition overtime activated for user:fake-user-123 from list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: dripfeed.EventDripfeedRemoved,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    alistUUID,
+					},
+					UUID: dripfeedUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime stopped for user:fake-user-123 from list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: dripfeed.EventDripfeedFinished,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    alistUUID,
+					},
+					UUID: dripfeedUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime finished for user:fake-user-123 from list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},

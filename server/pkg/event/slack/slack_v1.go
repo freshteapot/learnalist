@@ -169,7 +169,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		case event.ActionDeleted:
 			msg.Text = fmt.Sprintf("user:%s deleted plank:%s", moment.UserUUID, moment.Data.Uuid)
 		default:
-			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, moment.Action, entry.Kind)
 		}
 
 	case challenge.EventChallengeDone:
