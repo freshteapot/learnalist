@@ -1,3 +1,5 @@
+<svelte:options tag={null} />
+
 <script>
   import Router from "svelte-spa-router";
   import { replace } from "svelte-spa-router";
@@ -11,9 +13,8 @@
     "/play/slideshow": Slideshow,
     "/interact/spaced_repetition/add": SpacedRepetitionAdd,
     // Catch-all, must be last
-    "*": Nothing
+    "*": Nothing,
   };
 </script>
 
-<svelte:options tag={null} />
-<Router {routes} on:conditionsFailed={event => replace('/')} />
+<Router {routes} on:conditionsFailed={(event) => replace("/")} />

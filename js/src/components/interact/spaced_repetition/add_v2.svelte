@@ -10,7 +10,7 @@
     addListToOvertime,
     overtimeIsActive,
   } from "../../../spaced_repetition/api.js";
-  import { loggedIn } from "../../../shared.js";
+  import { loggedIn, notify } from "../../../shared.js";
   import LoginModal from "../../../components/login_modal.svelte";
   import { KeyUserUuid, getConfiguration } from "../../../configuration";
 
@@ -37,6 +37,7 @@
     "You need to be logged in so we can personalise your learning experience.";
   let loginNagMessage = loginNagMessageDefault;
   let loginNagClosed = true;
+  let listIsEmpty = aList.data.length === 0;
 
   onMount(async () => {
     userUuid = getConfiguration(KeyUserUuid);
@@ -117,10 +118,16 @@
   }
 
   function addingOvertime() {
+    if (listIsEmpty) {
+      notify("error", "No items to add", false);
+      return;
+    }
+
     if (!loggedIn()) {
       loginNagClosed = false;
       return;
     }
+
     data = aList.data[0];
     showAddingOvertime = true;
   }
@@ -152,7 +159,7 @@
         <p>
           Click on the row you want to add or <button
             class="br3"
-            on:click|preventDefault={addOvertime}>add all overtime</button
+            on:click|preventDefault={addingOvertime}>add all overtime</button
           >
         </p>
       </header>
