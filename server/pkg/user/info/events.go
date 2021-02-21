@@ -17,13 +17,15 @@ func (s UserInfoService) OnEvent(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		AppendAndSaveSpacedRepetition(s.userRepo, moment.UserUuid, moment.AlistUuid)
+		// TODO handle this failing
+		_ = AppendAndSaveSpacedRepetition(s.userRepo, moment.UserUuid, moment.AlistUuid)
 	case dripfeed.EventDripfeedRemoved:
 		fallthrough
 	case dripfeed.EventDripfeedFinished:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		RemoveAndSaveSpacedRepetition(s.userRepo, moment.UserUuid, moment.AlistUuid)
+		// TODO handle this failing
+		_ = RemoveAndSaveSpacedRepetition(s.userRepo, moment.UserUuid, moment.AlistUuid)
 	}
 }
