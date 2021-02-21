@@ -592,6 +592,7 @@ var _ = Describe("Testing Events", func() {
 		})
 
 		It("Skip if not already in the system", func() {
+
 			moment = event.Eventlog{
 				Kind:   event.SystemSpacedRepetition,
 				Action: event.ActionCreated,

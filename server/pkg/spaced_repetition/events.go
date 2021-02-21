@@ -55,13 +55,7 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 			return
 		}
 
-		// TODO
-		// I am wondering why we trigger this publish after the system
-		// Is this a mistake?
-		// Is this a feature
-		// Why do I end up with identical events (time potenitally off)
-		// The entry is a new
-		// This event, raises the question of event tracing
+		// We trigger the api event, to let other parts of the system know an event was created
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiSpacedRepetition,
 			Data: EventSpacedRepetition{
