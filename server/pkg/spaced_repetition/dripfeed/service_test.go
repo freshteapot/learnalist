@@ -70,7 +70,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 
 	When("Create", func() {
 		var (
-			uri                  = "/api/v1/api/v1/spaced-repetition/overtime"
+			uri                  = "/api/v1/spaced-repetition/overtime"
 			dripfeedHTTPResponse string
 			inputFake, input     openapi.SpacedRepetitionOvertimeInputBase
 		)
@@ -369,7 +369,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 
 	When("Delete", func() {
 		var (
-			uri              = "/api/v1/api/v1/spaced-repetition/overtime"
+			uri              = "/api/v1/spaced-repetition/overtime"
 			inputFake, input openapi.SpacedRepetitionOvertimeInputBase
 		)
 

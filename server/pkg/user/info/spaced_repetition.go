@@ -7,7 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
-func GetSpacedRepetition(repo user.ManagementStorage, userUUID string) (user.SpacedRepetition, error) {
+func getSpacedRepetition(repo user.ManagementStorage, userUUID string) (user.SpacedRepetition, error) {
 	data, err := repo.GetInfo(userUUID)
 
 	info := user.SpacedRepetition{}
@@ -32,7 +32,7 @@ func GetSpacedRepetition(repo user.ManagementStorage, userUUID string) (user.Spa
 	return info, nil
 }
 
-func SaveSpacedRepetition(repo user.ManagementStorage, userUUID string, spacedRepetition user.SpacedRepetition) error {
+func saveSpacedRepetition(repo user.ManagementStorage, userUUID string, spacedRepetition user.SpacedRepetition) error {
 	/*
 		if len(spacedRepetition.ListsOvertime) == 0 {
 			key := "spaced_repetition"
@@ -48,7 +48,7 @@ func SaveSpacedRepetition(repo user.ManagementStorage, userUUID string, spacedRe
 }
 
 func AppendAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string, alistUUID string) error {
-	info, err := GetSpacedRepetition(repo, userUUID)
+	info, err := getSpacedRepetition(repo, userUUID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			panic(err)
@@ -60,11 +60,11 @@ func AppendAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string,
 	}
 
 	info.ListsOvertime = append(info.ListsOvertime, alistUUID)
-	return SaveSpacedRepetition(repo, userUUID, info)
+	return saveSpacedRepetition(repo, userUUID, info)
 }
 
 func RemoveAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string, alistUUID string) error {
-	info, err := GetSpacedRepetition(repo, userUUID)
+	info, err := getSpacedRepetition(repo, userUUID)
 	if err != nil {
 		panic(err)
 	}
@@ -75,5 +75,5 @@ func RemoveAndSaveSpacedRepetition(repo user.ManagementStorage, userUUID string,
 	}
 
 	info.ListsOvertime = utils.StringArrayRemoveAtIndex(info.ListsOvertime, found)
-	return SaveSpacedRepetition(repo, userUUID, info)
+	return saveSpacedRepetition(repo, userUUID, info)
 }

@@ -43,6 +43,7 @@ const (
 	ApiDeleteUserLabelSuccess                   = "Label %s was removed."
 	UserInsertAlreadyExistsPasswordNotMatch     = "Failed to save."
 	UserInsertUsernameExists                    = "Username already exists."
+	UserInfoOnlyYourUUID                        = "You can only get info for the user you are logged in with"
 	AclHttpAccessDeny                           = "Access Denied"
 	ApiShareYouCantShareWithYourself            = "Today, we dont let you share with yourself"
 	ApiShareValidationError                     = "Please refer to the documentation on sharing a list"

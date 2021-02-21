@@ -46,7 +46,7 @@ func testSpacedRepetitionOvertime(userUUID string, storage user.ManagementStorag
 		fmt.Println(info, err)
 	*/
 	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
-	//app_settings.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
+	//userInfo.AppendAndSaveSpacedRepetition(storage, userUUID, "123-456")
 	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
 	userInfo.RemoveAndSaveSpacedRepetition(storage, userUUID, "123-456")
 }

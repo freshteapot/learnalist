@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 
 	"github.com/sirupsen/logrus"
@@ -33,19 +34,21 @@ func (s *UserInfoService) V1GetUserInfo(c echo.Context) error {
 	inputUUID := c.Param("uuid")
 	if inputUUID != userUUID {
 		return c.JSON(http.StatusForbidden, api.HTTPResponseMessage{
-			Message: "You can only get info for the user you are logged in with",
+			Message: i18n.UserInfoOnlyYourUUID,
 		})
 	}
 
 	b, err := s.userRepo.GetInfo(userUUID)
 	if err != nil {
-		logger.WithFields(logrus.Fields{
-			"event":     event.UserInfo,
-			"api":       "V1GetUserInfo",
-			"error":     err,
-			"user_uuid": userUUID,
-		}).Error("problem")
-		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+		if err != utils.ErrNotFound {
+			logger.WithFields(logrus.Fields{
+				"event":     event.UserInfo,
+				"api":       "V1GetUserInfo",
+				"error":     err,
+				"user_uuid": userUUID,
+			}).Error("problem")
+			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+		}
 	}
 
 	var pref user.UserPreference
