@@ -147,17 +147,17 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime activated for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition overtime activated for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case dripfeed.EventDripfeedRemoved:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime stopped for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition overtime stopped for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case dripfeed.EventDripfeedFinished:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime finished for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition overtime finished for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventPlank
