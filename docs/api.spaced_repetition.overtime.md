@@ -1,3 +1,5 @@
+# Note
+- User info on spaced repetition over time, only is cleared once all items have been added and have viewed once.
 
 # Adding a list for spaced repetition overtime
 - Codename: Dripfeed
