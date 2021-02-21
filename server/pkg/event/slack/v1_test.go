@@ -1,4 +1,4 @@
-package event_test
+package slack_test
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
