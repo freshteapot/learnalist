@@ -136,7 +136,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 
 		switch moment.Kind {
 		case spaced_repetition.EventKindNew:
-			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s ", entry.UUID, moment.Data.UserUUID)
+			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s", entry.UUID, moment.Data.UserUUID)
 		case spaced_repetition.EventKindAlreadyInSystem:
 			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s that already exists", entry.UUID, moment.Data.UserUUID)
 		default:

@@ -1,6 +1,8 @@
 package event_test
 
 import (
+	"fmt"
+
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
@@ -8,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -329,6 +332,65 @@ var _ = Describe("Testing Events to Slack", func() {
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
 					expect := `spaced repetition overtime deleted uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind:   event.ApiSpacedRepetitionOvertime,
+					Action: "not-supported",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `not-supported action not supported for api.spacedrepetition.overtime`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: spaced_repetition.EventKindNew,
+						Data: spaced_repetition.SpacedRepetitionEntry{
+							UserUUID: userUUID,
+						},
+					},
+					UUID: "fake-srs-item-123",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: spaced_repetition.EventKindAlreadyInSystem,
+						Data: spaced_repetition.SpacedRepetitionEntry{
+							UserUUID: userUUID,
+						},
+					},
+					UUID: "fake-srs-item-123",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123 that already exists`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: "not-supported",
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `not-supported kind not supported for system.spacedRepetition`
+					fmt.Println(msg.Text)
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
