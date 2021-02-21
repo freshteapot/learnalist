@@ -14,7 +14,6 @@ type ItemInputV2 struct {
 	entry *HTTPRequestInputV2
 }
 
-// TODO override show, confirm what we set it to is valid or reject
 func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) (ItemInputV2, error) {
 	item := ItemInputV2{}
 	json.Unmarshal(input, &item.entry)
