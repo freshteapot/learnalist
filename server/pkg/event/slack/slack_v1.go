@@ -9,6 +9,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 )
@@ -111,6 +112,52 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		if moment.Kind == spaced_repetition.EventKindDeleted {
 			msg.Text = fmt.Sprintf("user:%s removed entry:%s from spaced based learning", moment.Data.UserUUID, moment.Data.UUID)
 		}
+	case event.ApiSpacedRepetitionOvertime:
+		switch entry.Action {
+		case event.ActionCreated:
+			b, _ := json.Marshal(entry.Data)
+			var data dripfeed.EventDripfeedInputInfo
+			json.Unmarshal(b, &data)
+			msg.Text = fmt.Sprintf("spaced repetition overtime created uuid:%s, user:%s, list:%s", entry.UUID, data.Info.UserUUID, data.Info.AlistUUID)
+
+		case event.ActionDeleted:
+			b, _ := json.Marshal(entry.Data)
+			var data openapi.SpacedRepetitionOvertimeInfo
+			json.Unmarshal(b, &data)
+			msg.Text = fmt.Sprintf("spaced repetition overtime deleted uuid:%s, user:%s, list:%s", data.DripfeedUuid, data.UserUuid, data.AlistUuid)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported for %s`, entry.Action, entry.Kind)
+		}
+
+	case event.SystemSpacedRepetition:
+		b, _ := json.Marshal(entry.Data)
+		var moment spaced_repetition.EventSpacedRepetition
+		json.Unmarshal(b, &moment)
+
+		switch moment.Kind {
+		case spaced_repetition.EventKindNew:
+			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s ", entry.UUID, moment.Data.UserUUID)
+		case spaced_repetition.EventKindAlreadyInSystem:
+			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s that already exists", entry.UUID, moment.Data.UserUUID)
+		default:
+			msg.Text = fmt.Sprintf(`%s kind not supported for %s`, moment.Kind, entry.Kind)
+		}
+
+	case dripfeed.EventDripfeedAdded:
+		b, _ := json.Marshal(entry.Data)
+		var moment openapi.SpacedRepetitionOvertimeInfo
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("spaced repetition overtime activated for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
+	case dripfeed.EventDripfeedRemoved:
+		b, _ := json.Marshal(entry.Data)
+		var moment openapi.SpacedRepetitionOvertimeInfo
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("spaced repetition overtime stopped for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
+	case dripfeed.EventDripfeedFinished:
+		b, _ := json.Marshal(entry.Data)
+		var moment openapi.SpacedRepetitionOvertimeInfo
+		json.Unmarshal(b, &moment)
+		msg.Text = fmt.Sprintf("spaced repetition overtime finished for user:%s from list:%s ", moment.UserUuid, moment.AlistUuid)
 	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventPlank

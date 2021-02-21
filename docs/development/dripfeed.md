@@ -166,7 +166,7 @@ EOF
 Ie
 
 # Flow
-event.ApiDripfeed/EventDripfeedInput -> add all events
+event.ApiSpacedRepetitionOvertime/EventDripfeedInput -> add all events
 Trigger GetNext event.SystemSpacedRepetition/spaced_repetition.EventSpacedRepetition
 
 # Add all

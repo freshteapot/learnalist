@@ -77,11 +77,12 @@ var _ = Describe("Testing Events", func() {
 		When("Removing a list from dripfeed", func() {
 			BeforeEach(func() {
 				moment = event.Eventlog{
-					Kind: event.ApiDripfeed,
+					Kind: event.ApiSpacedRepetitionOvertime,
 					UUID: userUUID,
-					Data: dripfeed.EventDripfeedDelete{
-						DripfeedUUID: dripfeedUUID,
-						UserUUID:     userUUID,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    "fake-list-123",
 					},
 					Action: event.ActionDeleted,
 				}
@@ -144,7 +145,7 @@ var _ = Describe("Testing Events", func() {
 
 			moment = event.Eventlog{
 				UUID:   dripfeedUUID,
-				Kind:   event.ApiDripfeed,
+				Kind:   event.ApiSpacedRepetitionOvertime,
 				Action: event.ActionCreated,
 			}
 		})
@@ -312,7 +313,8 @@ var _ = Describe("Testing Events", func() {
 					expectedEvents = append(expectedEvents, moment.Kind)
 
 					if moment.Kind == event.SystemSpacedRepetition {
-						Expect(moment.Action).To(Equal(spaced_repetition.EventKindNew))
+						kind := moment.Data.(spaced_repetition.EventSpacedRepetition).Kind
+						Expect(kind).To(Equal(spaced_repetition.EventKindNew))
 						srsItem := moment.Data.(spaced_repetition.EventSpacedRepetition).Data
 						Expect(srsItem.UUID).To(Equal("ba9277fc4c6190fb875ad8f9cee848dba699937f"))
 						// Confirm the time set in the event, is the one used to decide when to reset from
@@ -352,7 +354,9 @@ var _ = Describe("Testing Events", func() {
 					expectedEvents = append(expectedEvents, moment.Kind)
 
 					if moment.Kind == event.SystemSpacedRepetition {
-						Expect(moment.Action).To(Equal(spaced_repetition.EventKindNew))
+						Expect(moment.Data.(spaced_repetition.EventSpacedRepetition).Kind).
+							To(Equal(spaced_repetition.EventKindNew))
+
 						srsItem := moment.Data.(spaced_repetition.EventSpacedRepetition).Data
 						Expect(srsItem.UUID).To(Equal(entry.SrsUUID))
 
@@ -614,9 +618,10 @@ var _ = Describe("Testing Events", func() {
 			moment = event.Eventlog{
 				Kind: event.SystemSpacedRepetition,
 				Data: spaced_repetition.EventSpacedRepetition{
+					Kind: spaced_repetition.EventKindAlreadyInSystem,
 					Data: srsItem,
 				},
-				Action:    spaced_repetition.EventKindAlreadyInSystem,
+
 				Timestamp: whenNext.UTC().Unix(),
 			}
 			dripfeedRepo.On("DeleteAllByUserUUIDAndSpacedRepetitionUUID", userUUID, srsItem.UUID).Return(want).Times(1)
@@ -671,9 +676,10 @@ var _ = Describe("Testing Events", func() {
 				moment = event.Eventlog{
 					Kind: event.SystemSpacedRepetition,
 					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: spaced_repetition.EventKindAlreadyInSystem,
 						Data: srsItem,
 					},
-					Action:    spaced_repetition.EventKindAlreadyInSystem,
+
 					Timestamp: whenNext.UTC().Unix(),
 				}
 				dripfeedRepo.On("DeleteAllByUserUUIDAndSpacedRepetitionUUID", userUUID, srsItem.UUID).Return(nil).Times(1)

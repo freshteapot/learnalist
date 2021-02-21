@@ -15,7 +15,7 @@ import (
 // @event.listen: event.ApiUserDelete
 // @event.listen: event.CMDUserDelete
 // @event.listen: event.SystemSpacedRepetition
-// @event.listen: event.ApiDripfeed
+// @event.listen: event.ApiSpacedRepetitionOvertime
 // @event.listen: event.ApiSpacedRepetition
 func (s DripfeedService) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
@@ -26,7 +26,7 @@ func (s DripfeedService) OnEvent(entry event.Eventlog) {
 		return
 	case event.SystemSpacedRepetition:
 		s.handleSystemSpacedRepetitionEvents(entry)
-	case event.ApiDripfeed:
+	case event.ApiSpacedRepetitionOvertime:
 		s.handleDripfeedEvents(entry)
 	case event.ApiSpacedRepetition:
 		s.handleAPISpacedRepetitionEvents(entry)
@@ -104,8 +104,7 @@ func (s DripfeedService) checkForNext(dripfeedInfo openapi.SpacedRepetitionOvert
 			Kind: spaced_repetition.EventKindNew,
 			Data: item,
 		},
-		Action: spaced_repetition.EventKindNew,
-		UUID:   item.UUID,
+		UUID: item.UUID,
 	})
 	// We handle deletion of new entry via the new action event above
 }
@@ -191,10 +190,11 @@ func (s DripfeedService) handleDripfeedEvents(entry event.Eventlog) {
 		s.checkForNext(info, eventTime)
 	case event.ActionDeleted:
 		b, _ := json.Marshal(entry.Data)
-		var moment EventDripfeedDelete
+		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
 
-		info, err := s.repo.GetInfo(moment.DripfeedUUID)
+		// TODO this is no longer needed
+		info, err := s.repo.GetInfo(moment.DripfeedUuid)
 		if err != nil {
 			s.logContext.WithFields(logrus.Fields{
 				"error":  err,
@@ -279,13 +279,13 @@ func (s DripfeedService) handleAPISpacedRepetitionEvents(entry event.Eventlog) {
 }
 
 func (s DripfeedService) handleSystemSpacedRepetitionEvents(entry event.Eventlog) {
-	if entry.Action != spaced_repetition.EventKindAlreadyInSystem {
-		return
-	}
-
 	b, _ := json.Marshal(entry.Data)
 	var moment spaced_repetition.EventSpacedRepetition
 	json.Unmarshal(b, &moment)
+
+	if moment.Kind != spaced_repetition.EventKindAlreadyInSystem {
+		return
+	}
 
 	srsItem := moment.Data
 	// First we remove the entry from the system that already exists

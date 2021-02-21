@@ -48,7 +48,6 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 					Kind: EventKindAlreadyInSystem,
 					Data: item,
 				},
-				Action: EventKindAlreadyInSystem,
 			})
 			return
 		}

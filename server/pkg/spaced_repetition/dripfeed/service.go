@@ -33,7 +33,7 @@ func NewService(repo DripfeedRepository, aclRepo acl.AclReaderList, listRepo ali
 	return s
 }
 
-// @event.emit: event.ApiDripfeed
+// @event.emit: event.ApiSpacedRepetitionOvertime
 func (s DripfeedService) Create(c echo.Context) error {
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	logContext := s.logContext
@@ -173,7 +173,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		UUID:   dripfeedUUID,
-		Kind:   event.ApiDripfeed,
+		Kind:   event.ApiSpacedRepetitionOvertime,
 		Data:   data,
 		Action: event.ActionCreated,
 	})
@@ -181,7 +181,7 @@ func (s DripfeedService) Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, dripfeedResponse)
 }
 
-// @event.emit: event.ApiDripfeed
+// @event.emit: event.ApiSpacedRepetitionOvertime
 func (s DripfeedService) Delete(c echo.Context) error {
 	loggedInUser := c.Get("loggedInUser").(uuid.User)
 	userUUID := loggedInUser.Uuid
@@ -195,7 +195,7 @@ func (s DripfeedService) Delete(c echo.Context) error {
 	var input openapi.SpacedRepetitionOvertimeInputBase
 	json.NewDecoder(c.Request().Body).Decode(&input)
 
-	if input.UserUuid != loggedInUser.Uuid {
+	if input.UserUuid != userUUID {
 		logContext.WithFields(logrus.Fields{
 			"error": "user-match",
 			"input": input,
@@ -206,7 +206,7 @@ func (s DripfeedService) Delete(c echo.Context) error {
 		})
 	}
 
-	dripfeedUUID := UUID(input.UserUuid, input.AlistUuid)
+	dripfeedUUID := UUID(userUUID, input.AlistUuid)
 
 	logContext = logContext.WithFields(logrus.Fields{
 		"input":         input,
@@ -230,10 +230,11 @@ func (s DripfeedService) Delete(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		UUID: dripfeedUUID,
-		Kind: event.ApiDripfeed,
-		Data: EventDripfeedDelete{
-			DripfeedUUID: dripfeedUUID,
-			UserUUID:     userUUID,
+		Kind: event.ApiSpacedRepetitionOvertime,
+		Data: openapi.SpacedRepetitionOvertimeInfo{
+			DripfeedUuid: dripfeedUUID,
+			UserUuid:     userUUID,
+			AlistUuid:    input.AlistUuid,
 		},
 		Action: event.ActionDeleted,
 	})

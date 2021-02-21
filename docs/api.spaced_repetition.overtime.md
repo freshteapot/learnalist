@@ -171,5 +171,5 @@ EOF
 - event.ApiUserDelete
 - event.CMDUserDelete
 - event.SystemSpacedRepetition
-- event.ApiDripfeed
+- event.ApiSpacedRepetitionOvertime
 - event.ApiSpacedRepetition

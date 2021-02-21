@@ -264,7 +264,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 				listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 
 				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
-					Expect(moment.Kind).To(Equal(event.ApiDripfeed))
+					Expect(moment.Kind).To(Equal(event.ApiSpacedRepetitionOvertime))
 					Expect(moment.Action).To(Equal(event.ActionCreated))
 
 					b, _ := json.Marshal(moment.Data)
@@ -345,7 +345,7 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 					listRepo.On("GetAlist", input.AlistUuid).Return(aList, nil)
 
 					eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
-						Expect(moment.Kind).To(Equal(event.ApiDripfeed))
+						Expect(moment.Kind).To(Equal(event.ApiSpacedRepetitionOvertime))
 						Expect(moment.Action).To(Equal(event.ActionCreated))
 
 						b, _ := json.Marshal(moment.Data)
@@ -439,10 +439,10 @@ var _ = Describe("Testing Dripfeed Service API", func() {
 			dripfeedRepo.On("Exists", dripfeedUUID).Return(true, nil)
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
-				Expect(moment.Kind).To(Equal(event.ApiDripfeed))
+				Expect(moment.Kind).To(Equal(event.ApiSpacedRepetitionOvertime))
 				Expect(moment.Action).To(Equal(event.ActionDeleted))
-				Expect(moment.Data.(dripfeed.EventDripfeedDelete).DripfeedUUID).To(Equal(dripfeedUUID))
-				Expect(moment.Data.(dripfeed.EventDripfeedDelete).UserUUID).To(Equal(userUUID))
+				Expect(moment.Data.(openapi.SpacedRepetitionOvertimeInfo).DripfeedUuid).To(Equal(dripfeedUUID))
+				Expect(moment.Data.(openapi.SpacedRepetitionOvertimeInfo).UserUuid).To(Equal(userUUID))
 				return true
 			}))
 

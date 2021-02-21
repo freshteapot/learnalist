@@ -20,7 +20,7 @@ const (
 	ApiListDelete                    = "api.list.delete"
 	ApiSpacedRepetition              = "api.spacedrepetition"
 	SystemSpacedRepetition           = "system.spacedRepetition"
-	ApiDripfeed                      = "api.dripfeed"
+	ApiSpacedRepetitionOvertime      = "api.spacedrepetition.overtime"
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
 	TopicNotifications               = "notifications"

@@ -40,12 +40,6 @@ type SpacedRepetitionSettingsBase struct {
 type SpacedRepetitionUUID struct {
 	UUID string `json:"uuid"`
 }
-
-type EventDripfeedDelete struct {
-	UserUUID     string `json:"user_uuid"`
-	DripfeedUUID string `json:"dripfeed_uuid"`
-}
-
 type EventDripfeedInputBase struct {
 	UserUUID  string `json:"user_uuid"`
 	AlistUUID string `json:"alist_uuid"`
