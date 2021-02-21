@@ -132,17 +132,3 @@ func (_m *DripfeedRepository) GetNext(dripfeedUUID string) (dripfeed.RepoItem, e
 
 	return r0, r1
 }
-
-// SaveInfo provides a mock function with given fields: input
-func (_m *DripfeedRepository) SaveInfo(input openapi.SpacedRepetitionOvertimeInfo) error {
-	ret := _m.Called(input)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(openapi.SpacedRepetitionOvertimeInfo) error); ok {
-		r0 = rf(input)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
