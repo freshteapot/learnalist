@@ -40,9 +40,7 @@ func (s SpacedRepetitionService) OnEvent(entry event.Eventlog) {
 					"method": "s.OnEvent",
 				}).Fatal("issue with repo")
 			}
-			// This I believe is used to trigger a new dripfeed
-			// TODO do I handle this?
-			// Why do I set the action twice?
+			// Trigger a new dripfeed to be looked for
 			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 				UUID: item.UUID,
 				Kind: event.SystemSpacedRepetition,

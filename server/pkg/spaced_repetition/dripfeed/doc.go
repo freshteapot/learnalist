@@ -83,5 +83,3 @@ var (
 	EventDripfeedRemoved  = "dripfeed.removed"
 	EventDripfeedFinished = "dripfeed.finished"
 )
-
-// openapi.SpacedRepetitionOvertimeInfo

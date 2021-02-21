@@ -125,8 +125,8 @@ func (s DripfeedService) Create(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
+	// Reject if list is empty
 	dataSize := 0
-	// TODO Reject if list is empty
 	switch aList.Info.ListType {
 	case alist.SimpleList:
 		dataSize = len(aList.Data.(alist.TypeV1))
