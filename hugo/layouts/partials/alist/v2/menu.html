@@ -1,6 +1,9 @@
 {{- $aList := . -}}
-{{- $spacedrepetition := cond (gt (len .data) 0) 1 0 -}}
-{{- $spacedrepetition = 1 -}}
+{{- $spacedrepetition := 0 -}}
+{{- with .data -}}
+{{- $spacedrepetition = cond (gt (len $aList.data) 0) 1 0 -}}
+{{- end -}}
+
 {{- with .info.interact -}}
 <div id="interact-menu">
   <interact-menu slideshow="{{ .slideshow }}" totalrecall="{{ .totalrecall }}"
