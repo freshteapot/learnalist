@@ -43,6 +43,7 @@ const (
 	ApiDeleteUserLabelSuccess                   = "Label %s was removed."
 	UserInsertAlreadyExistsPasswordNotMatch     = "Failed to save."
 	UserInsertUsernameExists                    = "Username already exists."
+	UserInfoOnlyYourUUID                        = "You can only get info for the user you are logged in with"
 	AclHttpAccessDeny                           = "Access Denied"
 	ApiShareYouCantShareWithYourself            = "Today, we dont let you share with yourself"
 	ApiShareValidationError                     = "Please refer to the documentation on sharing a list"
@@ -55,6 +56,7 @@ const (
 	ApiUserLoginError                           = "Please refer to the api documentation regarding /user/login"
 	PlankRecordNotFound                         = "Plank record cant be found, terribly sorry"
 	ChallengeNotFound                           = "Challenge cant be found, terribly sorry"
+	SpacedRepetitionOvertimeEmptyList           = "The list is empty, therefore nothing to add over time"
 )
 
 var (

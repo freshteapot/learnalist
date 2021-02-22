@@ -14,7 +14,8 @@ import {
   AlistInputFromJSON,
   AlistFromJSON,
   SpacedRepetitionEntryViewedFromJSON,
-  PlankFromJSON
+  PlankFromJSON,
+  SpacedRepetitionOvertimeInputBaseFromJSON
 } from "./openapi";
 
 const Services = {
@@ -190,7 +191,7 @@ async function updateSpacedRepetitionEntry(entry) {
     return api.updateSpacedRepetitionEntry(input);
   } catch (error) {
     console.log("error", error);
-    throw new Error("Failed to get lists by me");
+    throw new Error("Failed to update spaced repetition");
   }
 }
 
@@ -233,6 +234,51 @@ async function deletePlankEntry(uuid) {
   }
 }
 
+async function spacedRepetitionOvertimeIsActive(uuid) {
+  try {
+    const api = getApi(Services.SpacedRepetition);
+    await api.spacedRepetitionOvertimeIsActiveRaw({ uuid });
+    return true;
+  } catch (error) {
+    if (error.status == 404) {
+      return false;
+    }
+    console.log("error", error);
+    throw new Error("Failed to check if list is active for adding over time to spaced repetition");
+  }
+}
+
+async function spacedRepetitionAddListToOvertime(input) {
+  try {
+    const api = getApi(Services.SpacedRepetition);
+    await api.spacedRepetitionAddListToOvertimeRaw({
+      body: input
+    });
+    return true;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to add list to spaced repetition");
+  }
+}
+
+async function spacedRepetitionRemoveListFromOvertime(userUuid, alistUuid) {
+  try {
+    const api = getApi(Services.SpacedRepetition);
+    const input = {
+      spacedRepetitionOvertimeInputBase: SpacedRepetitionOvertimeInputBaseFromJSON({
+        alist_uuid: alistUuid,
+        user_uuid: userUuid,
+      })
+    }
+    await api.spacedRepetitionRemoveListFromOvertimeRaw(input);
+    return true;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to check if list is active for adding over time to spaced repetition");
+  }
+}
+
+
 export {
   getServer,
   postLogin,
@@ -247,5 +293,8 @@ export {
   getSpacedRepetitionEntries,
   getSpacedRepetitionNext,
   addSpacedRepetitionEntry,
-  updateSpacedRepetitionEntry
+  updateSpacedRepetitionEntry,
+  spacedRepetitionOvertimeIsActive,
+  spacedRepetitionAddListToOvertime,
+  spacedRepetitionRemoveListFromOvertime
 };

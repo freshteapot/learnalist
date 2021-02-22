@@ -1,7 +1,7 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS alist_kv (
-  uuid CHARACTER(36)  not null primary key
+  uuid CHARACTER(36) not null primary key
   CHECK(
     typeof("uuid") = "text" AND
     length("uuid") <= 36

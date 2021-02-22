@@ -19,6 +19,8 @@ const (
 	ApiListSaved                     = "api.list.saved"
 	ApiListDelete                    = "api.list.delete"
 	ApiSpacedRepetition              = "api.spacedrepetition"
+	SystemSpacedRepetition           = "system.spacedRepetition"
+	ApiSpacedRepetitionOvertime      = "api.spacedrepetition.overtime"
 	TopicMonolog                     = "lal.monolog"
 	TopicStaticSite                  = "lal.staticSite"
 	TopicNotifications               = "notifications"

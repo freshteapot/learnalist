@@ -531,7 +531,6 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 				"kind": "v1"
 			}
 			`
-
 			entryUUID = "ba9277fc4c6190fb875ad8f9cee848dba699937f"
 		)
 		It("Not valid entry", func() {
@@ -559,6 +558,7 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 
 			repo.On("SaveEntry", mock.Anything).Return(spaced_repetition.ErrSpacedRepetitionEntryExists)
 			service.SaveEntry(c)
+
 			Expect(rec.Code).To(Equal(http.StatusOK))
 			var entry openapi.SpacedRepetitionV1
 			json.Unmarshal(rec.Body.Bytes(), &entry)

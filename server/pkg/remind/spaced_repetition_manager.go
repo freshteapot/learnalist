@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"firebase.google.com/go/messaging"
+	"firebase.google.com/go/v4/messaging"
 	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -117,7 +117,10 @@ func (m *spacedRepetitionManager) Close() {
 // Send message
 // Update message sent
 // On SRS viewed remove unsent.
-
+// @event.listen: event.ApiAppSettingsRemindV1
+// @event.listen: event.ApiSpacedRepetition
+// @event.listen: event.ApiUserDelete
+// @event.listen: event.CMDUserDelete
 func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiAppSettingsRemindV1:

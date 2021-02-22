@@ -111,7 +111,6 @@ func (m sqliteManagement) DeleteUser(userUUID string) error {
 
 	tx, err := db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -140,7 +139,6 @@ func (m sqliteManagement) DeleteList(listUUID string) error {
 
 	tx, err := db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 

@@ -37,6 +37,11 @@ func (_m *ItemInput) IncrThreshold() {
 	_m.Called()
 }
 
+// ResetToStart provides a mock function with given fields: now
+func (_m *ItemInput) ResetToStart(now time.Time) {
+	_m.Called(now)
+}
+
 // String provides a mock function with given fields:
 func (_m *ItemInput) String() string {
 	ret := _m.Called()

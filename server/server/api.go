@@ -11,7 +11,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userInfo "github.com/freshteapot/learnalist-api/server/pkg/user/info"
 )
 
 func InitApi(
@@ -24,6 +26,8 @@ func InitApi(
 	mobileService mobile.MobileService,
 	remindService remind.RemindService,
 	appSettingsService app_settings.AppSettingsService,
+	dripfeedService dripfeed.DripfeedService,
+	userInfoService userInfo.UserInfoService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -45,8 +49,8 @@ func InitApi(
 	v1.GET("/version", apiManager.V1GetVersion)
 
 	v1.POST("/user/register", apiManager.V1PostRegister)
-	v1.GET("/user/info/:uuid", apiManager.V1GetUserInfo)
-	v1.PATCH("/user/info/:uuid", apiManager.V1PatchUserInfo)
+	v1.GET("/user/info/:uuid", userInfoService.V1GetUserInfo)
+	v1.PATCH("/user/info/:uuid", userInfoService.V1PatchUserInfo)
 	v1.POST("/user/login/idp", userService.LoginViaIDP)
 	v1.POST("/user/login", apiManager.V1PostLogin)
 	v1.POST("/user/logout", apiManager.V1PostLogout)
@@ -89,6 +93,11 @@ func InitApi(
 	srs.DELETE("/:uuid", spacedRepetitionService.DeleteEntry)
 	srs.POST("/", spacedRepetitionService.SaveEntry)
 	srs.POST("/viewed", spacedRepetitionService.EntryViewed)
+
+	// Dripfeed service
+	srs.GET("/overtime/active/:alistUUID", dripfeedService.ListActive) // Might be shit, need to pick one and go with it
+	srs.POST("/overtime", dripfeedService.Create)
+	srs.DELETE("/overtime", dripfeedService.Delete)
 
 	// Plank
 	plank := server.Group("/api/v1/plank")

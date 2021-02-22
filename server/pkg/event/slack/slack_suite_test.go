@@ -1,4 +1,4 @@
-package event_test
+package slack_test
 
 import (
 	"testing"

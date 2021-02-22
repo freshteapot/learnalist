@@ -34,10 +34,13 @@ type HTTPRequestInputV2Item struct {
 	To   string `json:"to"`
 }
 
+// TODO this could almost be the same as what is openapi.
+// Should we move this to openapi?
 type HTTPRequestInputSettings struct {
 	Level    string `json:"level"`
 	WhenNext string `json:"when_next"`
 	Created  string `json:"created"`
+	ExtID    string `json:"ext_id,omitempty"` // ext_id used by dripfeed, at first
 }
 type HTTPRequestInputSettingsV2 struct {
 	HTTPRequestInputSettings
@@ -211,6 +214,7 @@ type ItemInput interface {
 	Created() time.Time
 	IncrThreshold()
 	DecrThreshold()
+	ResetToStart(now time.Time)
 }
 
 var (
@@ -220,9 +224,10 @@ var (
 
 // Event specific
 var (
-	EventKindNew     = "new"
-	EventKindViewed  = "viewed"
-	EventKindDeleted = "deleted"
+	EventKindNew             = "new"
+	EventKindViewed          = "viewed"
+	EventKindDeleted         = "deleted"
+	EventKindAlreadyInSystem = "exists"
 )
 
 type EventSpacedRepetition struct {

@@ -304,7 +304,6 @@ func (r SqliteRepository) DeleteRecord(extUUID string, userUUID string) error {
 func (r SqliteRepository) Delete(UUID string) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 

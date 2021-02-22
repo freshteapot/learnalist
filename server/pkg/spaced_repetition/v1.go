@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
 type ItemInputV1 struct {
 	entry *HTTPRequestInputV1
 }
 
-func V1FromPOST(input []byte) ItemInputV1 {
+func V1FromPOST(input []byte, settings HTTPRequestInputSettings) (ItemInputV1, error) {
 	item := ItemInputV1{}
 
 	json.Unmarshal(input, &item.entry)
@@ -19,13 +21,10 @@ func V1FromPOST(input []byte) ItemInputV1 {
 	b, _ := json.Marshal(item.entry.Data)
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
-
-	item.entry.Settings.Level = Level0
-	now := time.Now().UTC()
-	whenNext := now.Add(Threshold0)
-	item.entry.Settings.Created = now.Format(time.RFC3339)
-	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
-	return item
+	item.entry.Kind = alist.SimpleList
+	item.entry.Show = item.entry.Data
+	item.entry.Settings = settings
+	return item, nil
 }
 
 func V1FromDB(input string) ItemInputV1 {
@@ -74,4 +73,12 @@ func (item ItemInputV1) IncrThreshold() {
 			break
 		}
 	}
+}
+
+func (item ItemInputV1) ResetToStart(now time.Time) {
+	item.entry.Settings.Level = Level0
+
+	whenNext := now.Add(Threshold0)
+	item.entry.Settings.Created = now.Format(time.RFC3339)
+	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 }

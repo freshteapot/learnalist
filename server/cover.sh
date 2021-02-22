@@ -1,5 +1,5 @@
 echo "# Output from the tests"
-go test `go list ./... | grep -vE 'event|integrations|e2e'` -covermode=count -coverprofile=profile.cov
+go test `go list ./... | grep -vE 'integrations|e2e'` -covermode=count -coverprofile=profile.cov
 echo ""
 TOTAL_COVERAGE=$(go tool cover -func=profile.cov | tail -1 | awk '{gsub("%","",$3)} {print $3}')
 OUTPUT=$(cat <<-END

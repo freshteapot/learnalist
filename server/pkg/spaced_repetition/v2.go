@@ -3,29 +3,42 @@ package spaced_repetition
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 )
 
 type ItemInputV2 struct {
 	entry *HTTPRequestInputV2
 }
 
-func V2FromPOST(input []byte) ItemInputV2 {
+func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) (ItemInputV2, error) {
 	item := ItemInputV2{}
-
 	json.Unmarshal(input, &item.entry)
 
 	b, _ := json.Marshal(item.entry.Data)
 	hash := fmt.Sprintf("%x", sha1.Sum(b))
 	item.entry.UUID = hash
 
-	item.entry.Settings.Level = Level0
-	now := time.Now().UTC()
-	whenNext := now.Add(Threshold0)
-	item.entry.Settings.Created = now.Format(time.RFC3339)
-	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
-	return item
+	show := item.entry.Settings.Show
+	switch show {
+	case "from":
+		item.entry.Show = item.entry.Data.From
+	case "to":
+		item.entry.Show = item.entry.Data.To
+	default:
+		return item, errors.New("show not supported")
+	}
+
+	item.entry.Kind = alist.FromToList
+	item.entry.Settings.Show = show
+	item.entry.Settings.Level = settings.Level
+	item.entry.Settings.Created = settings.Created
+	item.entry.Settings.WhenNext = settings.WhenNext
+	item.entry.Settings.ExtID = settings.ExtID
+	return item, nil
 }
 
 func V2FromDB(input string) ItemInputV2 {
@@ -74,4 +87,12 @@ func (item ItemInputV2) IncrThreshold() {
 			break
 		}
 	}
+}
+
+func (item ItemInputV2) ResetToStart(now time.Time) {
+	item.entry.Settings.Level = Level0
+
+	whenNext := now.Add(Threshold0)
+	item.entry.Settings.Created = now.Format(time.RFC3339)
+	item.entry.Settings.WhenNext = whenNext.Format(time.RFC3339)
 }

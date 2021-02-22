@@ -218,9 +218,9 @@ make sync-db-files
 ```sh
 kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
 ```
-Update tables
+### Update all tables
 ```sh
-cat  /srv/learnalist/db/XXX | sqlite3 /srv/learnalist/server.db
+cat  /srv/learnalist/db/*.sql | sqlite3 /srv/learnalist/server.db
 ```
 
 

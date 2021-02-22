@@ -1,4 +1,4 @@
-package event_test
+package slack_test
 
 import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -8,6 +8,8 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	eventReader "github.com/freshteapot/learnalist-api/server/pkg/event/slack"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
@@ -32,6 +34,7 @@ var _ = Describe("Testing Events to Slack", func() {
 		userUUID := "fake-user-123"
 		alistUUID := "fake-list-123"
 		plankUUID := "fake-plank-123"
+		dripfeedUUID := "fake-dripfeed-123"
 
 		tests := []struct {
 			entry event.Eventlog
@@ -143,6 +146,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					return nil
 				},
 			},
+			// start:event.ApiPlank
 			{
 				entry: event.Eventlog{
 					Kind: event.ApiPlank,
@@ -177,6 +181,20 @@ var _ = Describe("Testing Events to Slack", func() {
 					return nil
 				},
 			},
+			{
+				entry: event.Eventlog{
+					Kind: event.ApiPlank,
+					Data: event.EventPlank{
+						Action: "not-supported",
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := "not-supported action not supported api.plank"
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			// finish:event.ApiPlank
 			{
 				entry: event.Eventlog{
 					Kind: event.CMDUserDelete,
@@ -291,6 +309,154 @@ var _ = Describe("Testing Events to Slack", func() {
 					return nil
 				},
 			},
+			// start:spaced-repetition.overtime
+			{
+				entry: event.Eventlog{
+					UUID: dripfeedUUID,
+					Kind: event.ApiSpacedRepetitionOvertime,
+					Data: dripfeed.EventDripfeedInputV1{
+						Info: dripfeed.EventDripfeedInputBase{
+							AlistUUID: alistUUID,
+							UserUUID:  userUUID,
+							Kind:      alist.SimpleList,
+						},
+						Data: make(alist.TypeV1, 0),
+					},
+
+					Action: event.ActionCreated,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime created uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					UUID: dripfeedUUID,
+					Kind: event.ApiSpacedRepetitionOvertime,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						AlistUuid:    alistUUID,
+						UserUuid:     userUUID,
+					},
+
+					Action: event.ActionDeleted,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime deleted uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind:   event.ApiSpacedRepetitionOvertime,
+					Action: "not-supported",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `not-supported action not supported for api.spacedrepetition.overtime`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: spaced_repetition.EventKindNew,
+						Data: spaced_repetition.SpacedRepetitionEntry{
+							UserUUID: userUUID,
+						},
+					},
+					UUID: "fake-srs-item-123",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: spaced_repetition.EventKindAlreadyInSystem,
+						Data: spaced_repetition.SpacedRepetitionEntry{
+							UserUUID: userUUID,
+						},
+					},
+					UUID: "fake-srs-item-123",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123 that already exists`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: event.SystemSpacedRepetition,
+					Data: spaced_repetition.EventSpacedRepetition{
+						Kind: "not-supported",
+					},
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `not-supported kind not supported for system.spacedRepetition`
+
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: dripfeed.EventDripfeedAdded,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    alistUUID,
+					},
+					UUID: dripfeedUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime activated for user:fake-user-123 from list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: dripfeed.EventDripfeedRemoved,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    alistUUID,
+					},
+					UUID: dripfeedUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime stopped for user:fake-user-123 from list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: dripfeed.EventDripfeedFinished,
+					Data: openapi.SpacedRepetitionOvertimeInfo{
+						DripfeedUuid: dripfeedUUID,
+						UserUuid:     userUUID,
+						AlistUuid:    alistUUID,
+					},
+					UUID: dripfeedUUID,
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `spaced repetition overtime finished for user:fake-user-123 from list:fake-list-123`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			// finish:spaced-repetition.overtime
 		}
 
 		for _, test := range tests {

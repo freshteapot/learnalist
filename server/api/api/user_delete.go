@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @event.emit: event.ApiUserDelete
 func (m *Manager) V1DeleteUser(c echo.Context) error {
 	logger := m.logger
 	response := api.HTTPResponseMessage{}

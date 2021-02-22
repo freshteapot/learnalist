@@ -24,6 +24,7 @@ type ChallengeService struct {
 	logContext                          logrus.FieldLogger
 }
 
+// @openapi.path.tag: challenge
 func NewService(repo ChallengeRepository, challengePushNotificationRepository ChallengePushNotificationRepository, acl acl.AclChallenge, log logrus.FieldLogger) ChallengeService {
 	s := ChallengeService{
 		repo:                                repo,
@@ -61,6 +62,7 @@ func (s ChallengeService) Challenges(c echo.Context) error {
 	return c.JSON(http.StatusOK, challenges)
 }
 
+// @event.emit: challenge.EventChallengeCreated
 func (s ChallengeService) Create(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
@@ -128,6 +130,7 @@ func (s ChallengeService) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, challenge)
 }
 
+// @event.emit: challenge.EventChallengeJoined
 func (s ChallengeService) Join(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
@@ -175,6 +178,7 @@ func (s ChallengeService) Join(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// @event.emit: challenge.EventChallengeLeft
 func (s ChallengeService) Leave(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
 	userUUID := user.Uuid
@@ -293,6 +297,7 @@ func (s ChallengeService) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, challenge)
 }
 
+// @event.emit: event.ChangesetChallenge
 func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool, action string) {
 	var err error
 	// Known issue: when a user updates their display name. This will get out of sync.
@@ -312,5 +317,8 @@ func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool,
 	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
 		Kind: event.ChangesetChallenge,
 		Data: challenge,
+		// TODO below is not set, yet. It still works but only because it filters on delete
+		// https://github.com/freshteapot/learnalist-api/issues/199
+		//Action: action,
 	})
 }

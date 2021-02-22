@@ -34,7 +34,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
+	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userInfo "github.com/freshteapot/learnalist-api/server/pkg/user/info"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
@@ -174,6 +176,18 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "appSettings-service"),
 		)
 
+		userInfoService := userInfo.NewService(
+			userStorageRepo,
+			logger.WithField("context", "userInfo-service"),
+		)
+
+		dripfeedService := dripfeed.NewService(
+			dripfeed.NewSqliteRepository(db),
+			acl,
+			storageAlist,
+			logger.WithField("context", "dripfeed-service"),
+		)
+
 		server.InitApi(
 			apiManager,
 			userService,
@@ -184,6 +198,8 @@ var ServerCmd = &cobra.Command{
 			mobileService,
 			remindService,
 			appSettingsService,
+			dripfeedService,
+			userInfoService,
 		)
 
 		server.InitAlists(acl, dal, hugoHelper)

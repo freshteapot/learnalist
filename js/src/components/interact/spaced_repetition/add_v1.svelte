@@ -1,9 +1,18 @@
+<svelte:options tag={null} accessors={true} />
+
 <script>
   import Modal from "./spaced_repetition_modal.svelte";
-  import { addEntry } from "../../../spaced_repetition/api.js";
-
+  import OvertimeActive from "./overtime_active.svelte";
+  import {
+    addEntry,
+    addListToOvertime,
+    overtimeIsActive,
+  } from "../../../spaced_repetition/api.js";
+  import { loggedIn, notify } from "../../../shared.js";
+  import LoginModal from "../../../components/login_modal.svelte";
   import { push } from "svelte-spa-router";
-  import { tap } from "@sveltejs/gestures";
+  import { onMount } from "svelte";
+  import { KeyUserUuid, getConfiguration } from "../../../configuration";
 
   // {DomElement}
   export let playElement;
@@ -18,6 +27,23 @@
   let data;
   let state = "edit";
   let show = false;
+  // TODO add logic to not show add overtime if the list is empty
+  // Check to see if list is already added over time
+  let overtimeActive = false;
+  let userUuid = "";
+
+  const loginNagMessageDefault =
+    "You need to be logged in so we can personalise your learning experience.";
+  let loginNagMessage = loginNagMessageDefault;
+  let loginNagClosed = true;
+  let listIsEmpty = aList.data.length === 0;
+
+  onMount(async () => {
+    userUuid = getConfiguration(KeyUserUuid);
+    if (loggedIn()) {
+      overtimeActive = await overtimeIsActive(aList.uuid);
+    }
+  });
 
   function handleClose(event) {
     playElement.style.display = "none";
@@ -25,6 +51,11 @@
   }
 
   function edit(event) {
+    if (!loggedIn()) {
+      loginNagClosed = false;
+      return;
+    }
+
     const index = event.target
       .closest("[data-index]")
       .getAttribute("data-index");
@@ -47,7 +78,7 @@
     const input = {
       show: data,
       data: data,
-      kind: aList.info.type
+      kind: aList.info.type,
     };
     const response = await addEntry(input);
 
@@ -65,38 +96,76 @@
         break;
     }
   }
+
+  async function addOvertime() {
+    if (listIsEmpty) {
+      notify("error", "No items to add", false);
+      return;
+    }
+
+    if (!loggedIn()) {
+      loginNagClosed = false;
+      return;
+    }
+
+    const input = {
+      alist_uuid: aList.uuid,
+      user_uuid: userUuid,
+    };
+    const added = await addListToOvertime(input);
+    // TODO maybe visualise it failed
+    overtimeActive = added;
+  }
 </script>
+
+{#if overtimeActive}
+  <header>
+    <button class="br3" on:click={handleClose}>Close</button>
+    <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+    <OvertimeActive alistUuid={aList.uuid} {userUuid} bind:overtimeActive />
+  </header>
+{/if}
+
+{#if !overtimeActive}
+  <header>
+    <button class="br3" on:click={handleClose}>Close</button>
+    <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
+    <p>
+      Click on the row you want to add or <button
+        class="br3"
+        on:click|preventDefault={addOvertime}>add all overtime</button
+      >
+    </p>
+  </header>
+
+  <div id="list-data">
+    <ul class="lh-copy ph0 list">
+      {#each aList.data as item, index}
+        <li class="pv3 pr3 bb b--black-20" data-index={index} on:click={edit}>
+          {item}
+        </li>
+      {/each}
+    </ul>
+  </div>
+
+  <Modal {show} {state} on:add={add} on:close={close}>
+    {#if state === "edit"}
+      <pre>{JSON.stringify(data, '', 2)}</pre>
+    {/if}
+
+    {#if state === "feedback"}
+      <p>Already in the system</p>
+      <p>You will be reminded on {data.settings.when_next}</p>
+    {/if}
+  </Modal>
+{/if}
+
+{#if !loggedIn() && !loginNagClosed}
+  <LoginModal on:close={(e) => (loginNagClosed = true)}>
+    <p>{loginNagMessage}</p>
+  </LoginModal>
+{/if}
 
 <style>
   @import "../../../../all.css";
 </style>
-
-<svelte:options tag={null} accessors={true} />
-
-<header>
-  <button class="br3" on:click={handleClose}>Close</button>
-  <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
-  <h3>Click on the row you want to add</h3>
-</header>
-
-<div id="list-data">
-  <ul class="lh-copy ph0 list">
-    {#each aList.data as item, index}
-      <li class="pv3 pr3 bb b--black-20" data-index={index} on:click={edit}>
-        {item}
-      </li>
-    {/each}
-  </ul>
-</div>
-
-<Modal {show} {state} on:add={add} on:close={close}>
-
-  {#if state === 'edit'}
-    <pre>{JSON.stringify(data, '', 2)}</pre>
-  {/if}
-
-  {#if state === 'feedback'}
-    <p>Already in the system</p>
-    <p>You will be reminded on {data.settings.when_next}</p>
-  {/if}
-</Modal>
