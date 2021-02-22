@@ -29,7 +29,7 @@ func V2FromPOST(input []byte, settings HTTPRequestInputSettingsV2) (ItemInputV2,
 	case "to":
 		item.entry.Show = item.entry.Data.To
 	default:
-		return item, errors.New("Show not supported")
+		return item, errors.New("show not supported")
 	}
 
 	item.entry.Kind = alist.FromToList

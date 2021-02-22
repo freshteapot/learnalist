@@ -110,15 +110,7 @@ func (r sqliteRepository) GetNext(dripfeedUUID string) (RepoItem, error) {
 		return RepoItem{}, err
 	}
 
-	return RepoItem{
-		SrsUUID:      item.SrsUUID,
-		SrsKind:      item.SrsKind,
-		SrsBody:      item.SrsBody,
-		Position:     item.Position,
-		DripfeedUUID: item.DripfeedUUID,
-		UserUUID:     item.UserUUID,
-		AlistUUID:    item.AlistUUID,
-	}, nil
+	return RepoItem(item), nil
 }
 
 func (r sqliteRepository) AddAll(dripfeedUUID string, userUUID string, alistUUID string, items []string) error {
