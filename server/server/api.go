@@ -85,6 +85,9 @@ func InitApi(
 	v1.GET("/oauth/google/redirect", apiManager.V1OauthGoogleRedirect)
 	v1.GET("/oauth/google/callback", apiManager.V1OauthGoogleCallback)
 
+	v1.GET("/oauth/appleid/redirect", apiManager.V1OauthAppleIDRedirect)
+	v1.GET("/oauth/appleid/callback", apiManager.V1OauthAppleIDCallback)
+
 	// Spaced Repetition
 	srs := server.Group("/api/v1/spaced-repetition")
 	srs.Use(authenticate.Auth(authConfig))

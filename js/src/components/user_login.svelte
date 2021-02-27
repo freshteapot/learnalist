@@ -1,10 +1,12 @@
+<svelte:options tag={null} />
+
 <script>
   import { login, notify, api } from "../shared.js";
   import { loginHelper } from "../utils/login_helper.js";
   import {
     saveConfiguration,
     KeyUserUuid,
-    KeyUserAuthentication
+    KeyUserAuthentication,
   } from "../configuration.js";
 
   let username = "";
@@ -55,12 +57,6 @@
   }
 </script>
 
-<style>
-  @import "../../all.css";
-</style>
-
-<svelte:options tag={null} />
-
 {#if !$loginHelper.loggedIn}
   <form class="measure center" on:submit|preventDefault={handleSubmit}>
     <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
@@ -72,7 +68,8 @@
           name="username"
           bind:value={username}
           id="username"
-          autocapitalize="none" />
+          autocapitalize="none"
+        />
       </div>
       <div class="mv3">
         <label class="db fw6 lh-copy f6" for="password">Password</label>
@@ -82,7 +79,8 @@
           name="password"
           autocomplete="off"
           bind:value={password}
-          id="password" />
+          id="password"
+        />
       </div>
     </fieldset>
     <div class="measure flex">
@@ -92,13 +90,26 @@
             <button class="br3 db w-100" type="submit">Login</button>
           </div>
           <div class="flex items-center mb2">
+            <span class="f6 link dib black"> or with </span>
+          </div>
+
+          <div class="flex items-center mb2">
+            <a
+              target="_blank"
+              href="/api/v1/oauth/google/redirect"
+              class="f6 link underline dib black"
+            >
+              google
+            </a>
+          </div>
+          <div class="flex items-center mb2">
             <span class="f6 link dib black">
-              or with
               <a
                 target="_blank"
-                href="/api/v1/oauth/google/redirect"
-                class="f6 link underline dib black">
-                google
+                href="/api/v1/oauth/appleid/redirect"
+                class="f6 link underline dib black"
+              >
+                apple
               </a>
             </span>
           </div>
@@ -114,3 +125,7 @@
     <a href="/welcome.html">welcome page</a>
   </p>
 {/if}
+
+<style>
+  @import "../../all.css";
+</style>

@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.58.0 // indirect
 	firebase.google.com/go/v4 v4.1.0
 	github.com/DATA-DOG/go-sqlmock v1.3.3
+	github.com/Timothylock/go-signin-with-apple v0.0.0-20210131195746-828dfdd59ab1
 	github.com/antihax/optional v1.0.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/getkin/kin-openapi v0.30.0
@@ -39,6 +40,8 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.6.1
+	github.com/tideland/golib v4.24.2+incompatible // indirect
+	github.com/tideland/gorest v2.15.5+incompatible
 	github.com/tj/assert v0.0.3
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	google.golang.org/api v0.26.0

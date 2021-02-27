@@ -173,7 +173,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 		It("Response is not valid json", func() {
 			want := errors.New("fail")
-			userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", want)
+			userFromIDP.On("Lookup", user.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", want)
 			uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 			req, rec := setupFakeEndpoint(method, uri, "")
 			c := e.NewContext(req, rec)
@@ -183,8 +183,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 		When("User lookup returns not found, we register the user", func() {
 			It("Failed to register user due to saving to storage", func() {
-				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
-				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
+				userFromIDP.On("Lookup", user.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
+				userFromIDP.On("Register", user.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 				req, rec := setupFakeEndpoint(method, uri, "")
 				c := e.NewContext(req, rec)
@@ -199,8 +199,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 				testHugoHelper := &mocks.HugoSiteBuilder{}
 				testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-				userFromIDP.On("Lookup", "google", user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
-				userFromIDP.On("Register", "google", user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
+				userFromIDP.On("Lookup", user.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
+				userFromIDP.On("Register", user.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
 				datastore.On("GetAllListsByUser", userUUID).Return(noLists)
 				userSession.On("Activate", mock.Anything).Return(nil)
 				oauthReadWriter.On("GetTokenInfo", userUUID).Return(nil, errors.New("not found"))

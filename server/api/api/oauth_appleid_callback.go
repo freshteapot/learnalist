@@ -2,14 +2,11 @@ package api
 
 import (
 	"bytes"
-	"context"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
@@ -18,16 +15,16 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
+func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 	logger := m.logger
-	googleConfig := m.OauthHandlers.Google
+	oauthConfig := m.OauthHandlers.AppleID
 	oauthHandler := m.Datastore.OAuthHandler()
 	userSession := m.Datastore.UserSession()
 	userFromIDP := m.Datastore.UserFromIDP()
-
 	r := c.Request()
 	challenge := r.FormValue("state")
 	code := r.FormValue("code")
+
 	// Confirm the challenge is valid
 	has, err := userSession.IsChallengeValid(challenge)
 	if err != nil {
@@ -42,56 +39,35 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	}
 
 	// Exchange the code for the token
-	token, err := googleConfig.Exchange(oauth2.NoContext, code)
+	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		// Log
 		response := "Exhange of code to token failed"
 		logger.WithFields(logrus.Fields{
 			"error": err,
+			"idp":   "apple",
 		}).Error(response)
 
 		return c.String(http.StatusBadRequest, response)
 	}
 
-	ctx := context.Background()
-	client := googleConfig.Client(ctx, token)
-
-	// Have read the code, its very unlikely this would throw err (famous last words)
-	req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-	resp, err := client.Do(req)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
-	if err != nil {
-		// LOG the error
-		return c.String(http.StatusBadRequest, "no email address returned by Google")
-	}
-
-	// Look up the user based on their email and association with google.
-	userUUID, err := userFromIDP.Lookup(user.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID)
+	// TODO this might not be needed
+	// TODO there is a ticket about removing this
+	oauthExternalID := token.Extra("sub").(string)
+	contents := []byte(``)
+	// Look up the user based on their email and association with apple.
+	userUUID, err := userFromIDP.Lookup(user.IDPKeyApple, user.IDPKindUserID, oauthExternalID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
 				"error": err,
-			}).Error("Issue in google callback")
+			}).Error("Issue in appleid callback")
 			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register(user.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID, contents)
+		userUUID, err = userFromIDP.Register(user.IDPKeyApple, user.IDPKindUserID, oauthExternalID, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-register-user",
@@ -104,7 +80,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
 				UUID: userUUID,
-				Kind: event.KindUserRegisterIDPGoogle,
+				Kind: event.KindUserRegisterIDPApple,
 			},
 		})
 
@@ -133,7 +109,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
-			Kind: event.KindUserLoginIDPGoogle,
+			Kind: event.KindUserLoginIDPApple,
 		},
 	})
 
@@ -159,7 +135,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	vars["token"] = session.Token
 	vars["userUUID"] = userUUID
 	vars["refreshRedirectURL"] = "/welcome.html"
-	vars["idp"] = user.IDPKeyGoogle
+	vars["idp"] = user.IDPKeyApple
 
 	var tpl bytes.Buffer
 	oauthCallbackHtml200.Execute(&tpl, vars)

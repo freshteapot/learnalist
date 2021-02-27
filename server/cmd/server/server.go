@@ -59,8 +59,21 @@ var ServerCmd = &cobra.Command{
 		})
 		viper.Set("server.loginWith.google.clientSecret", "***")
 
+		// TODO hook up secret to file in kubernetes via a file or env or something
+		appleIDOauthConfig := oauth.NewAppleID(oauth.AppleConfig{
+			TeamID:   viper.GetString("server.loginWith.appleid.teamID"),
+			ClientID: viper.GetString("server.loginWith.appleid.clientID"),
+			KeyID:    viper.GetString("server.loginWith.appleid.keyID"),
+			Cert:     viper.GetString("server.loginWith.appleid.cert"),
+			Server:   viper.GetString("server.loginWith.appleid.server"),
+		})
+		fmt.Println(viper.GetString("server.loginWith.appleid.cert"))
+		viper.Set("server.loginWith.appleid.clientSecret", "***")
+		viper.Set("server.loginWith.appleid.cert", "***")
+
 		oauthHandlers := &oauth.Handlers{
-			Google: googleOauthConfig,
+			Google:  googleOauthConfig,
+			AppleID: appleIDOauthConfig,
 		}
 
 		userRegisterKey := viper.GetString("server.userRegisterKey")

@@ -8,7 +8,8 @@ import (
 )
 
 type Handlers struct {
-	Google OAuth2ConfigInterface
+	Google  OAuth2ConfigInterface
+	AppleID OAuth2ConfigInterface
 }
 
 // https://blog.seriesci.com/how-to-mock-oauth-in-go/

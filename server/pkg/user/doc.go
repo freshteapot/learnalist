@@ -10,6 +10,8 @@ import (
 const (
 	IDPKindEmail  = "email"
 	IDPKindUserID = "id"
+	IDPKeyGoogle  = "google"
+	IDPKeyApple   = "apple"
 )
 
 type ManagementStorage interface {

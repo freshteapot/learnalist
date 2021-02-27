@@ -29,7 +29,7 @@ var _ = Describe("Testing User from IDP", func() {
 
 		BeforeEach(func() {
 			dbCon, mockSql, err = helper.GetMockDB()
-			idp = "google"
+			idp = user.IDPKeyGoogle
 			identifier = "fake-ext-user-id-123"
 			kind = "id"
 			info = []byte(`{"hello": "world"}`)

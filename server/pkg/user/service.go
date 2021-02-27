@@ -2,9 +2,10 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -15,6 +16,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"github.com/tideland/gorest/jwt"
 	"google.golang.org/api/oauth2/v1"
 )
 
@@ -39,7 +41,8 @@ type UserService struct {
 type HTTPUserLoginIDPInput struct {
 	Idp         string `json:"idp"`
 	IDToken     string `json:"id_token"`
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"access_token"` // TODO remove
+	Code        string `json:"code"`
 }
 
 // @openapi.path.tag: user
@@ -70,7 +73,14 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
-	if input.Idp != "google" {
+	// TODO change to include apple
+	// TODO make configurable
+	idpAllowed := []string{
+		IDPKeyGoogle,
+		IDPKeyApple,
+	}
+
+	if !utils.StringArrayContains(idpAllowed, input.Idp) {
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-not-supported",
 			"idp":   input.Idp,
@@ -80,7 +90,16 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	}
 
 	// Convert token
-	token, err := verifyIdToken(input.IDToken)
+	var token *Tokeninfo
+
+	switch input.Idp {
+	case IDPKeyGoogle:
+		token, err = verifyIdTokenGoogle(input.IDToken)
+	case IDPKeyApple:
+		// TODO need the code or I just validate?
+		token, err = verifyIDTokenApple(input.IDToken)
+	}
+
 	if err != nil {
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-token-verification",
@@ -90,17 +109,17 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
-	if !utils.StringArrayContains(s.issuedTo, token.IssuedTo) {
+	if !utils.StringArrayContains(s.issuedTo, token.Aud) {
 		logContext.WithFields(logrus.Fields{
 			"event":           "idp-issued",
 			"idp":             input.Idp,
-			"input_issued_to": token.IssuedTo,
+			"input_issued_to": token.Aud,
 			"error":           err,
 		}).Error("Issue in login via idp")
 		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
 	}
 
-	extUserID := token.UserId
+	extUserID := token.Sub
 	userUUID, err := userFromIDP.Lookup(input.Idp, IDPKindUserID, extUserID)
 	if err != nil {
 		if err != utils.ErrNotFound {
@@ -112,36 +131,38 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
 
+		// TODO idp specific
 		// TODO needs better http setup
-		req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", input.AccessToken))
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			logContext.WithFields(logrus.Fields{
-				"event": "idp-user-info-via-google-1",
-				"error": err,
-			}).Error("Issue in login via idp")
-			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-		}
-
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			logContext.WithFields(logrus.Fields{
-				"event":       "idp-user-info-via-google-2",
-				"status_code": resp.StatusCode,
-				"error":       err,
-			}).Error("Issue in login via idp")
-			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-		}
-
-		contents, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			logContext.WithFields(logrus.Fields{
-				"event": "idp-user-info-via-google-3",
-				"error": err,
-			}).Error("Issue in login via idp")
-			return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-		}
+		//req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
+		//req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", input.AccessToken))
+		//resp, err := http.DefaultClient.Do(req)
+		//if err != nil {
+		//	logContext.WithFields(logrus.Fields{
+		//		"event": "idp-user-info-via-google-1",
+		//		"error": err,
+		//	}).Error("Issue in login via idp")
+		//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		//}
+		//
+		//defer resp.Body.Close()
+		//if resp.StatusCode != http.StatusOK {
+		//	logContext.WithFields(logrus.Fields{
+		//		"event":       "idp-user-info-via-google-2",
+		//		"status_code": resp.StatusCode,
+		//		"error":       err,
+		//	}).Error("Issue in login via idp")
+		//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		//}
+		//
+		//contents, err := ioutil.ReadAll(resp.Body)
+		//if err != nil {
+		//	logContext.WithFields(logrus.Fields{
+		//		"event": "idp-user-info-via-google-3",
+		//		"error": err,
+		//	}).Error("Issue in login via idp")
+		//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		//}
+		contents := []byte(``)
 
 		// Create a new user
 		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserID, contents)
@@ -214,7 +235,18 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 
 var httpClient = &http.Client{}
 
-func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
+type Tokeninfo struct {
+	// Audience: Who is the intended audience for this token. In general the
+	// same as issued_to.
+	Aud string `json:"aud,omitempty"`
+	// UserId: The obfuscated user id.
+	Sub string `json:"sub,omitempty"`
+}
+
+//
+// TODO pass in idp?
+func verifyIdTokenGoogle(idToken string) (*Tokeninfo, error) {
+	// TODO this is google specific
 	oauth2Service, err := oauth2.New(httpClient)
 	tokenInfoCall := oauth2Service.Tokeninfo()
 	tokenInfoCall.IdToken(idToken)
@@ -223,5 +255,36 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tokenInfo, nil
+
+	return &Tokeninfo{
+		Aud: tokenInfo.Audience,
+		Sub: tokenInfo.UserId,
+	}, nil
+}
+
+func verifyIDTokenApple(idToken string) (*Tokeninfo, error) {
+	// Or we go with "github.com/Timothylock/go-signin-with-apple/apple"
+	j, err := jwt.Decode(idToken)
+	if err != nil {
+		return nil, errors.New("bad token")
+	}
+
+	leeway := time.Minute
+	if !j.IsValid(leeway) {
+		return nil, errors.New("time has passed")
+	}
+
+	iss, _ := j.Claims().GetString("iss")
+
+	if iss != "https://appleid.apple.com" {
+		return nil, errors.New("bad-issuer")
+	}
+
+	aud, _ := j.Claims().GetString("aud")
+	sub, _ := j.Claims().GetString("sub")
+
+	return &Tokeninfo{
+		Aud: aud,
+		Sub: sub,
+	}, nil
 }
