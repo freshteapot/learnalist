@@ -9,9 +9,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-/*
-/oauth/appleid/redirect
-*/
 func (m *Manager) V1OauthAppleIDRedirect(c echo.Context) error {
 	oauthConfig := m.OauthHandlers.AppleID
 	if oauthConfig == nil {
@@ -26,7 +23,6 @@ func (m *Manager) V1OauthAppleIDRedirect(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	// TODO might not be the correct type
 	url := oauthConfig.AuthCodeURL(challenge, oauth2.AccessTypeOffline)
 	return c.Redirect(http.StatusFound, url)
 }
