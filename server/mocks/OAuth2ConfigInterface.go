@@ -8,6 +8,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	oauth "github.com/freshteapot/learnalist-api/server/pkg/oauth"
+
 	oauth2 "golang.org/x/oauth2"
 )
 
@@ -76,6 +78,27 @@ func (_m *OAuth2ConfigInterface) Exchange(ctx context.Context, code string, opts
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, ...oauth2.AuthCodeOption) error); ok {
 		r1 = rf(ctx, code, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUserUUIDFromIDP provides a mock function with given fields: input
+func (_m *OAuth2ConfigInterface) GetUserUUIDFromIDP(input oauth.IDPOauthInput) (string, error) {
+	ret := _m.Called(input)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(oauth.IDPOauthInput) string); ok {
+		r0 = rf(input)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(oauth.IDPOauthInput) error); ok {
+		r1 = rf(input)
 	} else {
 		r1 = ret.Error(1)
 	}

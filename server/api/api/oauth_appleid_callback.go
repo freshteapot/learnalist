@@ -7,6 +7,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
@@ -22,6 +23,11 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 	userSession := m.Datastore.UserSession()
 	userFromIDP := m.Datastore.UserFromIDP()
 	r := c.Request()
+	// TODO via flutter https://pub.dev/packages/sign_in_with_apple we might want to have a config variable or something
+	// to allow skipping of the challenge if state = supported app name (or android)
+	// might raise the question of what do we gain from having the challenge
+	// further in the code we verify the data (ie the code / id_token)
+	// then we create a user or get the user, regardless of the challenge
 	challenge := r.FormValue("state")
 	code := r.FormValue("code")
 
@@ -56,7 +62,7 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 	oauthExternalID := token.Extra("sub").(string)
 	contents := []byte(``)
 	// Look up the user based on their email and association with apple.
-	userUUID, err := userFromIDP.Lookup(user.IDPKeyApple, user.IDPKindUserID, oauthExternalID)
+	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyApple, user.IDPKindUserID, oauthExternalID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logger.WithFields(logrus.Fields{
@@ -67,7 +73,7 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register(user.IDPKeyApple, user.IDPKindUserID, oauthExternalID, contents)
+		userUUID, err = userFromIDP.Register(oauth.IDPKeyApple, user.IDPKindUserID, oauthExternalID, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-register-user",
@@ -135,7 +141,7 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 	vars["token"] = session.Token
 	vars["userUUID"] = userUUID
 	vars["refreshRedirectURL"] = "/welcome.html"
-	vars["idp"] = user.IDPKeyApple
+	vars["idp"] = oauth.IDPKeyApple
 
 	var tpl bytes.Buffer
 	oauthCallbackHtml200.Execute(&tpl, vars)

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	helper "github.com/freshteapot/learnalist-api/server/pkg/testhelper"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	storage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
@@ -29,7 +30,7 @@ var _ = Describe("Testing User from IDP", func() {
 
 		BeforeEach(func() {
 			dbCon, mockSql, err = helper.GetMockDB()
-			idp = user.IDPKeyGoogle
+			idp = oauth.IDPKeyGoogle
 			identifier = "fake-ext-user-id-123"
 			kind = "id"
 			info = []byte(`{"hello": "world"}`)

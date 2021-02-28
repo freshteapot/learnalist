@@ -3,6 +3,7 @@ package oauth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,8 +14,9 @@ import (
 )
 
 type appleClient struct {
-	config      AppleConfig
 	redirectURI string
+	webAudience AppleConfig
+	audiences   []AppleConfig
 }
 
 type AppleConfig struct {
@@ -25,10 +27,11 @@ type AppleConfig struct {
 	Cert     string
 }
 
-func NewAppleID(conf AppleConfig) OAuth2ConfigInterface {
+func NewAppleID(webAudience AppleConfig, audiences []AppleConfig) OAuth2ConfigInterface {
 	return &appleClient{
-		config:      conf,
-		redirectURI: conf.Server + "/api/v1/oauth/appleid/callback",
+		webAudience: webAudience,
+		redirectURI: webAudience.Server + "/api/v1/oauth/appleid/callback",
+		audiences:   audiences,
 	}
 }
 
@@ -36,18 +39,20 @@ func (c *appleClient) AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) s
 	u := url.Values{}
 	u.Add("response_type", "code")
 	u.Add("redirect_uri", c.redirectURI)
-	u.Add("client_id", c.config.ClientID)
+	u.Add("client_id", c.webAudience.ClientID)
 	u.Add("state", state)
 	return "https://appleid.apple.com/auth/authorize?" + u.Encode()
 }
 
 func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
-	secret, _ := apple.GenerateClientSecret(c.config.Cert, c.config.TeamID, c.config.ClientID, c.config.KeyID)
+	// This one needs to use the web
+	config := c.webAudience
+	secret, _ := apple.GenerateClientSecret(config.Cert, config.TeamID, config.ClientID, config.KeyID)
 	// Generate a new validation client
 	client := apple.New()
 
 	vReq := apple.AppValidationTokenRequest{
-		ClientID:     c.config.ClientID,
+		ClientID:     config.ClientID,
 		ClientSecret: secret,
 		Code:         code,
 	}
@@ -79,7 +84,7 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 		return nil, errors.New("bad-issuer")
 	}
 
-	if aud != c.config.ClientID {
+	if aud != config.ClientID {
 		return nil, errors.New("bad-client-not-match")
 	}
 
@@ -88,7 +93,7 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 		AccessToken:  accessToken,
 		TokenType:    tokenType,
 		RefreshToken: refreshToken,
-		Expiry:       time.Now(),
+		Expiry:       time.Now(), // TODO change
 	}
 
 	t = t.WithExtra(map[string]interface{}{
@@ -103,4 +108,65 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 func (c *appleClient) Client(ctx context.Context, t *oauth2.Token) *http.Client {
 	// TODO this is not in use
 	return &http.Client{}
+}
+
+func (c *appleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
+
+	// Or we go with "github.com/Timothylock/go-signin-with-apple/apple"
+	j, err := jwt.Decode(input.IDToken)
+	if err != nil {
+		return "", errors.New("bad token")
+	}
+
+	leeway := time.Minute
+	if !j.IsValid(leeway) {
+		return "", errors.New("time has passed")
+	}
+
+	iss, _ := j.Claims().GetString("iss")
+
+	if iss != "https://appleid.apple.com" {
+		return "", errors.New("bad-issuer")
+	}
+
+	aud, _ := j.Claims().GetString("aud")
+	sub, _ := j.Claims().GetString("sub")
+
+	// TODO check audience
+	match := false
+	var config AppleConfig
+	for _, supported := range c.audiences {
+		if supported.ClientID == aud {
+			match = true
+			config = supported
+			break
+		}
+	}
+
+	if !match {
+		return "", fmt.Errorf("%s audience not on the list for appleid", aud)
+	}
+	// At this point, life could go on
+	//return sub, nil
+	// Setting the below up will mean replay of id_token wont work, it does with google
+	// TODO do I want to further lock it down?
+	// I wonder if these actually need callbacks setup?
+	secret, _ := apple.GenerateClientSecret(config.Cert, config.TeamID, config.ClientID, config.KeyID)
+	client := apple.New()
+
+	vReq := apple.AppValidationTokenRequest{
+		ClientID:     config.ClientID,
+		ClientSecret: secret,
+		Code:         input.Code,
+	}
+
+	var resp apple.ValidationResponse
+
+	// Do the verification
+	err = client.VerifyAppToken(context.Background(), vReq, &resp)
+	if err != nil {
+		return "", err
+	}
+
+	return sub, nil
 }

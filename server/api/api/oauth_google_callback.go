@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -52,7 +53,10 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 
 		return c.String(http.StatusBadRequest, response)
 	}
+	// At this point we have the id_token, we can extract out the extUserUUID (sub).
 
+	// Could just
+	fmt.Println("token", token)
 	ctx := context.Background()
 	client := googleConfig.Client(ctx, token)
 
@@ -80,7 +84,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	}
 
 	// Look up the user based on their email and association with google.
-	userUUID, err := userFromIDP.Lookup(user.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID)
+	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logger.WithFields(logrus.Fields{
@@ -91,7 +95,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register(user.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID, contents)
+		userUUID, err = userFromIDP.Register(oauth.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-register-user",
@@ -159,7 +163,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	vars["token"] = session.Token
 	vars["userUUID"] = userUUID
 	vars["refreshRedirectURL"] = "/welcome.html"
-	vars["idp"] = user.IDPKeyGoogle
+	vars["idp"] = oauth.IDPKeyGoogle
 
 	var tpl bytes.Buffer
 	oauthCallbackHtml200.Execute(&tpl, vars)

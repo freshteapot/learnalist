@@ -53,28 +53,34 @@ var ServerCmd = &cobra.Command{
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
-			Key:    viper.GetString("server.loginWith.google.clientID"),
-			Secret: viper.GetString("server.loginWith.google.clientSecret"),
-			Server: viper.GetString("server.loginWith.google.server"),
+			Key:       viper.GetString("server.loginWith.google.clientID"),
+			Secret:    viper.GetString("server.loginWith.google.clientSecret"),
+			Server:    viper.GetString("server.loginWith.google.server"),
+			Audiences: viper.GetStringSlice("server.loginWith.google.audiences"),
 		})
 		viper.Set("server.loginWith.google.clientSecret", "***")
 
 		// TODO hook up secret to file in kubernetes via a file or env or something
-		appleIDOauthConfig := oauth.NewAppleID(oauth.AppleConfig{
-			TeamID:   viper.GetString("server.loginWith.appleid.teamID"),
-			ClientID: viper.GetString("server.loginWith.appleid.clientID"),
-			KeyID:    viper.GetString("server.loginWith.appleid.keyID"),
-			Cert:     viper.GetString("server.loginWith.appleid.cert"),
-			Server:   viper.GetString("server.loginWith.appleid.server"),
-		})
-		fmt.Println(viper.GetString("server.loginWith.appleid.cert"))
-		viper.Set("server.loginWith.appleid.clientSecret", "***")
-		viper.Set("server.loginWith.appleid.cert", "***")
+		var appleWebAudience oauth.AppleConfig
+		viper.UnmarshalKey("server.loginWith.appleid.web", &appleWebAudience)
 
-		oauthHandlers := &oauth.Handlers{
-			Google:  googleOauthConfig,
-			AppleID: appleIDOauthConfig,
+		var appleAudiences []oauth.AppleConfig
+		viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		appleAudiences = append(appleAudiences, appleWebAudience)
+
+		appleIDOauthConfig := oauth.NewAppleID(appleWebAudience, appleAudiences)
+
+		// Hiding cert from the allsettings
+		hideCertAppleAudiences := appleAudiences
+		for index, _ := range hideCertAppleAudiences {
+			hideCertAppleAudiences[index].Cert = "***"
 		}
+		viper.Set("server.loginWith.appleid.web.cert", "***")
+		viper.Set("server.loginWith.appleid.apps", hideCertAppleAudiences)
+
+		oauthHandlers := oauth.NewHandlers()
+		oauthHandlers.AddGoogle(googleOauthConfig)
+		oauthHandlers.AddAppleID(appleIDOauthConfig)
 
 		userRegisterKey := viper.GetString("server.userRegisterKey")
 		databaseName := viper.GetString("server.sqlite.database")
@@ -167,7 +173,7 @@ var ServerCmd = &cobra.Command{
 
 		userService := user.NewService(
 			db,
-			viper.GetStringSlice("server.loginWith.idp.issuedTo"),
+			*oauthHandlers,
 			userFromIDP,
 			userSession,
 			hugoHelper,
