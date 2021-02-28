@@ -2,9 +2,7 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -55,36 +53,43 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 	}
 	// At this point we have the id_token, we can extract out the extUserUUID (sub).
 
-	// Could just
+	// Could just extract it out via
+	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(oauth.IDPOauthInput{
+		IDToken: token.Extra("id_token").(string),
+	})
+	fmt.Println(extUserUUID)
 	fmt.Println("token", token)
-	ctx := context.Background()
-	client := googleConfig.Client(ctx, token)
+	fmt.Println("token.sub", token.Extra("sub").(string))
+	//ctx := context.Background()
+	//client := googleConfig.Client(ctx, token)
+	//
+	//// Have read the code, its very unlikely this would throw err (famous last words)
+	//req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
+	//resp, err := client.Do(req)
+	//if err != nil {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//defer resp.Body.Close()
+	//if resp.StatusCode != http.StatusOK {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//contents, err := ioutil.ReadAll(resp.Body)
+	//if err != nil {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
+	//if err != nil {
+	//	// LOG the error
+	//	return c.String(http.StatusBadRequest, "no email address returned by Google")
+	//}
+	//
 
-	// Have read the code, its very unlikely this would throw err (famous last words)
-	req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-	resp, err := client.Do(req)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	}
-
-	userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
-	if err != nil {
-		// LOG the error
-		return c.String(http.StatusBadRequest, "no email address returned by Google")
-	}
-
-	// Look up the user based on their email and association with google.
-	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID)
+	//// Look up the user based on their email and association with google.
+	contents := []byte(``)
+	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyGoogle, user.IDPKindUserID, extUserUUID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logger.WithFields(logrus.Fields{
@@ -95,7 +100,7 @@ func (m *Manager) V1OauthGoogleCallback(c echo.Context) error {
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register(oauth.IDPKeyGoogle, user.IDPKindUserID, userInfo.ID, contents)
+		userUUID, err = userFromIDP.Register(oauth.IDPKeyGoogle, user.IDPKindUserID, extUserUUID, contents)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"event": "idp-register-user",
