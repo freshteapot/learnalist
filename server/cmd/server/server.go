@@ -171,7 +171,6 @@ var ServerCmd = &cobra.Command{
 			acl,
 			"",
 			hugoHelper,
-			*oauthHandlers,
 			userRegisterKey,
 			logger)
 

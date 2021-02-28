@@ -5,7 +5,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/sirupsen/logrus"
 )
@@ -18,7 +17,6 @@ type Manager struct {
 	Acl             acl.Acl
 	DatabaseName    string
 	HugoHelper      hugo.HugoSiteBuilder
-	OauthHandlers   oauth.Handlers
 	logger          logrus.FieldLogger
 	insights        event.Insights
 	UserRegisterKey string
@@ -30,7 +28,6 @@ func NewManager(
 	acl acl.Acl,
 	databaseName string,
 	hugoHelper hugo.HugoSiteBuilder,
-	oauthHandlers oauth.Handlers,
 	userRegisterKey string,
 	logger logrus.FieldLogger,
 ) *Manager {
@@ -40,7 +37,6 @@ func NewManager(
 		Acl:             acl,
 		DatabaseName:    databaseName,
 		HugoHelper:      hugoHelper,
-		OauthHandlers:   oauthHandlers,
 		logger:          logger,
 		insights:        event.NewInsights(logger),
 		UserRegisterKey: userRegisterKey,
