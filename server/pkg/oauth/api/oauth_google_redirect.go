@@ -9,13 +9,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (m *Manager) V1OauthGoogleRedirect(c echo.Context) error {
-	googleConfig := m.OauthHandlers.Google
+func (s OauthService) V1OauthGoogleRedirect(c echo.Context) error {
+	googleConfig := s.oauthHandlers.Google
 	if googleConfig == nil {
 		return c.String(http.StatusInternalServerError, "this website has not configured Google OAuth")
 	}
 
-	challenge, err := m.Datastore.UserSession().CreateWithChallenge()
+	challenge, err := s.userSession.CreateWithChallenge()
 	if err != nil {
 		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,

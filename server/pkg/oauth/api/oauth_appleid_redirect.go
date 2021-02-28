@@ -9,13 +9,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (m *Manager) V1OauthAppleIDRedirect(c echo.Context) error {
-	oauthConfig := m.OauthHandlers.AppleID
+func (s OauthService) V1OauthAppleIDRedirect(c echo.Context) error {
+	oauthConfig := s.oauthHandlers.AppleID
+
 	if oauthConfig == nil {
 		return c.String(http.StatusInternalServerError, "this website has not configured AppleID OAuth")
 	}
 
-	challenge, err := m.Datastore.UserSession().CreateWithChallenge()
+	challenge, err := s.userSession.CreateWithChallenge()
 	if err != nil {
 		response := api.HTTPResponseMessage{
 			Message: i18n.InternalServerErrorFunny,

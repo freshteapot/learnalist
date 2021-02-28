@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -16,25 +17,23 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
-	logger := m.logger
-	oauthConfig := m.OauthHandlers.AppleID
-	oauthHandler := m.Datastore.OAuthHandler()
-	userSession := m.Datastore.UserSession()
-	userFromIDP := m.Datastore.UserFromIDP()
+func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
+	logContext := s.logContext.WithFields(logrus.Fields{
+		"endpoint": "callback",
+		"idp":      oauth.IDPKeyGoogle,
+	})
+
+	googleConfig := s.oauthHandlers.Google
+	userSession := s.userSession
+	userFromIDP := s.userFromIDP
+
 	r := c.Request()
-	// TODO via flutter https://pub.dev/packages/sign_in_with_apple we might want to have a config variable or something
-	// to allow skipping of the challenge if state = supported app name (or android)
-	// might raise the question of what do we gain from having the challenge
-	// further in the code we verify the data (ie the code / id_token)
-	// then we create a user or get the user, regardless of the challenge
 	challenge := r.FormValue("state")
 	code := r.FormValue("code")
-
 	// Confirm the challenge is valid
 	has, err := userSession.IsChallengeValid(challenge)
 	if err != nil {
-		logger.WithFields(logrus.Fields{
+		logContext.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("Invalid challenge")
 		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
@@ -45,37 +44,67 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 	}
 
 	// Exchange the code for the token
-	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+	token, err := googleConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		// Log
 		response := "Exhange of code to token failed"
-		logger.WithFields(logrus.Fields{
+		logContext.WithFields(logrus.Fields{
 			"error": err,
-			"idp":   "apple",
 		}).Error(response)
 
 		return c.String(http.StatusBadRequest, response)
 	}
+	// At this point we have the id_token, we can extract out the extUserUUID (sub).
 
-	// TODO this might not be needed
-	// TODO there is a ticket about removing this
-	oauthExternalID := token.Extra("sub").(string)
-	contents := []byte(``)
-	// Look up the user based on their email and association with apple.
-	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyApple, user.IDPKindUserID, oauthExternalID)
+	// Could just extract it out via
+	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(oauth.IDPOauthInput{
+		IDToken: token.Extra("id_token").(string),
+	})
+	fmt.Println(extUserUUID)
+	fmt.Println("token", token)
+	fmt.Println("token.sub", token.Extra("sub").(string))
+	//ctx := context.Background()
+	//client := googleConfig.Client(ctx, token)
+	//
+	//// Have read the code, its very unlikely this would throw err (famous last words)
+	//req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
+	//resp, err := client.Do(req)
+	//if err != nil {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//defer resp.Body.Close()
+	//if resp.StatusCode != http.StatusOK {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//contents, err := ioutil.ReadAll(resp.Body)
+	//if err != nil {
+	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+	//}
+	//
+	//userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
+	//if err != nil {
+	//	// LOG the error
+	//	return c.String(http.StatusBadRequest, "no email address returned by Google")
+	//}
+	//
+
+	//// Look up the user based on their id and association with google.
+	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyGoogle, user.IDPKindUserID, extUserUUID)
 	if err != nil {
 		if err != utils.ErrNotFound {
-			logger.WithFields(logrus.Fields{
+			logContext.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
 				"error": err,
-			}).Error("Issue in appleid callback")
+			}).Error("Issue in google callback")
 			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
 		}
 
 		// Create a user
-		userUUID, err = userFromIDP.Register(oauth.IDPKeyApple, user.IDPKindUserID, oauthExternalID, contents)
+		userUUID, err = userFromIDP.Register(oauth.IDPKeyGoogle, user.IDPKindUserID, extUserUUID, []byte(``))
 		if err != nil {
-			logger.WithFields(logrus.Fields{
+			logContext.WithFields(logrus.Fields{
 				"event": "idp-register-user",
 				"error": err,
 			}).Error("Failed to register new user via idp")
@@ -86,12 +115,13 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
 				UUID: userUUID,
-				Kind: event.KindUserRegisterIDPApple,
+				Kind: event.KindUserRegisterIDPGoogle,
 			},
 		})
 
+		// TODO ticket to convert this into an event
 		// Write an empty list
-		m.HugoHelper.WriteListsByUser(userUUID, m.Datastore.GetAllListsByUser(userUUID))
+		s.hugoHelper.WriteListsByUser(userUUID, s.alistsRepo.GetAllListsByUser(userUUID))
 	}
 
 	// Create a session for the user
@@ -104,7 +134,7 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 
 	err = userSession.Activate(session)
 	if err != nil {
-		logger.WithFields(logrus.Fields{
+		logContext.WithFields(logrus.Fields{
 			"event": "idp-session-activate",
 			"error": err,
 		}).Error("Failed to activate session")
@@ -115,33 +145,17 @@ func (m *Manager) V1OauthAppleIDCallback(c echo.Context) error {
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
-			Kind: event.KindUserLoginIDPApple,
+			Kind: event.KindUserLoginIDPGoogle,
 		},
 	})
 
-	// If refreshToken is empty, we look it up in the db
-	// before we write it back to the db.
-	if token.RefreshToken == "" {
-		storedToken, err := oauthHandler.GetTokenInfo(string(userUUID))
-		if err == nil {
-			token.RefreshToken = storedToken.RefreshToken
-		}
-	}
-
-	err = oauthHandler.WriteTokenInfo(string(userUUID), token)
-	if err != nil {
-		logger.WithFields(logrus.Fields{
-			"event": "idp-session-activate",
-			"error": err,
-		}).Error("Failed to save token info")
-		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
-	}
-
+	// Removed logic around storing refresh tokens, currently not in use
+	// TODO remove refresh token from db
 	vars := make(map[string]interface{})
 	vars["token"] = session.Token
 	vars["userUUID"] = userUUID
 	vars["refreshRedirectURL"] = "/welcome.html"
-	vars["idp"] = oauth.IDPKeyApple
+	vars["idp"] = oauth.IDPKeyGoogle
 
 	var tpl bytes.Buffer
 	oauthCallbackHtml200.Execute(&tpl, vars)

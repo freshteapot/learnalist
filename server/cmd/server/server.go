@@ -33,6 +33,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 
+	oauthApi "github.com/freshteapot/learnalist-api/server/pkg/oauth/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -154,6 +155,16 @@ var ServerCmd = &cobra.Command{
 			event.NewInsights(logger),
 		)
 
+		oauthApiService := oauthApi.NewService(
+			userManagement,
+			hugoHelper,
+			*oauthHandlers,
+			userSession,
+			userFromIDP,
+			storageAlist,
+			logger.WithField("context", "oauth-service"),
+		)
+
 		apiManager := api.NewManager(
 			dal,
 			userManagement,
@@ -219,6 +230,7 @@ var ServerCmd = &cobra.Command{
 			appSettingsService,
 			dripfeedService,
 			userInfoService,
+			oauthApiService,
 		)
 
 		server.InitAlists(acl, dal, hugoHelper)
