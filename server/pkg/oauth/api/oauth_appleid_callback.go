@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -22,11 +23,9 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 		"context": "oauth.callback",
 	})
 
-	hugoHelper := s.hugoHelper
 	oauthConfig := s.oauthHandlers.AppleID
 	userSession := s.userSession
 	userFromIDP := s.userFromIDP
-	alistRepo := s.alistsRepo
 
 	r := c.Request()
 	// TODO via flutter https://pub.dev/packages/sign_in_with_apple we might want to have a config variable or something
@@ -94,7 +93,7 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 
 		// TODO ticket to convert this into an event
 		// Write an empty list
-		hugoHelper.WriteListsByUser(userUUID, alistRepo.GetAllListsByUser(userUUID))
+		s.hugoHelper.WriteListsByUser(userUUID, make([]alist.ShortInfo, 0))
 	}
 
 	// Create a session for the user

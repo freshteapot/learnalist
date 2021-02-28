@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -121,7 +122,7 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 
 		// TODO ticket to convert this into an event
 		// Write an empty list
-		s.hugoHelper.WriteListsByUser(userUUID, s.alistsRepo.GetAllListsByUser(userUUID))
+		s.hugoHelper.WriteListsByUser(userUUID, make([]alist.ShortInfo, 0))
 	}
 
 	// Create a session for the user

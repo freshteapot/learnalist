@@ -161,7 +161,6 @@ var ServerCmd = &cobra.Command{
 			*oauthHandlers,
 			userSession,
 			userFromIDP,
-			storageAlist,
 			logger.WithField("context", "oauth-service"),
 		)
 
