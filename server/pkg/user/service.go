@@ -156,7 +156,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	// TODO is this kind supported in slack? (confirm)
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
