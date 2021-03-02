@@ -82,14 +82,21 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 
 	// Convert token
 	//var token *Tokeninfo
-	var extUserUUID string
+	var (
+		extUserUUID                                 string
+		eventKindLoginValidToken, eventKindRegister string
+	)
 	// This can be refactored, by looking at the aud
 	// Or keeping the idp and having the function
 	switch input.Idp {
 	case oauth.IDPKeyGoogle:
 		extUserUUID, err = s.oauthHandlers.Google.GetUserUUIDFromIDP(input)
+		eventKindRegister = event.KindUserRegisterIDPGoogle
+		eventKindLoginValidToken = event.KindUserLoginIDPGoogleViaIdToken
 	case oauth.IDPKeyApple:
 		extUserUUID, err = s.oauthHandlers.AppleID.GetUserUUIDFromIDP(input)
+		eventKindRegister = event.KindUserRegisterIDPApple
+		eventKindLoginValidToken = event.KindUserLoginIDPAppleViaIdToken
 	default:
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-not-supported-2",
@@ -137,7 +144,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
 				UUID: userUUID,
-				Kind: event.KindUserRegisterIDPGoogle,
+				Kind: eventKindRegister,
 			},
 		})
 
@@ -172,7 +179,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{
 			UUID: userUUID,
-			Kind: event.KindUserLoginIDPGoogleViaIdToken,
+			Kind: eventKindLoginValidToken,
 		},
 	})
 
