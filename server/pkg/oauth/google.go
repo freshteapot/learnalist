@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/tideland/gorest/jwt"
@@ -63,32 +62,7 @@ func (c googleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 	return c.config.Exchange(ctx, code, opts...)
 }
 
-func (c googleClient) Client(ctx context.Context, t *oauth2.Token) *http.Client {
-	return oauth2.NewClient(ctx, c.config.TokenSource(ctx, t))
-}
-
 func (c googleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
-	//// I dont need to use this, if I am happy to consume the jwt token
-	//// TODO set defaults
-	//httpClient := &http.Client{
-	//	Timeout: 5 * time.Second,
-	//}
-	//
-	//oauth2Service, err := googleOauth2Api.New(httpClient)
-	//tokenInfoCall := oauth2Service.Tokeninfo()
-	//tokenInfoCall.IdToken(input.IDToken)
-	//
-	//tokenInfo, err := tokenInfoCall.Do()
-	//if err != nil {
-	//	return "", err
-	//}
-	//
-	//// Check the audience
-	//if !utils.StringArrayContains(c.audiences, tokenInfo.Audience) {
-	//	return "", fmt.Errorf("%s audience not on the list for google", tokenInfo.Audience)
-	//}
-	//
-	//return tokenInfo.UserId, nil
 	j, err := jwt.Decode(input.IDToken)
 	if err != nil {
 		return "", errors.New("bad token")
@@ -129,35 +103,3 @@ func GoogleConvertRawUserInfo(raw []byte) (GoogleUserInfo, error) {
 	err := json.Unmarshal(raw, &info)
 	return info, err
 }
-
-// TODO idp specific
-// TODO needs better http setup
-//req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-//req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", input.AccessToken))
-//resp, err := http.DefaultClient.Do(req)
-//if err != nil {
-//	logContext.WithFields(logrus.Fields{
-//		"event": "idp-user-info-via-google-1",
-//		"error": err,
-//	}).Error("Issue in login via idp")
-//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-//}
-//
-//defer resp.Body.Close()
-//if resp.StatusCode != http.StatusOK {
-//	logContext.WithFields(logrus.Fields{
-//		"event":       "idp-user-info-via-google-2",
-//		"status_code": resp.StatusCode,
-//		"error":       err,
-//	}).Error("Issue in login via idp")
-//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-//}
-//
-//contents, err := ioutil.ReadAll(resp.Body)
-//if err != nil {
-//	logContext.WithFields(logrus.Fields{
-//		"event": "idp-user-info-via-google-3",
-//		"error": err,
-//	}).Error("Issue in login via idp")
-//	return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
-//}

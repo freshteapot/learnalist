@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -105,14 +104,7 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 	return t, nil
 }
 
-func (c *appleClient) Client(ctx context.Context, t *oauth2.Token) *http.Client {
-	// TODO this is not in use
-	return &http.Client{}
-}
-
 func (c *appleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
-
-	// Or we go with "github.com/Timothylock/go-signin-with-apple/apple"
 	j, err := jwt.Decode(input.IDToken)
 	if err != nil {
 		return "", errors.New("bad token")
@@ -132,13 +124,10 @@ func (c *appleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
 	aud, _ := j.Claims().GetString("aud")
 	sub, _ := j.Claims().GetString("sub")
 
-	// TODO check audience
 	match := false
-	var config AppleConfig
 	for _, supported := range c.audiences {
 		if supported.ClientID == aud {
 			match = true
-			config = supported
 			break
 		}
 	}
@@ -146,27 +135,5 @@ func (c *appleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
 	if !match {
 		return "", fmt.Errorf("%s audience not on the list for appleid", aud)
 	}
-	// At this point, life could go on
-	//return sub, nil
-	// Setting the below up will mean replay of id_token wont work, it does with google
-	// TODO do I want to further lock it down?
-	// I wonder if these actually need callbacks setup?
-	secret, _ := apple.GenerateClientSecret(config.Cert, config.TeamID, config.ClientID, config.KeyID)
-	client := apple.New()
-
-	vReq := apple.AppValidationTokenRequest{
-		ClientID:     config.ClientID,
-		ClientSecret: secret,
-		Code:         input.Code,
-	}
-
-	var resp apple.ValidationResponse
-
-	// Do the verification
-	err = client.VerifyAppToken(context.Background(), vReq, &resp)
-	if err != nil {
-		return "", err
-	}
-
 	return sub, nil
 }

@@ -2,7 +2,6 @@ package oauth
 
 import (
 	"context"
-	"net/http"
 
 	"golang.org/x/oauth2"
 )
@@ -36,7 +35,6 @@ type IDPTokeninfo struct {
 type OAuth2ConfigInterface interface {
 	AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string
 	Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
-	Client(ctx context.Context, t *oauth2.Token) *http.Client
 	// Return the extID / userID from the idp
 	GetUserUUIDFromIDP(input IDPOauthInput) (string, error)
 }
