@@ -56,7 +56,6 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 		return c.String(http.StatusBadRequest, response)
 	}
 	// At this point we have the id_token, we can extract out the extUserUUID (sub).
-
 	// Could just extract it out via
 	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(oauth.IDPOauthInput{
 		IDToken: token.Extra("id_token").(string),
@@ -102,7 +101,8 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 
 		// TODO ticket to convert this into an event
 		// Write an empty list
-		s.hugoHelper.WriteListsByUser(userUUID, make([]alist.ShortInfo, 0))
+		lists := make([]alist.ShortInfo, 0)
+		s.hugoHelper.WriteListsByUser(userUUID, lists)
 	}
 
 	// Create a session for the user

@@ -93,7 +93,8 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 
 		// TODO ticket to convert this into an event
 		// Write an empty list
-		s.hugoHelper.WriteListsByUser(userUUID, make([]alist.ShortInfo, 0))
+		lists := make([]alist.ShortInfo, 0)
+		s.hugoHelper.WriteListsByUser(userUUID, lists)
 	}
 
 	// Create a session for the user
