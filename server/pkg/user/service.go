@@ -11,21 +11,11 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
-	guuid "github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
-/*
-curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login/idp' -d'
-{
-    "idp": "google",
-	"id_token": "XXX",
-	"code": "XXX"
-}
-'
-*/
 type UserService struct {
 	db            *sqlx.DB
 	userFromIDP   UserFromIDP
@@ -127,10 +117,8 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 		}
 
-		contents := []byte(``)
-
 		// Create a new user
-		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserUUID, contents)
+		userUUID, err = userFromIDP.Register(input.Idp, IDPKindUserID, extUserUUID, []byte(``))
 		if err != nil {
 			logContext.WithFields(logrus.Fields{
 				"event": "idp-register-user",
@@ -154,23 +142,13 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		s.hugoHelper.WriteListsByUser(userUUID, lists)
 	}
 
-	// Create a session for the user
-	userSessionToken := guuid.New()
-	// Hack to make it work
-	challenge, _ := userSession.CreateWithChallenge()
-	session := UserSession{
-		Token:     userSessionToken.String(),
-		UserUUID:  userUUID,
-		Challenge: challenge,
-	}
-
-	err = userSession.Activate(session)
+	session, err := userSession.NewSession(userUUID)
 	if err != nil {
 		logContext.WithFields(logrus.Fields{
-			"event": "idp-session-activate",
+			"event": "idp-session-create",
 			"idp":   input.Idp,
 			"error": err,
-		}).Error("Failed to activate session")
+		}).Error("Failed to create session")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 

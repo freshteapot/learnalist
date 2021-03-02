@@ -25,14 +25,14 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 
 ## Via idp token
 - Making it easier to login via the apps (started with mobile app)
-
+- Supports google, appleid
 
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login/idp' -d'
 {
   "idp": "google",
   "id_token": "XXX",
-  "access_token": "XXX"
+  "code": "XXX"
 }
 '
 ```
