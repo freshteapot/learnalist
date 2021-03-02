@@ -2,11 +2,11 @@ package api
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
@@ -61,43 +61,23 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(oauth.IDPOauthInput{
 		IDToken: token.Extra("id_token").(string),
 	})
-	fmt.Println(extUserUUID)
-	fmt.Println("token", token)
-	fmt.Println("token.sub", token.Extra("sub").(string))
-	//ctx := context.Background()
-	//client := googleConfig.Client(ctx, token)
-	//
-	//// Have read the code, its very unlikely this would throw err (famous last words)
-	//req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo?prettyprint=false", nil)
-	//resp, err := client.Do(req)
-	//if err != nil {
-	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	//}
-	//
-	//defer resp.Body.Close()
-	//if resp.StatusCode != http.StatusOK {
-	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	//}
-	//
-	//contents, err := ioutil.ReadAll(resp.Body)
-	//if err != nil {
-	//	return c.String(http.StatusBadRequest, "Something went wrong, please try again")
-	//}
-	//
-	//userInfo, err := oauth.GoogleConvertRawUserInfo(contents)
-	//if err != nil {
-	//	// LOG the error
-	//	return c.String(http.StatusBadRequest, "no email address returned by Google")
-	//}
-	//
+	if err != nil {
+		logContext.WithFields(logrus.Fields{
+			"event":  "idp-token-verification",
+			"method": "google.GetUserUUIDFromIDP",
+			"error":  err,
+		}).Error("Issue in google callback")
+		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+	}
 
 	//// Look up the user based on their id and association with google.
 	userUUID, err := userFromIDP.Lookup(oauth.IDPKeyGoogle, user.IDPKindUserID, extUserUUID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logContext.WithFields(logrus.Fields{
-				"event": "idp-lookup-user-info",
-				"error": err,
+				"event":  "idp-lookup-user-info",
+				"method": "userFromIDP.Lookup",
+				"error":  err,
 			}).Error("Issue in google callback")
 			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
 		}
