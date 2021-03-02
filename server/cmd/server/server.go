@@ -181,7 +181,6 @@ var ServerCmd = &cobra.Command{
 		assetService.InitCheck()
 
 		userService := user.NewService(
-			db,
 			*oauthHandlers,
 			userFromIDP,
 			userSession,

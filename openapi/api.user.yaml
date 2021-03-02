@@ -134,6 +134,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpUserLoginResponse"
+        "400":
+          description: Bad input, most likely, invalid json
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+        "422":
+          description: Idp not supported
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
         "403":
           description: Missing data or invalid id_token
           content:

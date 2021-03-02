@@ -2,8 +2,10 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
@@ -11,30 +13,27 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
 type UserService struct {
-	db            *sqlx.DB
 	userFromIDP   UserFromIDP
 	userSession   Session
-	hugoHelper    hugo.HugoHelper
+	hugoHelper    hugo.HugoSiteBuilder
 	oauthHandlers oauth.Handlers
 	logContext    logrus.FieldLogger
 }
 
 // @openapi.path.tag: user
-func NewService(db *sqlx.DB,
+func NewService(
 	oauthHandlers oauth.Handlers,
 	userFromIDP UserFromIDP,
 	userSession Session,
-	hugoHelper hugo.HugoHelper,
+	hugoHelper hugo.HugoSiteBuilder,
 	logContext logrus.FieldLogger,
 ) UserService {
 	return UserService{
-		db:            db,
 		oauthHandlers: oauthHandlers,
 		userFromIDP:   userFromIDP,
 		userSession:   userSession,
@@ -56,18 +55,23 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
-		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		return c.JSON(http.StatusBadRequest, api.HTTPResponseMessage{
+			Message: "Check the documentation",
+		})
 	}
 
-	idpAllowed := s.oauthHandlers.Keys()
+	allowedIdps := s.oauthHandlers.Keys()
 
-	if !utils.StringArrayContains(idpAllowed, input.Idp) {
+	if !utils.StringArrayContains(allowedIdps, input.Idp) {
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-not-supported",
 			"idp":   input.Idp,
 			"error": err,
 		}).Error("Future feature")
-		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+
+		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
+			Message: fmt.Sprintf("Idp not supported: %s", strings.Join(allowedIdps, ",")),
+		})
 	}
 
 	// Convert token
