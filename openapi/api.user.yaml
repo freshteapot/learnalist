@@ -3,6 +3,8 @@ components:
   schemas:
     HttpUserLoginIDPInput:
       type: object
+      required:
+        - idp
       properties:
         idp:
           type: string
@@ -11,9 +13,9 @@ components:
         id_token:
           type: string
           description: We will verify this to confirm your identity and create an account linked to your id.
-        access_token:
+        code:
           type: string
-          description: We might use this to lookup your basic info.
+          description: Code from the server, part of a possible handshake
 
     HttpUserInfoInput:
       type: object

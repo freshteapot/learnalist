@@ -3,6 +3,7 @@ package oauth
 import (
 	"context"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"golang.org/x/oauth2"
 )
 
@@ -15,12 +16,6 @@ type Handlers struct {
 	keys    []string
 	Google  OAuth2ConfigInterface
 	AppleID OAuth2ConfigInterface
-}
-
-type IDPOauthInput struct {
-	Idp     string `json:"idp"`
-	IDToken string `json:"id_token"`
-	Code    string `json:"code,omitempty"`
 }
 
 type IDPTokeninfo struct {
@@ -36,7 +31,7 @@ type OAuth2ConfigInterface interface {
 	AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string
 	Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
 	// Return the extID / userID from the idp
-	GetUserUUIDFromIDP(input IDPOauthInput) (string, error)
+	GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (string, error)
 }
 
 type OAuthReadWriter interface {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Timothylock/go-signin-with-apple/apple"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/tideland/gorest/jwt"
 	"golang.org/x/oauth2"
 )
@@ -104,8 +105,8 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 	return t, nil
 }
 
-func (c *appleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
-	j, err := jwt.Decode(input.IDToken)
+func (c *appleClient) GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (string, error) {
+	j, err := jwt.Decode(input.IdToken)
 	if err != nil {
 		return "", errors.New("bad token")
 	}

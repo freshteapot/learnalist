@@ -12,6 +12,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -48,8 +49,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	userFromIDP := s.userFromIDP
 	userSession := s.userSession
 
-	logContext := s.logContext
-	var input oauth.IDPOauthInput
+	var input openapi.HttpUserLoginIdpInput
 	defer c.Request().Body.Close()
 	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
 
@@ -60,12 +60,15 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		})
 	}
 
+	logContext := s.logContext.WithFields(logrus.Fields{
+		"idp": input.Idp,
+	})
+
 	allowedIdps := s.oauthHandlers.Keys()
 
 	if !utils.StringArrayContains(allowedIdps, input.Idp) {
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-not-supported",
-			"idp":   input.Idp,
 			"error": err,
 		}).Error("Future feature")
 
@@ -94,7 +97,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 	default:
 		logContext.WithFields(logrus.Fields{
 			"event": "idp-not-supported-2",
-			"idp":   input.Idp,
 			"error": err,
 		}).Error("Future feature")
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
@@ -104,10 +106,9 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		logContext.WithFields(logrus.Fields{
 			"event":  "idp-token-verification",
 			"method": "GetUserUUIDFromIDP",
-			"idp":    input.Idp,
 			"error":  err,
 		}).Error("Issue in login via idp")
-		return c.JSON(http.StatusForbidden, api.HTTPAccessDeniedResponse)
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
 	userUUID, err := userFromIDP.Lookup(input.Idp, IDPKindUserID, extUserUUID)
@@ -115,7 +116,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		if err != utils.ErrNotFound {
 			logContext.WithFields(logrus.Fields{
 				"event": "idp-lookup-user-info",
-				"idp":   input.Idp,
 				"error": err,
 			}).Error("Issue in login via idp")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
@@ -126,7 +126,6 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 		if err != nil {
 			logContext.WithFields(logrus.Fields{
 				"event": "idp-register-user",
-				"idp":   input.Idp,
 				"error": err,
 			}).Error("Failed to register new user via login with id_token")
 			return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)

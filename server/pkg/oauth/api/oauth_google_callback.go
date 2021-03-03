@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	guuid "github.com/google/uuid"
@@ -57,8 +58,8 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 	}
 	// At this point we have the id_token, we can extract out the extUserUUID (sub).
 	// Could just extract it out via
-	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(oauth.IDPOauthInput{
-		IDToken: token.Extra("id_token").(string),
+	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(openapi.HttpUserLoginIdpInput{
+		IdToken: token.Extra("id_token").(string),
 	})
 	if err != nil {
 		logContext.WithFields(logrus.Fields{

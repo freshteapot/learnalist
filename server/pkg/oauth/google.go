@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/tideland/gorest/jwt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -62,8 +63,8 @@ func (c googleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 	return c.config.Exchange(ctx, code, opts...)
 }
 
-func (c googleClient) GetUserUUIDFromIDP(input IDPOauthInput) (string, error) {
-	j, err := jwt.Decode(input.IDToken)
+func (c googleClient) GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (string, error) {
+	j, err := jwt.Decode(input.IdToken)
 	if err != nil {
 		return "", errors.New("bad token")
 	}
