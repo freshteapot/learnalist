@@ -58,8 +58,10 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 	}
 	// At this point we have the id_token, we can extract out the extUserUUID (sub).
 	// Could just extract it out via
+
 	extUserUUID, err := googleConfig.GetUserUUIDFromIDP(openapi.HttpUserLoginIdpInput{
 		IdToken: token.Extra("id_token").(string),
+		Idp:     oauth.IDPKeyGoogle,
 	})
 	if err != nil {
 		logContext.WithFields(logrus.Fields{
@@ -79,7 +81,7 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 				"method": "userFromIDP.Lookup",
 				"error":  err,
 			}).Error("Issue in google callback")
-			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
 
 		// Create a user
