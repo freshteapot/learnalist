@@ -3,7 +3,6 @@ package user_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -78,8 +77,6 @@ var _ = Describe("Testing User from IDP", func() {
 			userSession,
 			hugoHelper,
 			logger)
-
-		fmt.Println(userUUID)
 
 		input = openapi.HttpUserLoginIdpInput{
 			Idp:     oauth.IDPKeyGoogle,
@@ -177,16 +174,6 @@ var _ = Describe("Testing User from IDP", func() {
 				}
 				eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything).Times(2).Run(verify)
 
-				//eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(entry event.Eventlog) bool {
-				//	b, _ := json.Marshal(entry.Data)
-				//	var moment event.EventUser
-				//	json.Unmarshal(b, &moment)
-				//	Expect(entry.Kind).To(Equal(event.ApiUserRegister))
-				//	Expect(moment.UUID).To(Equal(userUUID))
-				//	Expect(moment.Kind).To(Equal(event.KindUserRegisterIDPGoogle))
-				//	return true
-				//}))
-
 				hugoHelper.On("WriteListsByUser", userUUID, []alist.ShortInfo{}).Return(nil)
 				aSession := user.UserSession{
 					Token:     "hi",
@@ -209,11 +196,53 @@ var _ = Describe("Testing User from IDP", func() {
 		})
 
 		It("Failed to create session", func() {
+			oauthGoogle.On("GetUserUUIDFromIDP", input).Return(userUUID, nil)
+			userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, userUUID).Return(userUUID, nil)
+			userSession.On("NewSession", userUUID).Return(user.UserSession{}, want)
 
+			service.LoginViaIDP(c)
+
+			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+			testutils.CheckMessageResponseFromResponseRecorder(rec, i18n.InternalServerErrorFunny)
 		})
 
 		It("Session created", func() {
+			input.Idp = oauth.IDPKeyApple
+			inputBytes, _ = json.Marshal(input)
+			// Override BeforeEach to set the new input
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(inputBytes))
+			c = e.NewContext(req, rec)
+			c.SetPath(uri)
 
+			oauthApple.On("GetUserUUIDFromIDP", input).Return(userUUID, nil)
+			userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, userUUID).Return(userUUID, utils.ErrNotFound)
+			userFromIDP.On("Register", input.Idp, user.IDPKindUserID, userUUID, []byte(``)).Return(userUUID, nil)
+
+			expectedEvents := []string{}
+			verify := func(args mock.Arguments) {
+				moment := args[1].(event.Eventlog)
+				expectedEvents = append(expectedEvents, moment.Kind)
+			}
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything).Times(2).Run(verify)
+
+			hugoHelper.On("WriteListsByUser", userUUID, []alist.ShortInfo{}).Return(nil)
+			aSession := user.UserSession{
+				Token:     "hi",
+				UserUUID:  userUUID,
+				Challenge: "",
+			}
+			userSession.On("NewSession", userUUID).Return(aSession, nil)
+
+			service.LoginViaIDP(c)
+
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			Expect(expectedEvents).To(Equal([]string{event.ApiUserRegister, event.ApiUserLogin}))
+			response := api.HTTPLoginResponse{
+				Token:    "hi",
+				UserUUID: userUUID,
+			}
+			b, _ := json.Marshal(response)
+			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(string(b)))
 		})
 	})
 })
