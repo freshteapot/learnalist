@@ -7,12 +7,11 @@ import (
 	"net/http/httptest"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
-	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	oauthApi "github.com/freshteapot/learnalist-api/server/pkg/oauth/api"
-	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
@@ -25,7 +24,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var _ = Describe("Testing Google Oauth callback", func() {
+var _ = Describe("Testing AppleID Oauth callback", func() {
 
 	var (
 		logger *logrus.Logger
@@ -57,10 +56,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		userManagement := &mocks.Management{}
 		userSession = &mocks.Session{}
 		oauth2Config = &mocks.OAuth2ConfigInterface{}
-		oauthHandlers := oauth.Handlers{
-			Google: oauth2Config,
-		}
-
+		oauthHandlers := oauth.Handlers{}
+		oauthHandlers.AddAppleID(oauth2Config)
 		hugoHelper = &mocks.HugoSiteBuilder{}
 
 		service = oauthApi.NewService(
@@ -90,7 +87,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 			c = e.NewContext(req, rec)
 			c.SetPath(uri)
 
-			service.V1OauthGoogleCallback(c)
+			service.V1OauthAppleIDCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`Sadly, our service has taken a nap.`))
 		})
@@ -104,7 +101,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 			c = e.NewContext(req, rec)
 			c.SetPath(uri)
 
-			service.V1OauthGoogleCallback(c)
+			service.V1OauthAppleIDCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusBadRequest))
 			Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`Invalid code / challenge, please try to login again`))
 		})
@@ -119,7 +116,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 		c = e.NewContext(req, rec)
 		c.SetPath(uri)
 
-		service.V1OauthGoogleCallback(c)
+		service.V1OauthAppleIDCallback(c)
 		Expect(rec.Code).To(Equal(http.StatusBadRequest))
 		Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(`Exhange of code to token failed`))
 		Expect(hook.LastEntry().Data["error"]).To(Equal(want))
@@ -127,32 +124,25 @@ var _ = Describe("Testing Google Oauth callback", func() {
 	})
 
 	It("Talking to the idp, we fail to get the userUUID", func() {
-		input := openapi.HttpUserLoginIdpInput{
-			Idp:     oauth.IDPKeyGoogle,
-			IdToken: "fake-token",
-		}
-
 		token := &oauth2.Token{}
 		token = token.WithExtra(map[string]interface{}{
 			"id_token": "fake-token",
 			"aud":      "fake-aud",
-			"sub":      "fake-user-123",
+			"sub":      fakeExtUserID,
 			"iss":      "fake-iss",
 		})
 
 		userSession.On("IsChallengeValid", challenge).Return(true, nil)
-		userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", want)
+		userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("", want)
 		oauth2Config.On("Exchange", mock.Anything, mock.Anything).Return(token, nil)
-		oauth2Config.On("GetUserUUIDFromIDP", input).Return("", want)
 		uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 		req, rec = testutils.SetupJSONEndpoint(method, uri, "")
 		c = e.NewContext(req, rec)
 		c.SetPath(uri)
 
-		service.V1OauthGoogleCallback(c)
-		Expect(rec.Code).To(Equal(http.StatusForbidden))
-		testutils.CheckMessageResponseFromResponseRecorder(rec, api.HTTPAccessDeniedResponse.Message)
-
+		service.V1OauthAppleIDCallback(c)
+		Expect(rec.Code).To(Equal(http.StatusInternalServerError))
+		Expect(testutils.CleanEchoResponseFromResponseRecorder(rec)).To(Equal(i18n.InternalServerErrorFunny))
 	})
 
 	When("Looking up the user in the system", func() {
@@ -163,11 +153,6 @@ var _ = Describe("Testing Google Oauth callback", func() {
 			c.SetPath(uri)
 
 			userSession.On("IsChallengeValid", challenge).Return(true, nil)
-			input := openapi.HttpUserLoginIdpInput{
-				Idp:     oauth.IDPKeyGoogle,
-				IdToken: "fake-token",
-			}
-
 			token := &oauth2.Token{}
 			token = token.WithExtra(map[string]interface{}{
 				"id_token": "fake-token",
@@ -177,34 +162,33 @@ var _ = Describe("Testing Google Oauth callback", func() {
 			})
 
 			oauth2Config.On("Exchange", mock.Anything, mock.Anything).Return(token, nil)
-			oauth2Config.On("GetUserUUIDFromIDP", input).Return(fakeExtUserID, nil)
 		})
 
 		It("User found, but fail to create a session due to storage", func() {
-			userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("fake-user-123", nil)
+			userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("fake-user-123", nil)
 			userSession.On("Activate", mock.Anything).Return(want)
-			service.V1OauthGoogleCallback(c)
+			service.V1OauthAppleIDCallback(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 			Expect(hook.LastEntry().Data["event"]).To(Equal("idp-session-activate"))
 		})
 
 		When("User lookup returns not found, we register the user", func() {
 			It("Failed to lookup user due to storage", func() {
-				userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", want)
-				service.V1OauthGoogleCallback(c)
+				userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("", want)
+				service.V1OauthAppleIDCallback(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 				Expect(hook.LastEntry().Data["event"]).To(Equal("idp-lookup-user-info"))
 			})
 
 			It("Failed to register user due to saving to storage", func() {
-				userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
-				userFromIDP.On("Register", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
+				userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
+				userFromIDP.On("Register", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return("", errors.New("fail"))
 				uri := fmt.Sprintf("%s?state=%s&code=%s", uriPrefix, challenge, "")
 				req, rec = testutils.SetupJSONEndpoint(method, uri, "")
 				c = e.NewContext(req, rec)
 				c.SetPath(uri)
 
-				service.V1OauthGoogleCallback(c)
+				service.V1OauthAppleIDCallback(c)
 				Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 				Expect(hook.LastEntry().Data["event"]).To(Equal("idp-register-user"))
 			})
@@ -214,8 +198,8 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				noLists := make([]alist.ShortInfo, 0)
 
 				hugoHelper.On("WriteListsByUser", userUUID, noLists)
-				userFromIDP.On("Lookup", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
-				userFromIDP.On("Register", oauth.IDPKeyGoogle, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
+				userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
+				userFromIDP.On("Register", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
 
 				userSession.On("Activate", mock.Anything).Return(nil)
 
@@ -225,14 +209,14 @@ var _ = Describe("Testing Google Oauth callback", func() {
 				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					if try == 0 {
 						Expect(moment.Kind).To(Equal(event.ApiUserRegister))
-						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPGoogle))
+						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPApple))
 						try = 1
 						return true
 					}
 
 					if try == 1 {
 						Expect(moment.Kind).To(Equal(event.ApiUserLogin))
-						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLoginIDPGoogle))
+						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserLoginIDPApple))
 						return true
 					}
 
@@ -241,7 +225,7 @@ var _ = Describe("Testing Google Oauth callback", func() {
 
 				event.SetBus(eventMessageBus)
 
-				service.V1OauthGoogleCallback(c)
+				service.V1OauthAppleIDCallback(c)
 				Expect(rec.Code).To(Equal(http.StatusOK))
 				// Check the cookie exists
 				_, err := utils.GetCookieByName(rec.Result().Cookies(), "x-authentication-bearer")

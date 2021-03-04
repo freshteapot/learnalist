@@ -70,7 +70,7 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 				"event": "idp-lookup-user-info",
 				"error": err,
 			}).Error("Issue in appleid callback")
-			return c.String(http.StatusBadRequest, "Something went wrong, please try again")
+			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
 
 		// Create a user
