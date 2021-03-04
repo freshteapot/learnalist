@@ -69,7 +69,7 @@ var _ = Describe("Testing AppleID Oauth callback", func() {
 			logger)
 
 		method = http.MethodGet
-		uriPrefix = "/api/v1/oauth/google/callback"
+		uriPrefix = "/api/v1/oauth/appleid/callback"
 		e = echo.New()
 
 		challenge = "fake-123"

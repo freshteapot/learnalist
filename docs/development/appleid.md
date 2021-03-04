@@ -14,3 +14,12 @@
         - challenges
         - lists
     - double check challenges as I do this. Should be happy
+
+
+# How
+- Set config with cert etc
+- Run ngrok in terminal
+```sh
+ngrok http 1234
+```
+- Add above sub domain to test serviceID in apple
