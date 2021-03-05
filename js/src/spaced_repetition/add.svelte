@@ -1,5 +1,5 @@
 <script>
-  import { location, querystring } from "svelte-spa-router";
+  import { querystring } from "svelte-spa-router";
   import goto from "./goto.js";
   import { addEntry } from "./api.js";
 
@@ -16,7 +16,7 @@
   let toggleTo = false;
   const item = {
     from: "",
-    to: ""
+    to: "",
   };
   item.from = qs.has("c") ? qs.get("c") : "";
 
@@ -25,7 +25,7 @@
     item.to = item.to.trim();
 
     const input = {
-      show: item.from
+      show: item.from,
     };
 
     if (item.from === "") {
@@ -42,7 +42,7 @@
       input.data = item;
       input.kind = "v2";
       input.settings = {
-        show: "from"
+        show: "from",
       };
     }
 
@@ -79,19 +79,22 @@
 
 <article class="tc">
   <h1 class="f2 measure" title="Spaced Repetition">🧠 + 💪</h1>
-  <p>
-    <input type="text" bind:value={item.from} />
-  </p>
-  <p>
-    <input type="checkbox" bind:checked={toggleTo} />
-    <span>Add meaning / definition</span>
-  </p>
-
-  {#if toggleTo}
+  <div class="mb3">
     <p>
-      <input type="text" bind:value={item.to} />
+      <input type="text" bind:value={item.from} />
     </p>
-  {/if}
+
+    <label>
+      <input type="checkbox" bind:checked={toggleTo} />
+      <span>Add meaning / definition</span>
+    </label>
+
+    {#if toggleTo}
+      <p>
+        <input type="text" bind:value={item.to} />
+      </p>
+    {/if}
+  </div>
 
   <button class="br3" on:click={add}>Add</button>
   <button class="br3" on:click={() => goto.overview()}>cancel</button>
