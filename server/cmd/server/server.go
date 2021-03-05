@@ -61,7 +61,6 @@ var ServerCmd = &cobra.Command{
 		})
 		viper.Set("server.loginWith.google.clientSecret", "***")
 
-		// TODO hook up secret to file in kubernetes via a file or env or something
 		var appleWebAudience oauth.AppleConfig
 		viper.UnmarshalKey("server.loginWith.appleid.web", &appleWebAudience)
 
@@ -74,7 +73,7 @@ var ServerCmd = &cobra.Command{
 		// TODO If we move to use file path in the config.yaml, then we wont need to hide the cert
 		// Hiding cert from the allsettings
 		hideCertAppleAudiences := appleAudiences
-		for index, _ := range hideCertAppleAudiences {
+		for index := range hideCertAppleAudiences {
 			hideCertAppleAudiences[index].Cert = "***"
 		}
 		viper.Set("server.loginWith.appleid.web.cert", "***")

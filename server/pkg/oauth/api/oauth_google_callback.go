@@ -102,7 +102,7 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 			},
 		})
 
-		// TODO ticket to convert this into an event
+		// TODO https://github.com/freshteapot/learnalist-api/issues/207
 		// Write an empty list
 		lists := make([]alist.ShortInfo, 0)
 		s.hugoHelper.WriteListsByUser(userUUID, lists)
@@ -134,7 +134,6 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 	})
 
 	// Removed logic around storing refresh tokens, currently not in use
-	// TODO remove refresh token from db
 	vars := make(map[string]interface{})
 	vars["token"] = session.Token
 	vars["userUUID"] = userUUID

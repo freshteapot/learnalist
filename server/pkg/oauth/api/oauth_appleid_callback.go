@@ -82,7 +82,7 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 			}).Error("Failed to register new user via idp")
 			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
-		// TODO add to slack
+
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiUserRegister,
 			Data: event.EventUser{
@@ -91,7 +91,7 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 			},
 		})
 
-		// TODO ticket to convert this into an event
+		// TODO https://github.com/freshteapot/learnalist-api/issues/207
 		// Write an empty list
 		lists := make([]alist.ShortInfo, 0)
 		s.hugoHelper.WriteListsByUser(userUUID, lists)
