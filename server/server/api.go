@@ -8,6 +8,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
+	oauthApi "github.com/freshteapot/learnalist-api/server/pkg/oauth/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
@@ -28,6 +29,7 @@ func InitApi(
 	appSettingsService app_settings.AppSettingsService,
 	dripfeedService dripfeed.DripfeedService,
 	userInfoService userInfo.UserInfoService,
+	oauthApiService oauthApi.OauthService,
 ) {
 
 	authConfig := authenticate.Config{
@@ -82,8 +84,11 @@ func InitApi(
 	v1.DELETE("/assets/:uuid", assetService.DeleteEntry)
 
 	// Oauth
-	v1.GET("/oauth/google/redirect", apiManager.V1OauthGoogleRedirect)
-	v1.GET("/oauth/google/callback", apiManager.V1OauthGoogleCallback)
+	v1.GET("/oauth/google/redirect", oauthApiService.V1OauthGoogleRedirect)
+	v1.GET("/oauth/google/callback", oauthApiService.V1OauthGoogleCallback)
+
+	v1.GET("/oauth/appleid/redirect", oauthApiService.V1OauthAppleIDRedirect)
+	v1.GET("/oauth/appleid/callback", oauthApiService.V1OauthAppleIDCallback)
 
 	// Spaced Repetition
 	srs := server.Group("/api/v1/spaced-repetition")

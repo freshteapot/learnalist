@@ -11,7 +11,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
-	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/labstack/echo/v4"
@@ -48,10 +47,9 @@ var _ = Describe("Testing user delete endpoint", func() {
 		datastore = &mocks.Datastore{}
 		userManagement = &mocks.Management{}
 		acl := &mocks.Acl{}
-		oauthHandlers := oauth.Handlers{}
 		hugoHelper = &mocks.HugoSiteBuilder{}
 
-		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, oauthHandlers, "", logger)
+		manager = api.NewManager(datastore, userManagement, acl, "", hugoHelper, "", logger)
 
 		userUUID = "fake-123"
 		session.Token = "fake-token"

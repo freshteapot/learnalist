@@ -24,9 +24,20 @@ server:
       clientID: "XXX"
       clientSecret: "XXX"
       server: "http://localhost:1234"
-    idp:
-      issuedTo:
-        - "XXX"
+      audiences:
+        - XXX
+    appleID:
+      web:
+        clientID: "XXX"
+        cert: |
+          -----BEGIN PRIVATE KEY-----
+          XXX
+          -----END PRIVATE KEY-----
+        server: "http://localhost:1234"
+        teamID: "XXX"
+        keyID: "XXX"
+      apps: []
+        # Array of AppleConfig objects, same as server.loginWith.appleID.web
   userRegisterKey: ""
 tools:
   integrationTests:

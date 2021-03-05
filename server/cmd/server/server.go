@@ -33,6 +33,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 
+	oauthApi "github.com/freshteapot/learnalist-api/server/pkg/oauth/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
@@ -53,15 +54,33 @@ var ServerCmd = &cobra.Command{
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
-			Key:    viper.GetString("server.loginWith.google.clientID"),
-			Secret: viper.GetString("server.loginWith.google.clientSecret"),
-			Server: viper.GetString("server.loginWith.google.server"),
+			Key:       viper.GetString("server.loginWith.google.clientID"),
+			Secret:    viper.GetString("server.loginWith.google.clientSecret"),
+			Server:    viper.GetString("server.loginWith.google.server"),
+			Audiences: viper.GetStringSlice("server.loginWith.google.audiences"),
 		})
 		viper.Set("server.loginWith.google.clientSecret", "***")
 
-		oauthHandlers := &oauth.Handlers{
-			Google: googleOauthConfig,
+		var appleWebAudience oauth.AppleConfig
+		viper.UnmarshalKey("server.loginWith.appleid.web", &appleWebAudience)
+
+		var appleAudiences []oauth.AppleConfig
+		viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		appleAudiences = append(appleAudiences, appleWebAudience)
+
+		appleIDOauthConfig := oauth.NewAppleID(appleWebAudience, appleAudiences)
+
+		// Hiding cert from the allsettings
+		hideCertAppleAudiences := appleAudiences
+		for index := range hideCertAppleAudiences {
+			hideCertAppleAudiences[index].Cert = "***"
 		}
+		viper.Set("server.loginWith.appleid.web.cert", "***")
+		viper.Set("server.loginWith.appleid.apps", hideCertAppleAudiences)
+
+		oauthHandlers := oauth.NewHandlers()
+		oauthHandlers.AddGoogle(googleOauthConfig)
+		oauthHandlers.AddAppleID(appleIDOauthConfig)
 
 		userRegisterKey := viper.GetString("server.userRegisterKey")
 		databaseName := viper.GetString("server.sqlite.database")
@@ -135,13 +154,21 @@ var ServerCmd = &cobra.Command{
 			event.NewInsights(logger),
 		)
 
+		oauthApiService := oauthApi.NewService(
+			userManagement,
+			hugoHelper,
+			*oauthHandlers,
+			userSession,
+			userFromIDP,
+			logger.WithField("context", "oauth-service"),
+		)
+
 		apiManager := api.NewManager(
 			dal,
 			userManagement,
 			acl,
 			"",
 			hugoHelper,
-			*oauthHandlers,
 			userRegisterKey,
 			logger)
 
@@ -153,8 +180,7 @@ var ServerCmd = &cobra.Command{
 		assetService.InitCheck()
 
 		userService := user.NewService(
-			db,
-			viper.GetStringSlice("server.loginWith.idp.issuedTo"),
+			*oauthHandlers,
 			userFromIDP,
 			userSession,
 			hugoHelper,
@@ -200,6 +226,7 @@ var ServerCmd = &cobra.Command{
 			appSettingsService,
 			dripfeedService,
 			userInfoService,
+			oauthApiService,
 		)
 
 		server.InitAlists(acl, dal, hugoHelper)
