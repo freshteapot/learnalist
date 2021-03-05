@@ -315,10 +315,8 @@ func (s ChallengeService) updateStaticSite(challenge ChallengeInfo, lookup bool,
 	}
 
 	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
-		Kind: event.ChangesetChallenge,
-		Data: challenge,
-		// TODO below is not set, yet. It still works but only because it filters on delete
-		// https://github.com/freshteapot/learnalist-api/issues/199
-		//Action: action,
+		Kind:   event.ChangesetChallenge,
+		Data:   challenge,
+		Action: action,
 	})
 }
