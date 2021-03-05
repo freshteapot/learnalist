@@ -94,8 +94,11 @@ var apiOverviewCMD = &cobra.Command{
 			}
 		}
 
+		// Sort by tag
 		sort.Slice(endpoints, func(i, j int) bool {
-			return endpoints[i].Tag < endpoints[j].Tag
+			a := fmt.Sprintf("%s-%s-%s", endpoints[i].Tag, endpoints[i].Method, endpoints[i].Path)
+			b := fmt.Sprintf("%s-%s-%s", endpoints[j].Tag, endpoints[j].Method, endpoints[j].Path)
+			return a < b
 		})
 
 		builder := DocsApiOverview{}
