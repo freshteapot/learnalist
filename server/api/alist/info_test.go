@@ -14,12 +14,13 @@ import (
 
 var _ = Describe("Testing List Info", func() {
 	const (
-		KindDomainNotMatch = "info-from-001.json"
-		ValidFrom          = "info-from-002.json"
-		KindNotSupported   = "info-from-003.json"
-		MissingRefUrl      = "info-from-004.json"
-		MissingExtUUID     = "info-from-005.json"
-		ValidFromCram      = "info-from-006.json"
+		KindDomainNotMatch                = "info-from-001.json"
+		ValidFrom                         = "info-from-002.json"
+		KindNotSupported                  = "info-from-003.json"
+		MissingRefUrl                     = "info-from-004.json"
+		MissingExtUUID                    = "info-from-005.json"
+		ValidFromCram                     = "info-from-006.json"
+		FailDueToKindNotMatchingTopDomain = "info-from-007.json"
 	)
 
 	FIt("Validating from", func() {
@@ -61,6 +62,12 @@ var _ = Describe("Testing List Info", func() {
 				Input: testutils.GetTestData(ValidFromCram),
 				ExpectError: func(err error) {
 					Expect(err).To(BeNil())
+				},
+			},
+			{
+				Input: testutils.GetTestData(FailDueToKindNotMatchingTopDomain),
+				ExpectError: func(err error) {
+					Expect(err).To(Equal(i18n.ErrorAListFromDomainMisMatch))
 				},
 			},
 		}

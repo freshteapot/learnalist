@@ -139,12 +139,14 @@ func WithFromCheckSharing(info AlistInfo) bool {
 }
 
 func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
-
+	// TODO Next time we add an entry to allowed, then we can sink some itme into making it configurable
+	// Should be possible as its called inside an interface
 	allowed := map[string]string{
 		"cram":       "cram.com",
 		"brainscape": "brainscape.com",
 		"quizlet":    "quizlet.com",
 		"learnalist": "learnalist.net",
+		//"localhost":  "localhost", // TODO do i want to be explicit?
 	}
 
 	toTest := input.RefUrl
@@ -158,21 +160,34 @@ func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
 		return false
 	}
 
-	switch input.Kind {
-	case "cram":
-		fallthrough
-	case "brainscape":
-		fallthrough
-	case "quizlet":
-		fallthrough
-	case "learnalist":
-		// Poor mans hack to get rid of www.
-		host := u.Host
-		host = strings.TrimPrefix(host, "www.")
-		return host == allowed[input.Kind]
-	case "localhost":
+	kind, ok := allowed[input.Kind]
+	if !ok {
+		// TODO do I want to disable this in production?
+		if input.Kind != "localhost" {
+			return false
+		}
 		return true
-	default:
-		return false
 	}
+	// TODO Do I want to use u.Hostname() to be a little more forgiving?
+	return strings.HasSuffix(u.Host, kind)
+	//switch input.Kind {
+	//case "cram":
+	//	fallthrough
+	//case "brainscape":
+	//	fallthrough
+	//case "quizlet":
+	//	fallthrough
+	//case "learnalist":
+	//	// Could match on "HasSuffix"?
+	//	// Poor mans hack to get rid of www.
+	//	return strings.HasSuffix(u.Host, allowed[input.Kind])
+	//
+	//	host := u.Host
+	//	host = strings.TrimPrefix(host, "www.")
+	//	return host == allowed[input.Kind]
+	//case "localhost":
+	//	return true
+	//default:
+	//	return false
+	//}
 }
