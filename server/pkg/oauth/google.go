@@ -2,7 +2,6 @@ package oauth
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -12,32 +11,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
-
-type googleClient struct {
-	config    *oauth2.Config
-	audiences []string
-}
-
-type GoogleConfig struct {
-	Key       string
-	Secret    string
-	Server    string
-	Audiences []string
-}
-
-type GoogleUserInfo struct {
-	ID            string `json:"id"`
-	Email         string `json:"email"`
-	VerifiedEmail bool   `json:"verified_email"`
-	Name          string `json:"name"`
-	GivenName     string `json:"given_name"`
-	FamilyName    string `json:"family_name"`
-	Link          string `json:"link"`
-	Picture       string `json:"picture"`
-	Gender        string `json:"gender"`
-	Locale        string `json:"locale"`
-	Hd            string `json:"hd"`
-}
 
 func NewGoogle(conf GoogleConfig) OAuth2ConfigInterface {
 	return &googleClient{
@@ -83,7 +56,6 @@ func (c googleClient) GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (s
 	aud, _ := j.Claims().GetString("aud")
 	sub, _ := j.Claims().GetString("sub")
 
-	// TODO check audience
 	match := false
 	for _, supported := range c.audiences {
 		if supported == aud {
@@ -95,12 +67,5 @@ func (c googleClient) GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (s
 	if !match {
 		return "", fmt.Errorf("%s audience not on the list for google", aud)
 	}
-	// At this point, life could go on
 	return sub, nil
-}
-
-func GoogleConvertRawUserInfo(raw []byte) (GoogleUserInfo, error) {
-	var info GoogleUserInfo
-	err := json.Unmarshal(raw, &info)
-	return info, err
 }

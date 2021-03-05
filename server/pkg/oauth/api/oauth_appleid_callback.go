@@ -114,7 +114,6 @@ func (s OauthService) V1OauthAppleIDCallback(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 	}
 
-	// TODO add event to slack
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiUserLogin,
 		Data: event.EventUser{

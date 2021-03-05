@@ -13,20 +13,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type appleClient struct {
-	redirectURI string
-	webAudience AppleConfig
-	audiences   []AppleConfig
-}
-
-type AppleConfig struct {
-	TeamID   string
-	ClientID string
-	KeyID    string
-	Server   string
-	Cert     string
-}
-
 func NewAppleID(webAudience AppleConfig, audiences []AppleConfig) OAuth2ConfigInterface {
 	return &appleClient{
 		webAudience: webAudience,
