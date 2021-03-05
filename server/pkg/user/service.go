@@ -139,6 +139,7 @@ func (s UserService) LoginViaIDP(c echo.Context) error {
 			},
 		})
 
+		// TODO https://github.com/freshteapot/learnalist-api/issues/207
 		// TODO use event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{})
 		// Write an empty list
 		lists := make([]alist.ShortInfo, 0)

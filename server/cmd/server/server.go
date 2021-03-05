@@ -70,7 +70,6 @@ var ServerCmd = &cobra.Command{
 
 		appleIDOauthConfig := oauth.NewAppleID(appleWebAudience, appleAudiences)
 
-		// TODO If we move to use file path in the config.yaml, then we wont need to hide the cert
 		// Hiding cert from the allsettings
 		hideCertAppleAudiences := appleAudiences
 		for index := range hideCertAppleAudiences {
