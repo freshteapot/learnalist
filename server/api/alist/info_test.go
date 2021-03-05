@@ -19,9 +19,10 @@ var _ = Describe("Testing List Info", func() {
 		KindNotSupported   = "info-from-003.json"
 		MissingRefUrl      = "info-from-004.json"
 		MissingExtUUID     = "info-from-005.json"
+		ValidFromCram      = "info-from-006.json"
 	)
 
-	It("Validating from", func() {
+	FIt("Validating from", func() {
 		var tests = []struct {
 			Input       []byte
 			ExpectError func(err error)
@@ -54,6 +55,12 @@ var _ = Describe("Testing List Info", func() {
 				Input: testutils.GetTestData(KindDomainNotMatch),
 				ExpectError: func(err error) {
 					Expect(err).To(Equal(i18n.ErrorAListFromDomainMisMatch))
+				},
+			},
+			{
+				Input: testutils.GetTestData(ValidFromCram),
+				ExpectError: func(err error) {
+					Expect(err).To(BeNil())
 				},
 			},
 		}

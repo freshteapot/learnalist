@@ -1,3 +1,5 @@
+<svelte:options tag={null} />
+
 <script>
   import Router from "svelte-spa-router";
   import { replace } from "svelte-spa-router";
@@ -10,9 +12,8 @@
     "/overview": Overview,
     "/start": Start,
     "/settings": Settings,
-    "/": Redirect
+    "/": Redirect,
   };
 </script>
 
-<svelte:options tag={null} />
-<Router {routes} on:conditionsFailed={event => replace('/')} />
+<Router {routes} on:conditionsFailed={(event) => replace("/")} />

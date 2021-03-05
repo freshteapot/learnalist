@@ -1,6 +1,5 @@
 <script>
   import { push } from "svelte-spa-router";
-  import Info from "./info.svelte";
   import store from "./store.js";
   import { onMount } from "svelte";
   // Add new
@@ -31,16 +30,16 @@
       info: {
         title: data.title,
         type: "v2",
-        from: input.metadata
+        from: input.metadata,
       },
-      data: data.listData
+      data: data.listData,
     };
   }
 
   function cramToAlist(input) {
     // setID = UUID
     const data = input.detail;
-    const listData = data.listData.map(term => {
+    const listData = data.listData.map((term) => {
       return { from: term.front_plain, to: term.back_plain };
     });
 
@@ -48,9 +47,9 @@
       info: {
         title: data.title,
         type: "v2",
-        from: input.metadata
+        from: input.metadata,
       },
-      data: listData
+      data: listData,
     };
   }
 
@@ -58,7 +57,7 @@
     const data = input.detail;
     const listData = Object.values(
       data.listData.setPageData.termIdToTermsMap
-    ).map(term => {
+    ).map((term) => {
       return { from: term.word, to: term.definition };
     });
 
@@ -66,14 +65,14 @@
       info: {
         title: data.title,
         type: "v2",
-        from: input.metadata
+        from: input.metadata,
       },
-      data: listData
+      data: listData,
     };
   }
 
   function listenForMessagesFromBrowser() {
-    chrome.runtime.onMessageExternal.addListener(function(
+    chrome.runtime.onMessageExternal.addListener(function (
       request,
       sender,
       sendResponse
@@ -112,7 +111,7 @@
   }
 
   function checkForLists() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const load =
         tabs[0].url.includes("cram.com") ||
         tabs[0].url.includes("quizlet.com") ||
@@ -134,14 +133,14 @@
   }
 </script>
 
-{#if show != ''}
+{#if show != ""}
   <div class="flex flex-column">
     <div class=" w-100 pa3 mr2">
-      <button class="br3" on:click={() => push('/settings')}>Settings</button>
+      <button class="br3" on:click={() => push("/settings")}>Settings</button>
     </div>
-    {#if show == 'welcome'}
+    {#if show == "welcome"}
       <div class=" w-100 pa3 mr2">
-        <h1>Welcome!</h1>
+        <h1>Welcome!!</h1>
         <p>We will only try and load lists from</p>
         <ul class="list">
           <li>
@@ -160,7 +159,7 @@
       </div>
     {/if}
 
-    {#if show == 'not-supported'}
+    {#if show == "not-supported"}
       <div class=" w-100 pa3 mr2">
         <p>We were unable to find a list on this page.</p>
         <p>Do you think this is a bug? Let us know</p>

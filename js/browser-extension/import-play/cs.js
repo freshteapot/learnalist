@@ -3,7 +3,7 @@
   const allowed = config.allowed;
 
   const extensionId = chrome.runtime.id;
-
+  console.log("extensionId", extensionId);
   function loadScript(obj) {
     var s = document.createElement('script');
     s.src = chrome.runtime.getURL(obj.script);
@@ -28,7 +28,9 @@
 
   chrome.runtime.onMessage.addListener(
     function (msg, sender, sendResponse) {
+      console.log("addListener", msg);
       if (msg.kind == "lookup-login-info") {
+
         handleLogInToLearnalist(window.location);
         return;
       }
@@ -47,6 +49,7 @@
   async function handleLogInToLearnalist(location) {
     const config = await getConfig();
     const baseUrl = config.baseUrl;
+    console.log("baseUrl", baseUrl);
 
     if (location.origin != baseUrl) {
       return;

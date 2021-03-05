@@ -139,6 +139,7 @@ func WithFromCheckSharing(info AlistInfo) bool {
 }
 
 func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
+
 	allowed := map[string]string{
 		"cram":       "cram.com",
 		"brainscape": "brainscape.com",
@@ -165,7 +166,10 @@ func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
 	case "quizlet":
 		fallthrough
 	case "learnalist":
-		return u.Host == allowed[input.Kind]
+		// Poor mans hack to get rid of www.
+		host := u.Host
+		host = strings.TrimPrefix(host, "www.")
+		return host == allowed[input.Kind]
 	case "localhost":
 		return true
 	default:

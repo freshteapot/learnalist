@@ -1,8 +1,7 @@
 <script>
   // TODO do I care how often they hit save?
   import { push } from "svelte-spa-router";
-  import LoginModal from "../../components/login_modal.svelte";
-  import { loggedIn, notify } from "../../shared.js";
+  import { loggedIn } from "../../shared.js";
   import store from "./store.js";
 
   let aList = $store;
@@ -30,29 +29,30 @@
 
 <div class="flex flex-column">
   <div class=" w-100 pa3 mr2">
-    <button class="br3" on:click={() => push('/play/total_recall')}>
+    <button class="br3" on:click={() => push("/play/total_recall")}>
       Total Recall
     </button>
-    <button class="br3" on:click={() => push('/play/slideshow')}>
+    <button class="br3" on:click={() => push("/play/slideshow")}>
       Slideshow
     </button>
 
-    <button class="br3" on:click={() => push('/settings')}>Settings</button>
+    <button class="br3" on:click={() => push("/settings")}>Settings</button>
     {#if loggedIn()}
       <button
         class="br3"
-        on:click={() => push('/interact/spaced_repetition/add')}>
+        on:click={() => push("/interact/spaced_repetition/add")}
+      >
         🧠 + 💪
       </button>
 
-      {#if aList.info.from.kind != 'learnalist'}
+      {#if aList.info.from.kind != "learnalist"}
         <button class="br3" on:click={handleSave}>Save to Learnalist</button>
       {/if}
     {/if}
   </div>
 
   <div class="w-100 pa3 mr2">
-    {#if show == 'overview'}
+    {#if show == "overview"}
       <header class="w-100">
         <h1 class="tc">{aList.info.title}</h1>
       </header>
@@ -77,7 +77,7 @@
       </div>
     {/if}
 
-    {#if show == 'saved'}
+    {#if show == "saved"}
       {#if !loggedIn()}
         <p>
           <a target="_blank" href={`${store.getServer()}/login.html`}>
@@ -92,5 +92,4 @@
       {/if}
     {/if}
   </div>
-
 </div>
