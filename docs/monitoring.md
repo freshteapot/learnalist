@@ -103,6 +103,23 @@ openssl s_client -connect ${SITE_URL}:${SITE_SSL_PORT} \
   -servername ${SITE_URL} 2> /dev/null |  openssl x509 -noout  -dates
 ```
 
+# How to link accounts
+- Assuming nothing has been added
+## Current user
+fc
+## New user
+2b
+
+## Link new user to current user
+```sql
+UPDATE
+    user_from_idp
+SET
+    user_uuid="fc"
+WHERE
+    user_uuid="2b"
+```
+
 # Reference
 - https://docs.nats.io/nats-streaming-concepts/monitoring/endpoints
 - https://docs.nats.io/nats-server/configuration/monitoring#monitoring-endpoints
