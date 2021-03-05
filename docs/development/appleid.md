@@ -23,3 +23,8 @@
 ngrok http 1234
 ```
 - Add above sub domain to test serviceID in apple
+
+
+- Goto https://developer.apple.com/account/resources/identifiers/list
+- Pick Services ID
+-

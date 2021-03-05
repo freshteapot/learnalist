@@ -74,12 +74,13 @@ func (c *appleClient) Exchange(ctx context.Context, code string, opts ...oauth2.
 		return nil, errors.New("bad-client-not-match")
 	}
 
-	// TODO create date from ExpiresIN
+	expire, _ := j.Claims().Expiration()
+
 	t := &oauth2.Token{
 		AccessToken:  accessToken,
 		TokenType:    tokenType,
 		RefreshToken: refreshToken,
-		Expiry:       time.Now(), // TODO change
+		Expiry:       expire,
 	}
 
 	t = t.WithExtra(map[string]interface{}{
