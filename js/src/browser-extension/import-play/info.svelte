@@ -13,10 +13,10 @@
     if (saved) {
       return;
     }
-
+    debugger;
     try {
       await store.save();
-      listUrl = `${store.getServer()}/alist/${aList.uuid}.html`;
+      listUrl = `${store.getServer()}/alist/${$aList.uuid}.html`;
       show = "saved";
       saved = true;
     } catch (e) {

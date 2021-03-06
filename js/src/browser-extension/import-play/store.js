@@ -5,21 +5,22 @@ import { copyObject } from "../../utils/utils.js";
 const emptyData = {};
 
 let loaded = false;
-let data = copyObject(emptyData);
-const aList = writable(data);
+let aListData = copyObject(emptyData);
+const aList = writable(aListData);
 
 const load = async (input) => {
-  aList.set(input);
+  aListData = input;
+  aList.set(aListData);
   loaded = true;
 }
 
 const save = async () => {
   try {
-    const input = aList.get();
+    const input = aListData;
     input.info.type = "v2";
     input.info.from.ext_uuid = input.info.from.ext_uuid.toString();
-    let response = await api.addList(input);
-    aList.set(response);
+    aListData = await api.addList(input);
+    aList.set(aListData);
 
   } catch (e) {
     throw new Error(e.message);
