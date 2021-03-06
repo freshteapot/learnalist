@@ -13,7 +13,7 @@
     if (saved) {
       return;
     }
-    debugger;
+
     try {
       await store.save();
       listUrl = `${store.getServer()}/alist/${$aList.uuid}.html`;
