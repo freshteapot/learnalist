@@ -1,10 +1,10 @@
 <script>
   // TODO do I care how often they hit save?
   import { push } from "svelte-spa-router";
-  import { loggedIn } from "../../shared.js";
+  import { loggedIn, notify } from "../../shared.js";
   import store from "./store.js";
 
-  let aList = $store;
+  let aList = store.aList;
   let listUrl;
   let show = "overview";
   let saved = false;
@@ -15,14 +15,14 @@
     }
 
     try {
-      await store.save(aList);
-      aList = $store;
+      await store.save();
       listUrl = `${store.getServer()}/alist/${aList.uuid}.html`;
       show = "saved";
       saved = true;
     } catch (e) {
-      console.log("e", e);
-      alert("Fail");
+      saved = false;
+      show = "overview";
+      notify("error", "Unable to save to learnalist");
     }
   }
 </script>
@@ -38,14 +38,11 @@
 
     <button class="br3" on:click={() => push("/settings")}>Settings</button>
     {#if loggedIn()}
-      <button
-        class="br3"
-        on:click={() => push("/interact/spaced_repetition/add")}
-      >
+      <button class="br3" on:click={() => push("/spaced_repetition/add")}>
         🧠 + 💪
       </button>
 
-      {#if aList.info.from.kind != "learnalist"}
+      {#if $aList.info.from.kind != "learnalist"}
         <button class="br3" on:click={handleSave}>Save to Learnalist</button>
       {/if}
     {/if}
@@ -54,7 +51,7 @@
   <div class="w-100 pa3 mr2">
     {#if show == "overview"}
       <header class="w-100">
-        <h1 class="tc">{aList.info.title}</h1>
+        <h1 class="tc">{$aList.info.title}</h1>
       </header>
 
       <div>
@@ -66,7 +63,7 @@
             </tr>
           </thead>
           <tbody class="lh-copy">
-            {#each aList.data as item, index}
+            {#each $aList.data as item, index}
               <tr data-index={index}>
                 <td class="pv3 pr3 bb b--black-20">{item.from}</td>
                 <td class="pv3 pr3 bb b--black-20">{item.to}</td>

@@ -3,7 +3,7 @@
   const allowed = config.allowed;
 
   const extensionId = chrome.runtime.id;
-  console.log("extensionId", extensionId);
+
   function loadScript(obj) {
     var s = document.createElement('script');
     s.src = chrome.runtime.getURL(obj.script);
@@ -27,34 +27,37 @@
 
 
   chrome.runtime.onMessage.addListener(
-    function (msg, sender, sendResponse) {
-      console.log("addListener", msg);
-      if (msg.kind == "lookup-login-info") {
+    function (msg) {
+      const allowed = ["lookup-login-info", "load-data"];
 
-        handleLogInToLearnalist(window.location);
+      if (!allowed.includes(msg.kind)) {
+        console.log("kind not supported", msg.kind);
         return;
       }
 
-      const kind = whereAmI(window.location);
-
-      if (!kind) {
-        chrome.runtime.sendMessage({ kind: "not-supported" });
-        return;
+      switch (msg.kind) {
+        case "lookup-login-info":
+          handleLogInToLearnalist(window.location);
+          return;
+        case "load-data":
+          const kind = whereAmI(window.location);
+          if (!kind) {
+            chrome.runtime.sendMessage({ kind: "not-supported", location: window.location });
+            return;
+          }
+          loadScript(kind);
+          return;
       }
-
-      loadScript(kind);
     }
   );
 
   async function handleLogInToLearnalist(location) {
     const config = await getConfig();
     const baseUrl = config.baseUrl;
-    console.log("baseUrl", baseUrl);
 
     if (location.origin != baseUrl) {
       return;
     }
-
 
     // /logout.html redirects and seems to be to quick
     if (location.pathname == "/come-back-soon.html") {

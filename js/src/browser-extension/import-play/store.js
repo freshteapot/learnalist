@@ -6,45 +6,32 @@ const emptyData = {};
 
 let loaded = false;
 let data = copyObject(emptyData);
-const { subscribe, set, update } = writable(data);
-const loading = writable(false);
-const error = writable('');
+const aList = writable(data);
 
-
-const load = async (aList) => {
-  set(aList);
+const load = async (input) => {
+  aList.set(input);
   loaded = true;
 }
 
-const save = async (input) => {
+const save = async () => {
   try {
-    error.set('');
-    loading.set(true);
-
-    console.log(data === input);
+    const input = aList.get();
     input.info.type = "v2";
     input.info.from.ext_uuid = input.info.from.ext_uuid.toString();
-
-
-    let aList = await api.addList(input);
-    set(aList);
+    let response = await api.addList(input);
+    aList.set(response);
 
   } catch (e) {
-    console.log(e);
-    loading.set(false);
-    error.set(`Error has been occurred. Details: ${e.message}`);
+    throw new Error(e.message);
   }
 
 }
-
 const ImportPlayStore = () => ({
-  subscribe,
-  loading,
-  error,
   load,
   save,
   loaded: () => loaded,
-  getServer: () => api.getServer()
+  getServer: () => api.getServer(),
+  aList
 });
 
 export default ImportPlayStore();

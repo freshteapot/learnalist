@@ -5,10 +5,15 @@
     saveConfiguration,
     getConfiguration,
     clearConfiguration,
-    KeySettingsServer
+    KeySettingsServer,
   } from "../../configuration.js";
 
   let baseUrl = getConfiguration(KeySettingsServer, "https://learnalist.net");
+  let debugCheckDomain = "";
+
+  function handleUpdateDevelopmentCheckDomain() {
+    saveConfiguration("dev.checklist.domain", debugCheckDomain);
+  }
 
   function handleSubmit() {
     clearConfiguration();
@@ -26,7 +31,7 @@
 <div class="flex flex-column">
   <div class=" w-100 pa3 mr2">
     <h1 class="f2 measure">Settings</h1>
-    <button class="br3" on:click={() => push('/start')}>Close</button>
+    <button class="br3" on:click={() => push("/start")}>Close</button>
   </div>
 
   <div class="w-100 pa3 mr2">
@@ -46,5 +51,18 @@
     <p>
       <button class="br3" on:click|preventDefault={handleReset}>Reset</button>
     </p>
+  </div>
+
+  <div class=" w-100 pa3 mr2">
+    <h2>Include domain in check list filter</h2>
+    <p>Used locally for debugging</p>
+    <p>
+      <input class="w-100 pa3 mr2" bind:value={debugCheckDomain} />
+    </p>
+    <button
+      class="br3"
+      on:click|preventDefault={handleUpdateDevelopmentCheckDomain}
+      >Update</button
+    >
   </div>
 </div>

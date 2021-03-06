@@ -1,3 +1,5 @@
+<svelte:options tag={null} />
+
 <script>
   import { notifications } from "../../shared.js";
 
@@ -43,6 +45,28 @@
   $: setRemove(show, sticky);
 </script>
 
+<svelte:window on:beforeunload={beforeUnload} />
+
+{#if show}
+  <div
+    class="flex items-center justify-center pa3 navy"
+    class:info={level === "info"}
+    class:error={level === "error"}
+    on:click={dismiss}
+  >
+    <svg
+      class="w1"
+      data-icon="info"
+      viewBox="0 0 24 24"
+      style="fill:currentcolor;width:2em;height:2em"
+    >
+      <title>info icon</title>
+      <path d={getIcon($notifications.level)} />
+    </svg>
+    <span class="lh-title ml3">{message}</span>
+  </div>
+{/if}
+
 <style>
   @import "../../../all.css";
   .error {
@@ -52,24 +76,3 @@
     background-color: #96ccff;
   }
 </style>
-
-<svelte:window on:beforeunload={beforeUnload} />
-<svelte:options tag={null} />
-
-{#if show}
-  <div
-    class="flex items-center justify-center pa3 navy"
-    class:info={level === 'info'}
-    class:error={level === 'error'}
-    on:click={dismiss}>
-    <svg
-      class="w1"
-      data-icon="info"
-      viewBox="0 0 24 24"
-      style="fill:currentcolor;width:2em;height:2em">
-      <title>info icon</title>
-      <path d={getIcon($notifications.level)} />
-    </svg>
-    <span class="lh-title ml3">{message}</span>
-  </div>
-{/if}
