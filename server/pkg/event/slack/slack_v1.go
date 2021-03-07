@@ -87,6 +87,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList
 		json.Unmarshal(b, &moment)
+		// TODO https://github.com/freshteapot/learnalist-api/issues/212
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
 	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
