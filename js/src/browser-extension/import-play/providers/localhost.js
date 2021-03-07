@@ -11,6 +11,6 @@ export function convert(input) {
 export default {
     key: "learnalist",
     convert,
-    url: "https://www.learnalist.net",
+    url: "https://learnalist.net",
     domain: "learnalist.net",
 }
