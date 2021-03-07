@@ -63,6 +63,7 @@ type AlistTypeMarshalJSON interface {
 	ParseInfo(info AlistInfo) (AlistInfo, error)
 	ParseData([]byte) (interface{}, error)
 	Enrich(Alist) Alist
+	// TODO could I pass in some sort of config or opts?
 	Validate(Alist) error
 }
 

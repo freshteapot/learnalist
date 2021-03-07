@@ -1,5 +1,5 @@
-
 import svelte from 'rollup-plugin-svelte';
+import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
@@ -7,14 +7,16 @@ import typescript from '@rollup/plugin-typescript';
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-	input: 'src/browser-extension-import-play.js',
+	input: 'src/browser-extension/import-play/main.js',
 	output: {
+
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
 		file: 'browser-extension/import-play/bundle.js'
 	},
 	plugins: [
+
 		typescript(),
 		svelte({
 			// enable run-time checks when not in production
@@ -41,4 +43,3 @@ export default {
 		clearScreen: false
 	}
 };
-

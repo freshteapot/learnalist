@@ -139,6 +139,8 @@ func WithFromCheckSharing(info AlistInfo) bool {
 }
 
 func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
+	// TODO Next time we add an entry to allowed, then we can sink some itme into making it configurable
+	// Should be possible as its called inside an interface
 	allowed := map[string]string{
 		"cram":       "cram.com",
 		"brainscape": "brainscape.com",
@@ -157,18 +159,17 @@ func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
 		return false
 	}
 
-	switch input.Kind {
-	case "cram":
-		fallthrough
-	case "brainscape":
-		fallthrough
-	case "quizlet":
-		fallthrough
-	case "learnalist":
-		return u.Host == allowed[input.Kind]
-	case "localhost":
-		return true
-	default:
+	kind, ok := allowed[input.Kind]
+	if !ok {
 		return false
 	}
+
+	match := strings.HasSuffix(u.Hostname(), kind)
+	if !match {
+		// if hostname is not localhost then we return a fail
+		if u.Hostname() != "localhost" {
+			return false
+		}
+	}
+	return true
 }

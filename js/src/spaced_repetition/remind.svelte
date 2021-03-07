@@ -1,8 +1,9 @@
+<svelte:options tag={null} />
+
 <script>
-  import { push } from "svelte-spa-router";
   import { getNext, viewed } from "./api.js";
   import goto from "./goto.js";
-  import { loggedIn, notify, clearNotification } from "../shared.js";
+  import { notify, clearNotification } from "../shared.js";
   import { clearConfiguration } from "../configuration.js";
 
   let state = "loading";
@@ -128,16 +129,10 @@
   $: showEntry(state);
 </script>
 
-<style>
-  @import "../../all.css";
-</style>
-
-<svelte:options tag={null} />
 <svelte:window on:keydown={handleKeydown} />
 
-{#if state === 'show-entry'}
+{#if state === "show-entry"}
   <div bind:this={wrapper} class="flex flex-column">
-
     <article>
       <nav>
         <button class="br3" on:click={flipIt}>Flip</button>
@@ -162,8 +157,11 @@
         <div class="w-25 pa3 mr2">
           <button class="br3" on:click={later}>Later</button>
         </div>
-
       </nav>
     </article>
   </div>
 {/if}
+
+<style>
+  @import "../../all.css";
+</style>

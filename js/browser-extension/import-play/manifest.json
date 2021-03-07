@@ -9,6 +9,7 @@
     "https://learnalist.net/*",
     "http://localhost/*",
     "http://localhost:1234/*",
+    "http://192.168.0.10:1234/*",
     "https://quizlet.com/*",
     "https://www.cram.com/flashcards/*",
     "https://www.brainscape.com/flashcards/*"
@@ -16,6 +17,7 @@
   "content_scripts": [
     {
       "matches": [
+        "http://192.168.0.10:1234/*",
         "http://localhost:1234/*",
         "https://learnalist.net/*",
         "https://quizlet.com/*",
