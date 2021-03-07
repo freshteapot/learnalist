@@ -4,16 +4,31 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
 type Manager struct {
-	Acl        acl.Acl
-	Datastore  models.Datastore
-	HugoHelper hugo.HugoHelper
+	Acl                   acl.Acl
+	Datastore             models.Datastore
+	UserSession           user.Session
+	pathToPublicDirectory string
+}
+
+func NewManager(
+	acl acl.Acl,
+	datastore models.Datastore,
+	userSession user.Session,
+	pathToPublicDirectory string,
+) *Manager {
+	return &Manager{
+		Acl:                   acl,
+		Datastore:             datastore,
+		UserSession:           userSession,
+		pathToPublicDirectory: pathToPublicDirectory,
+	}
 }
 
 func GetAlistUUIDFromURL(input string) (string, string, error) {

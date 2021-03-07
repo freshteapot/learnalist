@@ -1,3 +1,6 @@
+staticsite:
+  directory: "./../hugo"
+  external: "true"
 hugo:
   directory: "./../hugo"
   environment: "dev"

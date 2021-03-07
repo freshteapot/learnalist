@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 )
 
 func (c Client) RawRequest(request *http.Request) (response *http.Response, err error) {
@@ -36,7 +37,7 @@ func (c Client) RawLogin(username string, password string) (*http.Response, erro
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Response, error) {
+func (c Client) RawPostListV1(credentials openapi.HttpUserLoginResponse, input string) (*http.Response, error) {
 	var response *http.Response
 	body := strings.NewReader(input)
 	url := fmt.Sprintf("%s/api/v1/alist", c.getServerURL())
@@ -46,13 +47,13 @@ func (c Client) RawPostListV1(userInfo RegisterResponse, input string) (*http.Re
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawPutListV1(userInfo RegisterResponse, uuid string, input string) (*http.Response, error) {
+func (c Client) RawPutListV1(credentials openapi.HttpUserLoginResponse, uuid string, input string) (*http.Response, error) {
 	fmt.Println("Updating a list via RawPutListV1")
 	var response *http.Response
 	body := strings.NewReader(input)
@@ -64,13 +65,13 @@ func (c Client) RawPutListV1(userInfo RegisterResponse, uuid string, input strin
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.Response, error) {
+func (c Client) RawDeleteListV1(credentials openapi.HttpUserLoginResponse, uuid string) (*http.Response, error) {
 	fmt.Println("Deleting a list via RawDeleteListV1")
 	var response *http.Response
 	url := fmt.Sprintf("%s/api/v1/alist/%s", c.getServerURL(), uuid)
@@ -81,13 +82,13 @@ func (c Client) RawDeleteListV1(userInfo RegisterResponse, uuid string) (*http.R
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawPostLabelV1(userInfo RegisterResponse, label string) (*http.Response, error) {
+func (c Client) RawPostLabelV1(credentials openapi.HttpUserLoginResponse, label string) (*http.Response, error) {
 	fmt.Println("Posting a list via RawPostLabelV1")
 	input := api.HTTPLabelInput{
 		Label: label,
@@ -102,13 +103,13 @@ func (c Client) RawPostLabelV1(userInfo RegisterResponse, label string) (*http.R
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawGetLabelsByMeV1(userInfo RegisterResponse) (*http.Response, error) {
+func (c Client) RawGetLabelsByMeV1(credentials openapi.HttpUserLoginResponse) (*http.Response, error) {
 	var response *http.Response
 	fmt.Println("GET  labels via RawGetLabelsByMeV1")
 	url := fmt.Sprintf("%s/api/v1/labels/by/me", c.getServerURL())
@@ -118,13 +119,13 @@ func (c Client) RawGetLabelsByMeV1(userInfo RegisterResponse) (*http.Response, e
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawDeleteLabelV1(userInfo RegisterResponse, label string) (*http.Response, error) {
+func (c Client) RawDeleteLabelV1(credentials openapi.HttpUserLoginResponse, label string) (*http.Response, error) {
 	fmt.Println("Posting a list via RawDeleteLabelV1")
 	var response *http.Response
 	url := fmt.Sprintf("%s/api/v1/labels/%s", c.getServerURL(), label)
@@ -134,13 +135,13 @@ func (c Client) RawDeleteLabelV1(userInfo RegisterResponse, label string) (*http
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawGetListsByMe(userInfo RegisterResponse, labels string, listType string) (*http.Response, error) {
+func (c Client) RawGetListsByMe(credentials openapi.HttpUserLoginResponse, labels string, listType string) (*http.Response, error) {
 	var response *http.Response
 	uri := fmt.Sprintf("%s/api/v1/alist/by/me", c.getServerURL())
 	if labels != "" {
@@ -159,13 +160,13 @@ func (c Client) RawGetListsByMe(userInfo RegisterResponse, labels string, listTy
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)
 }
 
-func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, input string) (*http.Response, error) {
+func (c Client) RawV1(credentials openapi.HttpUserLoginResponse, method string, uri string, input string) (*http.Response, error) {
 	var response *http.Response
 
 	url := fmt.Sprintf("%s/%s", c.getServerURL(), strings.TrimPrefix(uri, "/"))
@@ -176,7 +177,7 @@ func (c Client) RawV1(userInfo RegisterResponse, method string, uri string, inpu
 		return response, nil
 	}
 	req = req.WithContext(context.Background())
-	req.Header.Set("Authorization", "Basic "+userInfo.BasicAuth)
+	req.Header.Set("Authorization", "Bearer "+credentials.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.httpClient.Do(req)

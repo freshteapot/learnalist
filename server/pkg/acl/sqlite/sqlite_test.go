@@ -133,4 +133,30 @@ var _ = Describe("Testing Acl", func() {
 			Expect(with).To(Equal(keys.NotShared))
 		})
 	})
+
+	It("Check Public write access to lists", func() {
+		var (
+			result bool
+			err    error
+		)
+		userUUID := "fake-user-123"
+		doorKeeper = aclStorage.NewAcl(db)
+		result, err = doorKeeper.HasUserPublicListWriteAccess(userUUID)
+		Expect(err).Should(BeNil())
+		Expect(result).To(Equal(false))
+
+		err = doorKeeper.GrantUserPublicListWriteAccess(userUUID)
+		Expect(err).Should(BeNil())
+
+		result, err = doorKeeper.HasUserPublicListWriteAccess(userUUID)
+		Expect(err).Should(BeNil())
+		Expect(result).To(Equal(true))
+
+		err = doorKeeper.RevokeUserPublicListWriteAccess(userUUID)
+		Expect(err).Should(BeNil())
+
+		result, err = doorKeeper.HasUserPublicListWriteAccess(userUUID)
+		Expect(err).Should(BeNil())
+		Expect(result).To(Equal(false))
+	})
 })

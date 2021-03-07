@@ -52,11 +52,11 @@ tools remind manager
 			mobileRepo,
 			logger.WithField("context", "daily-reminder"))
 
-		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
+		userInfoRepo := userStorage.NewUserInfo(db)
 		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
 		remindSpacedRepetitionRepo := remind.NewRemindSpacedRepetitionSqliteRepository(db)
 		spacedRepetitionManager := remind.NewSpacedRepetition(
-			userStorageRepo,
+			userInfoRepo,
 			spacedRepetitionRepo,
 			remindSpacedRepetitionRepo,
 			logger.WithField("context", "spaced-repetition-reminder"))

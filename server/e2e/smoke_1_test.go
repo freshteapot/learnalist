@@ -1,62 +1,71 @@
 package e2e_test
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
-	"github.com/freshteapot/learnalist-api/server/e2e"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 )
 
 var _ = Describe("Testing Smoke test 1", func() {
-	It("share public", func() {
+	var (
+		userInfoOwner, userInfoReader openapi.HttpUserLoginResponse
+		authOwner, authReader         context.Context
+	)
 
+	AfterEach(func() {
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
+		openapiClient.DeleteUser(authReader, userInfoReader.UserUuid)
+	})
+
+	It("share public", func() {
 		var httpResponse api.HTTPResponse
 		var messageResponse api.HTTPResponseMessage
 
 		assert := assert.New(GinkgoT())
-		learnalistClient := e2e.NewClient(server)
-		userInfoOwner := learnalistClient.Register(usernameOwner, password)
-		fmt.Println(userInfoOwner.Uuid)
-		userInfoReader := learnalistClient.Register(usernameReader, password)
-		fmt.Println(userInfoReader.Uuid)
-		listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-		fmt.Println(listInfo.Uuid)
 
-		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
+		authOwner, userInfoOwner = RegisterAndLogin(openapiClient.API)
+		authReader, userInfoReader = RegisterAndLogin(openapiClient.API)
+
+		listInfo, _ := e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+
+		httpResponse = e2eClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 		assert.Equal(httpResponse.StatusCode, 403)
-		messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "public")
+		messageResponse = e2eClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "public")
 		assert.Equal(messageResponse.Message, "List is now public")
-		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
+		httpResponse = e2eClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 		assert.Equal(httpResponse.StatusCode, 200)
-		messageResponse = learnalistClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "friends")
+		messageResponse = e2eClient.SetListShareV1(userInfoOwner, listInfo.Uuid, "friends")
 		assert.Equal(messageResponse.Message, "List is now private to the owner and those granted access")
-		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
+		httpResponse = e2eClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 		assert.Equal(httpResponse.StatusCode, 403)
 
 		for j := 0; j <= 10; j++ {
-			learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+			e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 		}
 
-		for j := 0; j <= 100; j++ {
-			go func() {
-				learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-			}()
-		}
+		//for j := 0; j <= 20; j++ {
+		//	go func() {
+		//		e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		//	}()
+		//}
+
 	})
+
 	It("share private", func() {
 
 		var httpResponse api.HTTPResponse
 		assert := assert.New(GinkgoT())
-		learnalistClient := e2e.NewClient(server)
 
-		userInfoOwner := learnalistClient.Register(usernameOwner, password)
-		userInfoReader := learnalistClient.Register(usernameReader, password)
-		listInfo, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-		httpResponse = learnalistClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
+		authOwner, userInfoOwner = RegisterAndLogin(openapiClient.API)
+		authReader, userInfoReader = RegisterAndLogin(openapiClient.API)
+
+		listInfo, _ := e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		httpResponse = e2eClient.GetListByUUIDV1(userInfoReader, listInfo.Uuid)
 		assert.Equal(httpResponse.StatusCode, http.StatusForbidden)
 	})
 })

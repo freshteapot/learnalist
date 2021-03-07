@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"net/http"
 
-	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
@@ -94,18 +93,16 @@ func (s OauthService) V1OauthGoogleCallback(c echo.Context) error {
 			return c.String(http.StatusInternalServerError, i18n.InternalServerErrorFunny)
 		}
 
+		// TODO I wonder what I do want here?
+		pref := user.UserPreference{}
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: event.ApiUserRegister,
-			Data: event.EventUser{
+			Data: event.EventNewUser{
 				UUID: userUUID,
 				Kind: event.KindUserRegisterIDPGoogle,
+				Data: pref,
 			},
 		})
-
-		// TODO https://github.com/freshteapot/learnalist-api/issues/207
-		// Write an empty list
-		lists := make([]alist.ShortInfo, 0)
-		s.hugoHelper.WriteListsByUser(userUUID, lists)
 	}
 
 	// Create a session for the user

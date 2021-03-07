@@ -10,6 +10,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
@@ -21,31 +22,33 @@ import (
 
 var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 	AfterEach(emptyDatabase)
+	BeforeEach(func() {
+		eventMessageBus := &mocks.EventlogPubSub{}
+		event.SetBus(eventMessageBus)
+		eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything, mock.Anything)
+	})
+
 	var (
-		datastore   *mocks.Datastore
-		acl         *mocks.Acl
-		userA       *uuid.User
-		userB       *uuid.User
-		method      string
-		uri         string
-		e           *echo.Echo
-		input       string
-		inputGrant  api.HTTPShareListWithUserInput
-		inputObject api.HTTPShareListInput
+		datastore      *mocks.Datastore
+		userManagement *mocks.Management
+		acl            *mocks.Acl
+		userA          *uuid.User
+		userB          *uuid.User
+		method         string
+		uri            string
+		e              *echo.Echo
+		input          string
+		inputGrant     api.HTTPShareListWithUserInput
+		inputObject    api.HTTPShareListInput
 	)
 
 	BeforeEach(func() {
 		datastore = &mocks.Datastore{}
+		userManagement = &mocks.Management{}
 		acl = &mocks.Acl{}
 		m.Datastore = datastore
+		m.UserManagement = userManagement
 		m.Acl = acl
-
-		testHugoHelper := &mocks.HugoSiteBuilder{}
-		testHugoHelper.On("WriteList", mock.Anything)
-		testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-		testHugoHelper.On("WritePublicLists", mock.Anything)
-		testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
-		m.HugoHelper = testHugoHelper
 
 		userA = &uuid.User{
 			Uuid: "fake-123",
@@ -109,7 +112,7 @@ var _ = Describe("Testing When a list is saved with a valid info.from", func() {
 				ExtUuid: "xxx",
 			}
 			datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-			datastore.On("UserExists", userB.Uuid).Return(true)
+			userManagement.On("UserExists", userB.Uuid).Return(true)
 			acl.On("GrantUserListReadAccess", inputGrant.AlistUUID, inputGrant.UserUUID).Return(nil)
 
 			m.V1ShareListReadAccess(c)

@@ -48,7 +48,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 	switch entry.Kind {
 	case event.ApiUserRegister:
 		b, _ := json.Marshal(entry.Data)
-		var moment event.EventUser
+		var moment event.EventNewUser
 		json.Unmarshal(b, &moment)
 		msg.Text = fmt.Sprintf("%s: user:%s registered via %s", entry.Kind, moment.UUID, moment.Kind)
 	case event.ApiUserLogin:

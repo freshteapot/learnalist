@@ -1,6 +1,6 @@
 <script>
   import { replace } from "svelte-spa-router";
-  import { api } from "../../shared.js";
+  import { api, notify } from "../../shared.js";
   import goto from "../lib/goto.js";
   import storeListsByMe from "../../stores/lists_by_me.js";
   import storeListsEdits from "../../stores/editor_lists_edits.js";
@@ -22,22 +22,22 @@
     v1: ListEditDataV1,
     v2: ListEditDataV2,
     v3: ListEditDataV3,
-    v4: ListEditDataV4
+    v4: ListEditDataV4,
   };
 
   let listTypesCanInteract = {
     v1: ListEditInteractV1,
-    v2: ListEditInteractV2
+    v2: ListEditInteractV2,
   };
 
   let renderItem = Object.keys(listTypes)
-    .filter(key => aList.info.type === key)
+    .filter((key) => aList.info.type === key)
     .reduce((notFound, key) => {
       return listTypes[key];
     }, ListEditDataTodo);
 
   let interactElement = Object.keys(listTypesCanInteract)
-    .filter(key => aList.info.type === key)
+    .filter((key) => aList.info.type === key)
     .reduce((notFound, key) => {
       return listTypesCanInteract[key];
     }, null);
@@ -66,8 +66,7 @@
     try {
       aList = await api.updateList(aList);
     } catch (error) {
-      alert("failed try again");
-      console.error("status from server was", error);
+      notify("error", error, false);
       return;
     }
 
@@ -124,7 +123,8 @@
 
       <svelte:component
         this={interactElement}
-        bind:interact={aList.info.interact} />
+        bind:interact={aList.info.interact}
+      />
     </Box>
   {/if}
 

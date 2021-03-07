@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/e2e"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
@@ -23,36 +22,20 @@ var _ = Describe("Confirm logic around lists with from object in the info block"
 	)
 
 	var (
-		openapiClient  e2e.OpenApiClient
-		e2eClient      e2e.Client
-		userInfoOwnerA e2e.RegisterResponse
-		userInfoOwnerB e2e.RegisterResponse
-		password       = "test123"
+		userInfoOwnerA openapi.HttpUserLoginResponse
+		userInfoOwnerB openapi.HttpUserLoginResponse
 		authA          context.Context
 		authB          context.Context
 	)
 
 	BeforeEach(func() {
-		openapiClient = e2e.NewOpenApiClient(e2e.LOCAL_SERVER)
-		e2eClient = e2e.NewClient("http://localhost:1234")
-		userInfoOwnerA = e2eClient.Register(generateUsername(), password)
-
-		authA = context.WithValue(context.Background(), openapi.ContextBasicAuth, openapi.BasicAuth{
-			UserName: userInfoOwnerA.Username,
-			Password: password,
-		})
-
-		userInfoOwnerB = e2eClient.Register(generateUsername(), password)
-
-		authB = context.WithValue(context.Background(), openapi.ContextBasicAuth, openapi.BasicAuth{
-			UserName: userInfoOwnerB.Username,
-			Password: password,
-		})
+		authA, userInfoOwnerA = RegisterAndLogin(openapiClient.API)
+		authB, userInfoOwnerB = RegisterAndLogin(openapiClient.API)
 	})
 
 	AfterEach(func() {
-		openapiClient.DeleteUser(authA, userInfoOwnerA.Uuid)
-		openapiClient.DeleteUser(authB, userInfoOwnerB.Uuid)
+		openapiClient.DeleteUser(authA, userInfoOwnerA.UserUuid)
+		openapiClient.DeleteUser(authB, userInfoOwnerB.UserUuid)
 	})
 
 	When("Not present", func() {

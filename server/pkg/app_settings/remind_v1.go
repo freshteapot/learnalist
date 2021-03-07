@@ -1,15 +1,13 @@
 package app_settings
 
 import (
-	"encoding/json"
-
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
-func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSettingsRemindV1, error) {
-	data, err := repo.GetInfo(userUUID)
+func GetRemindV1(repo user.UserInfoRepository, userUUID string) (openapi.AppSettingsRemindV1, error) {
+	pref, err := repo.Get(userUUID)
 
 	// Assume not set, and default to true
 	settings := openapi.AppSettingsRemindV1{
@@ -21,12 +19,6 @@ func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSetti
 	if err != nil {
 		// Can return utils.ErrNotFound, based on repo.GetInfo
 		return settings, err
-	}
-
-	var pref user.UserPreference
-	err = json.Unmarshal(data, &pref)
-	if err != nil {
-		return settings, nil
 	}
 
 	// This was important
@@ -41,13 +33,18 @@ func GetRemindV1(repo user.ManagementStorage, userUUID string) (openapi.AppSetti
 	return settings, nil
 }
 
-func SaveRemindV1(repo user.ManagementStorage, userUUID string, settings openapi.AppSettingsRemindV1) error {
-	pref := user.UserPreference{
-		Apps: &user.UserPreferenceApps{
-			RemindV1: &settings,
-		},
+func SaveRemindV1(repo user.UserInfoRepository, userUUID string, settings openapi.AppSettingsRemindV1) error {
+	pref, err := repo.Get(userUUID)
+	if err != nil {
+		if err != utils.ErrNotFound {
+			return err
+		}
 	}
 
-	b, _ := json.Marshal(pref)
-	return repo.SaveInfo(userUUID, b)
+	if pref.Apps == nil {
+		pref.Apps = &user.UserPreferenceApps{}
+	}
+
+	pref.Apps.RemindV1 = &settings
+	return repo.Save(userUUID, pref)
 }

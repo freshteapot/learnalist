@@ -82,6 +82,17 @@ func (dal *DAL) SaveAlist(method string, aList alist.Alist) (alist.Alist, error)
 		return emptyAlist, errors.New(i18n.InternalServerErrorMissingUserUuid)
 	}
 
+	// If the list is destined for public consumption, confirm the owner of the list has public write access
+	if aList.Info.SharedWith == aclKeys.SharedWithPublic {
+		access, err := dal.Acl.HasUserPublicListWriteAccess(aList.User.Uuid)
+		if err != nil {
+			return emptyAlist, err
+		}
+		if !access {
+			return emptyAlist, i18n.ErrorInputSaveAlistOperationPublicWriteAccess
+		}
+	}
+
 	// We set the uuid
 	if method == http.MethodPost {
 		user := &uuid.User{

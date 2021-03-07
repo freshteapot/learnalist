@@ -59,6 +59,20 @@ func (store *Sqlite) HasUserListWriteAccess(alistUUID string, userUUID string) (
 	return store.HasUserKindWriteAccess("list", alistUUID, userUUID)
 }
 
+func (store *Sqlite) HasUserPublicListWriteAccess(userUUID string) (bool, error) {
+	return store.HasUserKindWriteAccess("list", keys.SharedWithPublic, userUUID)
+}
+
+// Grant a user access public write access
+func (store *Sqlite) GrantUserPublicListWriteAccess(userUUID string) error {
+	return store.GrantUserKindWriteAccess("list", keys.SharedWithPublic, userUUID)
+}
+
+// Revoke a users right to write public lists
+func (store *Sqlite) RevokeUserPublicListWriteAccess(userUUID string) error {
+	return store.RevokeUserKindWriteAccess("list", keys.SharedWithPublic, userUUID)
+}
+
 // TODO what is this trickery.
 // TODO nothing uses this, I wonder what the thought was
 func (store *Sqlite) ListIsSharedWith(alistUUID string) (string, error) {

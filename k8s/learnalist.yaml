@@ -29,6 +29,8 @@ spec:
           env:
             - name: HUGO_EXTERNAL
               value: "true"
+            - name: STATIC_SITE_EXTERNAL
+              value: "true"
             - name: EVENTS_VIA
               value: "nats"
             - name: EVENTS_NATS_SERVER

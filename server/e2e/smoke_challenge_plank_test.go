@@ -14,14 +14,6 @@ import (
 
 var _ = Describe("Smoke Challenge Plank", func() {
 
-	var client *openapi.APIClient
-
-	BeforeEach(func() {
-		config := openapi.NewConfiguration()
-		config.BasePath = "http://localhost:1234/api/v1"
-		client = openapi.NewAPIClient(config)
-	})
-
 	It("Test 1", func() {
 		// Create user
 		// Login
@@ -35,13 +27,13 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Username: generateUsername(),
 			Password: "test123",
 		}
-		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
+		data1, response, err := openapiClient.API.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))
 
 		// Login
-		loginInfo, response, err := client.UserApi.LoginWithUsernameAndPassword(ctx, openapi.HttpUserLoginRequest{
+		loginInfo, response, err := openapiClient.API.UserApi.LoginWithUsernameAndPassword(ctx, openapi.HttpUserLoginRequest{
 			Username: input.Username,
 			Password: input.Password,
 		})
@@ -55,7 +47,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Description: "hello",
 			Kind:        challenge.KindPlankGroup,
 		}
-		info, response, err := client.ChallengeApi.CreateChallenge(auth, challengeInput)
+		info, response, err := openapiClient.API.ChallengeApi.CreateChallenge(auth, challengeInput)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(info.Kind).To(Equal(challengeInput.Kind))
@@ -75,11 +67,11 @@ var _ = Describe("Smoke Challenge Plank", func() {
 		var record1 openapi.Plank
 
 		json.Unmarshal([]byte(record1JSON), &record1)
-		_, response, err = client.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		_, response, err = openapiClient.API.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		// Double check posting the same plank returns 200
-		_, response, err = client.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		_, response, err = openapiClient.API.PlankApi.AddPlankEntry(auth, record1, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		// Add another record
@@ -96,11 +88,11 @@ var _ = Describe("Smoke Challenge Plank", func() {
 		var record2 openapi.Plank
 
 		json.Unmarshal([]byte(record2JSON), &record2)
-		record2, response, err = client.PlankApi.AddPlankEntry(auth, record2, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
+		record2, response, err = openapiClient.API.PlankApi.AddPlankEntry(auth, record2, &openapi.AddPlankEntryOpts{XChallenge: optional.NewString(info.Uuid)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 
-		challengeInfo, response, err := client.ChallengeApi.GetChallenge(auth, info.Uuid)
+		challengeInfo, response, err := openapiClient.API.ChallengeApi.GetChallenge(auth, info.Uuid)
 
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
@@ -112,7 +104,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 		Expect(expect).To(Equal(record2))
 
 		// Delete user
-		_, response, err = client.UserApi.DeleteUser(auth, data1.Uuid)
+		_, response, err = openapiClient.API.UserApi.DeleteUser(auth, data1.Uuid)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 	})
@@ -133,13 +125,13 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Username: generateUsername(),
 			Password: "test123",
 		}
-		data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
+		data1, response, err := openapiClient.API.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(data1.Username).To(Equal(input.Username))
 
 		// Login
-		loginInfo, response, err := client.UserApi.LoginWithUsernameAndPassword(ctx, openapi.HttpUserLoginRequest{
+		loginInfo, response, err := openapiClient.API.UserApi.LoginWithUsernameAndPassword(ctx, openapi.HttpUserLoginRequest{
 			Username: input.Username,
 			Password: input.Password,
 		})
@@ -153,7 +145,7 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Description: "hello",
 			Kind:        challenge.KindTODO,
 		}
-		info, response, err := client.ChallengeApi.CreateChallenge(auth, challengeInput)
+		info, response, err := openapiClient.API.ChallengeApi.CreateChallenge(auth, challengeInput)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(info.Kind).To(Equal(challengeInput.Kind))
@@ -164,24 +156,24 @@ var _ = Describe("Smoke Challenge Plank", func() {
 			Description: "hello",
 			Kind:        challenge.KindPlankGroup,
 		}
-		info, response, err = client.ChallengeApi.CreateChallenge(auth, challengeInput)
+		info, response, err = openapiClient.API.ChallengeApi.CreateChallenge(auth, challengeInput)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusCreated))
 		Expect(info.Kind).To(Equal(challengeInput.Kind))
 		Expect(info.Description).To(Equal(challengeInput.Description))
 
-		items, response, err := client.ChallengeApi.GetChallengesByUser(auth, loginInfo.UserUuid, nil)
+		items, response, err := openapiClient.API.ChallengeApi.GetChallengesByUser(auth, loginInfo.UserUuid, nil)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		Expect(len(items)).To(Equal(2))
 
-		items, response, err = client.ChallengeApi.GetChallengesByUser(auth, loginInfo.UserUuid, &openapi.GetChallengesByUserOpts{Kind: optional.NewInterface(challenge.KindPlankGroup)})
+		items, response, err = openapiClient.API.ChallengeApi.GetChallengesByUser(auth, loginInfo.UserUuid, &openapi.GetChallengesByUserOpts{Kind: optional.NewInterface(challenge.KindPlankGroup)})
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		Expect(len(items)).To(Equal(1))
 
 		// Delete user
-		_, response, err = client.UserApi.DeleteUser(auth, data1.Uuid)
+		_, response, err = openapiClient.API.UserApi.DeleteUser(auth, data1.Uuid)
 		Expect(err).To(BeNil())
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 	})

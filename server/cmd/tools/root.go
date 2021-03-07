@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/freshteapot/learnalist-api/server/cmd/tools/alist"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/api"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/challenges"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/docs"
@@ -22,7 +23,6 @@ func init() {
 	RootCmd.AddCommand(integrationTestsCmd)
 	RootCmd.AddCommand(stubSQLFileCmd)
 	RootCmd.AddCommand(fixInteractV1Cmd)
-	RootCmd.AddCommand(fixPlankV1Cmd)
 	RootCmd.AddCommand(user.RootCmd)
 	RootCmd.AddCommand(api.RootCmd)
 	RootCmd.AddCommand(natsutils.RootCmd)
@@ -33,4 +33,5 @@ func init() {
 	RootCmd.AddCommand(eventReaderCMD)
 	RootCmd.AddCommand(slackEventsCMD)
 	RootCmd.AddCommand(experimental.RootCmd)
+	RootCmd.AddCommand(alist.RootCmd)
 }

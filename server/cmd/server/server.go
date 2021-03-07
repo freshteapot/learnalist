@@ -12,19 +12,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
+	serviceAlists "github.com/freshteapot/learnalist-api/server/alists/server"
 	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/api"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
-	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
@@ -32,13 +30,17 @@ import (
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
+	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
 
 	oauthApi "github.com/freshteapot/learnalist-api/server/pkg/oauth/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
-	userInfo "github.com/freshteapot/learnalist-api/server/pkg/user/info"
+	userApi "github.com/freshteapot/learnalist-api/server/pkg/user/api"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
+
+	eventHugoGlue "github.com/freshteapot/learnalist-api/server/pkg/event/hugo"
+	"github.com/freshteapot/learnalist-api/server/pkg/event/staticsite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/freshteapot/learnalist-api/server/server"
 )
@@ -88,20 +90,13 @@ var ServerCmd = &cobra.Command{
 		corsAllowedOrigins := viper.GetString("server.cors.allowedOrigins")
 		// Assets
 		assetsDirectory := viper.GetString("server.assets.directory")
+
 		// Static site
 		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-
-		hugoEnvironment := viper.GetString("hugo.environment")
-		if hugoEnvironment == "" {
-			fmt.Println("hugo.environment is missing")
-			os.Exit(1)
-		}
-
-		hugoExternal := viper.GetBool("hugo.external")
 
 		// A hack would be to access it via
 		loginCookie := authenticate.CookieConfig{
@@ -115,6 +110,17 @@ var ServerCmd = &cobra.Command{
 
 		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
+		if !viper.GetBool("staticsite.external") {
+			hugoEnvironment := viper.GetString("hugo.environment")
+			if hugoEnvironment == "" {
+				fmt.Println("hugo.environment is missing")
+				os.Exit(1)
+			}
+
+			hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logger.WithField("context", "static-site-hugo"))
+			hugoHelper.ListenForEvents()
+		}
+
 		serverConfig := server.Config{
 			Port:             port,
 			CorsAllowOrigins: corsAllowedOrigins,
@@ -123,40 +129,41 @@ var ServerCmd = &cobra.Command{
 
 		authenticate.SetLoginCookieConfig(loginCookie)
 
-		masterCron := cron.NewCron()
-		server.SetCron(masterCron)
-
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
-		hugoHelper.RegisterCronJob()
-		hugoHelper.ListenForEvents()
+		// Slightly decoupled, but life goes on
+		publishDirectory := fmt.Sprintf(hugo.RealtivePathPublic, hugoFolder)
 
 		// Setup access control layer.
-		acl := aclStorage.NewAcl(db)
+		aclRepo := aclStorage.NewAcl(db)
 		userSession := userStorage.NewUserSession(db)
 		userFromIDP := userStorage.NewUserFromIDP(db)
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 		labels := labelStorage.NewLabel(db)
 		storageAlist := alistStorage.NewAlist(db, logger)
-		storageApiUser := apiUserStorage.NewUser(db)
-		dal := models.NewDAL(
-			acl,
-			storageApiUser,
+		userInfoRepo := user.NewUserInfo(userStorage.NewUserInfo(db))
+
+		glueHugo := eventHugoGlue.NewGlue(
 			storageAlist,
-			labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+			logger.WithField("context", "event-hugo-glue"))
+		glueHugo.ListenForEvents()
+
+		dal := models.NewDAL(
+			aclRepo,
+			storageAlist,
+			labels,
+			oauthHandler)
 
 		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
 
 		userManagement := user.NewManagement(
 			userStorageRepo,
-			hugoHelper,
+			staticsite.NewSiteManagementViaEvents(),
 			event.NewInsights(logger),
 		)
 
 		oauthApiService := oauthApi.NewService(
 			userManagement,
-			hugoHelper,
 			*oauthHandlers,
 			userSession,
 			userFromIDP,
@@ -166,56 +173,74 @@ var ServerCmd = &cobra.Command{
 		apiManager := api.NewManager(
 			dal,
 			userManagement,
-			acl,
+			aclRepo,
 			"",
-			hugoHelper,
-			userRegisterKey,
 			logger)
 
 		// TODO how to hook up sse https://gist.github.com/freshteapot/d467adb7cb082d2d056205deb38a9694
 		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
-		spacedRepetitionService := spaced_repetition.NewService(spacedRepetitionRepo, logger.WithField("context", "spacedRepetition-service"))
-		plankService := plank.NewService(plank.NewSqliteRepository(db), logger.WithField("context", "plank-service"))
-		assetService := assets.NewService(assetsDirectory, acl, assets.NewSqliteRepository(db), logger.WithField("context", "assets-service"))
+		spacedRepetitionService := spaced_repetition.NewService(
+			spacedRepetitionRepo,
+			logger.WithField("context", "spacedRepetition-service"),
+		)
+
+		plankService := plank.NewService(
+			plank.NewSqliteRepository(db),
+			logger.WithField("context", "plank-service"),
+		)
+
+		assetService := assets.NewService(
+			assetsDirectory,
+			aclRepo,
+			assets.NewSqliteRepository(db),
+			logger.WithField("context", "assets-service"),
+		)
 		assetService.InitCheck()
 
-		userService := user.NewService(
+		userService := userApi.NewService(
 			*oauthHandlers,
+			aclRepo,
+			userManagement,
 			userFromIDP,
 			userSession,
-			hugoHelper,
+			userWithUsernameAndPassword,
+			userInfoRepo,
+			userRegisterKey,
 			logger.WithField("context", "user-service"))
 
 		challengeRepo := challenge.NewSqliteRepository(db)
 		challengeNotificationRepo := challengeRepo.(challenge.ChallengePushNotificationRepository)
-		challengeService := challenge.NewService(challengeRepo, challengeNotificationRepo, acl, logger.WithField("context", "challenge-service"))
+		challengeService := challenge.NewService(
+			challengeRepo,
+			challengeNotificationRepo,
+			aclRepo,
+			logger.WithField("context", "challenge-service"),
+		)
+
 		mobileService := mobile.NewService(
 			mobile.NewSqliteRepository(db),
 			logger.WithField("context", "mobile-service"))
 
 		remindService := remind.NewService(
-			userStorageRepo,
+			userInfoRepo,
 			logger.WithField("context", "remind-service"))
 
 		appSettingsService := app_settings.NewService(
-			userStorageRepo,
+			userInfoRepo,
 			logger.WithField("context", "appSettings-service"),
-		)
-
-		userInfoService := userInfo.NewService(
-			userStorageRepo,
-			logger.WithField("context", "userInfo-service"),
 		)
 
 		dripfeedService := dripfeed.NewService(
 			dripfeed.NewSqliteRepository(db),
-			acl,
+			aclRepo,
 			storageAlist,
 			logger.WithField("context", "dripfeed-service"),
 		)
 
 		server.InitApi(
 			apiManager,
+			userSession,
+			userWithUsernameAndPassword,
 			userService,
 			assetService,
 			spacedRepetitionService,
@@ -225,11 +250,18 @@ var ServerCmd = &cobra.Command{
 			remindService,
 			appSettingsService,
 			dripfeedService,
-			userInfoService,
 			oauthApiService,
 		)
 
-		server.InitAlists(acl, dal, hugoHelper)
+		server.InitAlists(
+			serviceAlists.NewManager(
+				aclRepo,
+				dal,
+				userSession,
+				publishDirectory),
+			userSession,
+			userWithUsernameAndPassword,
+			publishDirectory)
 
 		go func() {
 			server.Run()
@@ -260,5 +292,6 @@ func init() {
 	viper.SetDefault("server.events.via", "memory")
 	viper.BindEnv("server.events.via", "EVENTS_VIA")
 
-	viper.BindEnv("hugo.external", "HUGO_EXTERNAL")
+	viper.SetDefault("staticsite.external", false)
+	viper.BindEnv("staticsite.external", "STATIC_SITE_EXTERNAL")
 }

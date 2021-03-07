@@ -32,3 +32,9 @@ func GetTestDataAsJSONOneline(path string) string {
 	}
 	return string(b)
 }
+
+// ConvertInterface, make sure you pass in a clean version of out, or else things might odd.
+func ConvertInterface(in interface{}, out interface{}) error {
+	b, _ := json.Marshal(in)
+	return json.Unmarshal(b, &out)
+}

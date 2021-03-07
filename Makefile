@@ -1,6 +1,5 @@
 GIT_COMMIT:=$(shell git rev-parse HEAD)
 GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%dT%H:%M:%SZ' --format="%cd" ${GIT_COMMIT})
-
 ###############################################################################
 #
 # Development commands
@@ -73,6 +72,10 @@ run-notifications-push-notifications:
 
 run-api-server:
 	cd server && \
+	EVENTS_VIA="nats" \
+	EVENTS_STAN_CLIENT_ID=lal-server \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
 run-remind-manager:
@@ -84,6 +87,15 @@ run-remind-manager:
 	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags=json1 main.go --config=../config/dev.config.yaml \
 	tools remind manager
+
+run-static-site:
+	cd server && \
+	EVENTS_VIA="nats" \
+	EVENTS_STAN_CLIENT_ID=static-site \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	static-site
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost

@@ -14,12 +14,14 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition"
 	"github.com/freshteapot/learnalist-api/server/pkg/spaced_repetition/dripfeed"
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
-	userInfo "github.com/freshteapot/learnalist-api/server/pkg/user/info"
+	userApi "github.com/freshteapot/learnalist-api/server/pkg/user/api"
 )
 
 func InitApi(
 	apiManager *api.Manager,
-	userService user.UserService,
+	userSession user.Session,
+	userWithUsernameAndPassword user.UserWithUsernameAndPassword,
+	userService userApi.UserService,
 	assetService assets.AssetService,
 	spacedRepetitionService spaced_repetition.SpacedRepetitionService,
 	plankService plank.PlankService,
@@ -28,19 +30,18 @@ func InitApi(
 	remindService remind.RemindService,
 	appSettingsService app_settings.AppSettingsService,
 	dripfeedService dripfeed.DripfeedService,
-	userInfoService userInfo.UserInfoService,
 	oauthApiService oauthApi.OauthService,
 ) {
 
 	authConfig := authenticate.Config{
-		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
-		LookupBearer: apiManager.Datastore.UserSession().GetUserUUIDByToken,
+		LookupBasic:  userWithUsernameAndPassword.Lookup,
+		LookupBearer: userSession.GetUserUUIDByToken,
 		Skip:         authenticateApi.Skip,
 	}
 
 	assetAuthConfig := authenticate.Config{
-		LookupBasic:  apiManager.Datastore.UserWithUsernameAndPassword().Lookup,
-		LookupBearer: apiManager.Datastore.UserSession().GetUserUUIDByToken,
+		LookupBasic:  userWithUsernameAndPassword.Lookup,
+		LookupBearer: userSession.GetUserUUIDByToken,
 		Skip:         assets.SkipAuth,
 	}
 
@@ -50,13 +51,13 @@ func InitApi(
 
 	v1.GET("/version", apiManager.V1GetVersion)
 
-	v1.POST("/user/register", apiManager.V1PostRegister)
-	v1.GET("/user/info/:uuid", userInfoService.V1GetUserInfo)
-	v1.PATCH("/user/info/:uuid", userInfoService.V1PatchUserInfo)
+	v1.POST("/user/register", userService.V1PostRegister)
+	v1.GET("/user/info/:uuid", userService.V1GetUserInfo)
+	v1.PATCH("/user/info/:uuid", userService.V1PatchUserInfo)
 	v1.POST("/user/login/idp", userService.LoginViaIDP)
-	v1.POST("/user/login", apiManager.V1PostLogin)
-	v1.POST("/user/logout", apiManager.V1PostLogout)
-	v1.DELETE("/user/:uuid", apiManager.V1DeleteUser)
+	v1.POST("/user/login", userService.V1PostLogin)
+	v1.POST("/user/logout", userService.V1PostLogout)
+	v1.DELETE("/user/:uuid", userService.V1DeleteUser)
 
 	// Route => handler
 	v1.GET("/", apiManager.V1GetRoot)

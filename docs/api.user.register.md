@@ -35,3 +35,20 @@ curl -i -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -H'x-user-register: 
 }
 '
 ```
+
+
+# Register with extra
+- Give this user access to write public lists
+
+```sh
+curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
+{
+    "username":"iamtest1",
+    "password":"test123",
+    "extra": {
+      "display_name": "Chris",
+      "grant_public_list_write_access":"1"
+    }
+}
+'
+```

@@ -1,11 +1,8 @@
 package sqlite
 
 import (
-	"database/sql"
 	"errors"
-	"fmt"
 
-	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -13,35 +10,14 @@ type sqliteManagement struct {
 	db *sqlx.DB
 }
 
-const (
-	SqlUserInfoGet    = `SELECT json_extract(body, '$') AS body FROM user_info WHERE uuid=?`
-	SqlUserInfoCreate = `INSERT INTO user_info(uuid, body) values(?, json_insert('{}'))`
-	SqlUserInfoUpdate = `
-UPDATE
-    user_info
-SET
-    body=json_patch(body, ?)
-WHERE
-	uuid=?
+var (
+	SqlUserExists = `
+SELECT 1 FROM user WHERE uuid=?
+UNION
+SELECT 1 FROM user_from_idp WHERE user_uuid=?
 `
-	SqlUserInfoRemove = `
-UPDATE
-    user_info
-SET
-    body=json_remove(body, ?)
-WHERE
-	uuid=?
-`
-)
 
-func NewSqliteManagementStorage(db *sqlx.DB) sqliteManagement {
-	return sqliteManagement{db: db}
-}
-
-// FindUserUUID Find the user uuid based on the search string
-func (m sqliteManagement) FindUserUUID(search string) ([]string, error) {
-	db := m.db
-	query := `
+	SqlFindUser = `
 SELECT
 	uuid as user_uuid
 FROM
@@ -72,18 +48,7 @@ FROM
 WHERE
 	uuid=?`
 
-	userUUIDs := make([]string, 0)
-	err := db.Select(&userUUIDs, query, search, search, search, search)
-
-	if len(userUUIDs) > 1 {
-		return userUUIDs, errors.New("Too many userUUID found")
-	}
-	return userUUIDs, err
-}
-
-func (m sqliteManagement) GetLists(userUUID string) ([]string, error) {
-	lists := make([]string, 0)
-	query := `
+	SqlGetLists = `
 SELECT
 	uuid
 FROM
@@ -91,14 +56,7 @@ FROM
 WHERE
 	user_uuid=?`
 
-	err := m.db.Select(&lists, query, userUUID)
-
-	return lists, err
-}
-
-func (m sqliteManagement) DeleteUser(userUUID string) error {
-	db := m.db
-	queries := []string{
+	SqlDeleteUser = []string{
 		"DELETE FROM user_labels WHERE user_uuid=?",
 		"DELETE FROM user WHERE uuid=?",
 		"DELETE FROM alist_labels WHERE user_uuid=?",
@@ -109,6 +67,40 @@ func (m sqliteManagement) DeleteUser(userUUID string) error {
 		"DELETE FROM user_info WHERE uuid=?",
 	}
 
+	SqlDeleteList = []string{
+		"DELETE FROM alist_labels WHERE alist_uuid=?",
+		"DELETE FROM acl_simple WHERE ext_uuid=?",
+		"DELETE FROM alist_kv WHERE uuid=?",
+	}
+)
+
+func NewSqliteManagementStorage(db *sqlx.DB) sqliteManagement {
+	return sqliteManagement{db: db}
+}
+
+// FindUserUUID Find the user uuid based on the search string
+func (m sqliteManagement) FindUserUUID(search string) ([]string, error) {
+	db := m.db
+	userUUIDs := make([]string, 0)
+	err := db.Select(&userUUIDs, SqlFindUser, search, search, search, search)
+
+	if len(userUUIDs) > 1 {
+		return userUUIDs, errors.New("Too many userUUID found")
+	}
+	return userUUIDs, err
+}
+
+func (m sqliteManagement) GetLists(userUUID string) ([]string, error) {
+	lists := make([]string, 0)
+	err := m.db.Select(&lists, SqlGetLists, userUUID)
+
+	return lists, err
+}
+
+func (m sqliteManagement) DeleteUser(userUUID string) error {
+	db := m.db
+
+	queries := SqlDeleteUser
 	tx, err := db.Beginx()
 	if err != nil {
 		return err
@@ -132,10 +124,7 @@ func (m sqliteManagement) DeleteUser(userUUID string) error {
 
 func (m sqliteManagement) DeleteList(listUUID string) error {
 	db := m.db
-	queries := []string{
-		"DELETE FROM alist_labels WHERE alist_uuid=?",
-		"DELETE FROM acl_simple WHERE ext_uuid=?",
-		"DELETE FROM alist_kv WHERE uuid=?"}
+	queries := SqlDeleteList
 
 	tx, err := db.Beginx()
 	if err != nil {
@@ -158,32 +147,8 @@ func (m sqliteManagement) DeleteList(listUUID string) error {
 	return nil
 }
 
-// SaveInfo a very free approach to storing user info
-func (m sqliteManagement) SaveInfo(userUUID string, info []byte) error {
-	_, err := m.db.Exec(SqlUserInfoCreate, userUUID)
-	if err != nil {
-		if err.Error() != "UNIQUE constraint failed: user_info.uuid" {
-			return err
-		}
-	}
-	_, err = m.db.Exec(SqlUserInfoUpdate, string(info), userUUID)
-	return err
-}
-
-// RemoveInfo remove key, regardless if it exists
-// Dont use ".", as it breaks, ":" works
-func (m sqliteManagement) RemoveInfo(userUUID string, key string) error {
-	_, err := m.db.Exec(SqlUserInfoRemove, fmt.Sprintf(`$.%s`, key), userUUID)
-	return err
-}
-
-func (m sqliteManagement) GetInfo(userUUID string) ([]byte, error) {
-	var info []byte
-	err := m.db.Get(&info, SqlUserInfoGet, userUUID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			err = utils.ErrNotFound
-		}
-	}
-	return info, err
+func (m sqliteManagement) UserExists(userUUID string) bool {
+	var id int
+	m.db.Get(&id, SqlUserExists, userUUID, userUUID)
+	return id == 1
 }

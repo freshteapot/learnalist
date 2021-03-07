@@ -128,7 +128,6 @@ func getInputListWithShare(listType string, sharedWith string) string {
 }
 
 func generateUsername() string {
-
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("abcdefghijklmnopqrstuvwxyz" +
 		"0123456789")

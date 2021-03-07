@@ -10,7 +10,9 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 // TODO CHECK this function for "from too"
@@ -84,7 +86,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	if !m.Datastore.UserExists(input.UserUUID) {
+	if !m.UserManagement.UserExists(input.UserUUID) {
 		response := api.HTTPResponseMessage{
 			Message: i18n.SuccessUserNotFound,
 		}
@@ -166,12 +168,26 @@ func (m *Manager) V1ShareAlist(c echo.Context) error {
 
 	// Checks passed, now we update the value
 	aList.Info.SharedWith = input.Action
-	m.Datastore.SaveAlist(http.MethodPut, aList)
-	// Save to hugo
-	m.HugoHelper.WriteList(aList)
-	// TODO this might become a painful bottle neck
-	m.HugoHelper.WriteListsByUser(aList.User.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
-	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
+	_, err = m.Datastore.SaveAlist(http.MethodPut, aList)
+	if err != nil {
+		m.logger.WithFields(logrus.Fields{
+			"error":  err,
+			"method": "m.Datastore.SaveAlist",
+		}).Error("storage")
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	// https://github.com/freshteapot/learnalist-api/issues/217
+	// TODO update slack to know when list was shared with
+	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+		Kind: event.ApiListSaved,
+		Data: event.EventList{
+			UUID:     aList.Uuid,
+			UserUUID: user.Uuid,
+			Action:   event.ActionUpsert,
+			Data:     aList,
+		},
+	})
 
 	message := ""
 	switch input.Action {

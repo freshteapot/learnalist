@@ -85,7 +85,9 @@ rm -rf "$HUGO_DIR/public/"*
 mkdir -p $HUGO_DIR/{public/alist,public/alistsbyuser}
 ls -lah "$HUGO_DIR/public"
 # Start the server
+
 cd server && \
+STATIC_SITE_EXTERNAL=false \
 go run --tags="json1" main.go --config=$SERVER_CONFIG server &
 
 # Start static site engine

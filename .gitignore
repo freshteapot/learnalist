@@ -16,6 +16,11 @@ server/c.out
 ## Ignoring this as we generate it
 server/pkg/openapi/
 
+# Ignoring test folders for hugo inside
+server/pkg/staticsite/hugo/testdata/data
+server/pkg/staticsite/hugo/testdata/content
+server/pkg/staticsite/hugo/testdata/public
+
 # hugo
 hugo/content/alist/
 hugo/content/alistsbyuser/

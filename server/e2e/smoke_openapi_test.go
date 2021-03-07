@@ -16,34 +16,17 @@ import (
 
 var _ = Describe("Testing openapi", func() {
 	It("Get version", func() {
-		config := openapi.NewConfiguration()
-		config.BasePath = "http://localhost:1234/api/v1"
-		client := openapi.NewAPIClient(config)
-
-		version, response, _ := client.DefaultApi.GetServerVersion(context.Background())
+		version, response, _ := openapiClient.API.DefaultApi.GetServerVersion(context.Background())
 		fmt.Println(version)
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 	})
 
 	It("Get Next", func() {
-		config := openapi.NewConfiguration()
-		config.BasePath = "http://localhost:1234/api/v1"
+		authOwner, _ := RegisterAndLogin(openapiClient.API)
 
-		auth := context.WithValue(context.Background(), openapi.ContextBasicAuth, openapi.BasicAuth{
-			UserName: "iamtest1",
-			Password: "test123",
-		})
-
-		client := openapi.NewAPIClient(config)
-		_, response, err := client.SpacedRepetitionApi.GetNextSpacedRepetitionEntry(auth)
-		/*
-			fmt.Println("data", data)
-			fmt.Println("response", response.StatusCode)
-			fmt.Println("err", err)
-		*/
+		_, response, err := openapiClient.API.SpacedRepetitionApi.GetNextSpacedRepetitionEntry(authOwner)
 		Expect(err).Should(HaveOccurred())
 		Expect(response.StatusCode).To(Equal(http.StatusNotFound))
-
 	})
 
 	It("Register user", func() {
@@ -51,7 +34,7 @@ var _ = Describe("Testing openapi", func() {
 		config.BasePath = "http://localhost:1234/api/v1"
 		client := openapi.NewAPIClient(config)
 		input := openapi.HttpUserRegisterInput{
-			Username: "iamtest11",
+			Username: generateUsername(),
 			Password: "test123",
 		}
 

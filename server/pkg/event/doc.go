@@ -8,19 +8,22 @@ import (
 )
 
 const (
-	ApiAppSettingsRemindV1          = "api.appsettings.remind_v1"
-	ApiPlank                        = "api.plank"
-	CMDUserDelete                   = "cmd.user.delete"
-	ApiUserDelete                   = "api.user.delete"
-	ApiUserLogin                    = "api.user.login"
-	ApiUserLogout                   = "api.user.logout"
-	BrowserUserLogout               = "browser.user.logout"
-	ApiUserRegister                 = "api.user.register"
-	ApiListSaved                    = "api.list.saved"
-	ApiListDelete                   = "api.list.delete"
-	ApiSpacedRepetition             = "api.spacedrepetition"
-	SystemSpacedRepetition          = "system.spacedRepetition"
-	ApiSpacedRepetitionOvertime     = "api.spacedrepetition.overtime"
+	ApiAppSettingsRemindV1      = "api.appsettings.remind_v1"
+	ApiPlank                    = "api.plank"
+	CMDUserDelete               = "cmd.user.delete"
+	SystemUserDelete            = "system.user.delete"
+	ApiUserDelete               = "api.user.delete"
+	ApiUserLogin                = "api.user.login"
+	ApiUserLogout               = "api.user.logout"
+	BrowserUserLogout           = "browser.user.logout"
+	ApiUserRegister             = "api.user.register"
+	ApiListSaved                = "api.list.saved"
+	ApiListDelete               = "api.list.delete"
+	ApiSpacedRepetition         = "api.spacedrepetition"
+	SystemSpacedRepetition      = "system.spacedRepetition"
+	SystemListDelete            = "system.list.delete"
+	ApiSpacedRepetitionOvertime = "api.spacedrepetition.overtime"
+
 	TopicMonolog                    = "lal.monolog"
 	TopicStaticSite                 = "lal.staticSite"
 	TopicNotifications              = "notifications"
@@ -36,12 +39,16 @@ const (
 	KindUserLogoutSession            = "logout.session"
 	KindUserLogoutSessions           = "logout.sessions"
 	KindPushNotification             = "push-notification"
-	ActionNew                        = "new"
-	ActionCreated                    = "created"
-	ActionUpdated                    = "updated"
-	ActionDeleted                    = "deleted"
-	ActionUpsert                     = "upsert"
-	ChangesetChallenge               = "changeset.challenge"
+
+	ActionNew            = "new"
+	ActionCreated        = "created"
+	ActionUpdated        = "updated"
+	ActionDeleted        = "deleted"
+	ActionUpsert         = "upsert"
+	ChangesetChallenge   = "changeset.challenge"
+	ChangesetAlistPublic = "changeset.alist.public"
+	ChangesetAlistUser   = "changeset.alist.user"
+	ChangesetAlistList   = "changeset.alist.list"
 )
 
 var (
@@ -73,11 +80,18 @@ type NatsSubscriber interface {
 }
 
 type Eventlog struct {
-	UUID      string      `json:"uuid,omitempty"`
-	Kind      string      `json:"kind"`
-	Data      interface{} `json:"data,omitempty"`
-	Timestamp int64       `json:"timestamp,omitempty"`
-	Action    string      `json:"action,omitempty"`
+	UUID        string      `json:"uuid,omitempty"`
+	Kind        string      `json:"kind"`
+	Data        interface{} `json:"data,omitempty"`
+	Timestamp   int64       `json:"timestamp,omitempty"`
+	Action      string      `json:"action,omitempty"`
+	TriggeredBy string      `json:"triggered_by,omitempty"`
+}
+
+type EventNewUser struct {
+	UUID string      `json:"uuid"`
+	Kind string      `json:"kind"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 type EventUser struct {

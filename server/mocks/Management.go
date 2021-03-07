@@ -46,52 +46,15 @@ func (_m *Management) FindUser(search string) ([]string, error) {
 	return r0, r1
 }
 
-// GetInfo provides a mock function with given fields: userUUID
-func (_m *Management) GetInfo(userUUID string) ([]byte, error) {
+// UserExists provides a mock function with given fields: userUUID
+func (_m *Management) UserExists(userUUID string) bool {
 	ret := _m.Called(userUUID)
 
-	var r0 []byte
-	if rf, ok := ret.Get(0).(func(string) []byte); ok {
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
 		r0 = rf(userUUID)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]byte)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userUUID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RemoveInfo provides a mock function with given fields: userUUID, key
-func (_m *Management) RemoveInfo(userUUID string, key string) error {
-	ret := _m.Called(userUUID, key)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(userUUID, key)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// SaveInfo provides a mock function with given fields: userUUID, info
-func (_m *Management) SaveInfo(userUUID string, info []byte) error {
-	ret := _m.Called(userUUID, info)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, []byte) error); ok {
-		r0 = rf(userUUID, info)
-	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(bool)
 	}
 
 	return r0

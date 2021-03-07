@@ -15,10 +15,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) AppSettingsService {
+func NewService(userInfoRepo user.UserInfoRepository, log logrus.FieldLogger) AppSettingsService {
 	s := AppSettingsService{
-		userRepo:   userRepo,
-		logContext: log,
+		userInfoRepo: userInfoRepo,
+		logContext:   log,
 	}
 	return s
 }
@@ -43,7 +43,7 @@ func (s AppSettingsService) SaveRemindV1(c echo.Context) error {
 		})
 	}
 
-	current, err := GetRemindV1(s.userRepo, userUUID)
+	current, err := GetRemindV1(s.userInfoRepo, userUUID)
 	exists := true
 
 	if err != nil {
@@ -59,7 +59,7 @@ func (s AppSettingsService) SaveRemindV1(c echo.Context) error {
 		}
 	}
 
-	err = SaveRemindV1(s.userRepo, userUUID, input)
+	err = SaveRemindV1(s.userInfoRepo, userUUID, input)
 
 	if err != nil {
 		s.logContext.WithFields(logrus.Fields{

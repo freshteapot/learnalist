@@ -12,7 +12,7 @@ import (
 )
 
 func (m *Manager) GetMyLists(c echo.Context) error {
-	publicFolder := m.HugoHelper.GetPubicDirectory()
+	publicFolder := m.pathToPublicDirectory
 	user := c.Get("loggedInUser")
 	if user == nil {
 		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/no-access.html", publicFolder))
@@ -36,7 +36,7 @@ func (m *Manager) GetMyLists(c echo.Context) error {
 }
 
 func (m *Manager) GetMyListsByURI(c echo.Context) error {
-	publicFolder := m.HugoHelper.GetPubicDirectory()
+	publicFolder := m.pathToPublicDirectory
 	// If the userID in the url matches the one via loggedInUser
 	// then let them see the list, if not reject.
 	url := c.Request().URL.Path

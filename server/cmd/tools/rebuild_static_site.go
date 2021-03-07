@@ -10,14 +10,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
-	"github.com/freshteapot/learnalist-api/server/pkg/cron"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
@@ -26,7 +25,9 @@ var rebuildStaticSiteCmd = &cobra.Command{
 	Short: "Rebuild the static site based on all lists in the database",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
-		skipPublishing, _ := cmd.Flags().GetBool("skip-publishing")
+		event.SetDefaultSettingsForCMD()
+		event.SetupEventBus(logger.WithField("context", "tools-rebuild-static-site"))
+
 		databaseName := viper.GetString("server.sqlite.database")
 		// "path to static site builder
 		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
@@ -41,14 +42,8 @@ var rebuildStaticSiteCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		hugoExternal := viper.GetBool("hugo.external")
-
 		db := database.NewDB(databaseName)
-		masterCron := cron.NewCron()
-		if skipPublishing {
-			masterCron.Stop()
-		}
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, hugoExternal, masterCron, logger)
+		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logger)
 
 		makeLists(db, hugoHelper)
 		makeUserLists(db, hugoHelper)
@@ -57,10 +52,6 @@ var rebuildStaticSiteCmd = &cobra.Command{
 		makeChallenges(db, hugoHelper)
 		time.Sleep(5 * time.Second)
 	},
-}
-
-func init() {
-	rebuildStaticSiteCmd.Flags().Bool("skip-publishing", false, "Skip the actual building of the pages")
 }
 
 func makeLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
@@ -77,7 +68,7 @@ FROM
 		aList := new(alist.Alist)
 		json.Unmarshal([]byte(row.Body), &aList)
 		aList.User.Uuid = row.UserUuid
-
+		// TODO trigger event
 		helper.WriteList(*aList)
 	}
 }
@@ -107,6 +98,7 @@ WHERE
 			panic("...")
 		}
 
+		// TODO trigger event
 		helper.WriteListsByUser(userUUID, lists)
 	}
 }
@@ -132,6 +124,8 @@ WHERE shared_with="public";
 		fmt.Println(err)
 		panic("Failed to make public lists")
 	}
+
+	// TODO trigger event
 	helper.WritePublicLists(lists)
 }
 
@@ -148,6 +142,7 @@ func makeChallenges(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
 	for _, challengeUUID := range challenges {
 		challenge, _ := challengeRepo.Get(challengeUUID)
 		moment := event.Eventlog{
+			UUID:   challengeUUID,
 			Kind:   event.ChangesetChallenge,
 			Action: event.ActionUpdated,
 			Data:   challenge,

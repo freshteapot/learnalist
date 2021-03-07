@@ -39,7 +39,9 @@ To create a list of type "v1", set type in the info object payload.
 # Post it
 
 ```sh
-curl -XPOST 'http://localhost:1234/api/v1/alist' -u'iamtest1:test123' -d'
+curl -XPOST \
+-H "Authorization: Bearer ${token}" \
+'http://localhost:1234/api/v1/alist'  -d'
 {
   "data": [
     "monday",

@@ -9,7 +9,8 @@ require (
 	github.com/Timothylock/go-signin-with-apple v0.0.0-20210131195746-828dfdd59ab1
 	github.com/antihax/optional v1.0.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
-	github.com/getkin/kin-openapi v0.30.0
+	github.com/freshteapot/e2elog v0.0.0-20210313140524-8839651885c9
+	github.com/getkin/kin-openapi v0.49.0
 	github.com/google/uuid v1.1.1
 	github.com/gookit/goutil v0.2.7 // indirect
 	github.com/gookit/validate v1.2.0

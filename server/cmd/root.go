@@ -29,7 +29,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Path to the config file")
 	rootCmd.AddCommand(server.ServerCmd)
+	rootCmd.AddCommand(server.StaticSiteCMD)
 	rootCmd.AddCommand(tools.RootCmd)
+
 }
 
 // initConfig reads in config file and ENV variables if set.

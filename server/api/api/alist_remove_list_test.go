@@ -37,11 +37,6 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 	var req *http.Request
 	var rec *httptest.ResponseRecorder
 	BeforeEach(func() {
-		testHugoHelper := &mocks.HugoSiteBuilder{}
-		testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-		testHugoHelper.On("WritePublicLists", mock.Anything)
-		testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
-		m.HugoHelper = testHugoHelper
 
 		datastore = &mocks.Datastore{}
 		acl = &mocks.Acl{}
@@ -93,6 +88,8 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 			datastore.On("GetPublicLists").Return([]alist.ShortInfo{}, nil)
 			eventMessageBus := &mocks.EventlogPubSub{}
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
+				//fmt.Println("moment.Kind", moment.Kind)
+				//return true
 				Expect(moment.Kind).To(Equal(event.ApiListDelete))
 				Expect(moment.Data.(event.EventList).UUID).To(Equal(alistUUID))
 				return true
