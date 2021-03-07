@@ -23,7 +23,7 @@ var _ = Describe("Testing List Info", func() {
 		FailDueToKindNotMatchingTopDomain = "info-from-007.json"
 	)
 
-	FIt("Validating from", func() {
+	It("Validating from", func() {
 		var tests = []struct {
 			Input       []byte
 			ExpectError func(err error)
