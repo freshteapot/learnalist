@@ -30,18 +30,6 @@
     }
 
     chrome.tabs.sendMessage(learnalistTab.id, { kind: "lookup-login-info" });
-    //console.log(fromLocalStorage("app.user.uuid"));
-    //console.log(fromLocalStorage("app.user.authentication"));
-    /*
-    // This does not load the data from the page
-    const user = fromLocalStorage("app.user.uuid")
-    const token = fromLocalStorage("app.user.authentication")
-    if (user && token) {
-      toLocalStorage("app.user.uuid", user);
-      toLocalStorage("app.user.authentication", token);
-      return;
-    }
-    */
   }
 
 
