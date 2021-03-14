@@ -46,7 +46,7 @@ WHERE
 
 # Read the database
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c api -- sh
 sqlite3 /srv/learnalist/server.db
 ```
 
@@ -71,7 +71,7 @@ cat events.ndjson | jq -r 'select(.event=="stale") | "DELETE FROM mobile_device 
 ```
 
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c api -- sh
 sqlite3 /srv/learnalist/server.db
 ```
 
