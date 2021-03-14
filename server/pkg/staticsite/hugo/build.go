@@ -84,7 +84,6 @@ func (h HugoHelper) buildSite(logContext *logrus.Entry) error {
 }
 
 func (h HugoHelper) deleteFiles(files []string) {
-	fmt.Println("wft", len(files))
 	logContext := h.logContext.WithFields(logrus.Fields{
 		"event": "delete-file",
 	})
