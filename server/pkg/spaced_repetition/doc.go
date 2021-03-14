@@ -133,6 +133,11 @@ var incrThresholds = []struct {
 		Level:     Level9,
 		Threshold: Threshold9,
 	},
+	{
+		Match:     Level9,
+		Level:     Level9,
+		Threshold: Threshold9,
+	},
 }
 
 var decrThresholds = []struct {
