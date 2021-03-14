@@ -20,7 +20,6 @@ var StaticSiteCMD = &cobra.Command{
 	Use:   "static-site",
 	Short: "Run the static-site",
 	Long: `
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=static-site \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
@@ -32,8 +31,6 @@ static-site
 		logContext := logger.WithField("context", "static-site")
 
 		event.SetDefaultSettingsForCMD()
-		viper.Set("server.events.via", "nats")
-
 		viper.SetDefault("topic", event.TopicStaticSite)
 		event.SetupEventBus(logContext)
 

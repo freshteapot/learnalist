@@ -21,7 +21,6 @@ var publicAccessCMD = &cobra.Command{
 Example:
 
 TOPIC=lal.monolog \
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=tools-alist \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \

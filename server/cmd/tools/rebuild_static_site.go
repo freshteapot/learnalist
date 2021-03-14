@@ -3,7 +3,6 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -16,8 +15,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
-	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
-	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 var rebuildStaticSiteCmd = &cobra.Command{
@@ -30,31 +27,19 @@ var rebuildStaticSiteCmd = &cobra.Command{
 
 		databaseName := viper.GetString("server.sqlite.database")
 		// "path to static site builder
-		hugoFolder, err := utils.CmdParsePathToFolder("hugo.directory", viper.GetString("hugo.directory"))
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-
-		hugoEnvironment := viper.GetString("hugo.environment")
-		if hugoEnvironment == "" {
-			fmt.Println("hugo.environment is missing")
-			os.Exit(1)
-		}
 
 		db := database.NewDB(databaseName)
-		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logger)
 
-		makeLists(db, hugoHelper)
-		makeUserLists(db, hugoHelper)
-		makePublicLists(db, hugoHelper)
+		makeLists(db)
+		makeUserLists(db)
+		makePublicLists(db)
 
-		makeChallenges(db, hugoHelper)
-		time.Sleep(5 * time.Second)
+		makeChallenges(db)
+		time.Sleep(2 * time.Second)
 	},
 }
 
-func makeLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
+func makeLists(db *sqlx.DB) {
 	query := `
 SELECT
 	*
@@ -68,12 +53,17 @@ FROM
 		aList := new(alist.Alist)
 		json.Unmarshal([]byte(row.Body), &aList)
 		aList.User.Uuid = row.UserUuid
-		// TODO trigger event
-		helper.WriteList(*aList)
+
+		event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+			Kind:   event.ChangesetAlistList,
+			UUID:   aList.Uuid,
+			Data:   *aList,
+			Action: event.ActionUpdated,
+		})
 	}
 }
 
-func makeUserLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
+func makeUserLists(db *sqlx.DB) {
 	var users []string
 	err := db.Select(&users, `SELECT DISTINCT(user_uuid) FROM alist_kv`)
 	if err != nil {
@@ -98,12 +88,16 @@ WHERE
 			panic("...")
 		}
 
-		// TODO trigger event
-		helper.WriteListsByUser(userUUID, lists)
+		event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+			Kind:   event.ChangesetAlistUser,
+			UUID:   userUUID,
+			Data:   lists,
+			Action: event.ActionUpdated,
+		})
 	}
 }
 
-func makePublicLists(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
+func makePublicLists(db *sqlx.DB) {
 	query := `
 SELECT
 	uuid,
@@ -125,11 +119,14 @@ WHERE shared_with="public";
 		panic("Failed to make public lists")
 	}
 
-	// TODO trigger event
-	helper.WritePublicLists(lists)
+	event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+		Kind:   event.ChangesetAlistPublic,
+		Data:   lists,
+		Action: event.ActionUpdated,
+	})
 }
 
-func makeChallenges(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
+func makeChallenges(db *sqlx.DB) {
 	var challenges []string
 	err := db.Select(&challenges, `SELECT DISTINCT(uuid) FROM challenge`)
 	if err != nil {
@@ -141,13 +138,12 @@ func makeChallenges(db *sqlx.DB, helper hugo.HugoSiteBuilder) {
 
 	for _, challengeUUID := range challenges {
 		challenge, _ := challengeRepo.Get(challengeUUID)
-		moment := event.Eventlog{
-			UUID:   challengeUUID,
-			Kind:   event.ChangesetChallenge,
-			Action: event.ActionUpdated,
-			Data:   challenge,
-		}
 
-		helper.OnEvent(moment)
+		event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{
+			UUID:   challenge.UUID,
+			Kind:   event.ChangesetChallenge,
+			Data:   challenge,
+			Action: event.ActionUpdated,
+		})
 	}
 }

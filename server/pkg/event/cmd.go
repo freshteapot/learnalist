@@ -7,7 +7,7 @@ import (
 )
 
 func SetDefaultSettingsForCMD() {
-	viper.SetDefault("server.events.via", "memory")
+	viper.SetDefault("server.events.via", "nats")
 	viper.BindEnv("server.events.via", "EVENTS_VIA")
 
 	viper.SetDefault("server.events.nats.server", "nats")
@@ -24,8 +24,6 @@ func SetupEventBus(logContext logrus.FieldLogger) {
 	eventsVia := viper.GetString("server.events.via")
 
 	switch eventsVia {
-	case "memory":
-		SetBus(NewMemoryBus())
 	case "nats":
 		natsServer := viper.GetString("server.events.nats.server")
 		stanClusterID := viper.GetString("server.events.stan.clusterID")

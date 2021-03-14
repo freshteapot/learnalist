@@ -17,7 +17,6 @@ make run-nats-from-docker
 
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
@@ -39,7 +38,6 @@ Go [try some curl requests.](./play.along.md)
 
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
@@ -104,7 +102,6 @@ make run-api-server
 ### nats
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
@@ -124,7 +121,6 @@ scripts/run-slack.sh
 
 ```sh
 cd server
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-event-reader" \
 EVENTS_NATS_SERVER="127.0.0.1" \
@@ -135,7 +131,6 @@ go run main.go --config=../config/dev.config.yaml tools event-reader
 ## Run the challenge sync service
 ```sh
 TOPIC=lal.monolog \
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=challenges-sync \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
@@ -151,7 +146,6 @@ Topic where communications goto
 
 ```sh
 TOPIC=lal.monolog \
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=nats-reader \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \

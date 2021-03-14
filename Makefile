@@ -53,7 +53,6 @@ run-nats-from-docker:
 run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=challenges-sync \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -63,7 +62,6 @@ run-challenges-sync:
 run-notifications-push-notifications:
 	cd server && \
 	TOPIC=notifications \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -72,7 +70,6 @@ run-notifications-push-notifications:
 
 run-api-server:
 	cd server && \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=lal-server \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -81,7 +78,6 @@ run-api-server:
 run-remind-manager:
 	cd server && \
 	TOPIC=lal.monolog \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=remind-daily \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -90,7 +86,6 @@ run-remind-manager:
 
 run-static-site:
 	cd server && \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=static-site \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
