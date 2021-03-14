@@ -25,10 +25,3 @@ func (w HugoPublicListsWriter) Data(lists []alist.ShortInfo) {
 	path := fmt.Sprintf("%s/public_lists.json", w.dataDirectory)
 	w.writer.Write(path, content)
 }
-
-func (w HugoPublicListsWriter) GetFilesToPublish() []string {
-	return []string{
-		fmt.Sprintf("%s/public_lists.json", w.dataDirectory),
-	}
-
-}

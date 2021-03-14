@@ -23,24 +23,18 @@ func (h HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
 	c := h.challengeWriter.GetFilesToPublish()
-	d := h.PublicListsWriter.GetFilesToPublish()
 
 	toPublish := a
 	toPublish = append(toPublish, b...)
 	toPublish = append(toPublish, c...)
-	toPublish = append(toPublish, d...)
-
-	if len(toPublish) == 0 {
-		return
-	}
+	// Trigger a rebuild regardless
 
 	logContext.WithFields(logrus.Fields{
 		"event": "build-stats",
 		"stats": map[string]interface{}{
-			"public_list": len(d),
-			"lists":       len(a),
-			"user_lists":  len(b),
-			"challenges":  len(c),
+			"lists":      len(a),
+			"user_lists": len(b),
+			"challenges": len(c),
 		},
 	}).Info("stats")
 
@@ -54,11 +48,6 @@ func (h HugoHelper) Build(logContext *logrus.Entry) {
 			}).Error("failed building hugo")
 		}
 	}
-
-	// If I am waiting for external to build, how the hell does delete work?
-	//for _, toDelete := range toPublish {
-	//	fmt.Println("toDelete", toDelete)
-	//}
 
 	h.deleteFiles(toPublish)
 }
