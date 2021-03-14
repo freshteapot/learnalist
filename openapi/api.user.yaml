@@ -31,6 +31,10 @@ components:
           default: ""
           enum:
             - plank.app.v1
+        grant_public_list_write_access:
+          type: string
+          description: Give this user the ability to write public lists
+          default: ""
 
     HttpUserRegisterInput:
       type: object
@@ -200,6 +204,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
   /user/info/{uuid}:
+    get:
+      tags:
+        - user
+      description: Get user information, app settings, preferences some user state
+      operationId: getUserInfo
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: user info has been changed
+          content:
+            application/json:
+              schema:
+                type: object
+                # Todo get a real object
     patch:
       tags:
         - user

@@ -8,7 +8,6 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
-	"github.com/freshteapot/learnalist-api/server/e2e"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 	. "github.com/onsi/ginkgo"
@@ -18,74 +17,74 @@ import (
 
 var _ = Describe("Testing with Ginkgo", func() {
 	It("list crud", func() {
-
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 
-		aList, _ := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		aList, _ := e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 		assert.NotEmpty(aList.Uuid)
 		b, _ := json.Marshal(aList)
-		aListB, _ := learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(b))
+		aListB, _ := e2eClient.PutListV1(userInfoOwner, aList.Uuid, string(b))
 		assert.Equal(aList.Uuid, aListB.Uuid)
-		resp, _ := learnalistClient.RawPutListV1(userInfoOwner, "aa", string(b))
+		resp, _ := e2eClient.RawPutListV1(userInfoOwner, "aa", string(b))
 		assert.Equal(resp.StatusCode, http.StatusBadRequest)
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
+
 	It("list sharing", func() {
 
-		var aList alist.Alist
-		var aListB alist.Alist
-		var input []byte
+		var (
+			aList  alist.Alist
+			aListB alist.Alist
+			input  []byte
+		)
 
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
-
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 		fmt.Println("> By default shared privately")
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 		assert.Equal(aList.Info.SharedWith, aclKeys.NotShared)
 		fmt.Println("> Explicitly share privately")
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.NotShared))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.NotShared))
 		assert.Equal(aList.Info.SharedWith, aclKeys.NotShared)
 		fmt.Println("> Explicitly share with public")
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
 		assert.Equal(aList.Info.SharedWith, aclKeys.SharedWithPublic)
 		fmt.Println("Explicitly share with friends")
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithFriends))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithFriends))
 		assert.Equal(aList.Info.SharedWith, aclKeys.SharedWithFriends)
 
 		fmt.Println("> Share privately and then set it to public")
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.NotShared))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.NotShared))
 		assert.Equal(aList.Info.SharedWith, aclKeys.NotShared)
 		aList.Info.SharedWith = aclKeys.SharedWithPublic
 		input, _ = json.Marshal(aList)
-		aListB, _ = learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
+		aListB, _ = e2eClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
 		assert.Equal(aListB.Info.SharedWith, aclKeys.SharedWithPublic)
 		assert.Equal(aList, aListB)
 
 		fmt.Println("> Share publicly first, then set it to private")
 		aListB = alist.Alist{}
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
 		assert.Equal(aList.Info.SharedWith, aclKeys.SharedWithPublic)
 		aList.Info.SharedWith = aclKeys.NotShared
 		input, _ = json.Marshal(aList)
-		aListB, _ = learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
+		aListB, _ = e2eClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
 		assert.Equal(aListB.Info.SharedWith, aclKeys.NotShared)
 		assert.Equal(aList, aListB)
 
 		fmt.Println("> Share publicly first, then set it to friends")
 		aListB = alist.Alist{}
-		aList, _ = learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
+		aList, _ = e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, aclKeys.SharedWithPublic))
 		assert.Equal(aList.Info.SharedWith, aclKeys.SharedWithPublic)
 		aList.Info.SharedWith = aclKeys.SharedWithFriends
 		input, _ = json.Marshal(aList)
-		aListB, _ = learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
+		aListB, _ = e2eClient.PutListV1(userInfoOwner, aList.Uuid, string(input))
 		assert.Equal(aListB.Info.SharedWith, aclKeys.SharedWithFriends)
 		assert.Equal(aList, aListB)
+
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 
 	It("label crud", func() {
@@ -95,55 +94,51 @@ var _ = Describe("Testing with Ginkgo", func() {
 		var resp *http.Response
 
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
-
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 		fmt.Println("> Empty list of labels")
-		labels, err = learnalistClient.GetLabelsByMeV1(userInfoOwner)
+		labels, err = e2eClient.GetLabelsByMeV1(userInfoOwner)
 		assert.NoError(err)
 		assert.Equal(labels, []string{})
 
 		fmt.Println("> Add water as a label")
-		resp, err = learnalistClient.RawPostLabelV1(userInfoOwner, "water")
+		resp, err = e2eClient.RawPostLabelV1(userInfoOwner, "water")
 		assert.NoError(err)
 		assert.Equal(resp.StatusCode, http.StatusCreated)
 
 		fmt.Println("> Add fire as a label")
-		labels, err = learnalistClient.PostLabelV1(userInfoOwner, "fire")
+		labels, err = e2eClient.PostLabelV1(userInfoOwner, "fire")
 		assert.NoError(err)
 		assert.Equal(labels, []string{"fire", "water"})
 
 		fmt.Println("> Make sure adding fire twice, results in only fire appearing once")
-		labels, err = learnalistClient.PostLabelV1(userInfoOwner, "fire")
+		labels, err = e2eClient.PostLabelV1(userInfoOwner, "fire")
 		assert.NoError(err)
 		assert.Equal(labels, []string{"fire", "water"})
-		labels, err = learnalistClient.GetLabelsByMeV1(userInfoOwner)
+		labels, err = e2eClient.GetLabelsByMeV1(userInfoOwner)
 		assert.NoError(err)
 		assert.Equal(labels, []string{"fire", "water"})
 
 		fmt.Println("> Remove water")
-		resp, err = learnalistClient.RawDeleteLabelV1(userInfoOwner, "water")
+		resp, err = e2eClient.RawDeleteLabelV1(userInfoOwner, "water")
 		assert.NoError(err)
-		labels, err = learnalistClient.GetLabelsByMeV1(userInfoOwner)
+		labels, err = e2eClient.GetLabelsByMeV1(userInfoOwner)
 		assert.NoError(err)
 		assert.Equal(labels, []string{"fire"})
 
 		fmt.Println("> Remove fire and make sure the user has no labels")
-		resp, err = learnalistClient.RawDeleteLabelV1(userInfoOwner, "fire")
-		labels, err = learnalistClient.GetLabelsByMeV1(userInfoOwner)
+		resp, err = e2eClient.RawDeleteLabelV1(userInfoOwner, "fire")
+		labels, err = e2eClient.GetLabelsByMeV1(userInfoOwner)
 		assert.NoError(err)
 		assert.Equal(labels, []string{})
+
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 	It("user has empty lists", func() {
 
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
-		resp, err := learnalistClient.RawGetListsByMe(userInfoOwner, "", "")
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
+		resp, err := e2eClient.RawGetListsByMe(userInfoOwner, "", "")
 		assert.NoError(err)
 		assert.Equal(resp.StatusCode, http.StatusOK)
 
@@ -152,18 +147,19 @@ var _ = Describe("Testing with Ginkgo", func() {
 		data, err := ioutil.ReadAll(resp.Body)
 		assert.NoError(err)
 		assert.Equal(testutils.CleanEchoResponseFromByte(data), `[]`)
+
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
+
 	It("user has two list v1 and v2", func() {
 
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
-		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
-		learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.FromToList, ""))
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
+		e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.FromToList, ""))
 
-		resp, err := learnalistClient.RawGetListsByMe(userInfoOwner, "", "")
+		resp, err := e2eClient.RawGetListsByMe(userInfoOwner, "", "")
 		assert.NoError(err)
 		assert.Equal(resp.StatusCode, http.StatusOK)
 
@@ -176,33 +172,31 @@ var _ = Describe("Testing with Ginkgo", func() {
 		assert.NoError(err)
 		assert.Equal(aLists[0].Info.ListType, alist.SimpleList)
 		assert.Equal(aLists[1].Info.ListType, alist.FromToList)
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
-	It("alist v3", func() {
 
+	It("alist v3", func() {
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
-		aList, err := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.Concept2, ""))
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
+		aList, err := e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.Concept2, ""))
 		assert.NoError(err)
 		assert.Equal(aList.Info.Labels, []string{"rowing", "concept2"})
 		aList.Info.Labels = []string{}
 		b, _ := json.Marshal(aList)
-		aList2, err := learnalistClient.PutListV1(userInfoOwner, aList.Uuid, string(b))
+		aList2, err := e2eClient.PutListV1(userInfoOwner, aList.Uuid, string(b))
 		assert.NoError(err)
 		assert.Equal(aList.Uuid, aList2.Uuid)
 		assert.Equal(aList2.Info.Labels, []string{"rowing", "concept2"})
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 	It("alist filter", func() {
 
 		var aLists []*alist.Alist
 		var err error
 		assert := assert.New(GinkgoT())
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 		lists := []string{`
 {
 	"data": ["car"],
@@ -250,90 +244,94 @@ var _ = Describe("Testing with Ginkgo", func() {
 		}
 
 		for _, item := range lists {
-			aList, err := learnalistClient.PostListV1(userInfoOwner, item)
+			aList, err := e2eClient.PostListV1(userInfoOwner, item)
 			assert.NoError(err)
 			uuids = append(uuids, aList.Uuid)
 		}
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", "")
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "", "")
 		assert.NoError(err)
 		assert.Equal(4, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "water", "")
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "water", "")
 		assert.NoError(err)
 		assert.Equal(2, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", alist.SimpleList)
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "", alist.SimpleList)
 		assert.NoError(err)
 		assert.Equal(3, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "", alist.FromToList)
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "", alist.FromToList)
 		assert.NoError(err)
 		assert.Equal(1, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "car,water", "")
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "car,water", "")
 		assert.NoError(err)
 		assert.Equal(2, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "car,water", alist.FromToList)
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "car,water", alist.FromToList)
 		assert.NoError(err)
 		assert.Equal(1, len(aLists))
 
-		aLists, err = learnalistClient.GetListsByMe(userInfoOwner, "card", "")
+		aLists, err = e2eClient.GetListsByMe(userInfoOwner, "card", "")
 		assert.NoError(err)
 		assert.Equal(0, len(aLists))
+
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 
 	It("method not supported for saving list", func() {
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 
 		uri := "/api/v1/alist"
-		resp, err := learnalistClient.RawV1(userInfoOwner, http.MethodDelete, uri, "")
+		resp, err := e2eClient.RawV1(userInfoOwner, http.MethodDelete, uri, "")
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode, http.StatusMethodNotAllowed)
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 
 	It("delete alist not found", func() {
-		username := generateUsername()
-		learnalistClient := e2e.NewClient(server)
-		fmt.Printf("> Create user %s\n", username)
-		userInfoOwner := learnalistClient.Register(username, password)
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
 
 		alistUUID := "fake"
-		resp, err := learnalistClient.RawDeleteListV1(userInfoOwner, alistUUID)
+		resp, err := e2eClient.RawDeleteListV1(userInfoOwner, alistUUID)
 		defer resp.Body.Close()
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode, http.StatusNotFound)
 		testutils.CheckMessageResponseFromReader(resp.Body, i18n.SuccessAlistNotFound)
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
 	})
 
 	It("only owner of the list can alter it", func() {
-		learnalistClient := e2e.NewClient(server)
-		userInfoOwner := learnalistClient.Register(usernameOwner, password)
-		userInfoReader := learnalistClient.Register(usernameReader, password)
+		authOwner, userInfoOwner := RegisterAndLogin(openapiClient.API)
+		authReader, userInfoReader := RegisterAndLogin(openapiClient.API)
 
-		aList, err := learnalistClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
+		aList, err := e2eClient.PostListV1(userInfoOwner, getInputListWithShare(alist.SimpleList, ""))
 		Expect(err).To(BeNil())
 		Expect(aList.Uuid).To(Not(BeEmpty()))
 
 		b, _ := json.Marshal(aList)
-		resp, err := learnalistClient.RawPutListV1(userInfoOwner, aList.Uuid, string(b))
+		resp, err := e2eClient.RawPutListV1(userInfoOwner, aList.Uuid, string(b))
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode, http.StatusOK)
 
-		resp, err = learnalistClient.RawPutListV1(userInfoReader, aList.Uuid, string(b))
+		resp, err = e2eClient.RawPutListV1(userInfoReader, aList.Uuid, string(b))
 		defer resp.Body.Close()
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode, http.StatusForbidden)
 		testutils.CheckMessageResponseFromReader(resp.Body, i18n.InputSaveAlistOperationOwnerOnly)
 
-		resp, err = learnalistClient.RawDeleteListV1(userInfoReader, aList.Uuid)
+		resp, err = e2eClient.RawDeleteListV1(userInfoReader, aList.Uuid)
 		defer resp.Body.Close()
 		Expect(err).To(BeNil())
 		Expect(resp.StatusCode, http.StatusForbidden)
 		testutils.CheckMessageResponseFromReader(resp.Body, i18n.InputDeleteAlistOperationOwnerOnly)
+
+		// Delete user
+		openapiClient.DeleteUser(authOwner, userInfoOwner.UserUuid)
+		openapiClient.DeleteUser(authReader, userInfoReader.UserUuid)
 	})
 })

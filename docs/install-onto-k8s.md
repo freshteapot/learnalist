@@ -99,12 +99,12 @@ kill -9 $(lsof -ti tcp:6443)
 
 
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c api -- sh
 ```
 
-## Clear when hugo is external
-- **HUGO_EXTERNAL=false**
+## Rebuild Static site
 ```sh
+EVENTS_STAN_CLIENT_ID="rebuild-static-site-manual" \
 /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 
@@ -134,7 +134,7 @@ kubectl config use-context default
 kill -9 $(lsof -ti tcp:6443)
 ssh $SSH_SERVER -L 6443:127.0.0.1:6443 -N &
 make sync-site-assets
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c api -- /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 
 # Install everything
@@ -216,7 +216,7 @@ make sync-db-files
 
 ## Via a pod
 ```sh
-kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c learnalist -- sh
+kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].metadata.name}") -c api -- sh
 ```
 ### Update all tables
 ```sh

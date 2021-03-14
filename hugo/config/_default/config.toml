@@ -4,6 +4,7 @@ title = "Learnalist"
 
 uglyURLs = true
 disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS", "section"]
+ignoreErrors = ["error-remote-getjson"]
 
 [params]
   BuildCss = true

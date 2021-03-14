@@ -1,3 +1,6 @@
+staticsite:
+  directory: "/srv/learnalist/hugo"
+  external: "true"
 hugo:
   directory: "/srv/learnalist/hugo"
   environment: "lal01"

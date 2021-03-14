@@ -1,6 +1,5 @@
 GIT_COMMIT:=$(shell git rev-parse HEAD)
 GIT_HASH_DATE:=$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%dT%H:%M:%SZ' --format="%cd" ${GIT_COMMIT})
-
 ###############################################################################
 #
 # Development commands
@@ -30,6 +29,13 @@ rebuild-db-remind-manager:
 	rm -f /tmp/learnalist/remind-daily.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
 
+rebuild-static-site:
+	cd server && \
+	EVENTS_STAN_CLIENT_ID=rebuild-static-site \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
+
 test:
 	cd server && \
 	./cover.sh
@@ -54,7 +60,6 @@ run-nats-from-docker:
 run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=challenges-sync \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -64,7 +69,6 @@ run-challenges-sync:
 run-notifications-push-notifications:
 	cd server && \
 	TOPIC=notifications \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
@@ -73,21 +77,33 @@ run-notifications-push-notifications:
 
 run-api-server:
 	cd server && \
+	EVENTS_STAN_CLIENT_ID=lal-server \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
 run-remind-manager:
 	cd server && \
 	TOPIC=lal.monolog \
-	EVENTS_VIA="nats" \
 	EVENTS_STAN_CLIENT_ID=remind-daily \
 	EVENTS_STAN_CLUSTER_ID=test-cluster \
 	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags=json1 main.go --config=../config/dev.config.yaml \
 	tools remind manager
 
+run-static-site:
+	cd server && \
+	EVENTS_STAN_CLIENT_ID=static-site \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run main.go --config=../config/dev.config.yaml \
+	static-site
+
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
 develop:
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
 	scripts/run-hugo.sh
 
 develop-localhost:
@@ -150,10 +166,6 @@ generate-docs-api-overview: generate-openapi-one
 #
 # More production than development
 #
-rebuild-static-site:
-	cd server && \
-	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
-
 build-site-assets:
 	./scripts/build-site-assets.sh
 

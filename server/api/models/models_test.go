@@ -7,10 +7,8 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
-	apiUserStorage "github.com/freshteapot/learnalist-api/server/api/user/sqlite"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
-	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/suite"
@@ -30,18 +28,15 @@ func (suite *ModelSuite) SetupSuite() {
 	logger, _ := test.NewNullLogger()
 	db = database.NewTestDB()
 	acl := aclStorage.NewAcl(db)
-	userSession := userStorage.NewUserSession(db)
-	userFromIDP := userStorage.NewUserFromIDP(db)
-	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
 	storageAlist := alistStorage.NewAlist(db, logger)
-	storageApiUser := apiUserStorage.NewUser(db)
+
 	dal = models.NewDAL(
 		acl,
-		storageApiUser,
 		storageAlist,
-		labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+		labels,
+		oauthHandler)
 }
 
 func (suite *ModelSuite) SetupTest() {

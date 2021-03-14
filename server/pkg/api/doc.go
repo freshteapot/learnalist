@@ -7,17 +7,6 @@ type HTTPResponse struct {
 	Body       []byte
 }
 
-type HTTPUserRegisterInput struct {
-	Username string        `json:"username"`
-	Password string        `json:"password"`
-	Extra    HTTPUserExtra `json:"extra,omitempty"`
-}
-
-type HTTPUserExtra struct {
-	DisplayName string `json:"display_name,omitempty"`
-	CreatedVia  string `json:"created_via,omitempty"`
-}
-
 type HTTPUserRegisterResponse struct {
 	Uuid     string `json:"uuid"`
 	Username string `json:"username"`
@@ -48,13 +37,6 @@ type HTTPShareListWithUserInput struct {
 	AlistUUID string `json:"alist_uuid"`
 	Action    string `json:"action"`
 }
-
-type HTTPLoginResponse struct {
-	Token    string `json:"token"`
-	UserUUID string `json:"user_uuid"`
-}
-
-type HTTPLoginRequest HTTPUserRegisterInput
 
 type HTTPLogoutRequest struct {
 	Kind     string `json:"kind"`

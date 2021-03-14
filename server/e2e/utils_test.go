@@ -13,7 +13,12 @@ func RegisterAndLogin(client *openapi.APIClient) (context.Context, openapi.HttpU
 	input := openapi.HttpUserRegisterInput{
 		Username: generateUsername(),
 		Password: "test123",
+		Extra: openapi.HttpUserInfoInput{
+			DisplayName:                "Chris",
+			GrantPublicListWriteAccess: "1",
+		},
 	}
+
 	data1, response, err := client.UserApi.RegisterUserWithUsernameAndPassword(ctx, input, nil)
 	Expect(err).To(BeNil())
 	Expect(response.StatusCode).To(Equal(http.StatusCreated))

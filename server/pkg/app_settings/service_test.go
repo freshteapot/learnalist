@@ -33,7 +33,7 @@ var _ = Describe("Testing AppSettings API", func() {
 		req             *http.Request
 		rec             *httptest.ResponseRecorder
 		service         app_settings.AppSettingsService
-		repo            *mocks.ManagementStorage
+		repo            *mocks.UserInfoRepository
 		loggedInUser    *uuid.User
 		want            error
 
@@ -52,7 +52,7 @@ var _ = Describe("Testing AppSettings API", func() {
 		e = echo.New()
 
 		logger, hook = test.NewNullLogger()
-		repo = &mocks.ManagementStorage{}
+		repo = &mocks.UserInfoRepository{}
 		service = app_settings.NewService(repo, logger)
 	})
 
@@ -109,7 +109,7 @@ var _ = Describe("Testing AppSettings API", func() {
 			c = e.NewContext(req, rec)
 			c.Set("loggedInUser", *loggedInUser)
 
-			repo.On("GetInfo", userUUID).Return(nil, want)
+			repo.On("Get", userUUID).Return(user.UserPreference{}, want)
 
 			service.SaveRemindV1(c)
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
@@ -134,8 +134,7 @@ var _ = Describe("Testing AppSettings API", func() {
 			c = e.NewContext(req, rec)
 			c.Set("loggedInUser", *loggedInUser)
 
-			prefB, _ := json.Marshal(pref)
-			repo.On("GetInfo", userUUID).Return(prefB, nil)
+			repo.On("Get", userUUID).Return(pref, nil)
 
 			service.SaveRemindV1(c)
 			Expect(rec.Code).To(Equal(http.StatusOK))
@@ -160,10 +159,9 @@ var _ = Describe("Testing AppSettings API", func() {
 			c = e.NewContext(req, rec)
 			c.Set("loggedInUser", *loggedInUser)
 
-			repo.On("GetInfo", userUUID).Return(nil, utils.ErrNotFound)
+			repo.On("Get", userUUID).Return(user.UserPreference{}, utils.ErrNotFound)
 
-			prefB, _ := json.Marshal(pref)
-			repo.On("SaveInfo", userUUID, prefB).Return(want)
+			repo.On("Save", userUUID, pref).Return(want)
 			service.SaveRemindV1(c)
 
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
@@ -191,10 +189,9 @@ var _ = Describe("Testing AppSettings API", func() {
 			c = e.NewContext(req, rec)
 			c.Set("loggedInUser", *loggedInUser)
 
-			repo.On("GetInfo", userUUID).Return([]byte(`{}`), nil)
+			repo.On("Get", userUUID).Return(user.UserPreference{}, nil)
 
-			prefB, _ := json.Marshal(pref)
-			repo.On("SaveInfo", userUUID, prefB).Return(nil)
+			repo.On("Save", userUUID, pref).Return(nil)
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiAppSettingsRemindV1))
@@ -226,10 +223,8 @@ var _ = Describe("Testing AppSettings API", func() {
 			c = e.NewContext(req, rec)
 			c.Set("loggedInUser", *loggedInUser)
 
-			repo.On("GetInfo", userUUID).Return(nil, utils.ErrNotFound)
-
-			prefB, _ := json.Marshal(pref)
-			repo.On("SaveInfo", userUUID, prefB).Return(nil)
+			repo.On("Get", userUUID).Return(user.UserPreference{}, utils.ErrNotFound)
+			repo.On("Save", userUUID, pref).Return(nil)
 
 			eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 				Expect(moment.Kind).To(Equal(event.ApiAppSettingsRemindV1))

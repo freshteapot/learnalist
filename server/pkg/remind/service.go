@@ -2,8 +2,6 @@ package remind
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -20,14 +18,14 @@ import (
 )
 
 type RemindService struct {
-	userRepo   user.ManagementStorage
-	logContext logrus.FieldLogger
+	userInfoRepo user.UserInfoRepository
+	logContext   logrus.FieldLogger
 }
 
-func NewService(userRepo user.ManagementStorage, log logrus.FieldLogger) RemindService {
+func NewService(userInfoRepo user.UserInfoRepository, log logrus.FieldLogger) RemindService {
 	s := RemindService{
-		userRepo:   userRepo,
-		logContext: log,
+		userInfoRepo: userInfoRepo,
+		logContext:   log,
 	}
 	return s
 }
@@ -44,18 +42,36 @@ func (s RemindService) GetDailySettings(c echo.Context) error {
 		})
 	}
 
-	response, err := s.getPreferences(userUUID, appIdentifier)
+	pref, err := s.userInfoRepo.Get(userUUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	if response.AppIdentifier == "" {
+	if pref.DailyReminder == nil {
 		return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 			Message: "Settings not found",
 		})
 	}
 
-	return c.JSON(http.StatusOK, response)
+	var settings *openapi.RemindDailySettings
+	switch appIdentifier {
+	case apps.RemindV1:
+		if pref.DailyReminder.RemindV1 != nil {
+			settings = pref.DailyReminder.RemindV1
+		}
+	case apps.PlankV1:
+		if pref.DailyReminder.PlankV1 != nil {
+			settings = pref.DailyReminder.PlankV1
+		}
+	}
+
+	if settings.AppIdentifier == "" {
+		return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
+			Message: "Settings not found",
+		})
+	}
+
+	return c.JSON(http.StatusOK, settings)
 }
 
 func (s RemindService) DeleteDailySettings(c echo.Context) error {
@@ -70,20 +86,32 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 		})
 	}
 
-	response, err := s.getPreferences(userUUID, appIdentifier)
+	pref, err := s.userInfoRepo.Get(userUUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
-	if response.AppIdentifier == "" {
+	var settings *openapi.RemindDailySettings
+	switch appIdentifier {
+	case apps.RemindV1:
+		if pref.DailyReminder.RemindV1 != nil {
+			settings = pref.DailyReminder.RemindV1
+			pref.DailyReminder.RemindV1 = nil
+		}
+	case apps.PlankV1:
+		if pref.DailyReminder.PlankV1 != nil {
+			settings = pref.DailyReminder.PlankV1
+			pref.DailyReminder.PlankV1 = nil
+		}
+	}
+
+	if settings == nil {
 		return c.JSON(http.StatusNotFound, api.HTTPResponseMessage{
 			Message: "Settings not found",
 		})
 	}
 
-	// This might break if we move from sqlite
-	key := fmt.Sprintf(`%s.%s`, UserPreferenceKey, appIdentifier)
-	err = s.userRepo.RemoveInfo(userUUID, key)
+	err = s.userInfoRepo.Save(userUUID, pref)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
@@ -91,7 +119,7 @@ func (s RemindService) DeleteDailySettings(c echo.Context) error {
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		UUID:   userUUID,
 		Kind:   EventApiRemindDailySettings,
-		Data:   response,
+		Data:   settings,
 		Action: event.ActionDeleted,
 	})
 
@@ -144,20 +172,23 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 		}
 	}
 
-	info := user.UserPreference{
-		DailyReminder: &user.UserPreferenceDailyReminder{},
+	pref, err := s.userInfoRepo.Get(userUUID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
+	}
+
+	if pref.DailyReminder == nil {
+		pref.DailyReminder = &user.UserPreferenceDailyReminder{}
 	}
 
 	switch input.AppIdentifier {
 	case apps.RemindV1:
-		info.DailyReminder.RemindV1 = &input
+		pref.DailyReminder.RemindV1 = &input
 	case apps.PlankV1:
-		info.DailyReminder.PlankV1 = &input
+		pref.DailyReminder.PlankV1 = &input
 	}
 
-	b, _ := json.Marshal(info)
-
-	err = s.userRepo.SaveInfo(userUUID, b)
+	err = s.userInfoRepo.Save(userUUID, pref)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
@@ -170,37 +201,4 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 	})
 
 	return c.JSON(http.StatusOK, input)
-}
-
-func (s RemindService) getPreferences(userUUID string, appIdentifier string) (openapi.RemindDailySettings, error) {
-	var response openapi.RemindDailySettings
-	b, err := s.userRepo.GetInfo(userUUID)
-	if err != nil {
-		return response, err
-	}
-
-	var pref user.UserPreference
-	err = json.Unmarshal(b, &pref)
-	if err != nil {
-		return response, nil
-	}
-
-	if pref.DailyReminder == nil {
-		return response, nil
-	}
-
-	switch appIdentifier {
-	case apps.RemindV1:
-		if pref.DailyReminder.RemindV1 != nil {
-			response = *pref.DailyReminder.RemindV1
-		}
-	case apps.PlankV1:
-		if pref.DailyReminder.PlankV1 != nil {
-			response = *pref.DailyReminder.PlankV1
-		}
-	default:
-		return response, errors.New("not supported")
-	}
-
-	return response, nil
 }

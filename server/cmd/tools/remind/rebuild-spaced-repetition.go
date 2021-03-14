@@ -36,12 +36,12 @@ sqlite3 server.db .dump | grep 'INSERT INTO spaced_repetition' | sqlite3 other.d
 		databaseName := viper.GetString("db")
 		db := database.NewDB(databaseName)
 
-		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
+		userInfoRepo := userStorage.NewUserInfo(db)
 		spacedRepetitionRepo := spaced_repetition.NewSqliteRepository(db)
 		remindSpacedRepetitionRepo := remind.NewRemindSpacedRepetitionSqliteRepository(db)
 
 		manager := remind.NewSpacedRepetition(
-			userStorageRepo,
+			userInfoRepo,
 			spacedRepetitionRepo,
 			remindSpacedRepetitionRepo,
 			logger.WithField("context", "spaced-repetition-reminder"))

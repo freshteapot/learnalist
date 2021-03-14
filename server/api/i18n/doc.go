@@ -31,6 +31,7 @@ const (
 	InputSaveAlistOperationFromRestriction      = "List not shareable due to restriction on the info.from.kind"
 	InputSaveAlistOperationFromModify           = "Unable to modify info.from"
 	InputSaveAlistOperationFromKindNotSupported = "The kind used in info, is not supported"
+	InputSaveAlistOperationPublicWriteAccess    = "User does not have access to make a list public"
 	PostUserLabelJSONFailure                    = "Your input is invalid json."
 	InputAlistJSONFailure                       = "Your input is invalid json."
 	PostShareListJSONFailure                    = "Your input is invalid json."
@@ -60,16 +61,17 @@ const (
 )
 
 var (
-	ErrorCannotReadResponse                     = errors.New("Cannot read response.")
-	ErrorInternal                               = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
-	ErrorUserSessionActivate                    = errors.New("challenge doesnt exist or is active")
-	ErrorUserAlreadyExists                      = errors.New("user.already.exists")
-	ErrorUserAlreadyExistsWrongPassword         = errors.New("user.already.exists.wrong.password")
-	ErrorInputSaveAlistFromKindNotSupported     = errors.New(InputSaveAlistOperationFromKindNotSupported)
-	ErrorInputSaveAlistOperationFromRestriction = errors.New(InputSaveAlistOperationFromRestriction)
-	ErrorInputSaveAlistOperationFromModify      = errors.New(InputSaveAlistOperationFromModify)
-	ErrorInputSaveAlistOperationOwnerOnly       = errors.New(InputSaveAlistOperationOwnerOnly)
-	ErrorAListFromDomainMisMatch                = errors.New("In info.from, the domain doesnt match the kind")
-	ErrorValidationWarningLabelNotEmpty         = errors.New("The label cannot be empty.")
-	ErrorListNotFound                           = errors.New("list.not.found")
+	ErrorCannotReadResponse                       = errors.New("Cannot read response.")
+	ErrorInternal                                 = errors.New("An internal error has occurred. If you see this repeatedly, please contact support.")
+	ErrorUserSessionActivate                      = errors.New("challenge doesnt exist or is active")
+	ErrorUserAlreadyExists                        = errors.New("user.already.exists")
+	ErrorUserAlreadyExistsWrongPassword           = errors.New("user.already.exists.wrong.password")
+	ErrorInputSaveAlistFromKindNotSupported       = errors.New(InputSaveAlistOperationFromKindNotSupported)
+	ErrorInputSaveAlistOperationFromRestriction   = errors.New(InputSaveAlistOperationFromRestriction)
+	ErrorInputSaveAlistOperationFromModify        = errors.New(InputSaveAlistOperationFromModify)
+	ErrorInputSaveAlistOperationOwnerOnly         = errors.New(InputSaveAlistOperationOwnerOnly)
+	ErrorInputSaveAlistOperationPublicWriteAccess = errors.New(InputSaveAlistOperationPublicWriteAccess)
+	ErrorAListFromDomainMisMatch                  = errors.New("In info.from, the domain doesnt match the kind")
+	ErrorValidationWarningLabelNotEmpty           = errors.New("The label cannot be empty.")
+	ErrorListNotFound                             = errors.New("list.not.found")
 )

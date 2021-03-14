@@ -14,7 +14,7 @@ func (m *Manager) GetAlist(c echo.Context) error {
 	var err error
 	var alistUUID string
 	var isA string
-	publicFolder := m.HugoHelper.GetPubicDirectory()
+	publicFolder := m.pathToPublicDirectory
 
 	uri := c.Request().URL.Path
 	user := c.Get("loggedInUser")
@@ -29,7 +29,17 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		return c.HTMLBlob(http.StatusNotFound, data)
 	}
 
-	// TODO should we check if it exists?
+	// TODO https://github.com/freshteapot/learnalist-api/issues/220
+	// Giving public lists some context could avoid acl lookup
+	pathToAlist := fmt.Sprintf("%s/alist/%s.%s", publicFolder, alistUUID, isA)
+	_, err = os.Stat(pathToAlist)
+	if err != nil {
+		data, _ := ioutil.ReadFile(fmt.Sprintf("%s/alist/404.html", publicFolder))
+		return c.HTMLBlob(http.StatusNotFound, data)
+	}
+
+	// TODO https://github.com/freshteapot/learnalist-api/issues/221
+	// response should be JSON or HTML depending on the content-type
 	allow, err := m.Acl.HasUserListReadAccess(alistUUID, userUUID)
 	if err != nil {
 		// TODO log this?
@@ -42,11 +52,5 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		return c.HTMLBlob(http.StatusForbidden, data)
 	}
 
-	// At this point, we assume the list is real
-	pathToAlist := fmt.Sprintf("%s/alist/%s.%s", publicFolder, alistUUID, isA)
-	if _, err := os.Stat(pathToAlist); err == nil {
-		return c.File(pathToAlist)
-	}
-
-	return c.File(fmt.Sprintf("%s/alist/please-refresh.html", publicFolder))
+	return c.File(pathToAlist)
 }

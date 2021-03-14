@@ -3,8 +3,26 @@
 
 [Setup the server for development](./install-server-for-dev.md)
 
-
 # Run all tests
+```sh
+make run-e2e-tests
+```
+
+## Get stats
+```sh
+cd e2elog/example
+```
+### Get all openapi endpoints that were used
+```sh
+go run main.go -logs=/tmp/learnalist/e2e-all.log | jq -c '.endpoints[]|select(.touched)'
+```
+
+### Get stats
+```sh
+go run main.go -logs=/tmp/learnalist/e2e-all.log -stats
+```
+
+# Manually run tests
 Adding the clean testcache, makes sure it reconnects via http.
 
 - need to skip, due to the race conditions
@@ -36,7 +54,7 @@ Smoke tests, which dont clean up
 ```
 make run-e2e-tests
 cd -
-sqlite3 /tmp/learnalist/server.db  'SELECT uuid FROM user' | HUGO_EXTERNAL=false  xargs -I {}  go run --tags="json1" main.go tools user delete --config=../config/dev.config.yaml --dsn=/tmp/learnalist/server.db {}
+sqlite3 /tmp/learnalist/server.db  'SELECT uuid FROM user' | STATIC_SITE_EXTERNAL=false  xargs -I {}  go run --tags="json1" main.go tools user delete --config=../config/dev.config.yaml --dsn=/tmp/learnalist/server.db {}
 ```
 
 

@@ -49,7 +49,7 @@ WHERE token = ?`
 	UserSessionSelectChallengeIsValid = `SELECT 1 FROM user_sessions WHERE challenge=? AND token="none"`
 )
 
-func NewUserSession(db *sqlx.DB) *UserSession {
+func NewUserSession(db *sqlx.DB) user.Session {
 	return &UserSession{
 		db: db,
 	}

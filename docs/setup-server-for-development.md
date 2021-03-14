@@ -17,11 +17,9 @@ make run-nats-from-docker
 
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
-HUGO_EXTERNAL=false \
 make develop
 ```
 
@@ -40,11 +38,9 @@ Go [try some curl requests.](./play.along.md)
 
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
-HUGO_EXTERNAL=false \
 make run-api-server
 ```
 
@@ -67,7 +63,7 @@ make run-api-server
 
 ## Run the server and run hugo from within
 ```sh
-HUGO_EXTERNAL=false make run-api-server
+make run-api-server
 ```
 
 ## Run via docker
@@ -84,7 +80,7 @@ docker run --rm --name learnalist \
 -v $(pwd)/config:/srv/learnalist/config \
 -v /tmp/learnalist/server.db:/srv/learnalist/server.db \
 -p 1234:1234 \
--e HUGO_EXTERNAL=false \
+-e STATIC_SITE_EXTERNAL=true \
 learnalist:latest --config=/srv/learnalist/config/docker.config.yaml server
 ```
 
@@ -99,11 +95,6 @@ make run-nats-from-docker
 
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
-EVENTS_STAN_CLUSTER_ID="test-cluster" \
-EVENTS_STAN_CLIENT_ID="lal-server" \
-EVENTS_NATS_SERVER="127.0.0.1" \
-HUGO_EXTERNAL=false \
 make run-api-server
 ```
 
@@ -111,11 +102,9 @@ make run-api-server
 ### nats
 ```sh
 make clear-site rebuild-db
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-server" \
 EVENTS_NATS_SERVER="127.0.0.1" \
-HUGO_EXTERNAL=false \
 make develop
 ```
 ## Running slack events
@@ -132,7 +121,6 @@ scripts/run-slack.sh
 
 ```sh
 cd server
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLUSTER_ID="test-cluster" \
 EVENTS_STAN_CLIENT_ID="lal-event-reader" \
 EVENTS_NATS_SERVER="127.0.0.1" \
@@ -143,7 +131,6 @@ go run main.go --config=../config/dev.config.yaml tools event-reader
 ## Run the challenge sync service
 ```sh
 TOPIC=lal.monolog \
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=challenges-sync \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
@@ -159,10 +146,16 @@ Topic where communications goto
 
 ```sh
 TOPIC=lal.monolog \
-EVENTS_VIA="nats" \
 EVENTS_STAN_CLIENT_ID=nats-reader \
 EVENTS_STAN_CLUSTER_ID=test-cluster \
 EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools natsutils read
 ```
+
+
+
+# With hugo
+```sh
+hugo server -e dev --config=config/dev_external/config.yaml -w --disableFastRender --renderToDisk --ignoreCache
+``

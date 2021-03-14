@@ -1,6 +1,8 @@
 package slack_test
 
 import (
+	"encoding/json"
+
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
@@ -231,7 +233,7 @@ var _ = Describe("Testing Events to Slack", func() {
 			{
 				entry: event.Eventlog{
 					Kind: event.ApiListDelete,
-					Data: event.EventList{
+					Data: event.EventListOwner{
 						UUID:     alistUUID,
 						UserUUID: userUUID,
 					},
@@ -460,8 +462,12 @@ var _ = Describe("Testing Events to Slack", func() {
 		}
 
 		for _, test := range tests {
+			var overTheWire event.Eventlog
+			b, _ := json.Marshal(test.entry)
+			err := json.Unmarshal(b, &overTheWire)
+			Expect(err).To(BeNil(), "bad test?")
 			reader := eventReader.NewSlackV1Events(test.post, webhook, logger.WithField("context", "slack-events"))
-			reader.Read(test.entry)
+			reader.Read(overTheWire)
 		}
 
 	})

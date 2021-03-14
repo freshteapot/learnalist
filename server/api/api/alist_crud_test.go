@@ -31,12 +31,6 @@ var _ = Describe("Testing Alist endpoints", func() {
 		BeforeEach(func() {
 			method = http.MethodPost
 			uri = "/api/v1/alist"
-			testHugoHelper := &mocks.HugoSiteBuilder{}
-			testHugoHelper.On("WriteList", mock.Anything)
-			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
-			m.HugoHelper = testHugoHelper
 
 			datastore = &mocks.Datastore{}
 			acl = &mocks.Acl{}

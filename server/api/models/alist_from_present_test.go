@@ -16,25 +16,20 @@ import (
 
 var _ = Describe("Testing from present", func() {
 	var (
-		dal            *models.DAL
-		userUUID       string
-		user           *uuid.User
-		labels         *mocks.LabelReadWriter
-		acl            *mocks.Acl
-		aListStorage   *mocks.DatastoreAlists
-		apiUserStorage *mocks.DatastoreUsers
+		dal          *models.DAL
+		userUUID     string
+		user         *uuid.User
+		labels       *mocks.LabelReadWriter
+		acl          *mocks.Acl
+		aListStorage *mocks.DatastoreAlists
 	)
 
 	BeforeEach(func() {
 		acl = &mocks.Acl{}
-		userSession := &mocks.Session{}
-		userFromIDP := &mocks.UserFromIDP{}
-		userWithUsernameAndPassword := &mocks.UserWithUsernameAndPassword{}
 		oauthHandler := &mocks.OAuthReadWriter{}
 		labels = &mocks.LabelReadWriter{}
 		aListStorage = &mocks.DatastoreAlists{}
-		apiUserStorage = &mocks.DatastoreUsers{}
-		dal = models.NewDAL(acl, apiUserStorage, aListStorage, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
+		dal = models.NewDAL(acl, aListStorage, labels, oauthHandler)
 	})
 
 	When("Testing info.from is present", func() {

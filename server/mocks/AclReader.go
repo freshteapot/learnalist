@@ -114,6 +114,27 @@ func (_m *AclReader) HasUserListWriteAccess(alistUUID string, userUUID string) (
 	return r0, r1
 }
 
+// HasUserPublicListWriteAccess provides a mock function with given fields: userUUID
+func (_m *AclReader) HasUserPublicListWriteAccess(userUUID string) (bool, error) {
+	ret := _m.Called(userUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(userUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // IsListAvailableToFriends provides a mock function with given fields: alistUUID
 func (_m *AclReader) IsListAvailableToFriends(alistUUID string) (bool, error) {
 	ret := _m.Called(alistUUID)

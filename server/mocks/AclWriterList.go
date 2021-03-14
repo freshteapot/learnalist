@@ -65,6 +65,20 @@ func (_m *AclWriterList) GrantUserListWriteAccess(alistUUID string, userUUID str
 	return r0
 }
 
+// GrantUserPublicListWriteAccess provides a mock function with given fields: userUUID
+func (_m *AclWriterList) GrantUserPublicListWriteAccess(userUUID string) error {
+	ret := _m.Called(userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // MakeListPrivate provides a mock function with given fields: alistUUID, userUUID
 func (_m *AclWriterList) MakeListPrivate(alistUUID string, userUUID string) error {
 	ret := _m.Called(alistUUID, userUUID)
@@ -100,6 +114,20 @@ func (_m *AclWriterList) RevokeUserListWriteAccess(alistUUID string, userUUID st
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, string) error); ok {
 		r0 = rf(alistUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RevokeUserPublicListWriteAccess provides a mock function with given fields: userUUID
+func (_m *AclWriterList) RevokeUserPublicListWriteAccess(userUUID string) error {
+	ret := _m.Called(userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/freshteapot/learnalist-api/server/e2e"
-	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +16,7 @@ var deleteUserCmd = &cobra.Command{
 		//logger := logging.GetLogger()
 		server := "http://127.0.0.1:1234"
 
-		credentials := api.HTTPLoginRequest{
+		credentials := openapi.HttpUserLoginRequest{
 			Username: "iamtest1",
 			Password: "test123",
 		}

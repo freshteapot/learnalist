@@ -14,7 +14,7 @@ type RoundTripFunc struct {
 }
 
 // Execute provides a mock function with given fields: req
-func (_m *RoundTripFunc) Execute(req *http.Request) *http.Response {
+func (_m *RoundTripFunc) Execute(req *http.Request) (*http.Response, error) {
 	ret := _m.Called(req)
 
 	var r0 *http.Response
@@ -26,5 +26,12 @@ func (_m *RoundTripFunc) Execute(req *http.Request) *http.Response {
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }

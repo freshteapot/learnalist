@@ -11,6 +11,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/testutils"
 
 	"github.com/labstack/echo/v4"
@@ -22,27 +23,31 @@ import (
 var _ = Describe("Testing Sharing endpoints", func() {
 	AfterEach(emptyDatabase)
 
+	BeforeEach(func() {
+		eventMessageBus := &mocks.EventlogPubSub{}
+		event.SetBus(eventMessageBus)
+		eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything, mock.Anything)
+	})
+
 	When("/share/readaccess", func() {
-		var datastore *mocks.Datastore
-		var acl *mocks.Acl
-		var userA *uuid.User
-		var userB *uuid.User
-		var method string
-		var uri string
-		var e *echo.Echo
+		var (
+			datastore      *mocks.Datastore
+			userManagement *mocks.Management
+			acl            *mocks.Acl
+			userA          *uuid.User
+			userB          *uuid.User
+			method         string
+			uri            string
+			e              *echo.Echo
+		)
 
 		BeforeEach(func() {
 			datastore = &mocks.Datastore{}
+			userManagement = &mocks.Management{}
 			acl = &mocks.Acl{}
 			m.Datastore = datastore
+			m.UserManagement = userManagement
 			m.Acl = acl
-
-			testHugoHelper := &mocks.HugoSiteBuilder{}
-			testHugoHelper.On("WriteList", mock.Anything)
-			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
-			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{
 				Uuid: "fake-123",
@@ -190,8 +195,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			aList.User.Uuid = userA.Uuid
 			aList.Info.SharedWith = aclKeys.SharedWithPublic
 			datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-			datastore.On("UserExists", userB.Uuid).Return(false)
-
+			userManagement.On("UserExists", userB.Uuid).Return(false)
 			m.V1ShareListReadAccess(c)
 
 			Expect(rec.Code).To(Equal(http.StatusNotFound))
@@ -216,7 +220,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				aList.User.Uuid = userA.Uuid
 				aList.Info.SharedWith = aclKeys.SharedWithPublic
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("UserExists", userB.Uuid).Return(true)
+				userManagement.On("UserExists", userB.Uuid).Return(true)
 				acl.On("GrantUserListReadAccess", inputGrant.AlistUUID, inputGrant.UserUUID).Return(nil)
 
 				m.V1ShareListReadAccess(c)
@@ -242,7 +246,7 @@ var _ = Describe("Testing Sharing endpoints", func() {
 				aList.User.Uuid = userA.Uuid
 				aList.Info.SharedWith = aclKeys.SharedWithPublic
 				datastore.On("GetAlist", mock.Anything).Return(aList, nil)
-				datastore.On("UserExists", userB.Uuid).Return(true)
+				userManagement.On("UserExists", userB.Uuid).Return(true)
 				acl.On("RevokeUserListReadAccess", inputRevoke.AlistUUID, inputRevoke.UserUUID).Return(nil)
 
 				m.V1ShareListReadAccess(c)
@@ -266,13 +270,6 @@ var _ = Describe("Testing Sharing endpoints", func() {
 			acl = &mocks.Acl{}
 			m.Datastore = datastore
 			m.Acl = acl
-
-			testHugoHelper := &mocks.HugoSiteBuilder{}
-			testHugoHelper.On("WriteList", mock.Anything)
-			testHugoHelper.On("WriteListsByUser", mock.Anything, mock.Anything)
-			testHugoHelper.On("WritePublicLists", mock.Anything)
-			testHugoHelper.On("DeleteList", mock.Anything).Return(nil)
-			m.HugoHelper = testHugoHelper
 
 			userA = &uuid.User{
 				Uuid: "fake-123",

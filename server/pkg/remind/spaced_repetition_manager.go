@@ -17,7 +17,7 @@ import (
 
 type spacedRepetitionManager struct {
 	subscription         stan.Subscription
-	userRepo             user.ManagementStorage
+	userInfoRepo         user.UserInfoRepository
 	spacedRepetitionRepo spaced_repetition.SpacedRepetitionRepository
 	remindRepo           RemindSpacedRepetitionRepository
 	logContext           logrus.FieldLogger
@@ -25,12 +25,12 @@ type spacedRepetitionManager struct {
 }
 
 func NewSpacedRepetition(
-	userRepo user.ManagementStorage,
+	userInfoRepo user.UserInfoRepository,
 	spacedRepetitionRepo spaced_repetition.SpacedRepetitionRepository,
 	remindRepo RemindSpacedRepetitionRepository,
 	logContext logrus.FieldLogger) *spacedRepetitionManager {
 	return &spacedRepetitionManager{
-		userRepo:             userRepo,
+		userInfoRepo:         userInfoRepo,
 		spacedRepetitionRepo: spacedRepetitionRepo,
 		remindRepo:           remindRepo,
 		logContext:           logContext,
@@ -135,7 +135,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 			"user_uuid": userUUID,
 		})
 
-		err := app_settings.SaveRemindV1(m.userRepo, userUUID, updatedSettings)
+		err := app_settings.SaveRemindV1(m.userInfoRepo, userUUID, updatedSettings)
 		if err != nil {
 			// We might want this to be fatal
 			logContext.WithFields(logrus.Fields{
@@ -238,7 +238,7 @@ func (m *spacedRepetitionManager) OnEvent(entry event.Eventlog) {
 }
 
 func (m *spacedRepetitionManager) CheckForNextEntryAndSetReminder(logContext logrus.FieldLogger, userUUID string, lastActive time.Time) {
-	settings, err := app_settings.GetRemindV1(m.userRepo, userUUID)
+	settings, err := app_settings.GetRemindV1(m.userInfoRepo, userUUID)
 	if err != nil {
 		if err != utils.ErrNotFound {
 			logContext.WithFields(logrus.Fields{

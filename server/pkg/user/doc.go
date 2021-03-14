@@ -12,29 +12,6 @@ const (
 	IDPKindUserID = "id"
 )
 
-type ManagementStorage interface {
-	FindUserUUID(search string) ([]string, error)
-	GetLists(userUUID string) ([]string, error)
-	DeleteUser(userUUID string) error
-	DeleteList(listUUID string) error
-	SaveInfo(userUUID string, info []byte) error
-	GetInfo(userUUID string) ([]byte, error)
-	RemoveInfo(userUUID string, key string) error
-}
-
-type ManagementSite interface {
-	DeleteList(listUUID string) error
-	DeleteUser(userUUID string) error
-}
-
-type Management interface {
-	FindUser(search string) ([]string, error)
-	DeleteUser(userUUID string) error
-	SaveInfo(userUUID string, info []byte) error
-	GetInfo(userUUID string) ([]byte, error)
-	RemoveInfo(userUUID string, key string) error
-}
-
 type management struct {
 	storage  ManagementStorage
 	site     ManagementSite
@@ -47,6 +24,7 @@ type UserInfoFromUsernameAndPassword struct {
 	Hash     string
 }
 
+// TODO what is this
 type UserInfo struct {
 	UserUUID  string
 	Challenge string
@@ -61,6 +39,67 @@ type UserSession struct {
 	Created time.Time
 }
 
+type UserPreference struct {
+	UserUUID         string                       `json:"user_uuid,omitempty"`
+	DisplayName      string                       `json:"display_name,omitempty"`
+	CreatedVia       string                       `json:"created_via,omitempty"`
+	DailyReminder    *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
+	Apps             *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
+	LastActive       *LastActive                  `json:"last_active,omitempty"`
+	SpacedRepetition *SpacedRepetition            `json:"spaced_repetition,omitempty"`
+	Acl              ACL                          `json:"acl"`
+}
+
+type UserPreferenceDailyReminder struct {
+	RemindV1 *openapi.RemindDailySettings `json:"remind_v1,omitempty"` // Needed first :D
+	PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
+}
+
+type UserPreferenceApps struct {
+	PlankV1  *openapi.MobilePlankAppV1Settings `json:"plank_v1,omitempty"` // Only nice to sync between app and web, not needed yet
+	RemindV1 *openapi.AppSettingsRemindV1      `json:"remind_v1,omitempty"`
+}
+
+// TODO actually use
+type LastActive struct {
+	Plank            string `json:"plank,omitempty"`             // UTC int64? or string time.RFC3339Nano
+	SpacedRepetition string `json:"spaced_repetition,omitempty"` // UTC int64? or string time.RFC3339Nano
+}
+
+type SpacedRepetition struct {
+	ListsOvertime []string `json:"lists_overtime"` // UTC int64? or string time.RFC3339Nano
+}
+
+type ACL struct {
+	PublicListWrite int `json:"list_public_write"`
+}
+
+// TODO is this the correct name
+type UserInfoRepository interface {
+	Get(userUUID string) (UserPreference, error)
+	Save(userUUID string, pref UserPreference) error
+}
+
+type ManagementStorage interface {
+	UserExists(userUUID string) bool
+	FindUserUUID(search string) ([]string, error)
+	GetLists(userUUID string) ([]string, error)
+	DeleteUser(userUUID string) error
+	DeleteList(listUUID string) error
+}
+
+type ManagementSite interface {
+	DeleteList(listUUID string) error
+	DeleteUser(userUUID string) error
+}
+
+type Management interface {
+	UserExists(userUUID string) bool
+	FindUser(search string) ([]string, error)
+	DeleteUser(userUUID string) error
+}
+
+// TODO rename to UserSession
 type Session interface {
 	NewSession(userUUID string) (session UserSession, err error)
 	// Create create a session with a unique challenge, send the challenge in the oauth2 flow
@@ -86,34 +125,4 @@ type UserWithUsernameAndPassword interface {
 type UserFromIDP interface {
 	Register(idp string, kind string, identifier string, info []byte) (userUUID string, err error)
 	Lookup(idp string, kind string, identifier string) (userUUID string, err error)
-}
-
-type UserPreference struct {
-	UserUUID         string                       `json:"user_uuid,omitempty"`
-	DisplayName      string                       `json:"display_name,omitempty"`
-	CreatedVia       string                       `json:"created_via,omitempty"`
-	DailyReminder    *UserPreferenceDailyReminder `json:"daily_reminder,omitempty"`
-	Apps             *UserPreferenceApps          `json:"app_settings,omitempty"` // TODO good to know, but lets not run with it yet
-	LastActive       *LastActive                  `json:"last_active,omitempty"`
-	SpacedRepetition *SpacedRepetition            `json:"spaced_repetition,omitempty"`
-}
-
-type UserPreferenceDailyReminder struct {
-	RemindV1 *openapi.RemindDailySettings `json:"remind_v1,omitempty"` // Needed first :D
-	PlankV1  *openapi.RemindDailySettings `json:"plank_v1,omitempty"`
-}
-
-type UserPreferenceApps struct {
-	PlankV1  *openapi.MobilePlankAppV1Settings `json:"plank_v1,omitempty"` // Only nice to sync between app and web, not needed yet
-	RemindV1 *openapi.AppSettingsRemindV1      `json:"remind_v1,omitempty"`
-}
-
-// TODO actually use
-type LastActive struct {
-	Plank            string `json:"plank,omitempty"`             // UTC int64? or string time.RFC3339Nano
-	SpacedRepetition string `json:"spaced_repetition,omitempty"` // UTC int64? or string time.RFC3339Nano
-}
-
-type SpacedRepetition struct {
-	ListsOvertime []string `json:"lists_overtime"` // UTC int64? or string time.RFC3339Nano
 }

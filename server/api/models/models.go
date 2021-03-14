@@ -6,35 +6,30 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/label"
-	apiUser "github.com/freshteapot/learnalist-api/server/api/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
-	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 // DB allowing us to build an abstraction layer
 type DAL struct {
-	Acl                         acl.Acl
-	userSession                 user.Session
-	userFromIDP                 user.UserFromIDP
-	userWithUsernameAndPassword user.UserWithUsernameAndPassword
-	oauthHandler                oauth.OAuthReadWriter
-	labels                      label.LabelReadWriter
-	alist                       alist.DatastoreAlists
-	user                        apiUser.DatastoreUsers
+	Acl          acl.Acl
+	oauthHandler oauth.OAuthReadWriter
+	labels       label.LabelReadWriter
+	alist        alist.DatastoreAlists
 }
 
-func NewDAL(acl acl.Acl, apiUserStorage apiUser.DatastoreUsers, aListStorage alist.DatastoreAlists, labels label.LabelReadWriter, userSession user.Session, userFromIDP user.UserFromIDP, userWithUsernameAndPassword user.UserWithUsernameAndPassword, oauthHandler oauth.OAuthReadWriter) *DAL {
+func NewDAL(
+	acl acl.Acl,
+	aListStorage alist.DatastoreAlists,
+	labels label.LabelReadWriter,
+	oauthHandler oauth.OAuthReadWriter,
+) *DAL {
 	dal := &DAL{
-		Acl:                         acl,
-		userSession:                 userSession,
-		userFromIDP:                 userFromIDP,
-		userWithUsernameAndPassword: userWithUsernameAndPassword,
-		oauthHandler:                oauthHandler,
-		labels:                      labels,
-		alist:                       aListStorage,
-		user:                        apiUserStorage,
+		Acl:          acl,
+		oauthHandler: oauthHandler,
+		labels:       labels,
+		alist:        aListStorage,
 	}
 	return dal
 }

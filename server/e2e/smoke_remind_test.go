@@ -13,6 +13,7 @@ var _ = Describe("Testing remind API", func() {
 	var client *openapi.APIClient
 
 	BeforeEach(func() {
+		// TODO use global
 		config := openapi.NewConfiguration()
 		config.BasePath = "http://localhost:1234/api/v1"
 		client = openapi.NewAPIClient(config)

@@ -32,7 +32,6 @@ var _ = Describe("Testing AppleID Oauth redirect", func() {
 		req *http.Request
 		rec *httptest.ResponseRecorder
 
-		hugoHelper     *mocks.HugoSiteBuilder
 		userManagement *mocks.Management
 		userSession    *mocks.Session
 		userFromIDP    *mocks.UserFromIDP
@@ -53,11 +52,9 @@ var _ = Describe("Testing AppleID Oauth redirect", func() {
 		oauth2Config = &mocks.OAuth2ConfigInterface{}
 		oauthHandlers = oauth.Handlers{}
 		oauthHandlers.AddAppleID(oauth2Config)
-		hugoHelper = &mocks.HugoSiteBuilder{}
 
 		service = oauthApi.NewService(
 			userManagement,
-			hugoHelper,
 			oauthHandlers,
 			userSession,
 			userFromIDP,
@@ -76,7 +73,6 @@ var _ = Describe("Testing AppleID Oauth redirect", func() {
 		oauthHandlers.AppleID = nil
 		service = oauthApi.NewService(
 			userManagement,
-			hugoHelper,
 			oauthHandlers,
 			userSession,
 			userFromIDP,

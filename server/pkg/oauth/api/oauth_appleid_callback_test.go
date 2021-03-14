@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -38,7 +37,6 @@ var _ = Describe("Testing AppleID Oauth callback", func() {
 		req *http.Request
 		rec *httptest.ResponseRecorder
 
-		hugoHelper   *mocks.HugoSiteBuilder
 		userSession  *mocks.Session
 		userFromIDP  *mocks.UserFromIDP
 		oauth2Config *mocks.OAuth2ConfigInterface
@@ -58,11 +56,9 @@ var _ = Describe("Testing AppleID Oauth callback", func() {
 		oauth2Config = &mocks.OAuth2ConfigInterface{}
 		oauthHandlers := oauth.Handlers{}
 		oauthHandlers.AddAppleID(oauth2Config)
-		hugoHelper = &mocks.HugoSiteBuilder{}
 
 		service = oauthApi.NewService(
 			userManagement,
-			hugoHelper,
 			oauthHandlers,
 			userSession,
 			userFromIDP,
@@ -195,9 +191,7 @@ var _ = Describe("Testing AppleID Oauth callback", func() {
 
 			It("Success, user registered and now the post register step(s)", func() {
 				userUUID := "fake-uuid-123"
-				noLists := make([]alist.ShortInfo, 0)
 
-				hugoHelper.On("WriteListsByUser", userUUID, noLists)
 				userFromIDP.On("Lookup", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID).Return("", utils.ErrNotFound)
 				userFromIDP.On("Register", oauth.IDPKeyApple, user.IDPKindUserID, fakeExtUserID, mock.Anything).Return(userUUID, nil)
 
@@ -209,7 +203,8 @@ var _ = Describe("Testing AppleID Oauth callback", func() {
 				eventMessageBus.On("Publish", event.TopicMonolog, mock.MatchedBy(func(moment event.Eventlog) bool {
 					if try == 0 {
 						Expect(moment.Kind).To(Equal(event.ApiUserRegister))
-						Expect(moment.Data.(event.EventUser).Kind).To(Equal(event.KindUserRegisterIDPApple))
+						Expect(moment.Data.(event.EventNewUser).Kind).To(Equal(event.KindUserRegisterIDPApple))
+						Expect(moment.Data.(event.EventNewUser).Data.(user.UserPreference)).To(Equal(user.UserPreference{}))
 						try = 1
 						return true
 					}

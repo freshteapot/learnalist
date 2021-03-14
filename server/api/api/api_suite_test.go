@@ -10,7 +10,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
-	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,19 +29,13 @@ var (
 var _ = BeforeSuite(func() {
 	db = database.NewTestDB()
 	acl := aclStorage.NewAcl(db)
-	userSession := userStorage.NewUserSession(db)
-	userFromIDP := userStorage.NewUserFromIDP(db)
-	userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
 	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
 	aListStorage := &mocks.DatastoreAlists{}
-	apiUserStorage := &mocks.DatastoreUsers{}
-	dal = models.NewDAL(acl, apiUserStorage, aListStorage, labels, userSession, userFromIDP, userWithUsernameAndPassword, oauthHandler)
-	hugoHelper := &mocks.HugoSiteBuilder{}
+	dal = models.NewDAL(acl, aListStorage, labels, oauthHandler)
 
 	m = api.Manager{
-		Datastore:  dal,
-		Acl:        acl,
-		HugoHelper: hugoHelper,
+		Datastore: dal,
+		Acl:       acl,
 	}
 })

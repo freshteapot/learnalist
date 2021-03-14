@@ -121,7 +121,7 @@ uuid=?`
 
 	// Todo need to rebuild hugo
 	fmt.Println("Dont forget to rebuild static site")
-	fmt.Println("HUGO_EXTERNAL=false  /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site")
+	fmt.Println("STATIC_SITE_EXTERNAL=false  /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site")
 }
 
 func (f interactV1) RemoveInteractFromNonV1() {

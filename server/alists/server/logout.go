@@ -18,7 +18,7 @@ func (m *Manager) Logout(c echo.Context) error {
 	}
 
 	token := loginCookie.Value
-	session := m.Datastore.UserSession()
+	session := m.UserSession
 	authenticate.SendLogoutCookie(c)
 
 	userUUID, err := session.GetUserUUIDByToken(token)

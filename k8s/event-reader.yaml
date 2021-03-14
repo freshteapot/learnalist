@@ -22,8 +22,6 @@ spec:
           args:
             ["--config=/etc/learnalist/config.yaml", "tools", "event-reader"]
           env:
-            - name: EVENTS_VIA
-              value: "nats"
             - name: EVENTS_NATS_SERVER
               value: "nats.default.svc.cluster.local"
             - name: EVENTS_STAN_CLIENT_ID

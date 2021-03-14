@@ -99,15 +99,15 @@ async function addList(aList) {
 async function updateList(aList) {
   try {
     const api = getApi(Services.Alist);
-
     const input = {
       uuid: aList.uuid,
       alist: AlistFromJSON(aList)
     }
-    return await api.updateListByUuid(input);
+    const res = await api.updateListByUuidRaw(input);
+    return await res.value();
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to update list");
+    const body = await error.json();
+    throw new Error(body.message);
   }
 }
 

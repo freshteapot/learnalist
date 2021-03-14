@@ -6,6 +6,6 @@ import (
 )
 
 type AppSettingsService struct {
-	userRepo   user.ManagementStorage
-	logContext logrus.FieldLogger
+	userInfoRepo user.UserInfoRepository
+	logContext   logrus.FieldLogger
 }

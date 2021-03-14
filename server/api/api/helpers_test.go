@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -14,25 +13,6 @@ import (
 
 func emptyDatabase() {
 	database.EmptyDatabase(db)
-}
-
-func createNewUserWithSuccess(input string) (uuid string, httpStatusCode int) {
-	var raw map[string]interface{}
-	statusCode, jsonBytes := createNewUser(input)
-	Expect(statusCode).To(BeElementOf([]int{http.StatusOK, http.StatusCreated}))
-	json.Unmarshal(jsonBytes, &raw)
-	user_uuid := raw["uuid"].(string)
-	return user_uuid, statusCode
-}
-
-func createNewUser(input string) (statusCode int, responseBytes []byte) {
-	e := echo.New()
-	req, rec := setupFakeEndpoint(http.MethodPost, "/api/v1/user/register", input)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	c := e.NewContext(req, rec)
-	err := m.V1PostRegister(c)
-	Expect(err).ShouldNot(HaveOccurred())
-	return rec.Code, rec.Body.Bytes()
 }
 
 func createAList(userUUID, input string) (statusCode int, responseBytes []byte) {

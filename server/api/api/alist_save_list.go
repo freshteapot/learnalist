@@ -3,6 +3,7 @@ package api
 import (
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
@@ -67,11 +68,13 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 		response := api.HTTPResponseMessage{
 			Message: err.Error(),
 		}
-
+		// TODO this doesnt handle internal server error, interesting
 		switch err {
 		case i18n.ErrorListNotFound:
 			response.Message = i18n.SuccessAlistNotFound
 			return c.JSON(http.StatusNotFound, response)
+		case i18n.ErrorInputSaveAlistOperationPublicWriteAccess:
+			fallthrough
 		case i18n.ErrorInputSaveAlistOperationOwnerOnly:
 			return c.JSON(http.StatusForbidden, response)
 		case i18n.ErrorAListFromDomainMisMatch:
@@ -84,12 +87,6 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, response)
 		}
 	}
-
-	// Save to hugo
-	m.HugoHelper.WriteList(aList)
-	// TODO this might become a painful bottle neck
-	m.HugoHelper.WriteListsByUser(aList.User.Uuid, m.Datastore.GetAllListsByUser(user.Uuid))
-	m.HugoHelper.WritePublicLists(m.Datastore.GetPublicLists())
 
 	statusCode := http.StatusOK
 	action := event.ActionUpdated
@@ -108,6 +105,8 @@ func (m *Manager) V1SaveAlist(c echo.Context) error {
 			Data:     aList,
 		},
 	})
+	// A horrible idea, but curious,
+	time.Sleep(10 * time.Millisecond)
 
 	return c.JSON(statusCode, aList)
 }

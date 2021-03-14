@@ -2,35 +2,31 @@ package server
 
 import (
 	authenticateAlists "github.com/freshteapot/learnalist-api/server/alists/pkg/authenticate"
-	"github.com/freshteapot/learnalist-api/server/alists/pkg/hugo"
 	alists "github.com/freshteapot/learnalist-api/server/alists/server"
 	"github.com/freshteapot/learnalist-api/server/pkg/authenticate"
-
-	"github.com/freshteapot/learnalist-api/server/api/models"
-	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
 )
 
-func InitAlists(acl acl.Acl, dal models.Datastore, hugoHelper hugo.HugoHelper) {
-	m := alists.Manager{
-		Acl:        acl,
-		Datastore:  dal,
-		HugoHelper: hugoHelper,
-	}
+func InitAlists(
+	manager *alists.Manager,
+	userSession user.Session,
+	userWithUsernameAndPassword user.UserWithUsernameAndPassword,
+	pathToPublicDirectory string,
+) {
 
 	authConfig := authenticate.Config{
-		LookupBasic:  m.Datastore.UserWithUsernameAndPassword().Lookup,
-		LookupBearer: m.Datastore.UserSession().GetUserUUIDByToken,
+		LookupBasic:  userWithUsernameAndPassword.Lookup,
+		LookupBearer: userSession.GetUserUUIDByToken,
 		Skip:         authenticateAlists.SkipAuth,
 	}
 
-	server.GET("/logout.html", m.Logout)
-	server.GET("/lists-by-me.html", m.GetMyLists, authenticate.Auth(authConfig))
-	server.GET("/alistsbyuser/:uuid.html", m.GetMyListsByURI, authenticate.Auth(authConfig))
+	server.GET("/logout.html", manager.Logout)
+	server.GET("/lists-by-me.html", manager.GetMyLists, authenticate.Auth(authConfig))
+	server.GET("/alistsbyuser/:uuid.html", manager.GetMyListsByURI, authenticate.Auth(authConfig))
 
 	alists := server.Group("/alist")
 	alists.Use(authenticate.Auth(authConfig))
 
-	alists.GET("/*", m.GetAlist)
-
-	server.Static("/", m.HugoHelper.GetPubicDirectory())
+	alists.GET("/*", manager.GetAlist)
+	server.Static("/", pathToPublicDirectory)
 }

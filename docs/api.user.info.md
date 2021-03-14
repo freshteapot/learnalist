@@ -20,3 +20,19 @@ curl -XGET \
 # Breakdown
 ## spaced_repetition.lists_overtime
 Lists that are currently being added overitme for spaced repetition learning
+
+
+# Example
+```sh
+response=$(curl -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
+{
+    "username":"iamtest1",
+    "password":"test123"
+}
+')
+userUUID=$(echo $response | jq -r '.user_uuid')
+token=$(echo $response | jq -r '.token')
+curl -XGET \
+-H "Authorization: Bearer ${token}" \
+"http://127.0.0.1:1234/api/v1/user/info/${userUUID}"
+```
