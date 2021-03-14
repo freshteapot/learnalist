@@ -4,7 +4,6 @@ title = "Learnalist"
 
 uglyURLs = true
 disableKinds=["home", "sitemap", "taxonomy", "taxonomyTerm", "RSS", "section"]
-# TODO do I want to do this?
 ignoreErrors = ["error-remote-getjson"]
 
 [params]

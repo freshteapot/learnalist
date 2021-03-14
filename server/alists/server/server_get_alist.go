@@ -29,8 +29,8 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		return c.HTMLBlob(http.StatusNotFound, data)
 	}
 
-	// TODO if public lists go into a different folder, then we can skip the acl
-	// We could also test for 404 in both locations
+	// TODO https://github.com/freshteapot/learnalist-api/issues/220
+	// Giving public lists some context could avoid acl lookup
 	pathToAlist := fmt.Sprintf("%s/alist/%s.%s", publicFolder, alistUUID, isA)
 	_, err = os.Stat(pathToAlist)
 	if err != nil {
@@ -38,7 +38,8 @@ func (m *Manager) GetAlist(c echo.Context) error {
 		return c.HTMLBlob(http.StatusNotFound, data)
 	}
 
-	// TODO response should be JSON or HTML depending on the content-type
+	// TODO https://github.com/freshteapot/learnalist-api/issues/221
+	// response should be JSON or HTML depending on the content-type
 	allow, err := m.Acl.HasUserListReadAccess(alistUUID, userUUID)
 	if err != nil {
 		// TODO log this?
