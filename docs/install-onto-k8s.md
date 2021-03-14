@@ -104,6 +104,7 @@ kubectl exec -it $(kubectl get pods -l "app=learnalist" -o jsonpath="{.items[0].
 
 ## Rebuild Static site
 ```sh
+EVENTS_STAN_CLIENT_ID="rebuild-static-site-manual" \
 /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
 ```
 

@@ -120,6 +120,19 @@ WHERE
     user_uuid="2b"
 ```
 
+# User tools
+## Find user
+```sh
+EVENTS_STAN_CLIENT_ID="tools-user-mangement" \
+/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools user find "iamtest1"
+```
+
+## Delete user
+```sh
+EVENTS_STAN_CLIENT_ID="tools-user-mangement" \
+/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools user delete
+```
+
 # Reference
 - https://docs.nats.io/nats-streaming-concepts/monitoring/endpoints
 - https://docs.nats.io/nats-server/configuration/monitoring#monitoring-endpoints
