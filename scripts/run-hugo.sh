@@ -57,6 +57,7 @@ _APISERVER="http://${_BIND}:1234"
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TOP_LEVEL="${CWD}/../"
 HUGO_DIR="${CWD}/../hugo"
+SERVER_DIR="${CWD}/../server"
 DEFAULT_SERVER_CONFIG="${CWD}/../config/dev.config.yaml"
 SERVER_CONFIG="${CWD}/../config/dev_external.config.yaml"
 HUGO_CONFIG_DIR="${HUGO_DIR}/config/dev_external"
@@ -65,6 +66,7 @@ HUGO_CONFIG="${HUGO_CONFIG_DIR}/config.yaml"
 # Notice
 echo "Running hugo on ${_APISERVER} with config from ${HUGO_CONFIG}."
 echo "Running server with config from ${SERVER_CONFIG}."
+
 
 # Update config server
 rm -f $SERVER_CONFIG
@@ -84,27 +86,57 @@ mkdir -p "$HUGO_DIR/public"
 rm -rf "$HUGO_DIR/public/"*
 mkdir -p $HUGO_DIR/{public/alist,public/alistsbyuser}
 ls -lah "$HUGO_DIR/public"
-# Start the server
 
-cd server && \
-STATIC_SITE_EXTERNAL=false \
+
+# Static files
+cd $HUGO_DIR && \
+hugo -e dev_external \
+-b $_BASEURL
+
+
+# Start the server
+cd $SERVER_DIR && \
+EVENTS_STAN_CLIENT_ID=lal-server \
 go run --tags="json1" main.go --config=$SERVER_CONFIG server &
 
-# Start static site engine
-cd $HUGO_DIR && \
-hugo server \
--w \
--e dev_external \
---disableFastRender \
---forceSyncStatic \
---renderToDisk \
---verbose \
---verboseLog \
---debug \
--b $_BASEURL --bind $_BIND \
-&
-sleep 1
 
+# Start static site engine
+if [[ $STATIC_SITE_EXTERNAL == "true" ]]; then
+	cd $SERVER_DIR && \
+	EVENTS_STAN_CLIENT_ID=static-site \
+	go run main.go --config=$SERVER_CONFIG \
+	static-site &
+
+	# Without watch
+	cd $HUGO_DIR && \
+	hugo server \
+	-e dev_external \
+	--disableFastRender \
+	--forceSyncStatic \
+	--renderToDisk \
+	--verbose \
+	--verboseLog \
+	--debug \
+	-b $_BASEURL --bind $_BIND \
+	&
+	sleep 1
+fi
+
+if [[ $STATIC_SITE_EXTERNAL == "false" ]]; then
+	cd $HUGO_DIR && \
+	hugo server \
+	-w \
+	-e dev_external \
+	--disableFastRender \
+	--forceSyncStatic \
+	--renderToDisk \
+	--verbose \
+	--verboseLog \
+	--debug \
+	-b $_BASEURL --bind $_BIND \
+	&
+	sleep 1
+fi
 
 cd $TOP_LEVEL
 cd js

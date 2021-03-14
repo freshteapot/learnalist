@@ -29,6 +29,13 @@ rebuild-db-remind-manager:
 	rm -f /tmp/learnalist/remind-daily.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
 
+rebuild-static-site:
+	cd server && \
+	EVENTS_STAN_CLIENT_ID=rebuild-static-site \
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
+	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
+
 test:
 	cd server && \
 	./cover.sh
@@ -95,6 +102,8 @@ run-static-site:
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
 develop:
+	EVENTS_STAN_CLUSTER_ID=test-cluster \
+	EVENTS_NATS_SERVER=127.0.0.1 \
 	scripts/run-hugo.sh
 
 develop-localhost:
@@ -157,10 +166,6 @@ generate-docs-api-overview: generate-openapi-one
 #
 # More production than development
 #
-rebuild-static-site:
-	cd server && \
-	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
-
 build-site-assets:
 	./scripts/build-site-assets.sh
 

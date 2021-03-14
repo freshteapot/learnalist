@@ -14,21 +14,26 @@ spec:
         app: learnalist
     spec:
       containers:
-        - name: hugo
-          image: klakegg/hugo:0.80.0
-          command: [hugo-official]
-          args: ["--environment=lal01", "--verbose", "-w"]
+        - name: static-site
+          image: registry.devbox/learnalist:latest
+          args: ["static-site", "--config=/etc/learnalist/config.yaml"]
+          env:
+            - name: EVENTS_NATS_SERVER
+              value: "nats.default.svc.cluster.local"
+            - name: EVENTS_STAN_CLIENT_ID
+              value: "lal-staticsite"
           volumeMounts:
+            - name: config-volume
+              mountPath: /etc/learnalist/config.yaml
+              subPath: config.yaml
+              readOnly: true
             - name: srv-learnalist-volume
-              mountPath: "/src"
-              subPath: hugo
+              mountPath: "/srv/learnalist/"
 
-        - name: learnalist
+        - name: api
           image: registry.devbox/learnalist:latest
           args: ["server", "--config=/etc/learnalist/config.yaml"]
           env:
-            - name: HUGO_EXTERNAL
-              value: "true"
             - name: STATIC_SITE_EXTERNAL
               value: "true"
             - name: EVENTS_NATS_SERVER
