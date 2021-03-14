@@ -79,11 +79,26 @@ func (g glue) OnEvent(entry event.Eventlog) {
 		g.triggerPublicList()
 	case event.ApiListDelete:
 		b, _ := json.Marshal(entry.Data)
-		var moment event.EventList
-		json.Unmarshal(b, &moment)
+		var moment event.EventListOwner
+		err := json.Unmarshal(b, &moment)
+		if err != nil {
+			g.logContext.WithFields(logrus.Fields{
+				"error": err,
+				"entry": string(b),
+			}).Error("bad data")
+			return
+		}
 
 		userUUID := moment.UserUUID
 		alistUUID := moment.UUID
+
+		if userUUID == "" || alistUUID == "" {
+			g.logContext.WithFields(logrus.Fields{
+				"error": err,
+				"entry": string(b),
+			}).Error("data data")
+			return
+		}
 
 		// WriteList
 		event.GetBus().Publish(event.TopicStaticSite, event.Eventlog{

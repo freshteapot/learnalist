@@ -103,7 +103,12 @@ type EventList struct {
 	UUID     string      `json:"uuid"`
 	UserUUID string      `json:"user_uuid"`
 	Action   string      `json:"action,omitempty"`
-	Data     alist.Alist `json:"data,omitempty"`
+	Data     alist.Alist `json:"data,omitempty"` // If the list is not present it fails on json.Unmarshal
+}
+
+type EventListOwner struct {
+	UUID     string `json:"uuid"`
+	UserUUID string `json:"user_uuid"`
 }
 
 type EventKV struct {

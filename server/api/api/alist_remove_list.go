@@ -36,7 +36,7 @@ func (m *Manager) V1RemoveAlist(c echo.Context) error {
 
 	event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 		Kind: event.ApiListDelete,
-		Data: event.EventList{
+		Data: event.EventListOwner{
 			UUID:     alistUUID,
 			UserUUID: user.Uuid,
 		},

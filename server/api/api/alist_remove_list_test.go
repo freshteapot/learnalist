@@ -91,7 +91,7 @@ var _ = Describe("Testing Api endpoints that get lists", func() {
 				//fmt.Println("moment.Kind", moment.Kind)
 				//return true
 				Expect(moment.Kind).To(Equal(event.ApiListDelete))
-				Expect(moment.Data.(event.EventList).UUID).To(Equal(alistUUID))
+				Expect(moment.Data.(event.EventListOwner).UUID).To(Equal(alistUUID))
 				return true
 			}))
 			event.SetBus(eventMessageBus)
