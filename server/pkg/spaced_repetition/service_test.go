@@ -644,4 +644,54 @@ var _ = Describe("Testing Spaced Repetition Service API", func() {
 			Expect(rec.Code).To(Equal(http.StatusInternalServerError))
 		})
 	})
+
+	When("Entry has reached the end of known thresholds", func() {
+		var (
+			uri = "/api/v1/api/v1/spaced-repetition/viewed"
+		)
+
+		It("Threshold 9 will continue to use Threshold 9: https://github.com/freshteapot/learnalist-api/issues/218", func() {
+			input := openapi.SpacedRepetitionEntryViewed{
+				Action: spaced_repetition.ActionIncrement,
+				Uuid:   entryUUID,
+			}
+
+			b, _ := json.Marshal(input)
+			req, rec = testutils.SetupJSONEndpoint(http.MethodPost, uri, string(b))
+			c = e.NewContext(req, rec)
+
+			c.Set("loggedInUser", *user)
+			c.SetPath(uri)
+			created, _ := time.Parse(time.RFC3339, "2020-12-27T17:04:59Z")
+			whenNext, _ := time.Parse(time.RFC3339, "2020-12-27T18:04:59Z")
+			// When next entry is set to level9, this failed to update the time
+			// Now we confirm it keeps moving the entry along on level9 (the largest time gap)
+			repo.On("GetNext", user.Uuid).Return(spaced_repetition.SpacedRepetitionEntry{
+				UUID:     entryUUID,
+				UserUUID: userUUID,
+				Body:     `{"show":"Hello","kind":"v1","uuid":"ba9277fc4c6190fb875ad8f9cee848dba699937f","data":"Hello","settings":{"level":"9","when_next":"2020-12-27T18:04:59Z","created":"2020-12-27T17:04:59Z"}}`,
+				Created:  created,
+				WhenNext: whenNext,
+			}, nil)
+
+			repo.On("UpdateEntry", mock.MatchedBy(func(entry spaced_repetition.SpacedRepetitionEntry) bool {
+				whenNext := time.Now().UTC().Add(spaced_repetition.Threshold9)
+				diff := whenNext.Sub(entry.WhenNext)
+
+				Expect(whenNext.After(entry.WhenNext)).To(BeTrue(), "Verify time changed is anchored to threshold 9")
+				Expect(diff < (1*time.Second)).To(BeTrue(), "Verify time changed is anchored to threshold 9")
+
+				return true
+			})).Return(nil)
+
+			eventMessageBus.On("Publish", event.TopicMonolog, mock.Anything)
+
+			service.EntryViewed(c)
+			Expect(rec.Code).To(Equal(http.StatusOK))
+			var entry openapi.SpacedRepetitionV1
+			json.Unmarshal(rec.Body.Bytes(), &entry)
+			Expect(entry.Uuid).To(Equal(entryUUID))
+			Expect(entry.Settings.Level).To(Equal("9"))
+		})
+	})
 })
