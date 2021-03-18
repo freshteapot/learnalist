@@ -2,44 +2,73 @@ import lockfile from 'proper-lockfile';
 import fs from 'fs-extra';
 import del from 'del';
 
-const pathToManifestFile = "../hugo/data/manifest_js.json";
-const pathToManifestFileCSS = "../hugo/data/manifest_css.json";
-const pathToStaticDirectory = "../hugo/static";
-const pathToPublicDirectory = "../hugo/public";
+// I think a hack can be in here.
+const basePath = "../hugo"
+const localBasePath = "dist"
+//const basePath = "build/hugo"
+const pathToManifestFile = `${basePath}/data/manifest_js.json`;
+const pathToManifestFileCSS = `${basePath}/data/manifest_css.json`;
+const pathToStaticDirectory = `${basePath}/static`;
+const pathToPublicDirectory = `${basePath}/public`;
 
 const getComponentInfo = (componentKey, dev) => {
-    let chunkhash = Date.now();
+    let chunkhash = "." + Date.now();
     if (dev) {
-        chunkhash = "dev";
+        chunkhash = "";
     }
 
-    const filename = `${componentKey}.${chunkhash}.js`;
-    const filenameCSS = `${componentKey}.${chunkhash}.css`;
-    const outputPath = `${pathToStaticDirectory}/js/${filename}`;
+    const filenameJS = `${componentKey}${chunkhash}.js`;
+    const filenameCSS = `${componentKey}${chunkhash}.css`;
+    const outputPathJS = `${pathToStaticDirectory}/js/${filenameJS}`;
     const outputPathCSS = `${pathToStaticDirectory}/css/${filenameCSS}`;
 
     // Should we only delete dev? and then leave it as a manual step to remove production?
     // Or try and include in rollupdelete?
     const rollupDeleteTargets = [
+        // Delete local
+        `${localBasePath}/${componentKey}.js`,
+        `${localBasePath}/${componentKey}.js.map`,
+        `${localBasePath}/${componentKey}.css`,
+        `${localBasePath}/${componentKey}.css.map`,
+
+        // Delete staticsite: hugo static
+        `${pathToStaticDirectory}/js/${componentKey}.js`,
         `${pathToStaticDirectory}/js/${componentKey}.*.js`,
         `${pathToStaticDirectory}/js/${componentKey}.*.js.map`,
+        `${pathToStaticDirectory}/css/${componentKey}.css`,
         `${pathToStaticDirectory}/css/${componentKey}.*.css`,
         `${pathToStaticDirectory}/css/${componentKey}.*.css.map`,
 
+        // Development only
+        // Delete staticsite: hugo public
+        `${pathToPublicDirectory}/js/${componentKey}.js`,
         `${pathToPublicDirectory}/js/${componentKey}.*.js`,
         `${pathToPublicDirectory}/js/${componentKey}.*.js.map`,
+        `${pathToPublicDirectory}/css/${componentKey}.css`,
         `${pathToPublicDirectory}/css/${componentKey}.*.css`,
         `${pathToPublicDirectory}/css/${componentKey}.*.css.map`,
     ];
 
+    const rollupCopyTargets = [
+        { src: `dist/${componentKey}.js`, dest: `${pathToStaticDirectory}/js/`, rename: `${componentKey}.js` },
+        { src: `dist/${componentKey}.js.map`, dest: `${pathToStaticDirectory}/js/`, rename: `${componentKey}.js.map` },
+        { src: `dist/${componentKey}.css`, dest: `${pathToStaticDirectory}/css/`, rename: `${componentKey}.css` },
+        { src: `dist/${componentKey}.css.map`, dest: `${pathToStaticDirectory}/css/`, rename: `${componentKey}.css.map` },
+    ];
+
     return {
-        componentKey: componentKey,
-        chunkhash: chunkhash,
-        filename: filename,
-        filenameCSS: filenameCSS,
-        outputPath: outputPath,
-        outputPathCSS: outputPathCSS,
+        componentKey,
+        chunkhash,
+        filenameJS,
+        filenameCSS,
+        outputPathJS,
+        outputPathCSS,
+        localBasePath,
+        localPathCSS: `${filenameCSS}`,
+        localPathJS: `${filenameJS}`,
+
         rollupDeleteTargets,
+        rollupCopyTargets,
     }
 }
 
@@ -82,7 +111,6 @@ const write = async (manifestFile, key, value) => {
 
     try {
         const manifest = await fs.readJson(manifestFile)
-        console.log('success!')
         newManifest = { ...manifest, ...newManifest }
     } catch (err) {
         // skip error
@@ -93,7 +121,6 @@ const write = async (manifestFile, key, value) => {
 
     try {
         await fs.writeJson(manifestFile, newManifest, { spaces: ' ' })
-        console.log('success!')
     } catch (err) {
         console.log('failed to update manifest!')
         console.log(err);
@@ -107,7 +134,7 @@ const write = async (manifestFile, key, value) => {
 
 const syncManifest = async (componentInfo) => {
     try {
-        await write(pathToManifestFile, componentInfo.componentKey, `/js/${componentInfo.filename}`);
+        await write(pathToManifestFile, componentInfo.componentKey, `/js/${componentInfo.filenameJS}`);
         await write(pathToManifestFileCSS, componentInfo.componentKey, `/css/${componentInfo.filenameCSS}`);
     } catch (e) {
         // Deal with the fact the chain failed
