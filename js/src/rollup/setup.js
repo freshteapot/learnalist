@@ -66,7 +66,7 @@ export default (key, format) => {
                     customElement: false,
                 },
             }),
-            css({ output: componentInfo.filenameCSS }),
+            css({ output: `${componentKey}.css` }),
 
             // Little hack to move the above, due to css not working with relative or outside of folder
             copy({

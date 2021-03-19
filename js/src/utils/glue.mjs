@@ -19,8 +19,6 @@ const getComponentInfo = (componentKey, dev) => {
 
     const filenameJS = `${componentKey}${chunkhash}.js`;
     const filenameCSS = `${componentKey}${chunkhash}.css`;
-    const outputPathJS = `${pathToStaticDirectory}/js/${filenameJS}`;
-    const outputPathCSS = `${pathToStaticDirectory}/css/${filenameCSS}`;
 
     // Should we only delete dev? and then leave it as a manual step to remove production?
     // Or try and include in rollupdelete?
@@ -49,11 +47,11 @@ const getComponentInfo = (componentKey, dev) => {
         `${pathToPublicDirectory}/css/${componentKey}.*.css.map`,
     ];
 
+    // Horrible, for now
     const rollupCopyTargets = [
-        { src: `dist/${componentKey}.js`, dest: `${pathToStaticDirectory}/js/`, rename: `${componentKey}.js` },
-        { src: `dist/${componentKey}.js.map`, dest: `${pathToStaticDirectory}/js/`, rename: `${componentKey}.js.map` },
-        { src: `dist/${componentKey}.css`, dest: `${pathToStaticDirectory}/css/`, rename: `${componentKey}.css` },
-        { src: `dist/${componentKey}.css.map`, dest: `${pathToStaticDirectory}/css/`, rename: `${componentKey}.css.map` },
+        { src: `dist/${componentKey}.js`, dest: `${pathToStaticDirectory}/js/`, rename: `${filenameJS}` },
+        { src: `dist/${componentKey}.js.map`, dest: `${pathToStaticDirectory}/js/`, rename: `${filenameJS}.map` },
+        { src: `dist/${componentKey}.css`, dest: `${pathToStaticDirectory}/css/`, rename: `${filenameCSS}` },
     ];
 
     return {
@@ -61,11 +59,7 @@ const getComponentInfo = (componentKey, dev) => {
         chunkhash,
         filenameJS,
         filenameCSS,
-        outputPathJS,
-        outputPathCSS,
         localBasePath,
-        localPathCSS: `${filenameCSS}`,
-        localPathJS: `${filenameJS}`,
 
         rollupDeleteTargets,
         rollupCopyTargets,
