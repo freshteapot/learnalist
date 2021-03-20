@@ -7,3 +7,4 @@ data/alistsbyuser/
 data/challenge/
 data/public_lists.json
 public/
+samples/

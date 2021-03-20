@@ -11,3 +11,4 @@ data/manifest_css.json
 public/
 static/js
 static/css
+samples/
