@@ -3,7 +3,7 @@ import Banner from './components/banner/banner.svelte';
 import LoginHeader from './components/login_header.svelte';
 import UserLogin from './components/user_login.svelte';
 
-//// The crudest attempt to see if we have setup the site with configuration in localstorage
+// The crudest attempt to see if we have setup the site with configuration in localstorage
 const installed = getConfiguration(KeySettingsInstallDefaults, null)
 if (installed === null) {
     clearConfiguration();
