@@ -2,20 +2,15 @@ import lockfile from 'proper-lockfile';
 import fs from 'fs-extra';
 import del from 'del';
 
-// I think a hack can be in here.
 const basePath = "../hugo"
 const localBasePath = "dist"
-//const basePath = "build/hugo"
 const pathToManifestFile = `${basePath}/data/manifest_js.json`;
 const pathToManifestFileCSS = `${basePath}/data/manifest_css.json`;
 const pathToStaticDirectory = `${basePath}/static`;
 const pathToPublicDirectory = `${basePath}/public`;
 
-const getComponentInfo = (componentKey, dev) => {
-    let chunkhash = "." + Date.now();
-    if (dev) {
-        chunkhash = "";
-    }
+const getComponentInfo = (componentKey, production) => {
+    let chunkhash = production ? "." + Date.now() : "";
 
     const filenameJS = `${componentKey}${chunkhash}.js`;
     const filenameCSS = `${componentKey}${chunkhash}.css`;
@@ -24,27 +19,16 @@ const getComponentInfo = (componentKey, dev) => {
     // Or try and include in rollupdelete?
     const rollupDeleteTargets = [
         // Delete local
-        `${localBasePath}/${componentKey}.js`,
-        `${localBasePath}/${componentKey}.js.map`,
-        `${localBasePath}/${componentKey}.css`,
-        `${localBasePath}/${componentKey}.css.map`,
+        `${localBasePath}/${componentKey}.*`,
 
         // Delete staticsite: hugo static
-        `${pathToStaticDirectory}/js/${componentKey}.js`,
-        `${pathToStaticDirectory}/js/${componentKey}.*.js`,
-        `${pathToStaticDirectory}/js/${componentKey}.*.js.map`,
-        `${pathToStaticDirectory}/css/${componentKey}.css`,
-        `${pathToStaticDirectory}/css/${componentKey}.*.css`,
-        `${pathToStaticDirectory}/css/${componentKey}.*.css.map`,
+        `${pathToStaticDirectory}/js/${componentKey}.*`,
+        `${pathToStaticDirectory}/css/${componentKey}.*`,
 
         // Development only
         // Delete staticsite: hugo public
-        `${pathToPublicDirectory}/js/${componentKey}.js`,
-        `${pathToPublicDirectory}/js/${componentKey}.*.js`,
-        `${pathToPublicDirectory}/js/${componentKey}.*.js.map`,
-        `${pathToPublicDirectory}/css/${componentKey}.css`,
-        `${pathToPublicDirectory}/css/${componentKey}.*.css`,
-        `${pathToPublicDirectory}/css/${componentKey}.*.css.map`,
+        `${pathToPublicDirectory}/js/${componentKey}.*`,
+        `${pathToPublicDirectory}/css/${componentKey}.*`,
     ];
 
     // Horrible, for now

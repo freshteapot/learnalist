@@ -11,7 +11,7 @@ const production = !process.env.ROLLUP_WATCH;
 
 import { getComponentInfo, rollupPluginManifestSync } from "./src/utils/glue.mjs";
 const componentKey = "shared";
-const componentInfo = getComponentInfo(componentKey, !production);
+const componentInfo = getComponentInfo(componentKey, production);
 
 export default {
     input: 'src/shared.js',

@@ -62,6 +62,7 @@ hugo/node_modules/
 # Postcss specific
 hugo/hugo_stats.json
 hugo/resources/
+hugo/layouts/design/from-svelte.html
 
 # js
 js/node_modules

@@ -20,7 +20,7 @@ export default (key, format) => {
     }
 
     const componentKey = key;
-    const componentInfo = getComponentInfo(componentKey, !production);
+    const componentInfo = getComponentInfo(componentKey, production);
 
     return {
         external: ['shared'],
@@ -66,9 +66,12 @@ export default (key, format) => {
                     customElement: false,
                 },
             }),
+
+            // This is written inside the output.dir folder
             css({ output: `${componentKey}.css` }),
 
-            // Little hack to move the above, due to css not working with relative or outside of folder
+            // Rollup restricts the folder location, the lines below take the output and copy them
+            // over into the hugo landscape
             copy({
                 targets: componentInfo.rollupCopyTargets,
                 verbose: true, force: true,
@@ -104,17 +107,11 @@ export default (key, format) => {
             }),
             commonjs(),
 
-            /**
-             * Minifies JavaScript bundle in production
-             */
+            // Minifies JavaScript bundle in production
             production && terser(),
 
-            /**
-             * Sync the new filename to hugo, for instant feedback
-             */
-
+            // Sync the new filename to hugo, for instant feedback
             rollupPluginManifestSync(componentInfo)
-            // TODO how to move from here
         ]
     }
 }

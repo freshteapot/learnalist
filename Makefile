@@ -16,6 +16,8 @@ clear-site:
 	rm -f ./hugo/data/alistsbyuser/*
 	rm -f ./hugo/content/challenge/*
 	rm -f ./hugo/data/challenge/*
+	cp ./js/manifest_css.json ./hugo/data/manifest_css.json
+	cp ./js/manifest_js.json ./hugo/data/manifest_js.json
 	echo "[]" > ./hugo/data/public_lists.json
 	cd ./hugo && hugo
 
