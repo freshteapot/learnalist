@@ -11,7 +11,7 @@ Record your plank activity, alone or with friends
 - available via TestFlight
 - Send me a message to get access
 
-## Andoird
+## Android
 - Currently in beta on the play store
 - Send me a message to get access
 
