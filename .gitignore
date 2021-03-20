@@ -31,6 +31,8 @@ hugo/data/alistsbyuser/
 hugo/data/challenge/
 hugo/public/
 hugo/node_modules/
+hugo/data/manifest_css.json
+hugo/data/manifest_js.json
 
 # Postcss specific
 hugo/hugo_stats.json
@@ -38,6 +40,8 @@ hugo/resources/
 
 # js
 js/node_modules
+# Ignoring the output from rolllup
+js/dist
 ## Ignoring this as we generate it
 js/src/openapi/
 
