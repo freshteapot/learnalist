@@ -27,7 +27,7 @@
   let data;
   let state = "edit";
   let show = false;
-  // TODO add logic to not show add overtime if the list is empty
+  // TODO add logic to not show add over time if the list is empty
   // Check to see if list is already added over time
   let overtimeActive = false;
   let userUuid = "";
@@ -133,7 +133,7 @@
     <p>
       Click on the row you want to add or <button
         class="br3"
-        on:click|preventDefault={addOvertime}>add all overtime</button
+        on:click|preventDefault={addOvertime}>add all over time</button
       >
     </p>
   </header>

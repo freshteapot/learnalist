@@ -159,7 +159,7 @@
         <p>
           Click on the row you want to add or <button
             class="br3"
-            on:click|preventDefault={addingOvertime}>add all overtime</button
+            on:click|preventDefault={addingOvertime}>add all over time</button
           >
         </p>
       </header>
