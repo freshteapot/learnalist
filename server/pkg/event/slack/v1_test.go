@@ -328,7 +328,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					Action: event.ActionCreated,
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime created uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
+					expect := `spaced repetition over time created uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -346,7 +346,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					Action: event.ActionDeleted,
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime deleted uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
+					expect := `spaced repetition over time deleted uuid:fake-dripfeed-123, user:fake-user-123, list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -374,7 +374,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					UUID: "fake-srs-item-123",
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123`
+					expect := `spaced repetition over time system added entry:fake-srs-item-123 for user:fake-user-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -391,7 +391,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					UUID: "fake-srs-item-123",
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime system added entry:fake-srs-item-123 for user:fake-user-123 that already exists`
+					expect := `spaced repetition over time system added entry:fake-srs-item-123 for user:fake-user-123 that already exists`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -421,7 +421,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					UUID: dripfeedUUID,
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime activated for user:fake-user-123 from list:fake-list-123`
+					expect := `spaced repetition over time activated for user:fake-user-123 from list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -437,7 +437,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					UUID: dripfeedUUID,
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime stopped for user:fake-user-123 from list:fake-list-123`
+					expect := `spaced repetition over time stopped for user:fake-user-123 from list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
@@ -453,7 +453,7 @@ var _ = Describe("Testing Events to Slack", func() {
 					UUID: dripfeedUUID,
 				},
 				post: func(url string, msg *slack.WebhookMessage) error {
-					expect := `spaced repetition overtime finished for user:fake-user-123 from list:fake-list-123`
+					expect := `spaced repetition over time finished for user:fake-user-123 from list:fake-list-123`
 					Expect(msg.Text).To(Equal(expect))
 					return nil
 				},
