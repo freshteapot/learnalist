@@ -300,3 +300,23 @@ kubectl create secret generic learnalist-server \
 --dry-run -o yaml |
 kubectl apply -f -
 ```
+
+
+# Update changelog
+## Get latest data
+```sh
+cd ~/git/git-log-json
+go run main.go ~/git/learnalist-api | jq > changelog.json
+cp changelog.json ~/git/learnalist-api/hugo/data/
+```
+## Sync
+```sh
+make sync-content
+```
+## Rebuild content from within the pod
+- log onto learnalist pod
+
+```
+cd /srv/learnalist/hugo
+hugo --environment=lal01 --verbose --ignoreCache
+```

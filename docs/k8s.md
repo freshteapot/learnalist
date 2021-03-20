@@ -73,33 +73,10 @@ kubectl get configmap learnalist-config --from-file=config.yaml=config/docker.co
 
 
 # Sync files
-## hugo + javascript
-```sh
-rsync -avzP \
---rsync-path="sudo rsync" \
---exclude-from="exclude-srv-learnalist.txt" \
-./hugo $SSH_SERVER:/srv/learnalist
-```
-
-
-## hugo public files
-// TODO is this needed now?
-// Check via k3d or something
-```sh
-rsync -avvvzP \
---rsync-path="sudo rsync" \
---exclude-from='exclude-srv-learnalist-public.txt' \
-./hugo/public/ $SSH_SERVER:/srv/learnalist/site-cache
-```
-
-# Rebuild static-site
-- rebuild all lists
-- rebuild all user lists
 
 ```sh
-/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools rebuild-static-site
+make sync-site-assets
 ```
-
 
 # Reference
 - [acme.sh](https://github.com/acmesh-official/acme.sh)

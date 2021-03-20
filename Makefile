@@ -168,7 +168,7 @@ generate-docs-api-overview: generate-openapi-one
 #
 # More production than development
 #
-build-site-assets:
+build-site-assets: generate-openapi-js
 	./scripts/build-site-assets.sh
 
 sync-site-assets:
@@ -182,6 +182,11 @@ sync-db-files:
 	--rsync-path="sudo rsync" \
 	./server/db ${SSH_SERVER}:/srv/learnalist
 
+sync-content:
+	rsync -avzP \
+	--rsync-path="sudo rsync" \
+	--exclude-from="sync-content-exclude-srv-learnalist.txt" \
+	./hugo ${SSH_SERVER}:/srv/learnalist
 
 build-image-base:
 	cd server && \

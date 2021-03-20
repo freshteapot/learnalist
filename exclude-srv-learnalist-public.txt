@@ -1,3 +1,0 @@
-alistsbyuser/
-alist/
-design/
