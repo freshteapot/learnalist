@@ -5,10 +5,12 @@ import commonjs from '@rollup/plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
 import { terser } from 'rollup-plugin-terser';
 import del from 'rollup-plugin-delete';
-import postcss from "rollup-plugin-postcss";
-import autoPreprocess from 'svelte-preprocess'
+import css from 'rollup-plugin-css-only';
+import sveltePreprocess from 'svelte-preprocess';
+import copy from 'rollup-plugin-copy'
 
-const IS_PROD = !process.env.ROLLUP_WATCH;
+
+const production = !process.env.ROLLUP_WATCH;
 import { getComponentInfo, rollupPluginManifestSync } from "../utils/glue.mjs";
 
 // External and replacement needs to be the full path :(
@@ -18,7 +20,7 @@ export default (key, format) => {
     }
 
     const componentKey = key;
-    const componentInfo = getComponentInfo(componentKey, !IS_PROD);
+    const componentInfo = getComponentInfo(componentKey, production);
 
     return {
         external: ['shared'],
@@ -27,10 +29,10 @@ export default (key, format) => {
             globals: {
                 'shared': 'shared',
             },
-            sourcemap: !IS_PROD,
+            sourcemap: !production,
             format: format, // if I want to use globals, this is the way
             name: componentInfo.componentKey,
-            file: componentInfo.outputPath
+            dir: componentInfo.localBasePath,
         },
         plugins: [
             alias({
@@ -42,52 +44,73 @@ export default (key, format) => {
                 ]
             }),
             del({ targets: componentInfo.rollupDeleteTargets, verbose: true, force: true }),
-            postcss({
-                extract: true,
-            }),
-
             typescript(),
 
             svelte({
-                dev: !IS_PROD,
-                customElement: false,
+                onwarn: (warning, handler) => {
+                    const { code, frame } = warning;
+                    if (code === "css-unused-selector")
+                        return;
+
+                    handler(warning);
+                },
                 exclude: /\.wc\.svelte$/,
-                preprocess: autoPreprocess({
-                    postcss: true
+                preprocess: sveltePreprocess({
+                    postcss: {
+                        configFilePath: "./postcss.config.js",
+                    },
                 }),
-                //emitCss: false,
-                css: css => {
-                    // TODO how to have this cache friendly?
-                    css.write(componentInfo.outputPathCSS);
-                }
+                compilerOptions: {
+                    // enable run-time checks when not in production
+                    dev: !production,
+                    customElement: false,
+                },
+            }),
+
+            // This is written inside the output.dir folder
+            css({ output: `${componentKey}.css` }),
+
+            // Rollup restricts the folder location, the lines below take the output and copy them
+            // over into the hugo landscape
+            copy({
+                targets: componentInfo.rollupCopyTargets,
+                verbose: true, force: true,
+                hook: 'writeBundle'
             }),
 
             // TODO Css is not coming thru when customelement includes non-custom element
             // Possible tip https://github.com/sveltejs/svelte/issues/4274.
             svelte({
-                dev: !IS_PROD,
-                customElement: true,
                 include: /\.wc\.svelte$/,
-                preprocess: autoPreprocess({
-                    postcss: true
+                preprocess: sveltePreprocess({
+                    postcss: {
+                        configFilePath: "./postcss.config.js",
+                    },
                 }),
-                css: true, // I Wonder if I actually need this.
+                compilerOptions: {
+                    // enable run-time checks when not in production
+                    dev: !production,
+                    customElement: true,
+                },
+                onwarn: (warning, handler) => {
+                    const { code, frame } = warning;
+                    if (code === "css-unused-selector")
+                        return;
+
+                    handler(warning);
+                },
             }),
 
             resolve({
                 browser: true,
-                dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/')
+                dedupe: ['svelte']
             }),
             commonjs(),
 
-            /**
-             * Minifies JavaScript bundle in production
-             */
-            IS_PROD && terser(),
+            // Minifies JavaScript bundle in production
+            production && terser(),
 
-            /**
-             * Sync the new filename to hugo, for instant feedback
-             */
+            // Sync the new filename to hugo, for instant feedback
             rollupPluginManifestSync(componentInfo)
         ]
     }

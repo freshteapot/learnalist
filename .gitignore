@@ -7,7 +7,6 @@ config/dev_external.config.yaml
 hugo/config/dev_external/
 
 # GO: Ignore all files in vendor
-server/vendor/
 server/learnalist-cli
 server/e2e/smoke-test
 server/profile.cov
@@ -22,37 +21,56 @@ server/pkg/staticsite/hugo/testdata/content
 server/pkg/staticsite/hugo/testdata/public
 
 # hugo
-hugo/content/alist/
-hugo/content/alistsbyuser/
-hugo/content/challenge/
-hugo/data/public_lists.json
-hugo/data/alist/
-hugo/data/alistsbyuser/
-hugo/data/challenge/
-hugo/public/
-hugo/node_modules/
-
-# Postcss specific
-hugo/hugo_stats.json
-hugo/resources/
-
-# js
-js/node_modules
-## Ignoring this as we generate it
-js/src/openapi/
-
-## Browser extension
-js/browser-extension/import-play/bundle.js*
-js/browser-extension/import-play/bundle.css*
-
 # Removing dev assets
+## CSS
 hugo/static/css/base.*
+hugo/static/css/main.*
+hugo/static/css/plank*
+hugo/static/css/srs.*
 hugo/static/css/editor.*
 hugo/static/css/v1.*
+hugo/static/css/v2.*
+hugo/static/css/v3.*
+hugo/static/css/v4.*
+## JS
+hugo/static/js/base.*
 hugo/static/js/main.*
+hugo/static/js/plank*
+hugo/static/js/srs.*
 hugo/static/js/editor.*
 hugo/static/js/shared.*
 hugo/static/js/v1.*
 hugo/static/js/v2.*
 hugo/static/js/v3.*
 hugo/static/js/v4.*
+## Manifests
+hugo/data/manifest_css.json
+hugo/data/manifest_js.json
+## Content
+hugo/content/alist/
+hugo/content/alistsbyuser/
+hugo/content/challenge/
+## Data
+hugo/data/public_lists.json
+hugo/data/alist/
+hugo/data/alistsbyuser/
+hugo/data/challenge/
+## Public
+hugo/public/
+hugo/node_modules/
+
+# Postcss specific
+hugo/hugo_stats.json
+hugo/resources/
+hugo/layouts/design/from-svelte.html
+
+# js
+js/node_modules
+# Ignoring the output from rolllup
+js/dist
+## Ignoring this as we generate it
+js/src/openapi/
+
+## Browser extension
+js/browser-extension/import-play/bundle.js*
+js/browser-extension/import-play/bundle.css*

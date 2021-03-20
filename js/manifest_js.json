@@ -1,0 +1,11 @@
+{
+    "v3": "/js/v3.js",
+    "v4": "/js/v4.js",
+    "shared": "/js/shared.js",
+    "plank-v1": "/js/plank-v1.js",
+    "srs": "/js/srs.js",
+    "main": "/js/main.js",
+    "v1": "/js/v1.js",
+    "v2": "/js/v2.js",
+    "editor": "/js/editor.js"
+}
