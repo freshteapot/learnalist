@@ -1,0 +1,39 @@
+{{ define "main" }}
+{{- $changes := getJSON "data/changelog.json" -}}
+{{- $hrefPrefixPR := "https://github.com/freshteapot/learnalist-api/pull/%s" -}}
+{{- $hrefPrefixCommit := "https://github.com/freshteapot/learnalist-api/commit/%s" -}}
+<article class="w-100 bg-white">
+
+    <div class="pa4">
+        <h1>{{.Title}}</h1>
+        <p>{{.Content}}</p>
+        <div class="overflow-auto">
+            <table class="f6 w-100 mw8 " cellspacing="0">
+                <tbody class="lh-copy">
+                    {{range $changes}}
+                    {{- $changelog := . -}}
+                    {{- $prHref := (printf $hrefPrefixPR $changelog.pr) -}}
+                    {{- $commitHref := (printf $hrefPrefixCommit $changelog.hash) -}}
+                    <tr>
+                        <td class="pv3 pr3">
+                            <cite class="f5 fs-normal">
+                                <span>{{dateFormat "2006-01-02" $changelog.when}}</span>
+                            </cite>
+                            <pre class="black-60 pre-ns nowrap">{{ $changelog.what }}</pre>
+                            <cite class="f7 fs-normal">
+                                <a class="black-40 near-black dim" target="_blank" href="{{$prHref}}">
+                                    PR {{$changelog.pr}}</a>
+
+                                <a class="black-40 near-black dim" target="_blank" href="{{$commitHref}}">
+                                    Commit {{$changelog.hash}}</a>
+                            </cite>
+                        </td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</article>
+
+{{ end }}

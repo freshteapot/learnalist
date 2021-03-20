@@ -1,0 +1,290 @@
+[
+  {
+    "hash": "42e63a",
+    "what": "- Update js dependencies in js and hugo\r\n- manifest_js and manifest_css have a base that is now copied to hugo\r\n- How we move js and css from js to hugo has changed a little\r\n\r\nFixes #224",
+    "when": "2021-03-20T08:38:53+01:00",
+    "pr": "225"
+  },
+  {
+    "hash": "c3bf2f",
+    "what": "- Only able to publish public lists if you have write access (#214).\r\n- Registering a new user allows for setting if they have write access for public lists (#214).\r\n- Notifying hugo of changes via events (#207).\r\n- Able to grant and revoke access to write public lists via the command line.\r\n- Challenges now trigger events to hugo for updating (#198 #199)\r\n- e2e openapi client records the requests, making it easier to see scope of coverage linked to the openapi document.\r\n\r\nResolves #214 #207 #199 #198",
+    "when": "2021-03-14T16:34:02+01:00",
+    "pr": "215"
+  },
+  {
+    "hash": "e3ba21",
+    "what": "Handling when entry has reached the highest spaced learning level.\r\nFixes #218",
+    "when": "2021-03-14T11:31:13+01:00",
+    "pr": "219"
+  },
+  {
+    "hash": "29e3a3",
+    "what": "- When saving a list from external source, we now check the suffix of the hostname for match.\r\n- Import and play has its own Spaced Repetition UI, decoupled from the website.\r\n- New extension to provide support for adding via context menu (works in both firefox and google out the box)\r\n\r\nResolves #139",
+    "when": "2021-03-07T08:08:37+01:00",
+    "pr": "211"
+  },
+  {
+    "hash": "1c81a6",
+    "what": "- Clicking \"Add meaning / definition\" toggles checkbox and expose meaning box.\r\n\r\nResolves #134",
+    "when": "2021-03-05T21:43:38+01:00",
+    "pr": "209"
+  },
+  {
+    "hash": "e2b118",
+    "what": "- Document how to use daily reminders api.\r\n- Better searching on auto generated api index.\r\n\r\nResolves #200",
+    "when": "2021-03-05T21:24:19+01:00",
+    "pr": "208"
+  },
+  {
+    "hash": "05f0fe",
+    "what": "- Login with appleID via web.\r\n- Login with appleID via idp rest endpoint.\r\n- Improved test coverage.\r\n- Document how to update idps to the \"learnalist user uuid\".\r\n\r\n\r\nResolves #203",
+    "when": "2021-03-05T20:51:15+01:00",
+    "pr": "204"
+  },
+  {
+    "hash": "6bd534",
+    "what": "- Add lists overtime for spaced repetition learning, via api and UI.\r\n- Improve developer experience around restarting nats\r\n- Fix issue where Rollback of transaction would have crashed due to tx being nil\r\n- Only show spaced repetition if the list has entries.\r\n\r\nResolves #193",
+    "when": "2021-02-22T18:46:02+01:00",
+    "pr": "194"
+  },
+  {
+    "hash": "b719ec",
+    "what": "- Fixes a crash in remind-manager. It was not running EVENTS = nats\r\n- GetReinders now returns array of tokens not just the first token to send message to.",
+    "when": "2021-01-15T20:35:37+01:00",
+    "pr": "196"
+  },
+  {
+    "hash": "97ccb9",
+    "what": "- using mockery 2.5.1 to build our mocks\r\n- improved the server README",
+    "when": "2021-01-10T22:12:52+01:00",
+    "pr": "195"
+  },
+  {
+    "hash": "d062e8",
+    "what": "- Send a reminder to users with the mobile app. It is delayed by last_active, currently set to 5 minutes. Only sends once until further interaction from the user.\r\n- Api endpoint for app-settings, allowing to opt in or opt out for spaced repetition notifications via push.\r\n- A fix to remove a users spaced repetition entries when the user is deleted.\r\n- Cruedly checking to see if hugo, npm, go, and yq are installed.\r\n- Clicking on server information, returns the correct information.\r\n- Bump version of Hugo to 0.80.0 (#188)\r\n\r\nResolves #188 #183",
+    "when": "2021-01-08T23:22:12+01:00",
+    "pr": "184"
+  },
+  {
+    "hash": "15e8b4",
+    "what": "- Let two users add the same entry for spaced repetition learning.\r\n- Improve test coverage of spaced_repetition pkg.\r\n- e2e test to verify two users adding the same entry\r\n\r\nResolves #185.",
+    "when": "2020-12-28T13:24:40+01:00",
+    "pr": "186"
+  },
+  {
+    "hash": "414cdc",
+    "what": "- Brings reminder engine to learnalist, the engine is location aware and hopefully delivers the reminders in the local time of the user.\r\n- Decoupled the reminder engine, so it can be stand alone from the rest of the system.\r\n- When registering mobile device, if \"app + token\" already exists, we remove the previous entry as it is now assumed to be a new user.\r\n\r\nHelps bring #168 to life.",
+    "when": "2020-12-21T19:50:45+01:00",
+    "pr": "170"
+  },
+  {
+    "hash": "e28041",
+    "what": "- Restrict access to the /api/v1/user/register via header simple key\r\n- Small improvements to the documentation\r\n\r\nResolves #153",
+    "when": "2020-12-18T09:34:06+01:00",
+    "pr": "181"
+  },
+  {
+    "hash": "3bbb52",
+    "what": "- Via idp login, lookup google profile when registering new user.\r\n- Bug in tools command, not using events.",
+    "when": "2020-12-15T23:28:16+01:00",
+    "pr": "180"
+  },
+  {
+    "hash": "147663",
+    "what": "- Able to query challenges api and filter by kind.\r\n- Added index on user_uuid to table acl_simple.\r\n\r\nResolves #169.",
+    "when": "2020-12-15T18:13:07+01:00",
+    "pr": "179"
+  },
+  {
+    "hash": "3021e6",
+    "what": "Metadata work\r\n- When list is public show description\r\n- When list is public and has labels, add tags\r\n- When list is not public tell the robots to ignore",
+    "when": "2020-12-14T20:45:46+01:00",
+    "pr": "178"
+  },
+  {
+    "hash": "5b60a1",
+    "what": "Remove Data heading, resolves #164.",
+    "when": "2020-12-14T17:30:46+01:00",
+    "pr": "177"
+  },
+  {
+    "hash": "0049e8",
+    "what": "- Challenge records only include users in the challenge.\r\n- Challenge user list is based on acl, not if they have added a record.\r\n- Hugo now also listens via events to write content (lal.staticSite).\r\n- Hugo supports writing challenge pages when altered via the api.\r\n- Able to add \"content specific metadata\" in hugo.\r\n- Small start to cleaning up out of date documentation.\r\n\r\nResolves #172",
+    "when": "2020-12-14T17:07:57+01:00",
+    "pr": "173"
+  },
+  {
+    "hash": "ff36aa",
+    "what": "- Adding nats + stan k8s files for ops.\r\n- Creating a short lived store for use with sending events for static site generation.\r\n- ssl renewal works now, we will find out in March.",
+    "when": "2020-12-14T14:39:59+01:00",
+    "pr": "174"
+  },
+  {
+    "hash": "cc44da",
+    "what": "- Registering mobile device with a token now supports adding app_identifier.\r\n- Openapi reflects the new app_identifier attribute.\r\n\r\nResolves #162",
+    "when": "2020-12-12T16:39:25+01:00",
+    "pr": "161"
+  },
+  {
+    "hash": "8d3215",
+    "what": "- using the makefile to fire up nats to improve the developer experience.",
+    "when": "2020-12-11T16:12:19+01:00",
+    "pr": "167"
+  },
+  {
+    "hash": "dd04e3",
+    "what": "* New api endpoint to allow login via idp_token.\r\n* Push notifications service consuming nats stream.\r\n* New api to register mobile device, linking token to user.\r\n* Notifications for when a user joins, leaves or adds to a challenge.\r\n* Updated slack-reader to handle the new events.\r\n* Able to toggle spaced repetition with the spacebar.\r\n* Building the api.overview file based on parsing the openapi document.",
+    "when": "2020-12-08T22:36:10+01:00",
+    "pr": "155"
+  },
+  {
+    "hash": "f7c053",
+    "what": "Short version:\r\n- New api for plank recording and viewing history.\r\n- New api for challenges.\r\n- Able to create a \"plank challenge\".\r\n- Able to give your user a display name via the api.\r\n\r\nLonger version:\r\n- Plank app has its own api now\r\n- History via desc\r\n- Adding logs to user delete\r\n- Making it clear the test coverage dropped\r\n- Copy data from lists to plank table\r\n- Move planks to plank table and remove lists\r\n- Fix lists with no shared settings and set to private\r\n- Challenge system, allowing a user to create a challenge group for planking.\r\n- Able to add display_name via register api.\r\n- Able to add display_name via user/info api.\r\n\r\nSolves #136.",
+    "when": "2020-11-09T23:31:39+01:00",
+    "pr": "140"
+  },
+  {
+    "hash": "dbde22",
+    "what": "- Closing nats connections.\r\n- Simplified event system for nats and memory.\r\n- Fixed an issue with \"func init\" and bindEnv in Viper.\r\n- Added \"logout\" events.",
+    "when": "2020-10-11T21:19:45+02:00",
+    "pr": "146"
+  },
+  {
+    "hash": "27114f",
+    "what": "Small improvements to the docs.",
+    "when": "2020-09-29T23:28:44+02:00",
+    "pr": "131"
+  },
+  {
+    "hash": "31ecb9",
+    "what": "- Able to add an asset (very poormans cdn)\n- Introducing an event bus to decouple when a user is deleted and removing assets.\n- Requires manual update to the db (acl_simple).\n- Small refactor on parsing in variables into InitApi.\n- Adding iptables to k3s setup to block public access to kubectl.",
+    "when": "2020-09-26T11:26:15+02:00",
+    "pr": "109"
+  },
+  {
+    "hash": "a6682c",
+    "what": "Improved spaced repetition\r\n- Overview of entries.\r\n- Stats of when entries were created.\r\n- Able to add entry without going thru an existing list.\r\n\r\nPlank\r\n- History reports week better \r\n\r\nResolves #125",
+    "when": "2020-08-24T00:15:51+02:00",
+    "pr": "126"
+  },
+  {
+    "hash": "69db1c",
+    "what": "- Add created and update fields to the spaced repetition #113.",
+    "when": "2020-08-11T16:08:53+02:00",
+    "pr": "116"
+  },
+  {
+    "hash": "0cfa9b",
+    "what": "* Moved openapi into own folder\r\n* Able to generate full openapi from parts.\r\n* Able to generate clients for, golang, typescript-fetch and dart.\r\n* Cobbled some code together to extract the css class names used in svelte so hugo adds the missing ones from tachyons in base css.\r\n* Spaced repetition gives the user chance to give feedback on sooner or later to remind of entry.",
+    "when": "2020-07-28T18:51:43+02:00",
+    "pr": "115"
+  },
+  {
+    "hash": "d6503b",
+    "what": "* A plank recorder is born, record planks and view history.\r\n* Plank recorder works for logged in and non logged in user, with call to action.\r\n* Cleaned up editor code to use more of the website code base\r\n* Using api generated by the openapi document\r\n* Fixed missing css setup in many of the files\r\n* Moved the header section of hugo into its own partial\r\n* Moved hugo to a side car in kubernetes, speeding up rendering for the indvidual file as the files scale\r\n* Sharing code logic for rollups.",
+    "when": "2020-07-19T10:55:12+02:00",
+    "pr": "110"
+  },
+  {
+    "hash": "f4d2b6",
+    "what": "* Add slideshow to list type V2\r\n* Update docs on how to clean up ssh tunnels\r\n* Sharing css via all.css in js world.",
+    "when": "2020-06-22T22:53:56+02:00",
+    "pr": "104"
+  },
+  {
+    "hash": "698061",
+    "what": "- Able to delete a user via the api.\r\n- Cli tool to delete the user (via the server).\r\n- fixed and documented https certificate, not using fullchain.\r\n- Making it clearer where all the api httpXXX structs are.\r\n- Improved more of the logging to log as json, including field \"context.\r\n- Upgraded to golang 1.14.3\r\n- Upgraded to alpine 3.12\r\n- Upgraded to hugo 0.72\r\n- Via make it is now possible to run end to end tests locally",
+    "when": "2020-06-14T19:07:35+02:00",
+    "pr": "94"
+  },
+  {
+    "hash": "fa6512",
+    "what": "- Fixes #91, a bug when first time login via google would result in the user not having a data json file of its lists, which would then cause \"my lists\" to show a 500 as there is no file on disk to render. \r\n- Added test coverage for the google oauth callback endpoint.\r\n- Improved test coverage a little more.",
+    "when": "2020-05-23T16:44:26+02:00",
+    "pr": "93"
+  },
+  {
+    "hash": "1b3e75",
+    "what": "* Adding status codes, to the api documentation.",
+    "when": "2019-05-29T14:18:06+02:00",
+    "pr": "54"
+  },
+  {
+    "hash": "f5924f",
+    "what": "- List type v4 data is an array of objects with attributes content and url.\r\n- Cleaned up code in package \"alist\", to follow naming conventions better.\r\n- Return messages, refer generically to the documentation (which doesn't exist.. yet!).\r\n- Added list type specific documentation.\r\n- Added countries and months (under dataset) with a crude covert script (integrations/convert).",
+    "when": "2019-05-23T15:10:29+02:00",
+    "pr": "51"
+  },
+  {
+    "hash": "d20eaa",
+    "what": "* Fixes #47, make sure the user is lowercase.\r\n* User endpoint returns the uuid and the username.\r\n* Better validation on both username and password.",
+    "when": "2019-05-23T00:06:53+02:00",
+    "pr": "49"
+  },
+  {
+    "hash": "e54613",
+    "what": "* Acl in use on list creation, editing and viewing.\r\n* Acl support via casbin, saved to the database.\r\n* /share/alist endpoint to grant or revoke access to a list.\r\n* /alist/:uuid checks to see if you are allowed to read the list.\r\n* Does require database update before launch.\r\n* Fixes #45.",
+    "when": "2019-05-22T14:22:15+02:00",
+    "pr": "46"
+  },
+  {
+    "hash": "e7050c",
+    "what": "Creating functions to return New lists with preset data.",
+    "when": "2019-05-19T12:20:41+02:00",
+    "pr": "44"
+  },
+  {
+    "hash": "1c4be8",
+    "what": "Support for Concept2 / v3 list type, fixes #38.",
+    "when": "2019-05-19T11:05:14+02:00",
+    "pr": "43"
+  },
+  {
+    "hash": "a67650",
+    "what": "Moving to prefix api with version v1.",
+    "when": "2019-05-18T17:19:45+02:00",
+    "pr": "42"
+  },
+  {
+    "hash": "4142f8",
+    "what": "- Filter a list via labels, list type and labels and list type, fixes #39.\n- Documented the new query parameters.",
+    "when": "2019-05-18T17:19:29+02:00",
+    "pr": "41"
+  },
+  {
+    "hash": "0a98b5",
+    "what": "- When using PUT or DELETE, it now checks the request User is the same as the list user.\r\n- Added api test for version.\r\n- Reduced duplication in the tests.\r\n- MustExec, will cause a panic, removed some and documented the non-test example.",
+    "when": "2019-05-16T22:40:16+02:00",
+    "pr": "36"
+  },
+  {
+    "hash": "8d0e5a",
+    "what": "Tests are able to run via the command line (Fixes #33).",
+    "when": "2019-05-15T12:34:46+02:00",
+    "pr": "34"
+  },
+  {
+    "hash": "cb0fc6",
+    "what": "* Removing a label will remove it from the list as well.\r\n* Added the integration script to cleanup current data related to removing of labels.",
+    "when": "2019-05-14T22:39:20+02:00",
+    "pr": "31"
+  },
+  {
+    "hash": "4a7d1e",
+    "what": "When a user is created it returns a 201.\r\nWhen a user is created with the same username and password it returns a 200.\r\nWhen a user is created with a username in the system it returns a 400.",
+    "when": "2019-05-14T13:28:51+02:00",
+    "pr": "32"
+  },
+  {
+    "hash": "8d0ba0",
+    "what": "- Removing a list will make sure the user who created is the only one who can delete it (Fixed #25).\r\n- Posting a list will return a 201, updating = 200 (Fixed #23).",
+    "when": "2019-05-10T11:39:36+02:00",
+    "pr": "26"
+  },
+  {
+    "hash": "d4cd11",
+    "what": "- Updated the api readmer to reflect the current state of the api endpoints.\r\n- The system is aware of labels now (#19).\r\n- When querying for the users lists, it is now possible to filter the results based on labels (#19).\r\n- PUT now creates lists that do not exist (#20)\r\n- Slowly improving the tests.",
+    "when": "2019-05-09T08:11:20+02:00",
+    "pr": "24"
+  }
+]
