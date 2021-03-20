@@ -3,7 +3,7 @@
 
 - On click, message if in system
 - Visually display already in the system
-- Overtime page, remove items (need title from ids)
+- Over time page, remove items (need title from ids)
 
 - Add dripfeed
   - save

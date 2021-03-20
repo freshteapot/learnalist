@@ -1,12 +1,12 @@
 # Note
 - User info on spaced repetition over time, only is cleared once all items have been added and have viewed once.
 
-# Adding a list for spaced repetition overtime
+# Adding a list for spaced repetition over time
 - Codename: Dripfeed
-- Dripfeed, adding an item overtime, tightly coupled to the user interacting with entries in spaced repetition
+- Dripfeed, adding an item over time, tightly coupled to the user interacting with entries in spaced repetition
 
 # Example api request
-- Trigger adding the list items overtime
+- Trigger adding the list items over time
 
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d'
@@ -21,7 +21,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/spaced-repetition/overtime' -d'
 - Create user
 - Login
 - Create a list
-- Add list for learning overtime
+- Add list for learning over time
 
 ```sh
 curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
@@ -153,7 +153,7 @@ EOF
 )
 ```
 
-# Remove list from further adding overtime
+# Remove list from further adding over time
 
 ```sh
 curl -XDELETE \
