@@ -23,6 +23,8 @@ Click on the list menu option <button class="br3">🧠 + 💪</button> to add an
 - Wait for the system to slowly add the list over time.
 - <a class="link underline" href="/faq/add-a-list-overtime-for-spaced-learning.html">read more</a>
 
+## Add via your mobile
+Learn more about [Add, Remind, Repeat](/features/mobile-remind-v1.html)
 ## Add via a browser extension
 Coming soon
 
