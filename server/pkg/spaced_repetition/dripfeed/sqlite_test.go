@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing Spaced Repetitiion Overtime Repository Sqlite", func() {
+var _ = Describe("Testing Spaced Repetitiion Over time Repository Sqlite", func() {
 	var (
 		dbCon                  *sqlx.DB
 		mockSql                sqlmock.Sqlmock

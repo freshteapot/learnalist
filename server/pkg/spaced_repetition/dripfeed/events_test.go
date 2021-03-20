@@ -703,7 +703,7 @@ var _ = Describe("Testing Events", func() {
 		})
 	})
 
-	When("Adding overtime is finished", func() {
+	When("Adding over time is finished", func() {
 		BeforeEach(func() {
 			moment = event.Eventlog{
 				Kind: dripfeed.EventDripfeedFinished,

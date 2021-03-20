@@ -1,11 +1,11 @@
 ---
-title: "Add a list overtime for spaced learning"
+title: "Add a list over time for spaced learning"
 js_include: ["main"]
 css_include: ["main"]
 ---
 
-## What is <button class="br3">add all overtime</button>?
-<button class="br3">add all overtime</button>, adds (feeds) items from a list into your <a class="link underline" href="/spaced-repetition.html#/overview">spaced repetition list</a> to help YOU continuously learn.
+## What is <button class="br3">add all over time</button>?
+<button class="br3">add all over time</button>, adds (feeds) items from a list into your <a class="link underline" href="/spaced-repetition.html#/overview">spaced repetition list</a> to help YOU continuously learn.
 
 ## Why?
 Slowly drip feeding items from a list  for spaced learning avoids overwhelming you as you grasp new words or concepts.
@@ -13,11 +13,11 @@ Slowly drip feeding items from a list  for spaced learning avoids overwhelming y
 ## How to use
 - Find a list.
 - Click on <button class="br3">🧠 + 💪</button>.
-- Click on <button class="br3">add all overtime</button>
+- Click on <button class="br3">add all over time</button>
 - Done
 
 ## How does it work
-Once you click on <button class="br3">add all overtime</button>
+Once you click on <button class="br3">add all over time</button>
 
 - A snapshot of the list will be saved.
 - When an entry from your <a class="link underline" href="/spaced-repetition.html#/overview">spaced repetition list</a> is viewed that is linked to dripfeed. It potentially triggers a new entry from the snapshot to be added for learning.

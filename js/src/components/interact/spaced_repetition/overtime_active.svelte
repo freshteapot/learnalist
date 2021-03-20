@@ -15,7 +15,7 @@
 </script>
 
 <p>
-    All items are being added overtime, click to <a
+    All items are being added over time, click to <a
         href="#"
         class="link"
         on:click|once|preventDefault={stopOvertime}>cancel / stop</a

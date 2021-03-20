@@ -119,13 +119,13 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			b, _ := json.Marshal(entry.Data)
 			var data dripfeed.EventDripfeedInputInfo
 			json.Unmarshal(b, &data)
-			msg.Text = fmt.Sprintf("spaced repetition overtime created uuid:%s, user:%s, list:%s", entry.UUID, data.Info.UserUUID, data.Info.AlistUUID)
+			msg.Text = fmt.Sprintf("spaced repetition over time created uuid:%s, user:%s, list:%s", entry.UUID, data.Info.UserUUID, data.Info.AlistUUID)
 
 		case event.ActionDeleted:
 			b, _ := json.Marshal(entry.Data)
 			var data openapi.SpacedRepetitionOvertimeInfo
 			json.Unmarshal(b, &data)
-			msg.Text = fmt.Sprintf("spaced repetition overtime deleted uuid:%s, user:%s, list:%s", data.DripfeedUuid, data.UserUuid, data.AlistUuid)
+			msg.Text = fmt.Sprintf("spaced repetition over time deleted uuid:%s, user:%s, list:%s", data.DripfeedUuid, data.UserUuid, data.AlistUuid)
 		default:
 			msg.Text = fmt.Sprintf(`%s action not supported for %s`, entry.Action, entry.Kind)
 		}
@@ -137,9 +137,9 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 
 		switch moment.Kind {
 		case spaced_repetition.EventKindNew:
-			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s", entry.UUID, moment.Data.UserUUID)
+			msg.Text = fmt.Sprintf("spaced repetition over time system added entry:%s for user:%s", entry.UUID, moment.Data.UserUUID)
 		case spaced_repetition.EventKindAlreadyInSystem:
-			msg.Text = fmt.Sprintf("spaced repetition overtime system added entry:%s for user:%s that already exists", entry.UUID, moment.Data.UserUUID)
+			msg.Text = fmt.Sprintf("spaced repetition over time system added entry:%s for user:%s that already exists", entry.UUID, moment.Data.UserUUID)
 		default:
 			msg.Text = fmt.Sprintf(`%s kind not supported for %s`, moment.Kind, entry.Kind)
 		}
@@ -148,17 +148,17 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime activated for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition over time activated for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case dripfeed.EventDripfeedRemoved:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime stopped for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition over time stopped for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case dripfeed.EventDripfeedFinished:
 		b, _ := json.Marshal(entry.Data)
 		var moment openapi.SpacedRepetitionOvertimeInfo
 		json.Unmarshal(b, &moment)
-		msg.Text = fmt.Sprintf("spaced repetition overtime finished for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
+		msg.Text = fmt.Sprintf("spaced repetition over time finished for user:%s from list:%s", moment.UserUuid, moment.AlistUuid)
 	case event.ApiPlank:
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventPlank
