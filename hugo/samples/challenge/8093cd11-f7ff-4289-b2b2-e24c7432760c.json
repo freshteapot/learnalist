@@ -1,0 +1,26 @@
+{
+    "uuid": "8093cd11-f7ff-4289-b2b2-e24c7432760c",
+    "kind": "plank-group",
+    "description": "weekend planks",
+    "created": "2020-11-13T21:31:07Z",
+    "created_by": "c29fcd50-e873-48f0-9eb9-263d44a5de69",
+    "users": [
+        {
+            "user_uuid": "c29fcd50-e873-48f0-9eb9-263d44a5de69",
+            "name": "Chris"
+        }
+    ],
+    "records": [
+        {
+            "user_uuid": "c29fcd50-e873-48f0-9eb9-263d44a5de69",
+            "uuid": "e29933016ee334ee4d0f564841eef70e2e479336",
+            "showIntervals": false,
+            "intervalTime": 0,
+            "beginningTime": 1605303069980,
+            "currentTime": 1605303069980,
+            "timerNow": 2049,
+            "intervalTimerNow": 0,
+            "laps": 0
+        }
+    ]
+}

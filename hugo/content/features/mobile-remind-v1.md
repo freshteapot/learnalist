@@ -7,13 +7,24 @@ css_include: ["main"]
 # Short version
 A little app, trying to help YOU remember things
 
+# Status
+## iOS
+- available via TestFlight, with bugs
+- Send me a message to get access
+
+## Android
+- Not yet available (but soon), in the meantime you can always use the website
+- Send me a message if your interested to test it
+
+# Bugs
+- [#229](https://github.com/freshteapot/learnalist-api/issues/229) You need to accept "push notifications" or things dont work.
 # Features
 - Add an entry
 - Remove an entry
 - Review entries
 - Get reminders to your phone to aid you in your learning
 - Uses spaced repetition delivered via https://learnalist.net
-
+- Set a daily reminder to motivate you or pat you on the back for adding more entries
 # But first, what is spaced repetition
 People have concluded that being reminded of something over time helps remember it,
 

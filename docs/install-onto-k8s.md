@@ -300,3 +300,10 @@ kubectl create secret generic learnalist-server \
 --dry-run -o yaml |
 kubectl apply -f -
 ```
+
+
+# Rebuild content
+```
+cd /srv/learnalist/hugo
+hugo --environment=lal01 --verbose --ignoreCache
+```
