@@ -55,6 +55,8 @@ SELECT
     )
 FROM
 	_with_or_without_medium
+GROUP BY
+	user_uuid
 `
 )
 
