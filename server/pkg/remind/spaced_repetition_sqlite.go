@@ -116,6 +116,7 @@ func (r remindSpacedRepetitionSqliteRepository) GetReminders(whenNext string, la
 	for _, item := range dbItems {
 		var r SpacedRepetitionReminder
 		json.Unmarshal(item, &r)
+		// TODO with the change to group by, I am not sure we need this protection anymore.
 		// Seems to be needed as I am now returning a json object
 		if r.UserUUID == "" {
 			continue
