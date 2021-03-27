@@ -50,7 +50,7 @@ static-site
 			fmt.Println("hugo.environment is missing")
 			os.Exit(1)
 		}
-
+		hugoEnvironment = "lal01"
 		hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logContext)
 
 		sc := event.GetBus().(*event.NatsBus).Connection()

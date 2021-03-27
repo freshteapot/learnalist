@@ -25,6 +25,7 @@ type FileWriter interface {
 }
 
 type HugoHelper struct {
+	debug              bool
 	subscription       stan.Subscription
 	cwd                string
 	environment        string

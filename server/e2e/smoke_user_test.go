@@ -88,7 +88,7 @@ var _ = Describe("Smoke user", func() {
 		Expect(pref.DisplayName).To(Equal("Chris"))
 		// Add DailyReminderSettings
 		input := openapi.RemindDailySettings{
-			TimeOfDay:     "01:00",
+			TimeOfDay:     "01:00:00",
 			Tz:            "Europe/Oslo",
 			AppIdentifier: apps.RemindV1,
 			Medium:        []string{"push"},

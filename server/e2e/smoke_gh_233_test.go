@@ -16,7 +16,7 @@ import (
 )
 
 var _ = Describe("Regression GH-233", func() {
-	FIt("", func() {
+	It("Confirming that 2 different users get daily notifications, instead of 1 user with many tokens", func() {
 		client := openapiClient.API
 		authA, loginInfoA := RegisterAndLogin(client)
 		authB, loginInfoB := RegisterAndLogin(client)

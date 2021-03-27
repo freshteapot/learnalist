@@ -5,18 +5,31 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
+
+var timer *time.Timer
 
 func (h HugoHelper) ProcessContent() {
 	logContext := h.logContext.WithFields(logrus.Fields{
 		"context": "hugo-build",
 		"event":   "process-content",
 	})
-	//logContext.Info("started")
-	h.Build(logContext)
-	//logContext.Info("finished")
+
+	if timer != nil {
+		return
+	}
+
+	timer := time.AfterFunc(500*time.Millisecond, func() {
+		logContext.Info("started")
+		h.Build(logContext)
+		logContext.Info("finished")
+		timer = nil
+	})
+
+	defer timer.Stop()
 }
 
 func (h HugoHelper) Build(logContext *logrus.Entry) {
