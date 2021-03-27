@@ -23,14 +23,12 @@ var (
 )
 
 func TestE2e(t *testing.T) {
-	// TODO create listeners for nats?
 	logger := logging.GetLogger()
 	logContext := logger.WithField("context", "e2e")
 
-	// TODO maybe add nano time
-	e2eNatsClientID := "e2e"
+	e2eStanClientID := "e2e"
 	event.SetDefaultSettingsForCMD()
-	os.Setenv("EVENTS_STAN_CLIENT_ID", e2eNatsClientID)
+	os.Setenv("EVENTS_STAN_CLIENT_ID", e2eStanClientID)
 	os.Setenv("EVENTS_STAN_CLUSTER_ID", "test-cluster")
 	os.Setenv("EVENTS_NATS_SERVER", "127.0.0.1")
 	event.SetupEventBus(logContext)
