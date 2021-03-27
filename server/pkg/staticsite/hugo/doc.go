@@ -1,6 +1,8 @@
 package hugo
 
 import (
+	"time"
+
 	"github.com/freshteapot/learnalist-api/server/api/alist"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/nats-io/stan.go"
@@ -25,16 +27,16 @@ type FileWriter interface {
 }
 
 type HugoHelper struct {
-	debug              bool
-	subscription       stan.Subscription
-	cwd                string
-	environment        string
-	externalHugo       bool
-	AlistWriter        HugoAListWriter
-	AlistsByUserWriter HugoAListUserWriter
-	PublicListsWriter  HugoPublicListsWriter
-	challengeWriter    hugoChallengeWriter
-	logContext         logrus.FieldLogger
+	contentWillBuildTimer *time.Timer
+	subscription          stan.Subscription
+	cwd                   string
+	environment           string
+	externalHugo          bool
+	AlistWriter           HugoAListWriter
+	AlistsByUserWriter    HugoAListUserWriter
+	PublicListsWriter     HugoPublicListsWriter
+	challengeWriter       hugoChallengeWriter
+	logContext            logrus.FieldLogger
 }
 
 type Job struct {

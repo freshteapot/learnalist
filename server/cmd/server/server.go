@@ -110,16 +110,16 @@ var ServerCmd = &cobra.Command{
 
 		event.SetupEventBus(logger.WithField("context", "event-bus-setup"))
 
-		if !viper.GetBool("staticsite.external") {
-			hugoEnvironment := viper.GetString("hugo.environment")
-			if hugoEnvironment == "" {
-				fmt.Println("hugo.environment is missing")
-				os.Exit(1)
-			}
-
-			hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logger.WithField("context", "static-site-hugo"))
-			hugoHelper.ListenForEvents()
-		}
+		//if !viper.GetBool("staticsite.external") {
+		//	hugoEnvironment := viper.GetString("hugo.environment")
+		//	if hugoEnvironment == "" {
+		//		fmt.Println("hugo.environment is missing")
+		//		os.Exit(1)
+		//	}
+		//
+		//	hugoHelper := hugo.NewHugoHelper(hugoFolder, hugoEnvironment, logger.WithField("context", "static-site-hugo"))
+		//	hugoHelper.ListenForEvents()
+		//}
 
 		serverConfig := server.Config{
 			Port:             port,
