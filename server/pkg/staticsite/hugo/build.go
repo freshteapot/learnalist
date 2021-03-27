@@ -5,21 +5,32 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-func (h HugoHelper) ProcessContent() {
-	logContext := h.logContext.WithFields(logrus.Fields{
-		"context": "hugo-build",
-		"event":   "process-content",
+func (h *HugoHelper) ProcessContent() {
+	// Protecting against a herd of events
+	// Controlling how often we rebuild
+	if h.contentWillBuildTimer != nil {
+		return
+	}
+
+	h.contentWillBuildTimer = time.AfterFunc(500*time.Millisecond, func() {
+		logContext := h.logContext.WithFields(logrus.Fields{
+			"context": "hugo-build",
+			"event":   "process-content",
+		})
+
+		logContext.Info("started")
+		h.Build(logContext)
+		logContext.Info("finished")
+		h.contentWillBuildTimer = nil
 	})
-	//logContext.Info("started")
-	h.Build(logContext)
-	//logContext.Info("finished")
 }
 
-func (h HugoHelper) Build(logContext *logrus.Entry) {
+func (h *HugoHelper) Build(logContext *logrus.Entry) {
 	a := h.AlistWriter.GetFilesToPublish()
 	b := h.AlistsByUserWriter.GetFilesToPublish()
 	c := h.challengeWriter.GetFilesToPublish()
@@ -52,7 +63,7 @@ func (h HugoHelper) Build(logContext *logrus.Entry) {
 	h.deleteFiles(toPublish)
 }
 
-func (h HugoHelper) buildSite(logContext *logrus.Entry) error {
+func (h *HugoHelper) buildSite(logContext *logrus.Entry) error {
 	logContext = logContext.WithFields(logrus.Fields{
 		"event": "build-site",
 	})
@@ -83,7 +94,7 @@ func (h HugoHelper) buildSite(logContext *logrus.Entry) error {
 	return nil
 }
 
-func (h HugoHelper) deleteFiles(files []string) {
+func (h *HugoHelper) deleteFiles(files []string) {
 	logContext := h.logContext.WithFields(logrus.Fields{
 		"event": "delete-file",
 	})

@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewHugoHelper(cwd string, environment string, logger logrus.FieldLogger) HugoHelper {
+func NewHugoHelper(cwd string, environment string, logger logrus.FieldLogger) *HugoHelper {
 	check := []string{
 		RealtivePathContentAlist,
 		RealtivePathDataAlist,
@@ -34,10 +34,11 @@ func NewHugoHelper(cwd string, environment string, logger logrus.FieldLogger) Hu
 	writer := NewHugoFileWriter(logger.WithField("context", "hugo-writer"))
 
 	publishDirectory := fmt.Sprintf(RealtivePathPublic, cwd)
-	return HugoHelper{
-		logContext:  logger,
-		cwd:         cwd,
-		environment: environment,
+	return &HugoHelper{
+		contentWillBuildTimer: nil,
+		logContext:            logger,
+		cwd:                   cwd,
+		environment:           environment,
 		AlistWriter: NewHugoAListWriter(
 			fmt.Sprintf(RealtivePathContentAlist, cwd),
 			fmt.Sprintf(RealtivePathDataAlist, cwd),
@@ -61,11 +62,11 @@ func NewHugoHelper(cwd string, environment string, logger logrus.FieldLogger) Hu
 	}
 }
 
-func (h HugoHelper) GetPubicDirectory() string {
+func (h *HugoHelper) GetPubicDirectory() string {
 	return fmt.Sprintf(RealtivePathPublic, h.cwd)
 }
 
-func (h HugoHelper) Subscribe(topic string, sc stan.Conn) error {
+func (h *HugoHelper) Subscribe(topic string, sc stan.Conn) error {
 	var err error
 	handle := func(msg *stan.Msg) {
 		var moment event.Eventlog
@@ -87,7 +88,7 @@ func (h HugoHelper) Subscribe(topic string, sc stan.Conn) error {
 	return err
 }
 
-func (h HugoHelper) Close() {
+func (h *HugoHelper) Close() {
 	err := h.subscription.Close()
 	if err != nil {
 		h.logContext.WithField("error", err).Error("closing subscription")

@@ -2,6 +2,7 @@ package remind
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -19,11 +20,21 @@ func DefaultWhenNextWithLastActiveOffset() (string, string) {
 	return whenNext, lastActive
 }
 
+func ParseAndValidateTimeOfDay(input string) (string, error) {
+	parts := strings.Split(input, ":")
+
+	if len(parts) == 2 {
+		input = fmt.Sprintf("%s:%s:00", parts[0], parts[1])
+	}
+
+	return input, ValidateTimeOfDay(input)
+}
+
 func ValidateTimeOfDay(input string) error {
 	fail := errors.New("fail")
 	parts := strings.Split(input, ":")
 
-	if len(parts) != 2 {
+	if len(parts) != 3 {
 		return fail
 	}
 
@@ -37,11 +48,21 @@ func ValidateTimeOfDay(input string) error {
 		return fail
 	}
 
+	second, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return fail
+	}
+
+	// make sure the number is no larger than 2 in length, ugly code
 	if len(parts[0]) > 2 {
 		return fail
 	}
 
 	if len(parts[1]) > 2 {
+		return fail
+	}
+
+	if len(parts[2]) > 2 {
 		return fail
 	}
 
@@ -59,6 +80,14 @@ func ValidateTimeOfDay(input string) error {
 		return fail
 	}
 	if minute > 59 {
+		return fail
+	}
+
+	// Second
+	if second < 0 {
+		return fail
+	}
+	if second > 59 {
 		return fail
 	}
 	return nil

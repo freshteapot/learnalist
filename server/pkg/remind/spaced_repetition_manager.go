@@ -356,6 +356,7 @@ func (m *spacedRepetitionManager) SendNotifications() {
 
 				// Send message
 				event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
+					UUID: remind.UserUUID,
 					Kind: event.KindPushNotification,
 					Data: message,
 				})

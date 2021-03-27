@@ -150,7 +150,7 @@ func (s RemindService) SetDailySettings(c echo.Context) error {
 		})
 	}
 	// Validate time_of_day
-	err = ValidateTimeOfDay(input.TimeOfDay)
+	input.TimeOfDay, err = ParseAndValidateTimeOfDay(input.TimeOfDay)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, api.HTTPResponseMessage{
 			Message: "time_of_day is not valid",

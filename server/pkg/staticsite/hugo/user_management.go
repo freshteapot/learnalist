@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (h HugoHelper) DeleteList(listUUID string) error {
+func (h *HugoHelper) DeleteList(listUUID string) error {
 	contentDirectory := fmt.Sprintf(RealtivePathContentAlist, h.cwd)
 	dataDirectory := fmt.Sprintf(RealtivePathDataAlist, h.cwd)
 	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlist, h.cwd)
@@ -21,7 +21,7 @@ func (h HugoHelper) DeleteList(listUUID string) error {
 	return nil
 }
 
-func (h HugoHelper) DeleteUser(userUUID string) error {
+func (h *HugoHelper) DeleteUser(userUUID string) error {
 	contentDirectory := fmt.Sprintf(RealtivePathContentAlistsByUser, h.cwd)
 	dataDirectory := fmt.Sprintf(RealtivePathDataAlistsByUser, h.cwd)
 	publishDirectory := fmt.Sprintf(RealtivePathPublicContentAlistsByUser, h.cwd)

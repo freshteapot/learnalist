@@ -60,7 +60,7 @@ tools remind manager
 			spacedRepetitionRepo,
 			remindSpacedRepetitionRepo,
 			logger.WithField("context", "spaced-repetition-reminder"))
-
+		// TODO mobile device cleanup is not being handled
 		sc := event.GetBus().(*event.NatsBus).Connection()
 
 		subscribers := make([]event.NatsSubscriber, 0)

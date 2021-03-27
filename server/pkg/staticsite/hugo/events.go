@@ -9,11 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (h HugoHelper) ListenForEvents() {
+func (h *HugoHelper) ListenForEvents() {
 	event.GetBus().Subscribe(event.TopicStaticSite, "hugoHelper", h.OnEvent)
 }
 
-func (h HugoHelper) OnEvent(entry event.Eventlog) {
+func (h *HugoHelper) OnEvent(entry event.Eventlog) {
 	logContext := h.logContext.WithFields(logrus.Fields{
 		"kind":   entry.Kind,
 		"action": entry.Action,

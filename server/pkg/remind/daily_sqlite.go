@@ -51,6 +51,8 @@ SELECT
     )
 FROM
     _with_or_without_medium
+GROUP BY
+	user_uuid
 `
 )
 
@@ -114,9 +116,9 @@ func (r remindDailySettingsSqliteRepository) GetReminders(whenNext string) ([]Re
 	}
 
 	for _, item := range dbItems {
-
 		var r RemindMe
 		json.Unmarshal(item, &r)
+		// TODO with the change to group by, I am not sure we need this protection anymore.
 		// Seems to be needed as I am now returning a json object
 		if r.UserUUID == "" {
 			continue

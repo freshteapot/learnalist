@@ -78,7 +78,6 @@ css_include: {{css_include .Info}}
 	content := strings.TrimSpace(tpl.String())
 
 	path := fmt.Sprintf("%s/%s.md", w.contentDirectory, aList.Uuid)
-	fmt.Println(path)
 	w.writer.Write(path, []byte(content))
 }
 

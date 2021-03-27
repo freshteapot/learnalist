@@ -99,7 +99,7 @@ var _ = Describe("Testing Remind API", func() {
 		}{
 			{
 				input:  "00:00:00",
-				expect: want,
+				expect: nil,
 			},
 			{
 				input:  "car:00",
@@ -137,12 +137,35 @@ var _ = Describe("Testing Remind API", func() {
 				input:  "00:-1", // under 0
 				expect: want,
 			},
+
+			{
+				input:  "01:01:60", // under 0
+				expect: want,
+			},
+			{
+				input:  "01:01:-1", // under 0
+				expect: want,
+			},
+			{
+				input:  "01:01:car", // Not number
+				expect: want,
+			},
+			{
+				input:  "01:01:123", // To large
+				expect: want,
+			},
+			{
+				input:  "01:01:car:01", // Wrong amount of ":"
+				expect: want,
+			},
 		}
 
 		for _, test := range tests {
-			err := remind.ValidateTimeOfDay(test.input)
+			var err error
+			//err := remind.ValidateTimeOfDay(test.input)
+			test.input, err = remind.ParseAndValidateTimeOfDay(test.input)
 			if test.expect != nil {
-				Expect(err).To(Equal(test.expect))
+				Expect(err).To(Equal(test.expect), test.input)
 				continue
 			}
 			Expect(err).To(BeNil())

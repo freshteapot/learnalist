@@ -9,18 +9,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (h HugoHelper) WriteList(aList alist.Alist) {
+func (h *HugoHelper) WriteList(aList alist.Alist) {
 	h.AlistWriter.Data(aList)
 	h.AlistWriter.Content(aList)
 }
 
 // WriteListsByUser
-func (h HugoHelper) WriteListsByUser(userUUID string, lists []alist.ShortInfo) {
+func (h *HugoHelper) WriteListsByUser(userUUID string, lists []alist.ShortInfo) {
 	h.AlistsByUserWriter.Data(userUUID, lists)
 	h.AlistsByUserWriter.Content(userUUID)
 }
 
-func (h HugoHelper) WritePublicLists(lists []alist.ShortInfo) {
+func (h *HugoHelper) WritePublicLists(lists []alist.ShortInfo) {
 	h.PublicListsWriter.Data(lists)
 }
 

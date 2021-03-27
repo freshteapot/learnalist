@@ -25,7 +25,7 @@ var _ = Describe("Testing remind API", func() {
 			// Register User
 			auth, loginInfo := RegisterAndLogin(client)
 			input := openapi.RemindDailySettings{
-				TimeOfDay:     "00:00",
+				TimeOfDay:     "00:00:00",
 				Tz:            "Europe/Oslo",
 				AppIdentifier: apps.RemindV1,
 				Medium:        []string{"push"},
