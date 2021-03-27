@@ -10,16 +10,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var contentWillBuildTimer *time.Timer
-
 func (h *HugoHelper) ProcessContent() {
-
+	// Protecting against a herd of events
+	// Controlling how often we rebuild
 	if h.contentWillBuildTimer != nil {
 		return
 	}
 
 	h.contentWillBuildTimer = time.AfterFunc(500*time.Millisecond, func() {
-		//contentWillBuildTimer = time.AfterFunc(1000*time.Millisecond, func() {
 		logContext := h.logContext.WithFields(logrus.Fields{
 			"context": "hugo-build",
 			"event":   "process-content",
@@ -28,7 +26,6 @@ func (h *HugoHelper) ProcessContent() {
 		logContext.Info("started")
 		h.Build(logContext)
 		logContext.Info("finished")
-		//contentWillBuildTimer.Stop()
 		h.contentWillBuildTimer = nil
 	})
 }
