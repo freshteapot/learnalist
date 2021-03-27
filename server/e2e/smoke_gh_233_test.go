@@ -21,7 +21,6 @@ var _ = Describe("Regression GH-233", func() {
 		authA, loginInfoA := RegisterAndLogin(client)
 		authB, loginInfoB := RegisterAndLogin(client)
 		// if this allowed seconds, then the test wouldnt have to wait
-		// TODO I dont think we have to wait for seconds
 		future := time.Now().Add(1 * time.Second)
 		input := openapi.RemindDailySettings{
 			TimeOfDay:     fmt.Sprintf("%02d:%02d:%02d", future.Hour(), future.Minute(), future.Second()),
@@ -47,7 +46,6 @@ var _ = Describe("Regression GH-233", func() {
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 		Expect(msg.Message).To(Equal("Device registered"))
 
-		// How to use with context + select = SEXY
 		_, _, err = client.RemindApi.SetRemindDailySetting(authA, input)
 		Expect(err).To(BeNil())
 		_, _, err = client.RemindApi.SetRemindDailySetting(authB, input)
