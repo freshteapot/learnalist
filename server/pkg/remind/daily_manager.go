@@ -261,6 +261,7 @@ func (m *dailyManager) SendNotifications() {
 
 			// Send message
 			event.GetBus().Publish(event.TopicNotifications, event.Eventlog{
+				UUID: remind.UserUUID,
 				Kind: event.KindPushNotification,
 				Data: message,
 			})
@@ -295,7 +296,13 @@ func (m *dailyManager) updateSettingsWithWhenNext(userUUID string, conf openapi.
 	hour, _ := strconv.Atoi(parts[0])
 	minute, _ := strconv.Atoi(parts[1])
 	now := time.Now()
-	local := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, 0, 0, loc)
+	// TODO remove this code once in production and all settings updated?
+	seconds := 0
+	if len(parts) > 2 {
+		seconds, _ = strconv.Atoi(parts[2])
+	}
+
+	local := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, seconds, 0, loc)
 	// Has the time already passed, if yes add date
 	whenNext := m.whenNext(now, local)
 

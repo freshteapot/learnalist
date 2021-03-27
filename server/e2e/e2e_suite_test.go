@@ -10,6 +10,8 @@ import (
 
 	"github.com/freshteapot/e2elog"
 	"github.com/freshteapot/learnalist-api/server/e2e"
+	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/getkin/kin-openapi/openapi3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,6 +23,20 @@ var (
 )
 
 func TestE2e(t *testing.T) {
+	// TODO create listeners for nats?
+	logger := logging.GetLogger()
+	logContext := logger.WithField("context", "e2e")
+
+	// TODO maybe add nano time
+	e2eNatsClientID := "e2e"
+	event.SetDefaultSettingsForCMD()
+	os.Setenv("EVENTS_STAN_CLIENT_ID", e2eNatsClientID)
+	os.Setenv("EVENTS_STAN_CLUSTER_ID", "test-cluster")
+	os.Setenv("EVENTS_NATS_SERVER", "127.0.0.1")
+	event.SetupEventBus(logContext)
+
+	event.GetBus().Start(event.TopicNotifications)
+
 	openapiClient = e2e.NewOpenApiClient(e2e.LOCAL_SERVER)
 	e2eClient = e2e.NewClient("http://localhost:1234")
 	RegisterFailHandler(Fail)
