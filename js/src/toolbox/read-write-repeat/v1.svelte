@@ -1,10 +1,5 @@
 <script>
-  import { onMount } from "svelte";
   import { text_area_resize } from "./auto_resize_height.js";
-
-  onMount(async () => {
-    //document.querySelector("#top-header").style.display = "none";
-  });
 
   let input = "";
   let offset = 0;
