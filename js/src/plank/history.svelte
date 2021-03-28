@@ -2,8 +2,6 @@
   // TODO visualise with colour the daily, weekly, monthly
   // TODO visualise days in a row doing a plank
   import dayjs from "dayjs";
-  import isBetween from "dayjs/plugin/isBetween";
-  import isToday from "dayjs/plugin/isToday";
   import en from "dayjs/locale/en";
 
   import { createEventDispatcher } from "svelte";
@@ -11,19 +9,22 @@
   import { loggedIn, notify } from "../shared.js";
   import { formatTime } from "./utils.js";
   import LoginModal from "../components/login_modal.svelte";
+  import {
+    totals,
+    todayTotals,
+    weekTotals,
+    monthTotals,
+  } from "./stats/helpers";
 
   dayjs.locale({
     ...en,
     weekStart: 1,
   });
-  dayjs.extend(isBetween);
-  dayjs.extend(isToday);
 
   const dispatch = createEventDispatcher();
 
   const error = store.error;
 
-  let details = false;
   let loginNag = true;
   const loginNagMessageDefault =
     "History is not saved, you need to login to save it";
@@ -35,49 +36,6 @@
 
   function closeLoginModal() {
     loginNag = false;
-  }
-
-  function totals(entries) {
-    return entries.reduce((a, b) => a + (b["timerNow"] || 0), 0);
-  }
-
-  function todayTotals(entries) {
-    return entries.reduce((a, b) => {
-      if (!dayjs(b.beginningTime).isToday()) {
-        return a;
-      }
-      return a + (b["timerNow"] || 0);
-    }, 0);
-  }
-
-  function weekTotals(entries) {
-    const startOf = dayjs().startOf("week");
-    const endOf = dayjs().endOf("week");
-
-    return entries.reduce((a, b) => {
-      const now = dayjs(b.beginningTime);
-      if (!now.isBetween(startOf, endOf)) {
-        return a;
-      }
-      return a + (b["timerNow"] || 0);
-    }, 0);
-  }
-
-  function monthTotals(entries) {
-    const startOf = dayjs().startOf("month");
-    const endOf = dayjs().endOf("month");
-
-    return entries.reduce((a, b) => {
-      const now = dayjs(b.beginningTime);
-      if (!now.isBetween(startOf, endOf)) {
-        return a;
-      }
-      return a + (b["timerNow"] || 0);
-    }, 0);
-  }
-
-  function formatWhen(entry) {
-    return new Date(entry.beginningTime).toISOString();
   }
 
   function deleteEntry(entry) {
@@ -97,10 +55,6 @@
     }
   }
 
-  function checkShowLoginNag() {
-    console.log(loginNag && !loggedIn());
-    return loginNag && !loggedIn();
-  }
   let showLoginNag = false;
 
   // TODO handle when the dates are wrong or empty
@@ -173,8 +127,13 @@
     </div>
   </div>
 {/if}
+
 {#if showLoginNag}
   <LoginModal on:close={closeLoginModal}>
     <p>{loginNagMessage}</p>
   </LoginModal>
 {/if}
+
+<style>
+  @import "../../all.css";
+</style>

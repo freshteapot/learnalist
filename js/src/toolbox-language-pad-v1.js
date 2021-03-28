@@ -1,4 +1,4 @@
-
+// Auto generated from rollup.config.toolbox.js
 import Experience from "./toolbox/language-pad/v1.svelte";
 
 // Actual app to handle the interactions

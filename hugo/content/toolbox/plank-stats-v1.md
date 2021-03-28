@@ -1,5 +1,5 @@
 ---
-title: "Language pad"
+title: "Plank stats"
 type: "toolbox"
 layout: "single"
 js_include: ["main", "toolbox-plank-stats"]

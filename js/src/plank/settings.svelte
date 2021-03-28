@@ -1,7 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import store from "./store.js";
-  import { copyObject } from "../utils/utils.js";
 
   const dispatch = createEventDispatcher();
 
@@ -10,14 +9,10 @@
   function close() {
     store.settings(settings);
     dispatch("close", {
-      settings
+      settings,
     });
   }
 </script>
-
-<style>
-
-</style>
 
 <button class="br3" on:click={close}>Close Settings</button>
 
@@ -32,3 +27,7 @@
     <span>(seconds)</span>
   </p>
 {/if}
+
+<style>
+  @import "../../all.css";
+</style>

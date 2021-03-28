@@ -1,5 +1,5 @@
 ---
-title: "Language pad"
+title: "Language Pad"
 type: "toolbox"
 layout: "single"
 js_include: ["main", "toolbox-language-pad-v1"]
