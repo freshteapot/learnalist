@@ -1,6 +1,5 @@
 <script>
   import humanizeDuration from "humanize-duration";
-
   import { summary, streakRanges, trackRecord } from "date-streaks";
   import { monthTotals, todayTotals, totals, weekTotals } from "./helpers.js";
 

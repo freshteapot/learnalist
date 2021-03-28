@@ -1,5 +1,3 @@
-// TODO visualise with colour the daily, weekly, monthly
-// TODO visualise days in a row doing a plank
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import isToday from "dayjs/plugin/isToday";
