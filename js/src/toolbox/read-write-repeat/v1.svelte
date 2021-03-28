@@ -1,6 +1,10 @@
 <script>
-  // Ifølge har visepresident Mike Pence nå gått med på å ha pleksiglass mellom seg og motdebattant Kamala Harris under visepresidentdebatten natt til torsdag i Salt Lake City. I går avviste Pence å godta slike barrierer.
+  import { onMount } from "svelte";
   import { text_area_resize } from "./auto_resize_height.js";
+
+  onMount(async () => {
+    //document.querySelector("#top-header").style.display = "none";
+  });
 
   let input = "";
   let offset = 0;

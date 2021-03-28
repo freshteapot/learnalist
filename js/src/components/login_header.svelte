@@ -1,3 +1,5 @@
+<svelte:options tag={null} />
+
 <script>
   import { onMount, onDestroy } from "svelte";
   import { location } from "svelte-spa-router";
@@ -67,7 +69,7 @@
   async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
     dontLookup = false;
     await checkForSpacedRepetition();
-    poller = setInterval(function() {
+    poller = setInterval(function () {
       checkForSpacedRepetition();
     }, 60 * 1000);
   }
@@ -93,50 +95,56 @@
 
   // Could also check when we come back to the page
   $: urlChange(window.location.href, $location);
+  $: showSiteMenu = window.location.pathname.includes("/toolbox/") === false;
 </script>
-
-<style>
-  @import "../../all.css";
-</style>
-
-<svelte:options tag={null} />
 
 <div class="fr mt0">
   {#if loggedIn()}
-    {#if hasSpacedRepetition}
+    {#if showSiteMenu}
+      {#if hasSpacedRepetition}
+        <a
+          title="You have something to learn."
+          href="/spaced-repetition.html#/remind"
+          class="f6 fw6 hover-blue link black-70 ml0 mr2-l di"
+        >
+          <button class="br3">🧠 + 💪</button>
+        </a>
+      {/if}
+
       <a
-        title="You have something to learn."
-        href="/spaced-repetition.html#/remind"
-        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
-        <button class="br3">🧠 + 💪</button>
+        title="create, edit, share"
+        href="/editor.html"
+        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di"
+      >
+        Create
+      </a>
+      <a
+        title="Lists created by you"
+        href="/lists-by-me.html"
+        class="f6 fw6 hover-blue link black-70 di"
+      >
+        My Lists
       </a>
     {/if}
-
-    <a
-      title="create, edit, share"
-      href="/editor.html"
-      class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
-      Create
-    </a>
-    <a
-      title="Lists created by you"
-      href="/lists-by-me.html"
-      class="f6 fw6 hover-blue link black-70 di">
-      My Lists
-    </a>
     <a
       title="Logout"
       href="/logout.html"
       on:click={preLogout}
-      class="f6 fw6 hover-blue link black-70 di ml3">
+      class="f6 fw6 hover-blue link black-70 di ml3"
+    >
       Logout
     </a>
   {:else if window.location.pathname != loginurl}
     <a
       title="Click to login"
       href={loginurl}
-      class="f6 fw6 hover-red link black-70 mr2 mr3-m mr4-l dib">
+      class="f6 fw6 hover-red link black-70 mr2 mr3-m mr4-l dib"
+    >
       Login
     </a>
   {/if}
 </div>
+
+<style>
+  @import "../../all.css";
+</style>

@@ -1,0 +1,34 @@
+<script>
+  import { loggedIn, notify } from "../../shared.js";
+
+  import store from "../store.js";
+  import Summary from "./summary.svelte";
+
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    if (!loggedIn()) {
+      return;
+    }
+
+    await store.history();
+  });
+
+  function checkLogin() {
+    if (!loggedIn()) {
+      notify("info", "You need to login to see your summary", true);
+    }
+  }
+
+  $: checkLogin();
+  $: isLoggedIn = loggedIn();
+  $: history = $store.history;
+</script>
+
+{#if !isLoggedIn}
+  <p>Please login first</p>
+{/if}
+
+{#if isLoggedIn}
+  <Summary {history} />
+{/if}

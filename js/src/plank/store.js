@@ -33,15 +33,16 @@ const loadHistory = async () => {
     error.set('');
     loading.set(true);
     const response = await history();
-    loading.set(false);
+
     data.history = response;
     set(data);
+    loading.set(false);
   } catch (e) {
     console.log(e);
-    loading.set(false);
     allLists = [];
     data = copyObject(emptyData);
     set(data);
+    loading.set(false);
     error.set(`Error has been occurred. Details: ${e.message}`);
   }
 }

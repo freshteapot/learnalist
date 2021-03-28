@@ -14,7 +14,7 @@
 
   dayjs.locale({
     ...en,
-    weekStart: 1
+    weekStart: 1,
   });
   dayjs.extend(isBetween);
   dayjs.extend(isToday);
@@ -111,20 +111,20 @@
   $: stats = [
     {
       name: "Today",
-      value: formatTime(todayTotals($store.history))
+      value: formatTime(todayTotals($store.history)),
     },
     {
       name: "Week",
-      value: formatTime(weekTotals($store.history))
+      value: formatTime(weekTotals($store.history)),
     },
     {
       name: "Month",
-      value: formatTime(monthTotals($store.history))
+      value: formatTime(monthTotals($store.history)),
     },
     {
       name: "Overall",
-      value: formatTime(totals($store.history))
-    }
+      value: formatTime(totals($store.history)),
+    },
   ];
 </script>
 
@@ -155,7 +155,7 @@
           {#each $store.history as entry}
             <tr>
               <td class="pv3 pr3 bb b--black-20">
-                {dayjs(entry.beginningTime).format('YY-MM-DD')}
+                {dayjs(entry.beginningTime).format("YY-MM-DD")}
               </td>
               <td class="pv3 pr3 bb b--black-20">
                 {formatTime(entry.timerNow)}

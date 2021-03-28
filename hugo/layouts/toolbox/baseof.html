@@ -8,6 +8,7 @@
 </head>
 
 <body class="w-100 bg-white">
+    {{- partial "header.html" $ -}}
     <main id="main-panel">
         {{ block "main" . }}{{ end }}
     </main>

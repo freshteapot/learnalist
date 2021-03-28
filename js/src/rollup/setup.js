@@ -8,7 +8,7 @@ import del from 'rollup-plugin-delete';
 import css from 'rollup-plugin-css-only';
 import sveltePreprocess from 'svelte-preprocess';
 import copy from 'rollup-plugin-copy'
-
+import json from '@rollup/plugin-json';
 
 const production = !process.env.ROLLUP_WATCH;
 import { getComponentInfo, rollupPluginManifestSync } from "../utils/glue.mjs";
@@ -35,6 +35,7 @@ export default (key, format) => {
             dir: componentInfo.localBasePath,
         },
         plugins: [
+            json(),
             alias({
                 entries: [
                     { find: '../shared.js', replacement: 'shared' },
