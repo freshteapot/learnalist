@@ -2,10 +2,13 @@ package alist
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
+	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/event/staticsite"
@@ -13,6 +16,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/user"
 	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -41,6 +45,14 @@ tools list public-access chris --access=revoke
 		db := database.NewDB(dsn)
 		aclRepo := aclStorage.NewAcl(db)
 
+		storageAlist := alistStorage.NewAlist(db, logger)
+
+		userManagement := user.NewManagement(
+			userStorage.NewSqliteManagementStorage(db),
+			staticsite.NewSiteManagementViaEvents(),
+			event.NewInsights(logger),
+		)
+
 		userUUID := args[0]
 		if userUUID == "" {
 			fmt.Println("User UUID is missing")
@@ -55,17 +67,11 @@ tools list public-access chris --access=revoke
 		}
 
 		accessType, _ := cmd.Flags().GetString("access")
-		allowed := []string{"grant", "revoke", "current"}
+		allowed := []string{"grant", "revoke"}
 		if !utils.StringArrayContains(allowed, accessType) {
 			fmt.Println("Access can be only grant or revoke")
 			return
 		}
-
-		userManagement := user.NewManagement(
-			userStorage.NewSqliteManagementStorage(db),
-			staticsite.NewSiteManagementViaEvents(),
-			event.NewInsights(logger),
-		)
 
 		exists := userManagement.UserExists(userUUID)
 		if !exists {
@@ -84,8 +90,60 @@ tools list public-access chris --access=revoke
 			TriggeredBy: "cmd",
 		})
 
-		// TODO if revoke do more
-		// Change public lists to private
+		if accessType == "grant" {
+			return
+		}
+
+		logContext := logger.WithField("sub-context", "revoke")
+		shortLists := storageAlist.GetAllListsByUser(userUUID)
+		changed := make([]string, 0)
+		for _, short := range shortLists {
+			aList, err := storageAlist.GetAlist(short.UUID)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("SHIT BROKE")
+			}
+
+			if aList.Info.SharedWith != keys.SharedWithPublic {
+				continue
+			}
+			// Change to private
+			aList.Info.SharedWith = keys.NotShared
+
+			_, err = storageAlist.SaveAlist(http.MethodPut, aList)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("SHIT BROKE")
+			}
+
+			err = aclRepo.MakeListPrivate(aList.Uuid, userUUID)
+
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("SHIT BROKE")
+			}
+
+			// Send event that shared was changed
+			// This will trigger public lists to be made
+			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+				Kind: event.ApiListSaved,
+				Data: event.EventList{
+					UUID:     aList.Uuid,
+					UserUUID: userUUID,
+					Action:   event.ActionUpdated,
+					Data:     aList,
+				},
+			})
+			changed = append(changed, aList.Uuid)
+		}
+
+		logContext.WithFields(logrus.Fields{
+			"total": len(changed),
+			"lists": changed,
+		}).Info("lists revoked")
 	},
 }
 
