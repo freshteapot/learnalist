@@ -28,7 +28,7 @@ func (s AclService) handlePublicListAccess(entry event.Eventlog) {
 	if err != nil {
 		return
 	}
-
+	// Today, this assumes the userUUID exists
 	message := ""
 	switch moment.Action {
 	case "revoke":
