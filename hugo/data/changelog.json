@@ -1,5 +1,29 @@
 [
   {
+    "hash": "6511c7",
+    "what": "- Streamlining the process of creating single page apps, under \"toolbox\".\r\n- Adding language-pad to toolbox\r\n- Adding read-write-repeat to toolbox\r\n- Adding plank-stats to toolbox\r\n- Adding css to plank\r\n- Cleanup script to remove files that are not in the manifest_css.json or manifest_js.json on the server\r\n- When leaving plank stats page, ensure we remove any notifications\r\n- On visibility change we now use the same logic to filter checking for next spaced repetitions",
+    "when": "2021-03-29T14:29:39+02:00",
+    "pr": "235"
+  },
+  {
+    "hash": "d6cb92",
+    "what": "- Fixed a bug that was sending daily reminders to the wrong users devices (#233).\r\n- e2e test for the above issue, has shown me one way to hook into the log for more fine grained e2e testing.\r\n- Static site file rebuild, now batches the requests to protect a little from event herding.",
+    "when": "2021-03-27T14:12:57+01:00",
+    "pr": "234"
+  },
+  {
+    "hash": "293e1e",
+    "what": "- Spelling mistake on Android\r\n- Using \"over time\" instead of overtime",
+    "when": "2021-03-20T19:52:07+01:00",
+    "pr": "232"
+  },
+  {
+    "hash": "44c4ab",
+    "what": "- Landing page for remind app.\r\n- Landing page for humble plank app.\r\n- Page for technical-changelog and documented how to update it.\r\n- Samples are used in the hugo css build step to make sure we touch paths in different layouts.\r\n- Added sync-content option to makefile.\r\n- sync-site-assets will now rebuild js libraries from openapi before running.",
+    "when": "2021-03-20T15:27:18+01:00",
+    "pr": "231"
+  },
+  {
     "hash": "42e63a",
     "what": "- Update js dependencies in js and hugo\r\n- manifest_js and manifest_css have a base that is now copied to hugo\r\n- How we move js and css from js to hugo has changed a little\r\n\r\nFixes #224",
     "when": "2021-03-20T08:38:53+01:00",
