@@ -237,6 +237,8 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "dripfeed-service"),
 		)
 
+		// TODO add acl here
+
 		server.InitApi(
 			apiManager,
 			userSession,
