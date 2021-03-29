@@ -18,6 +18,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	labelStorage "github.com/freshteapot/learnalist-api/server/api/label/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/models"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/app_settings"
 	"github.com/freshteapot/learnalist-api/server/pkg/assets"
@@ -237,7 +238,10 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "dripfeed-service"),
 		)
 
-		// TODO add acl here
+		_ = acl.NewService(
+			aclRepo,
+			logger.WithField("context", "acl-service"),
+		)
 
 		server.InitApi(
 			apiManager,
