@@ -16,6 +16,6 @@ func NewService(repo Acl, log logrus.FieldLogger) AclService {
 		logContext: log,
 	}
 
-	event.GetBus().Subscribe(event.TopicMonolog, "acl", s.OnEvent)
+	event.GetBus().Subscribe(event.TopicMonolog, "aclService", s.OnEvent)
 	return s
 }
