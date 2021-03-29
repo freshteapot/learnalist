@@ -250,10 +250,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
 	case event.ApiAppSettingsRemindV1:
-		//b, _ := json.Marshal(entry.Data)
-		//var settings openapi.AppSettingsRemindV1
-		//json.Unmarshal(b, &settings)
-
 		userUUID := entry.UUID
 		switch entry.Action {
 		case event.ActionUpsert:
