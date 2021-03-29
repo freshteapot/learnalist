@@ -117,9 +117,4 @@
 
 <style>
   @import "../../../all.css";
-
-  .run {
-    width: 32px;
-    height: 32px;
-  }
 </style>
