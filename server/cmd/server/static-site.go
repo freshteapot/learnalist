@@ -31,7 +31,6 @@ static-site
 		logContext := logger.WithField("context", "static-site")
 
 		event.SetDefaultSettingsForCMD()
-		viper.SetDefault("topic", event.TopicStaticSite)
 		event.SetupEventBus(logContext)
 
 		viper.SetDefault("topic", event.TopicStaticSite)

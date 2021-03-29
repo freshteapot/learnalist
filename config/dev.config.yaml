@@ -12,6 +12,12 @@ remind:
 server:
   assets:
     directory: "/tmp/learnalist/assets"
+  events:
+    nats:
+      server: 127.0.0.1
+    stan:
+      clusterID: test-cluster
+
   sqlite:
     database: /tmp/learnalist/server.db
   fcm:

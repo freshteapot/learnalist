@@ -24,10 +24,6 @@ var publicAccessCMD = &cobra.Command{
 	Long: `
 Example:
 
-TOPIC=lal.monolog \
-EVENTS_STAN_CLIENT_ID=tools-alist \
-EVENTS_STAN_CLUSTER_ID=test-cluster \
-EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools list public-access chris --access=revoke
 `,
