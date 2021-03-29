@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -42,6 +44,7 @@ func NewSlackV1Events(post PostWebhook, webhook string, logContext logrus.FieldL
 // @event.listen: event.ApiPlank
 // @event.listen: challenge.EventChallengeDone
 // @event.listen: challenge.EventChallengeNewRecord
+// @event.listen: acl.EventPublicListAccess
 func (s SlackEvents) Read(entry event.Eventlog) {
 	var msg slack.WebhookMessage
 
@@ -259,6 +262,21 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		default:
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
+
+	case acl.EventPublicListAccess:
+		b, _ := json.Marshal(entry.Data)
+		var moment acl.EventPublicListAccessData
+		json.Unmarshal(b, &moment)
+
+		switch moment.Action {
+		case aclKeys.ActionGrant:
+			msg.Text = fmt.Sprintf("user:%s is allowed to create public lists", moment.UserUUID)
+		case event.ActionDeleted:
+			msg.Text = fmt.Sprintf("user:%s is no longer allowed to create public lists", moment.UserUUID)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, moment.Action, entry.Kind)
+		}
+
 	default:
 		msg.Text = entry.Kind
 	}
