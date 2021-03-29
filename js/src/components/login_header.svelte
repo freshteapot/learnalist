@@ -1,5 +1,7 @@
+<svelte:options tag={null} />
+
 <script>
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { location } from "svelte-spa-router";
   import { loggedIn, api } from "../shared.js";
   import { visibilityChange } from "../utils/visibilitychange.js";
@@ -14,29 +16,14 @@
     document.addEventListener(visibilityChange, handleVisibilityChange, false);
   });
 
-  onDestroy(async () => {
-    document.removeEventListener(
-      visibilityChange,
-      handleVisibilityChange,
-      false
-    );
-  });
-
   function preLogout() {
     clearConfiguration();
   }
 
   async function checkForSpacedRepetition() {
-    if (!loggedIn() || dontLookup) {
+    if (dontLookup) {
       clearInterval(poller);
       return;
-    }
-
-    if (window.location.pathname.indexOf("/spaced-repetition") !== -1) {
-      if (window.location.hash.indexOf("/remind") !== -1) {
-        clearInterval(poller);
-        return;
-      }
     }
 
     const response = await api.getSpacedRepetitionNext();
@@ -45,9 +32,9 @@
       case 200:
         clearInterval(poller);
         hasSpacedRepetition = true;
+        dontLookup = true;
         break;
       case 204:
-        console.log("nothing to see");
         dontLookup = true;
         break;
       case 401:
@@ -67,76 +54,110 @@
   async function checkForSpacedRepetitionStraightAwayThenPeriodically() {
     dontLookup = false;
     await checkForSpacedRepetition();
-    poller = setInterval(function() {
+    poller = setInterval(function () {
       checkForSpacedRepetition();
     }, 60 * 1000);
   }
 
+  function urlChangeFilterToolbox(href) {
+    if (!href.includes("/toolbox/")) {
+      return false;
+    }
+
+    clearInterval(poller);
+    return true;
+  }
+
+  function urlChangeFilterSpacedRepetition(href, spaLocation) {
+    if (href.indexOf("/spaced-repetition") === -1) {
+      return false;
+    }
+
+    if (spaLocation !== "/remind") {
+      return false;
+    }
+
+    clearInterval(poller);
+    // Hide as we are on the page
+    hasSpacedRepetition = false;
+    return true;
+  }
+
   // Based on the window href and the hash, we can watch when the page changes
   function urlChange(href, spaLocation) {
-    if (href.indexOf("/spaced-repetition") !== -1) {
-      if (spaLocation === "/remind") {
-        clearInterval(poller);
-        // Hide as we are on the page
-        hasSpacedRepetition = false;
-        return;
-      }
+    if (!loggedIn()) {
+      return;
     }
+
+    if (urlChangeFilterToolbox(href)) {
+      return;
+    }
+
+    if (urlChangeFilterSpacedRepetition(href, spaLocation)) {
+      return;
+    }
+
     checkForSpacedRepetitionStraightAwayThenPeriodically();
   }
 
   function handleVisibilityChange(event) {
     if (event.target.visibilityState === "visible") {
-      checkForSpacedRepetitionStraightAwayThenPeriodically();
+      urlChange(event.target.location.href, $location);
     }
   }
 
   // Could also check when we come back to the page
   $: urlChange(window.location.href, $location);
+  $: showSiteMenu = window.location.href.includes("/toolbox/") === false;
 </script>
-
-<style>
-  @import "../../all.css";
-</style>
-
-<svelte:options tag={null} />
 
 <div class="fr mt0">
   {#if loggedIn()}
-    {#if hasSpacedRepetition}
+    {#if showSiteMenu}
+      {#if hasSpacedRepetition}
+        <a
+          title="You have something to learn."
+          href="/spaced-repetition.html#/remind"
+          class="f6 fw6 hover-blue link black-70 ml0 mr2-l di"
+        >
+          <button class="br3">🧠 + 💪</button>
+        </a>
+      {/if}
+
       <a
-        title="You have something to learn."
-        href="/spaced-repetition.html#/remind"
-        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
-        <button class="br3">🧠 + 💪</button>
+        title="create, edit, share"
+        href="/editor.html"
+        class="f6 fw6 hover-blue link black-70 ml0 mr2-l di"
+      >
+        Create
+      </a>
+      <a
+        title="Lists created by you"
+        href="/lists-by-me.html"
+        class="f6 fw6 hover-blue link black-70 di"
+      >
+        My Lists
       </a>
     {/if}
-
-    <a
-      title="create, edit, share"
-      href="/editor.html"
-      class="f6 fw6 hover-blue link black-70 ml0 mr2-l di">
-      Create
-    </a>
-    <a
-      title="Lists created by you"
-      href="/lists-by-me.html"
-      class="f6 fw6 hover-blue link black-70 di">
-      My Lists
-    </a>
     <a
       title="Logout"
       href="/logout.html"
       on:click={preLogout}
-      class="f6 fw6 hover-blue link black-70 di ml3">
+      class="f6 fw6 hover-blue link black-70 di ml3"
+    >
       Logout
     </a>
   {:else if window.location.pathname != loginurl}
     <a
       title="Click to login"
       href={loginurl}
-      class="f6 fw6 hover-red link black-70 mr2 mr3-m mr4-l dib">
+      class="f6 fw6 hover-red link black-70 mr2 mr3-m mr4-l dib"
+    >
       Login
     </a>
   {/if}
 </div>
+
+<style>
+  @import "../../all.css";
+</style>

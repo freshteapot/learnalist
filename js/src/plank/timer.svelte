@@ -12,3 +12,7 @@
   <p>{formatTime(intervalTimerNow)}</p>
   <p>{laps} lap(s)</p>
 {/if}
+
+<style>
+  @import "../../all.css";
+</style>

@@ -208,6 +208,7 @@
 </div>
 
 <style>
+  @import "../../all.css";
   .actions {
     list-style-type: decimal;
   }
