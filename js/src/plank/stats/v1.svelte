@@ -22,7 +22,6 @@
 
   function beforeunload(event) {
     clearNotification();
-    return (event.returnValue = "");
   }
 
   $: checkLogin();
