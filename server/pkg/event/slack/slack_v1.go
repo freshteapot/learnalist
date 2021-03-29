@@ -271,7 +271,7 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		switch moment.Action {
 		case aclKeys.ActionGrant:
 			msg.Text = fmt.Sprintf("user:%s is allowed to create public lists", moment.UserUUID)
-		case event.ActionDeleted:
+		case aclKeys.ActionRevoke:
 			msg.Text = fmt.Sprintf("user:%s is no longer allowed to create public lists", moment.UserUUID)
 		default:
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, moment.Action, entry.Kind)
