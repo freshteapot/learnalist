@@ -1,5 +1,5 @@
 <script>
-  import { loggedIn, notify } from "../../shared.js";
+  import { loggedIn, notify, clearNotification } from "../../shared.js";
 
   import store from "../store.js";
   import Summary from "./summary.svelte";
@@ -20,10 +20,17 @@
     }
   }
 
+  function beforeunload(event) {
+    clearNotification();
+    return (event.returnValue = "");
+  }
+
   $: checkLogin();
   $: isLoggedIn = loggedIn();
   $: history = $store.history;
 </script>
+
+<svelte:window on:beforeunload={beforeunload} />
 
 {#if !isLoggedIn}
   <p>Please login first</p>
