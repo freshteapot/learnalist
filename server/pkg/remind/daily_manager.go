@@ -229,6 +229,9 @@ func (m *dailyManager) SendNotifications() {
 	msgSent := 0
 	msgSkipped := 0
 	for _, remind := range reminders {
+		// TODO for this to work, we willl need different templates
+		// remindV1
+		// plankV1
 		process := m.shouldSendNotification(remind)
 
 		if !process {
