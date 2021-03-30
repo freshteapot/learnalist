@@ -35,7 +35,7 @@ var syncCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
-		viper.SetDefault("topic", "lal.monolog")
+		viper.SetDefault("topic", event.TopicMonolog)
 		viper.BindEnv("topic", "TOPIC")
 		subjectRead := viper.GetString("topic")
 		subjectWrite := "challenges"

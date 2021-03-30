@@ -21,8 +21,6 @@ var StaticSiteCMD = &cobra.Command{
 	Short: "Run the static-site",
 	Long: `
 EVENTS_STAN_CLIENT_ID=static-site \
-EVENTS_STAN_CLUSTER_ID=test-cluster \
-EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 static-site
 `,

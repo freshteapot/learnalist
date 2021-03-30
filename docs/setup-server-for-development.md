@@ -36,9 +36,6 @@ Go [try some curl requests.](./play.along.md)
 
 ```sh
 make clear-site rebuild-db
-EVENTS_STAN_CLUSTER_ID="test-cluster" \
-EVENTS_STAN_CLIENT_ID="lal-server" \
-EVENTS_NATS_SERVER="127.0.0.1" \
 make run-api-server
 ```
 
@@ -100,9 +97,6 @@ make run-api-server
 ### nats
 ```sh
 make clear-site rebuild-db
-EVENTS_STAN_CLUSTER_ID="test-cluster" \
-EVENTS_STAN_CLIENT_ID="lal-server" \
-EVENTS_NATS_SERVER="127.0.0.1" \
 make develop
 ```
 ## Running slack events
@@ -118,11 +112,7 @@ scripts/run-slack.sh
 ## Running the event reader
 
 ```sh
-cd server
-EVENTS_STAN_CLUSTER_ID="test-cluster" \
-EVENTS_STAN_CLIENT_ID="lal-event-reader" \
-EVENTS_NATS_SERVER="127.0.0.1" \
-go run main.go --config=../config/dev.config.yaml tools event-reader
+make run-event-reader
 ```
 
 
@@ -130,8 +120,6 @@ go run main.go --config=../config/dev.config.yaml tools event-reader
 ```sh
 TOPIC=lal.monolog \
 EVENTS_STAN_CLIENT_ID=challenges-sync \
-EVENTS_STAN_CLUSTER_ID=test-cluster \
-EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools challenge sync
 ```
@@ -145,8 +133,6 @@ Topic where communications goto
 ```sh
 TOPIC=lal.monolog \
 EVENTS_STAN_CLIENT_ID=nats-reader \
-EVENTS_STAN_CLUSTER_ID=test-cluster \
-EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools natsutils read
 ```
