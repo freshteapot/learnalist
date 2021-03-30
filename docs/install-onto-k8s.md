@@ -180,11 +180,17 @@ PATCH=$(cat <<_EOF_
   {"spec":{"template":{"metadata":{"creationTimestamp":"$(date -u '+%FT%TZ')"}}}}
 _EOF_
 )
-kubectl patch deployment learnalist -p "${PATCH}"
 kubectl patch deployment event-reader -p "${PATCH}"
 kubectl patch deployment slack-events -p "${PATCH}"
 kubectl patch deployment notifications-push-notifications -p "${PATCH}"
 kubectl patch deployment remind-manager -p "${PATCH}"
+```
+
+Until I fix https://github.com/freshteapot/learnalist-api/issues/156, this ugly hack will have to do
+
+```sh
+kubectl scale deployment learnalist --replicas=0
+kubectl scale deployment learnalist --replicas=1
 ```
 
 ```sh

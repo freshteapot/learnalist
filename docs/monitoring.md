@@ -131,6 +131,9 @@ WHERE
 /app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools user delete
 ```
 
+# Manage user access to public lists
+/app/bin/learnalist-cli --config=/etc/learnalist/config.yaml tools list public-access XXX --access=grant
+
 # Reference
 - https://docs.nats.io/nats-streaming-concepts/monitoring/endpoints
 - https://docs.nats.io/nats-server/configuration/monitoring#monitoring-endpoints
