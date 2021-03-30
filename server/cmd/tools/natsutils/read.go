@@ -38,7 +38,7 @@ var readCMD = &cobra.Command{
 		logger := logging.GetLogger()
 		logger.Info("Read events")
 		event.SetDefaultSettingsForCMD()
-		viper.SetDefault("topic", "lal.monolog")
+		viper.SetDefault("topic", event.TopicMonolog)
 		viper.BindEnv("topic", "TOPIC")
 
 		topic := viper.GetString("topic")
