@@ -2,13 +2,21 @@ package alist
 
 import (
 	"fmt"
+	"net/http"
+	"os"
 
+	alistStorage "github.com/freshteapot/learnalist-api/server/api/alist/sqlite"
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
+	"github.com/freshteapot/learnalist-api/server/pkg/event/staticsite"
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
+	"github.com/freshteapot/learnalist-api/server/pkg/user"
+	userStorage "github.com/freshteapot/learnalist-api/server/pkg/user/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -18,31 +26,32 @@ var publicAccessCMD = &cobra.Command{
 	Short: "Grant or revoke user access to writing public lists",
 	Args:  cobra.ExactArgs(1),
 	Long: `
+Grant user access to write public lists
+Revoke user access to write public lists and set the users public lists to private
+
 Example:
 
-TOPIC=lal.monolog \
-EVENTS_STAN_CLIENT_ID=tools-alist \
-EVENTS_STAN_CLUSTER_ID=test-cluster \
-EVENTS_NATS_SERVER=127.0.0.1 \
 go run main.go --config=../config/dev.config.yaml \
 tools list public-access chris --access=revoke
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do I want to do this via sqlite or events?
-		// Grant = just set acl
-		// Revoke = set acl and set all public to private
-		// Lookup user lists which are public (do I have this feature?)
-		// if list is public, update to private
-		// Or
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
+		os.Setenv("EVENTS_STAN_CLIENT_ID", "tools-alist")
 		event.SetupEventBus(logger.WithField("context", "tools-list-public-access"))
 
 		dsn := viper.GetString("server.sqlite.database")
 		db := database.NewDB(dsn)
 		aclRepo := aclStorage.NewAcl(db)
 
-		fmt.Println(args)
+		storageAlist := alistStorage.NewAlist(db, logger)
+
+		userManagement := user.NewManagement(
+			userStorage.NewSqliteManagementStorage(db),
+			staticsite.NewSiteManagementViaEvents(),
+			event.NewInsights(logger),
+		)
+
 		userUUID := args[0]
 		if userUUID == "" {
 			fmt.Println("User UUID is missing")
@@ -57,24 +66,19 @@ tools list public-access chris --access=revoke
 		}
 
 		accessType, _ := cmd.Flags().GetString("access")
-		allowed := []string{"grant", "revoke", "current"}
+		allowed := []string{"grant", "revoke"}
 		if !utils.StringArrayContains(allowed, accessType) {
 			fmt.Println("Access can be only grant or revoke")
 			return
 		}
 
-		fmt.Printf("Set user:%s access to %s\n", userUUID, accessType)
+		exists := userManagement.UserExists(userUUID)
+		if !exists {
+			fmt.Printf("Couldnt find user:%s\n", userUUID)
+			os.Exit(1)
+		}
 
-		//event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
-		//	Kind: event.CMDAcl,
-		//	Data: event.Eventlog{
-		//		Kind: event.KindAclPublicListAccess,
-		//		Data: acl.EventPublicListAccess{
-		//			UserUUID: userUUID,
-		//			Action:   accessType,
-		//		},
-		//	},
-		//})
+		fmt.Printf("Set user:%s access to %s\n", userUUID, accessType)
 
 		event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 			Kind: acl.EventPublicListAccess,
@@ -85,6 +89,58 @@ tools list public-access chris --access=revoke
 			TriggeredBy: "cmd",
 		})
 
+		if accessType == "grant" {
+			return
+		}
+
+		logContext := logger.WithField("sub-context", "revoke")
+		shortLists := storageAlist.GetAllListsByUser(userUUID)
+		changed := make([]string, 0)
+		for _, short := range shortLists {
+			aList, err := storageAlist.GetAlist(short.UUID)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Failed to get list from storage")
+			}
+
+			if aList.Info.SharedWith != keys.SharedWithPublic {
+				continue
+			}
+			// Change to private
+			aList.Info.SharedWith = keys.NotShared
+
+			_, err = storageAlist.SaveAlist(http.MethodPut, aList)
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Failed to update list to storage")
+			}
+
+			err = aclRepo.MakeListPrivate(aList.Uuid, userUUID)
+
+			if err != nil {
+				logContext.WithFields(logrus.Fields{
+					"error": err,
+				}).Fatal("Failed to set list to private")
+			}
+
+			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
+				Kind: event.ApiListSaved,
+				Data: event.EventList{
+					UUID:     aList.Uuid,
+					UserUUID: userUUID,
+					Action:   event.ActionUpdated,
+					Data:     aList,
+				},
+			})
+			changed = append(changed, aList.Uuid)
+		}
+
+		logContext.WithFields(logrus.Fields{
+			"total": len(changed),
+			"lists": changed,
+		}).Info("lists revoked")
 	},
 }
 

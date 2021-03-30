@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/freshteapot/learnalist-api/server/api/alist"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/apps"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
@@ -459,6 +460,53 @@ var _ = Describe("Testing Events to Slack", func() {
 				},
 			},
 			// finish:spaced-repetition.overtime
+			// start: acl.access
+			{
+				entry: event.Eventlog{
+					Kind: acl.EventPublicListAccess,
+					Data: acl.EventPublicListAccessData{
+						UserUUID: userUUID,
+						Action:   "grant",
+					},
+					TriggeredBy: "cmd",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `user:fake-user-123 is allowed to create public lists`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: acl.EventPublicListAccess,
+					Data: acl.EventPublicListAccessData{
+						UserUUID: userUUID,
+						Action:   "revoke",
+					},
+					TriggeredBy: "cmd",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `user:fake-user-123 is no longer allowed to create public lists`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			{
+				entry: event.Eventlog{
+					Kind: acl.EventPublicListAccess,
+					Data: acl.EventPublicListAccessData{
+						UserUUID: userUUID,
+						Action:   "a1",
+					},
+					TriggeredBy: "cmd",
+				},
+				post: func(url string, msg *slack.WebhookMessage) error {
+					expect := `a1 action not supported acl.publicListAccess`
+					Expect(msg.Text).To(Equal(expect))
+					return nil
+				},
+			},
+			// finish: acl.access
 		}
 
 		for _, test := range tests {

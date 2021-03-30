@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
 	"github.com/freshteapot/learnalist-api/server/pkg/openapi"
@@ -42,6 +44,7 @@ func NewSlackV1Events(post PostWebhook, webhook string, logContext logrus.FieldL
 // @event.listen: event.ApiPlank
 // @event.listen: challenge.EventChallengeDone
 // @event.listen: challenge.EventChallengeNewRecord
+// @event.listen: acl.EventPublicListAccess
 func (s SlackEvents) Read(entry event.Eventlog) {
 	var msg slack.WebhookMessage
 
@@ -87,7 +90,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		b, _ := json.Marshal(entry.Data)
 		var moment event.EventList
 		json.Unmarshal(b, &moment)
-		// TODO https://github.com/freshteapot/learnalist-api/issues/212
 		msg.Text = fmt.Sprintf("list:%s deleted by user:%s", moment.UUID, moment.UserUUID)
 	case event.ApiSpacedRepetition:
 		b, _ := json.Marshal(entry.Data)
@@ -248,10 +250,6 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
 	case event.ApiAppSettingsRemindV1:
-		//b, _ := json.Marshal(entry.Data)
-		//var settings openapi.AppSettingsRemindV1
-		//json.Unmarshal(b, &settings)
-
 		userUUID := entry.UUID
 		switch entry.Action {
 		case event.ActionUpsert:
@@ -259,6 +257,21 @@ func (s SlackEvents) Read(entry event.Eventlog) {
 		default:
 			msg.Text = fmt.Sprintf(`%s action not supported %s`, entry.Kind, entry.Action)
 		}
+
+	case acl.EventPublicListAccess:
+		b, _ := json.Marshal(entry.Data)
+		var moment acl.EventPublicListAccessData
+		json.Unmarshal(b, &moment)
+
+		switch moment.Action {
+		case aclKeys.ActionGrant:
+			msg.Text = fmt.Sprintf("user:%s is allowed to create public lists", moment.UserUUID)
+		case aclKeys.ActionRevoke:
+			msg.Text = fmt.Sprintf("user:%s is no longer allowed to create public lists", moment.UserUUID)
+		default:
+			msg.Text = fmt.Sprintf(`%s action not supported %s`, moment.Action, entry.Kind)
+		}
+
 	default:
 		msg.Text = entry.Kind
 	}

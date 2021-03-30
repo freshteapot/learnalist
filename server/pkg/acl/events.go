@@ -28,7 +28,7 @@ func (s AclService) handlePublicListAccess(entry event.Eventlog) {
 	if err != nil {
 		return
 	}
-
+	// Today, this assumes the userUUID exists
 	message := ""
 	switch moment.Action {
 	case "revoke":
@@ -46,7 +46,10 @@ func (s AclService) handlePublicListAccess(entry event.Eventlog) {
 	})
 
 	if err != nil {
-		logContext.Fatal("Issue talking to storage")
+		logContext.WithFields(logrus.Fields{
+			"eventHandler": "handlePublicListAccess",
+			"error":        err,
+		}).Fatal("Issue talking to storage")
 	}
 
 	logContext.Info(message)
@@ -58,15 +61,20 @@ func (s AclService) handleApiUserRegister(entry event.Eventlog) {
 		pref   user.UserPreference
 	)
 	b, _ := json.Marshal(entry.Data)
-	json.Unmarshal(b, &moment)
+	err := json.Unmarshal(b, &moment)
+	if err != nil {
+		return
+	}
 
 	userUUID := moment.UUID
 	b, _ = json.Marshal(moment.Data)
-	json.Unmarshal(b, &pref)
+	err = json.Unmarshal(b, &pref)
+	if err != nil {
+		return
+	}
 
 	if pref.Acl.PublicListWrite == 1 {
 		// TODO can I rely on this pref.UserUUID?
-
 		err := s.repo.GrantUserPublicListWriteAccess(userUUID)
 		if err != nil {
 			s.logContext.WithFields(logrus.Fields{

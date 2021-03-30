@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/freshteapot/learnalist-api/server/api/database"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -21,6 +22,7 @@ var deleteUserCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
+		os.Setenv("EVENTS_STAN_CLIENT_ID", "tools-user-mangement")
 		event.SetupEventBus(logger.WithField("context", "tools-user-delete"))
 
 		dsn := viper.GetString("server.sqlite.database")

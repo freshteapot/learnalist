@@ -1,7 +1,18 @@
 # End to end testing
+
+# Bring online
 ## Get the server up and running
 
-[Setup the server for development](./install-server-for-dev.md)
+```sh
+STATIC_SITE_EXTERNAL=false \
+make clear-site rebuild-db develop
+```
+
+## Start reminder
+
+```sh
+make rebuild-db-remind-manager run-remind-manager
+```
 
 # Run all tests
 ```sh

@@ -34,8 +34,6 @@ rebuild-db-remind-manager:
 rebuild-static-site:
 	cd server && \
 	EVENTS_STAN_CLIENT_ID=rebuild-static-site \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags="json1" main.go tools rebuild-static-site --config=../config/dev.config.yaml
 
 test:
@@ -63,8 +61,6 @@ run-challenges-sync:
 	cd server && \
 	TOPIC=lal.monolog \
 	EVENTS_STAN_CLIENT_ID=challenges-sync \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run main.go --config=../config/dev.config.yaml \
 	tools challenges sync
 
@@ -72,40 +68,36 @@ run-notifications-push-notifications:
 	cd server && \
 	TOPIC=notifications \
 	EVENTS_STAN_CLIENT_ID=notifications-push-notifications \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run main.go --config=../config/dev.config.yaml \
 	tools notifications push-notifications
 
 run-api-server:
 	cd server && \
 	EVENTS_STAN_CLIENT_ID=lal-server \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags="json1" main.go --config=../config/dev.config.yaml server
 
 run-remind-manager:
 	cd server && \
 	TOPIC=lal.monolog \
 	EVENTS_STAN_CLIENT_ID=remind-daily \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run --tags=json1 main.go --config=../config/dev.config.yaml \
 	tools remind manager
 
 run-static-site:
 	cd server && \
 	EVENTS_STAN_CLIENT_ID=static-site \
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
 	go run main.go --config=../config/dev.config.yaml \
 	static-site
+
+run-event-reader:
+	cd server && \
+	EVENTS_STAN_CLIENT_ID="lal-event-reader" \
+	go run main.go --config=../config/dev.config.yaml tools event-reader
 
 # Running development with hugo and golang ran outside of the javascript landscape
 # Enables the ability to expose the code to my ip address not just localhost
 develop:
-	EVENTS_STAN_CLUSTER_ID=test-cluster \
-	EVENTS_NATS_SERVER=127.0.0.1 \
+	EVENTS_STAN_CLIENT_ID=lal-server \
 	scripts/run-hugo.sh
 
 develop-localhost:
