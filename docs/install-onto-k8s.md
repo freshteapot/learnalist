@@ -305,9 +305,7 @@ kubectl apply -f -
 # Update changelog
 ## Get latest data
 ```sh
-cd ~/git/git-log-json
-go run main.go ~/git/learnalist-api | jq > changelog.json
-cp changelog.json ~/git/learnalist-api/hugo/data/
+make build-changelog
 ```
 ## Sync
 ```sh
