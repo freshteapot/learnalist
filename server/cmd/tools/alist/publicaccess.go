@@ -26,16 +26,15 @@ var publicAccessCMD = &cobra.Command{
 	Short: "Grant or revoke user access to writing public lists",
 	Args:  cobra.ExactArgs(1),
 	Long: `
+Grant user access to write public lists
+Revoke user access to write public lists and set the users public lists to private
+
 Example:
 
 go run main.go --config=../config/dev.config.yaml \
 tools list public-access chris --access=revoke
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Grant = just set acl
-		// Revoke = set acl and set all public to private
-		// Lookup user lists which are public (do I have this feature?)
-		// if list is public, update to private
 		logger := logging.GetLogger()
 		event.SetDefaultSettingsForCMD()
 		os.Setenv("EVENTS_STAN_CLIENT_ID", "tools-alist")
@@ -102,7 +101,7 @@ tools list public-access chris --access=revoke
 			if err != nil {
 				logContext.WithFields(logrus.Fields{
 					"error": err,
-				}).Fatal("SHIT BROKE")
+				}).Fatal("Failed to get list from storage")
 			}
 
 			if aList.Info.SharedWith != keys.SharedWithPublic {
@@ -115,7 +114,7 @@ tools list public-access chris --access=revoke
 			if err != nil {
 				logContext.WithFields(logrus.Fields{
 					"error": err,
-				}).Fatal("SHIT BROKE")
+				}).Fatal("Failed to update list to storage")
 			}
 
 			err = aclRepo.MakeListPrivate(aList.Uuid, userUUID)
@@ -123,11 +122,9 @@ tools list public-access chris --access=revoke
 			if err != nil {
 				logContext.WithFields(logrus.Fields{
 					"error": err,
-				}).Fatal("SHIT BROKE")
+				}).Fatal("Failed to set list to private")
 			}
 
-			// Send event that shared was changed
-			// This will trigger public lists to be made
 			event.GetBus().Publish(event.TopicMonolog, event.Eventlog{
 				Kind: event.ApiListSaved,
 				Data: event.EventList{
