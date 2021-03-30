@@ -77,7 +77,13 @@ func validateAListInfo(info AlistInfo) error {
 	}
 
 	if info.From != nil {
-		allowed := []string{"learnalist", "brainscape", "cram", "quizlet"}
+		allowed := []string{
+			"learnalist",
+			"brainscape",
+			"cram",
+			"duolingo",
+			"quizlet",
+		}
 		if !utils.StringArrayContains(allowed, info.From.Kind) {
 			return i18n.ErrorInputSaveAlistFromKindNotSupported
 		}
@@ -142,10 +148,11 @@ func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
 	// TODO Next time we add an entry to allowed, then we can sink some itme into making it configurable
 	// Should be possible as its called inside an interface
 	allowed := map[string]string{
-		"cram":       "cram.com",
-		"brainscape": "brainscape.com",
-		"quizlet":    "quizlet.com",
 		"learnalist": "learnalist.net",
+		"brainscape": "brainscape.com",
+		"cram":       "cram.com",
+		"quizlet":    "quizlet.com",
+		"duolingo":   "duolingo.com",
 	}
 
 	toTest := input.RefUrl

@@ -7,22 +7,26 @@
     "contextMenus",
     "activeTab",
     "https://learnalist.net/*",
+    "https://quizlet.com/*",
+    "https://www.cram.com/flashcards/*",
+    "https://www.brainscape.com/flashcards/*",
+    "https://www.duolingo.com/skill/*",
     "http://localhost/*",
     "http://localhost:1234/*",
     "http://192.168.0.10:1234/*",
-    "https://quizlet.com/*",
-    "https://www.cram.com/flashcards/*",
-    "https://www.brainscape.com/flashcards/*"
+    "http://192.168.1.190:1234/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "http://192.168.0.10:1234/*",
-        "http://localhost:1234/*",
         "https://learnalist.net/*",
-        "https://quizlet.com/*",
         "https://www.cram.com/flashcards/*",
-        "https://www.brainscape.com/flashcards/*"
+        "https://www.brainscape.com/flashcards/*",
+        "https://www.duolingo.com/skill/*",
+        "https://quizlet.com/*",
+        "http://localhost:1234/*",
+        "http://192.168.0.10:1234/*",
+        "http://192.168.1.190:1234/*"
       ],
       "js": [
         "shared.js",
@@ -48,19 +52,22 @@
   },
   "manifest_version": 2,
   "web_accessible_resources": [
-    "quizlet.js",
-    "cram.js",
     "brainscape.js",
+    "cram.js",
+    "duolingo.js",
+    "quizlet.js",
     "learnalist.js",
     "config.json"
   ],
   "externally_connectable": {
     "matches": [
-      "https://quizlet.com/*",
-      "https://www.cram.com/flashcards/*",
       "https://www.brainscape.com/flashcards/*",
+      "https://www.cram.com/flashcards/*",
+      "https://www.duolingo.com/skill/*",
+      "https://quizlet.com/*",
       "https://learnalist.net/alist/*",
-      "http://localhost:1234/alist/*"
+      "http://localhost:1234/alist/*",
+      "http://192.168.1.190:1234/alist/*"
     ]
   }
 }

@@ -2,12 +2,9 @@
 
 <script>
   import { push } from "svelte-spa-router";
-  import { onMount } from "svelte";
-
   import Modal from "../../../components/interact/spaced_repetition/spaced_repetition_modal.svelte";
   import { addEntry } from "../../../spaced_repetition/api.js";
   import { notify } from "../../../shared.js";
-  import { KeyUserUuid, getConfiguration } from "../../../configuration";
 
   // {DomElement}
   export let playElement;

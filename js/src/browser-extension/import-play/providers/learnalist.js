@@ -1,5 +1,5 @@
 
-export function convert(input) {
+function convert(input) {
     const aList = input.detail;
     if (aList.info.type !== "v2") {
         throw "Not v2";
