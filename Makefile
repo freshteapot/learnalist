@@ -195,3 +195,6 @@ push-image:
 	cd server && \
 	docker tag learnalist:latest registry.devbox:5000/learnalist:latest
 	docker push registry.devbox:5000/learnalist:latest
+
+build-changelog:
+	scripts/build-changelog.sh

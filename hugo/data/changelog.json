@@ -1,5 +1,17 @@
 [
   {
+    "hash": "caf393",
+    "what": "- Fix Granting or revoking users ability to create public lists via the command line (#230)\r\n- Using event.TopicMonolog everywhere\r\n- Improving the documentation around running e2e tests",
+    "when": "2021-03-30T14:12:00+02:00",
+    "pr": "238"
+  },
+  {
+    "hash": "ab8b66",
+    "what": "- Remove the \"are you sure prompt\" that is triggered before leaving the plank-stats-v1 page to login",
+    "when": "2021-03-29T14:57:11+02:00",
+    "pr": "237"
+  },
+  {
     "hash": "6511c7",
     "what": "- Streamlining the process of creating single page apps, under \"toolbox\".\r\n- Adding language-pad to toolbox\r\n- Adding read-write-repeat to toolbox\r\n- Adding plank-stats to toolbox\r\n- Adding css to plank\r\n- Cleanup script to remove files that are not in the manifest_css.json or manifest_js.json on the server\r\n- When leaving plank stats page, ensure we remove any notifications\r\n- On visibility change we now use the same logic to filter checking for next spaced repetitions",
     "when": "2021-03-29T14:29:39+02:00",
