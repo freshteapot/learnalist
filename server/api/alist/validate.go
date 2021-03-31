@@ -19,7 +19,7 @@ type ValidateSettings struct {
 }
 
 func DefaultValidateSettings() ValidateSettings {
-	// TODO how to move this outside of the validate
+	// TODO next time, refactor so it is outside of Validate and configurable via the config
 	settings := ValidateSettings{
 		ExternalKindMapping: map[string]string{
 			"learnalist": "learnalist.net",
@@ -43,7 +43,6 @@ func Validate(aList Alist) error {
 	settings := DefaultValidateSettings()
 	err = validateAListInfo(aList.Info, settings)
 	if err != nil {
-		//err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
 		return err
 	}
 
@@ -102,7 +101,6 @@ func validateAListInfo(info AlistInfo, settings ValidateSettings) error {
 	}
 
 	if info.From != nil {
-		// TODO next time, refactor so it is not hardcoded in the function
 		allowed := settings.Kinds
 
 		if !utils.StringArrayContains(allowed, info.From.Kind) {
@@ -110,8 +108,6 @@ func validateAListInfo(info AlistInfo, settings ValidateSettings) error {
 		}
 
 		v := validate.Struct(*info.From)
-
-		//v.StringRule("Kind", "required|in:cram,brainscape,quizlet,learnalist")
 		v.StringRule("RefUrl", "required")
 		v.StringRule("ExtUuid", "required")
 
