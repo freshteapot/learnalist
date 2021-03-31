@@ -1,7 +1,8 @@
 {
   "name": "Import and Play",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Use learnalist interactions with lists and flashcards on the internet",
+  "homepage_url": "https://learnalist.net",
   "permissions": [
     "tabs",
     "contextMenus",
