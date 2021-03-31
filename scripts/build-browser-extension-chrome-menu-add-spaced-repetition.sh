@@ -14,9 +14,4 @@ Next:
 
 Goto:
     https://chrome.google.com/u/0/webstore/devconsole/
-
-- Have you rebuilt the site in production? (will avoid alot of 404 for css and js).
-- Once happy, remove stale files from the remote server.
-
-ssh $SSH_SERVER 'sudo bash -s' < /tmp/cleanup/commands
 _EOF_
