@@ -7,7 +7,7 @@ rm -rf /tmp/learnalist/browser-extension
 mkdir -p /tmp/learnalist/browser-extension
 cp -r js/browser-extension/menu-add-spaced-repetition /tmp/learnalist/browser-extension
 cd /tmp/learnalist/browser-extension/menu-add-spaced-repetition
-zip -rq ../menu-add-spaced-repetition.zip ./*
+zip -r ../menu-add-spaced-repetition.zip ./*
 cd /tmp/learnalist/browser-extension/
 mkdir temp
 cp menu-add-spaced-repetition.zip temp
