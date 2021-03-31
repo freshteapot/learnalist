@@ -4,7 +4,7 @@ type: features
 css_include: ["main"]
 ---
 
-A browser extension to allow you to quickly add a word / sentence from the internet to Learnalist for learning over time.
+A browser extension to allow you to quickly add a word / sentence from the internet to [Learnalist](/spaced-repetition.html#/add) for learning over time.
 
 # How
 - Found a word / sentence on a web page?
