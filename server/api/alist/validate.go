@@ -162,8 +162,6 @@ func WithFromCheckSharing(info AlistInfo) bool {
 }
 
 func WithFromCheckFromDomain(input openapi.AlistFrom, settings ValidateSettings) bool {
-	// TODO Next time we add an entry to allowed, then we can sink some itme into making it configurable
-	// Should be possible as its called inside an interface
 	allowed := settings.ExternalKindMapping
 
 	toTest := input.RefUrl
