@@ -31,6 +31,7 @@
     "build:js:alist:srs": "rollup -c rollup.config.alist.srs.js",
     "build:js:plank:v1": "rollup -c rollup.config.plank.v1.js",
     "build:js:toolbox": "rollup -c rollup.config.toolbox.js",
+    "build:js:browser-extension:import-play": "rollup -c rollup.config.browser-extension.import-play.js",
     "build:js:components": "npm run build:js:main && npm run build:js:shared && npm run build:js:alist:v1 && npm run build:js:alist:v2 && npm run build:js:alist:v3 && npm run build:js:alist:v4 && npm run build:js:alist:srs && npm run build:js:alist:editor && npm run build:js:plank:v1 && npm run build:js:toolbox",
     "build": "npm run build:js:components && npm run build:hugo"
   },
