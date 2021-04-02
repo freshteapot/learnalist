@@ -40,8 +40,9 @@
 {{- end -}}
 {{- end -}}
 
-<script src="{{ $shareJS }}"></script>
+
 {{- with .Params.js_include -}}
+<script src="{{ $shareJS }}"></script>
 {{- range . -}}
 {{- $name := index $manifest . -}}
 <script type="module" src="{{ relURL $name }}"></script>
