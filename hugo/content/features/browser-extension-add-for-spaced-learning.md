@@ -3,6 +3,9 @@ title: Add to 🧠 + 💪
 type: features
 css_include: ["main"]
 ---
+# Add to your browser
+- [Google Chrome](https://chrome.google.com/webstore/detail/add-to-%F0%9F%A7%A0-%20-%F0%9F%92%AA/adcedknkpbdbnlkkmkafiopmppbigkjc)
+- Firefox (TODO)
 
 A browser extension to allow you to quickly add a word / sentence from the internet to [Learnalist](/spaced-repetition.html#/add) for learning over time.
 

@@ -1,6 +1,6 @@
 {
-  "name": "Add to 🧠 + 💪",
-  "version": "1.0.1",
+  "name": "Select and Save",
+  "version": "1.0.2",
   "description": "Highlight text and add via the menu to learnalist.net for learning over time",
   "homepage_url": "https://learnalist.net/features/browser-extension-add-for-spaced-learning.html",
   "permissions": [
