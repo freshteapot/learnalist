@@ -2,6 +2,11 @@
     "baseUrl": "https://learnalist.net",
     "allowed": [
         {
+            "origin": "https://www.duolingo.com",
+            "kind": "duolingo",
+            "script": "duolingo.js"
+        },
+        {
             "origin": "https://quizlet.com",
             "kind": "quizlet",
             "script": "quizlet.js"

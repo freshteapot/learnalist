@@ -13,12 +13,36 @@ import (
 	"github.com/gookit/validate"
 )
 
+type ValidateSettings struct {
+	ExternalKindMapping map[string]string
+	Kinds               []string
+}
+
+func DefaultValidateSettings() ValidateSettings {
+	// TODO next time, refactor so it is outside of Validate and configurable via the config
+	settings := ValidateSettings{
+		ExternalKindMapping: map[string]string{
+			"learnalist": "learnalist.net",
+			"brainscape": "brainscape.com",
+			"cram":       "cram.com",
+			"quizlet":    "quizlet.com",
+			"duolingo":   "duolingo.com",
+		},
+	}
+
+	settings.Kinds = make([]string, 0)
+	for kind, _ := range settings.ExternalKindMapping {
+		settings.Kinds = append(settings.Kinds, kind)
+	}
+
+	return settings
+}
+
 func Validate(aList Alist) error {
 	var err error
-
-	err = validateAListInfo(aList.Info)
+	settings := DefaultValidateSettings()
+	err = validateAListInfo(aList.Info, settings)
 	if err != nil {
-		//err = errors.New(fmt.Sprintf("Failed to pass list info. %s", err.Error()))
 		return err
 	}
 
@@ -44,7 +68,7 @@ func Validate(aList Alist) error {
 	return mapper.Validate(aList)
 }
 
-func validateAListInfo(info AlistInfo) error {
+func validateAListInfo(info AlistInfo, settings ValidateSettings) error {
 	var err error
 	var feedbackMessage string
 	var feedback []string = []string{}
@@ -77,14 +101,13 @@ func validateAListInfo(info AlistInfo) error {
 	}
 
 	if info.From != nil {
-		allowed := []string{"learnalist", "brainscape", "cram", "quizlet"}
+		allowed := settings.Kinds
+
 		if !utils.StringArrayContains(allowed, info.From.Kind) {
 			return i18n.ErrorInputSaveAlistFromKindNotSupported
 		}
 
 		v := validate.Struct(*info.From)
-
-		//v.StringRule("Kind", "required|in:cram,brainscape,quizlet,learnalist")
 		v.StringRule("RefUrl", "required")
 		v.StringRule("ExtUuid", "required")
 
@@ -92,7 +115,7 @@ func validateAListInfo(info AlistInfo) error {
 			return ErrorListFromValid
 		}
 
-		if !WithFromCheckFromDomain(*info.From) {
+		if !WithFromCheckFromDomain(*info.From, settings) {
 			return i18n.ErrorAListFromDomainMisMatch
 		}
 
@@ -138,15 +161,8 @@ func WithFromCheckSharing(info AlistInfo) bool {
 	return false
 }
 
-func WithFromCheckFromDomain(input openapi.AlistFrom) bool {
-	// TODO Next time we add an entry to allowed, then we can sink some itme into making it configurable
-	// Should be possible as its called inside an interface
-	allowed := map[string]string{
-		"cram":       "cram.com",
-		"brainscape": "brainscape.com",
-		"quizlet":    "quizlet.com",
-		"learnalist": "learnalist.net",
-	}
+func WithFromCheckFromDomain(input openapi.AlistFrom, settings ValidateSettings) bool {
+	allowed := settings.ExternalKindMapping
 
 	toTest := input.RefUrl
 	_, err := url.ParseRequestURI(toTest)

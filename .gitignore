@@ -32,6 +32,7 @@ hugo/static/css/v1.*
 hugo/static/css/v2.*
 hugo/static/css/v3.*
 hugo/static/css/v4.*
+hugo/static/css/toolbox-.*
 ## JS
 hugo/static/js/base.*
 hugo/static/js/main.*
@@ -43,6 +44,7 @@ hugo/static/js/v1.*
 hugo/static/js/v2.*
 hugo/static/js/v3.*
 hugo/static/js/v4.*
+hugo/static/js/toolbox-.*
 ## Manifests
 hugo/data/manifest_css.json
 hugo/data/manifest_js.json

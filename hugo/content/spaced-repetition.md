@@ -26,8 +26,7 @@ Click on the list menu option <button class="br3">🧠 + 💪</button> to add an
 ## Add via your mobile
 Learn more about [Add, Remind, Repeat](/features/mobile-remind-v1.html)
 ## Add via a browser extension
-Coming soon
-
+- [Add a word / sentence quickly to Learnalist with right click](/features/browser-extension-add-for-spaced-learning.html)
 ## Overview
 Look at <a class="link underline" href="/spaced-repetition.html#/overview">your entries and see some stats</a>.
 

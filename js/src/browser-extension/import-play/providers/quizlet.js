@@ -1,4 +1,4 @@
-export function convert(input) {
+function convert(input) {
     const data = input.detail;
     const listData = Object.values(
         data.listData.setPageData.termIdToTermsMap

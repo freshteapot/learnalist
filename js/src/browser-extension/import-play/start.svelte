@@ -2,8 +2,9 @@
   import { push } from "svelte-spa-router";
   import store from "./store.js";
   import { onMount } from "svelte";
-  import cram from "./providers/cram.js";
   import brainscape from "./providers/brainscape.js";
+  import cram from "./providers/cram.js";
+  import duolingo from "./providers/duolingo.js";
   import quizlet from "./providers/quizlet.js";
   import learnalist from "./providers/learnalist.js";
   import { getConfiguration } from "../../configuration.js";
@@ -16,7 +17,7 @@
   let aList;
   let show = "";
   let assumeFailedToFindList = null;
-  const providers = [learnalist, quizlet, brainscape, cram];
+  const providers = [learnalist, brainscape, cram, duolingo, quizlet];
   const mappers = Object.fromEntries(providers.map((e) => [e.key, e.convert]));
   const domains = providers.map((e) => e.domain);
 
