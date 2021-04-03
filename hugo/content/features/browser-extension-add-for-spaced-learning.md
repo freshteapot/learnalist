@@ -1,5 +1,5 @@
 ---
-title: Add to 🧠 + 💪
+title: Select and Save
 type: features
 css_include: ["main"]
 ---
