@@ -7,8 +7,9 @@ css_include: ["main"]
 ---
 
 **Please excuse the mess and I am sorry if things dont work from time to time**
-
 # Today
+- Learnalist, a place for learning.
+- [Privacy Policy](https://learnalist.net/faq/privacy-policy.html)
 ## Lists
 - You can make private lists.
 - You can make public lists.
