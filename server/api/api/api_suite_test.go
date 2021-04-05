@@ -9,7 +9,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/models"
 	"github.com/freshteapot/learnalist-api/server/mocks"
 	aclStorage "github.com/freshteapot/learnalist-api/server/pkg/acl/sqlite"
-	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,10 +28,9 @@ var (
 var _ = BeforeSuite(func() {
 	db = database.NewTestDB()
 	acl := aclStorage.NewAcl(db)
-	oauthHandler := oauthStorage.NewOAuthReadWriter(db)
 	labels := labelStorage.NewLabel(db)
 	aListStorage := &mocks.DatastoreAlists{}
-	dal = models.NewDAL(acl, aListStorage, labels, oauthHandler)
+	dal = models.NewDAL(acl, aListStorage, labels)
 
 	m = api.Manager{
 		Datastore: dal,
