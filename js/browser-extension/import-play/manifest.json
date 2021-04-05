@@ -6,7 +6,6 @@
   "permissions": [
     "tabs",
     "contextMenus",
-    "activeTab",
     "https://learnalist.net/*",
     "https://quizlet.com/*",
     "https://www.cram.com/flashcards/*",
@@ -62,11 +61,11 @@
   ],
   "externally_connectable": {
     "matches": [
+      "https://learnalist.net/alist/*",
       "https://www.brainscape.com/flashcards/*",
       "https://www.cram.com/flashcards/*",
       "https://www.duolingo.com/skill/*",
       "https://quizlet.com/*",
-      "https://learnalist.net/alist/*",
       "http://localhost:1234/alist/*",
       "http://192.168.1.190:1234/alist/*"
     ]
