@@ -7,29 +7,25 @@ import (
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/label"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
-	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
 	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 )
 
 // DB allowing us to build an abstraction layer
 type DAL struct {
-	Acl          acl.Acl
-	oauthHandler oauth.OAuthReadWriter
-	labels       label.LabelReadWriter
-	alist        alist.DatastoreAlists
+	Acl    acl.Acl
+	labels label.LabelReadWriter
+	alist  alist.DatastoreAlists
 }
 
 func NewDAL(
 	acl acl.Acl,
 	aListStorage alist.DatastoreAlists,
 	labels label.LabelReadWriter,
-	oauthHandler oauth.OAuthReadWriter,
 ) *DAL {
 	dal := &DAL{
-		Acl:          acl,
-		oauthHandler: oauthHandler,
-		labels:       labels,
-		alist:        aListStorage,
+		Acl:    acl,
+		labels: labels,
+		alist:  aListStorage,
 	}
 	return dal
 }

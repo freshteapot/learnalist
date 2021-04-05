@@ -26,10 +26,9 @@ var _ = Describe("Testing from present", func() {
 
 	BeforeEach(func() {
 		acl = &mocks.Acl{}
-		oauthHandler := &mocks.OAuthReadWriter{}
 		labels = &mocks.LabelReadWriter{}
 		aListStorage = &mocks.DatastoreAlists{}
-		dal = models.NewDAL(acl, aListStorage, labels, oauthHandler)
+		dal = models.NewDAL(acl, aListStorage, labels)
 	})
 
 	When("Testing info.from is present", func() {

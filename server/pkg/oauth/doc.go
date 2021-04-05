@@ -34,11 +34,6 @@ type OAuth2ConfigInterface interface {
 	GetUserUUIDFromIDP(input openapi.HttpUserLoginIdpInput) (string, error)
 }
 
-type OAuthReadWriter interface {
-	GetTokenInfo(userUUID string) (*oauth2.Token, error)
-	WriteTokenInfo(userUUID string, token *oauth2.Token) error
-}
-
 type googleClient struct {
 	config    *oauth2.Config
 	audiences []string
