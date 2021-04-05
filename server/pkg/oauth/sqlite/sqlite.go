@@ -34,6 +34,7 @@ FROM
 WHERE user_uuid = ?`
 )
 
+// Removed using this in #205
 func NewOAuthReadWriter(db *sqlx.DB) oauth.OAuthReadWriter {
 	return &Sqlite{
 		db: db,
