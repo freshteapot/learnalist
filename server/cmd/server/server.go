@@ -28,7 +28,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
-	oauthStorage "github.com/freshteapot/learnalist-api/server/pkg/oauth/sqlite"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
@@ -139,7 +138,7 @@ var ServerCmd = &cobra.Command{
 		userSession := userStorage.NewUserSession(db)
 		userFromIDP := userStorage.NewUserFromIDP(db)
 		userWithUsernameAndPassword := userStorage.NewUserWithUsernameAndPassword(db)
-		oauthHandler := oauthStorage.NewOAuthReadWriter(db)
+
 		labels := labelStorage.NewLabel(db)
 		storageAlist := alistStorage.NewAlist(db, logger)
 		userInfoRepo := user.NewUserInfo(userStorage.NewUserInfo(db))
@@ -153,7 +152,7 @@ var ServerCmd = &cobra.Command{
 			aclRepo,
 			storageAlist,
 			labels,
-			oauthHandler)
+		)
 
 		userStorageRepo := userStorage.NewSqliteManagementStorage(db)
 
