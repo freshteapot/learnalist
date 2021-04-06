@@ -1,5 +1,23 @@
 [
   {
+    "hash": "aa0b2f",
+    "what": "- Adding link to Import and Play chrome extension\r\n- Tidying up the top level readme",
+    "when": "2021-04-07T00:16:12+02:00",
+    "pr": "248"
+  },
+  {
+    "hash": "117fe6",
+    "what": "Import and play browser extension is approved, fixes #129.",
+    "when": "2021-04-06T23:50:04+02:00",
+    "pr": "247"
+  },
+  {
+    "hash": "d3bc23",
+    "what": "- Removed unused code (OAuthReadWriter) (Fixes #205)",
+    "when": "2021-04-05T21:31:32+02:00",
+    "pr": "246"
+  },
+  {
     "hash": "57af0d",
     "what": "- Browser extension \"Import and Play\" tries to make a list out of the vocabulary section of skills on duolingo.com (#241)\r\n- Server support for lists created with from.kind duolingo (#241)\r\n- Added first version copy for the browser extension \"Select and Save\" / \"Add to 🧠 + 💪\"\r\n- Add first version copy for the browser extension \"Import and Play\"\r\n- Creating a first version of a privacy policy based on Legalmattic from Automattic\r\n- share.js is only included if the template has js files to include",
     "when": "2021-04-03T12:59:59+02:00",
