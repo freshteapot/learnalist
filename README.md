@@ -14,7 +14,9 @@
 | Add list over time for spaced repetition learning | [web](https://learnalist.net/faq/add-a-list-overtime-for-spaced-learning.html) | [repo](hugo/content/faq/add-a-list-overtime-for-spaced-learning.md) |
 | A plank app (Testflight) | [web](https://learnalist.net/features/mobile-humble-plank-v1.html) | [repo](hugo/content/features/mobile-humble-plank-v1.md) |
 | Remind app (Testflight) | [web](https://learnalist.net/features/mobile-remind-v1.html) | [repo](hugo/content/features/mobile-remind-v1.md) |
-
+| Log in with google | --- | --- |
+| Log in with apple | --- | --- |
+| Create public / private lists | --- | --- |
 
 # Getting Started
 
