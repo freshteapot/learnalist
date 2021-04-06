@@ -6,6 +6,10 @@ css_include: ["main"]
 
 A browser extension allowing you to use Learnalist tools on content from other education sites.
 
+# Add to your browser
+- [Google Chrome](https://chrome.google.com/webstore/detail/albfclncbcgldhpmcffplhimefiidamm)
+- Firefox (TODO)
+
 # Learnalist tools
 ## Slideshow
 Click thru the list at your own pace.
