@@ -28,6 +28,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/freshteapot/learnalist-api/server/pkg/payment"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
@@ -241,6 +242,22 @@ var ServerCmd = &cobra.Command{
 			aclRepo,
 			logger.WithField("context", "acl-service"),
 		)
+
+		paymentService := payment.NewService(
+			"TODO",
+			"[]",
+			logger.WithField("context", "payment-service"),
+		)
+
+		authConfig := authenticate.Config{
+			LookupBasic:  userWithUsernameAndPassword.Lookup,
+			LookupBearer: userSession.GetUserUUIDByToken,
+			Skip:         payment.SkipAuth,
+		}
+
+		paymentsRouter := server.Server.Group("/payments")
+		paymentsRouter.Use(authenticate.Auth(authConfig))
+		paymentService.Serve(paymentsRouter)
 
 		server.InitApi(
 			apiManager,
