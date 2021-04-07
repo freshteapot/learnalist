@@ -53,7 +53,8 @@ func NewService(webhookSecret string, options string, log logrus.FieldLogger) Pa
 }
 
 func (s PaymentService) Serve(router *echo.Group) error {
-	router.GET("/start", s.CreateCheckoutSession)
+	// TODO Do I need to serve the files or can I mix and match with hugo (should be able to)
+	router.GET("/create-checkout-session", s.CreateCheckoutSession)
 	router.POST("/webhook", s.Webhook)
 	return nil
 }
@@ -84,6 +85,8 @@ func (s PaymentService) Webhook(c echo.Context) error {
 	}
 
 	if event.Type == "checkout.session.completed" {
+		// TODO trigger event
+		// TODO get the client reference ID
 		fmt.Println("Checkout Session completed!")
 	}
 
