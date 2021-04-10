@@ -66,7 +66,7 @@
 		return;
 	}
 
-	$: readyToPay = stripe && currentCurrency !== "";
+	$: readyToPay = stripe && currentCurrency !== "" && picked !== "";
 	$: currencies = [
 		"",
 		...new Set(options.map((e) => e.currency.toUpperCase())),
@@ -76,39 +76,43 @@
 	);
 </script>
 
-<!-- svelte-ignore a11y-no-onchange -->
-<select bind:value={currentCurrency}>
-	{#each currencies as currency}
-		<option value={currency}>
-			{currency}
-		</option>
-	{/each}
-</select>
+<div class="pa2">
+	<h2>1) Pick a Currency</h2>
+	<!-- svelte-ignore a11y-no-onchange -->
+	<select bind:value={currentCurrency}>
+		{#each currencies as currency}
+			<option value={currency}>
+				{currency}
+			</option>
+		{/each}
+	</select>
 
-{#if currentCurrency}
-	<p>Pick amount</p>
-	{#each prices as price}
-		<label>
-			<input type="radio" bind:group={picked} value={price.id} />
-			{price.human_amount} ({price.currency.toUpperCase()})
-		</label>
-	{/each}
-{/if}
+	{#if currentCurrency}
+		<h2>2) Pick amount</h2>
+		{#each prices as price}
+			<label>
+				<input type="radio" bind:group={picked} value={price.id} />
+				{price.human_amount} ({price.currency.toUpperCase()})
+			</label>
+		{/each}
+	{/if}
 
-{#if readyToPay}
-	<button on:click={breadwinner}>Take my money</button>
-{/if}
+	{#if readyToPay}
+		<h2>3) Support</h2>
+		<button class="br3" on:click={breadwinner}>Go to checkout</button>
+	{/if}
+
+	{#if !loggedIn() && !loginNagShown}
+		<LoginModal on:close={closeLoginModal}>
+			<p>{loginNagMessage}</p>
+		</LoginModal>
+	{/if}
+</div>
 
 <svelte:head>
 	<!--
 	<script
-		src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch" ✂prettier:content✂="" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=">{}</script>
+		src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch" ✂prettier:content✂="" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=" ✂prettier:content✂="e30=">{}</script>
 	-->
 	<script src="https://js.stripe.com/v3/" on:load={stripeLoaded}></script>
 </svelte:head>
-
-{#if !loggedIn() && !loginNagShown}
-	<LoginModal on:close={closeLoginModal}>
-		<p>{loginNagMessage}</p>
-	</LoginModal>
-{/if}
