@@ -55,6 +55,7 @@ var ServerCmd = &cobra.Command{
 
 		viper.SetDefault("server.userRegisterKey", "")
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
+		viper.BindEnv("server.payment.privateKey", "PAYMENT_PRIVATE_KEY")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:       viper.GetString("server.loginWith.google.clientID"),
@@ -68,7 +69,9 @@ var ServerCmd = &cobra.Command{
 		viper.UnmarshalKey("server.loginWith.appleid.web", &appleWebAudience)
 
 		var appleAudiences []oauth.AppleConfig
-		viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		err := viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		fmt.Println(err)
+
 		appleAudiences = append(appleAudiences, appleWebAudience)
 
 		appleIDOauthConfig := oauth.NewAppleID(appleWebAudience, appleAudiences)
@@ -104,6 +107,11 @@ var ServerCmd = &cobra.Command{
 			Domain: viper.GetString("server.cookie.domain"),
 			Secure: viper.GetBool("server.cookie.secure"),
 		}
+
+		var paymentPriceOptions []payment.PaymentOption
+		err = viper.UnmarshalKey("server.payment.prices", &paymentPriceOptions)
+		// Little hack to make AllSettings happy
+		viper.Set("server.payment.prices", paymentPriceOptions)
 
 		logger.WithFields(logrus.Fields{
 			"settings": viper.AllSettings(),
@@ -243,9 +251,27 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "acl-service"),
 		)
 
+		//paymentPriceOptions, err := payment.LoadOptions(viper.GetString("server.payment.prices"))
+		//if err != nil {
+		//	logger.WithFields(logrus.Fields{
+		//		"context": "payment-service",
+		//		"error":   err,
+		//		"what":    "getting price options",
+		//	},
+		//	).Fatal("starting")
+		//}
+
+		//var paymentPriceOptions []payment.PaymentOption
+		//err = viper.UnmarshalKey("server.payment.prices", &paymentPriceOptions)
+		//fmt.Println("paymentPriceOptions", err)
+
 		paymentService := payment.NewService(
-			"TODO",
-			"[]",
+			payment.PaymentServiceConfig{
+				Server:        viper.GetString("server.payment.server"),
+				WebhookSecret: viper.GetString("server.payment.webhookSecret"),
+				PrivateKey:    viper.GetString("server.payment.privateKey"),
+				Options:       paymentPriceOptions,
+			},
 			logger.WithField("context", "payment-service"),
 		)
 
@@ -254,8 +280,8 @@ var ServerCmd = &cobra.Command{
 			LookupBearer: userSession.GetUserUUIDByToken,
 			Skip:         payment.SkipAuth,
 		}
-
-		paymentsRouter := server.Server.Group("/payments")
+		// This is a little decoupled from /payment inside the service
+		paymentsRouter := server.Server.Group("/payment")
 		paymentsRouter.Use(authenticate.Auth(authConfig))
 		paymentService.Serve(paymentsRouter)
 

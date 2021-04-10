@@ -48,6 +48,15 @@ server:
       apps: []
         # Array of AppleConfig objects, same as server.loginWith.appleID.web
   userRegisterKey: ""
+  payment:
+    server: "http://localhost:1234"
+    webhookSecret: "XXX"
+    privateKey: "XXX"
+    prices:
+      - id: price_XXX
+        currency: nok
+        unit_amount: 20000
+        human_amount: 200
 tools:
   integrationTests:
     username: ""

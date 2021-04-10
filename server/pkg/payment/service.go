@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/api"
+	"github.com/thoas/go-funk"
 
 	"github.com/stripe/stripe-go/v71/webhook"
 
@@ -18,43 +19,46 @@ import (
 	"github.com/stripe/stripe-go/v71/checkout/session"
 )
 
+type SupportV1Input struct {
+	PriceID string `json:"price_id"`
+}
+
+// Thank you https://lornajane.net/posts/2020/accessing-nested-config-with-viper
 type PaymentOption struct {
 	ID          string `json:"id"`
 	Currency    string `json:"currency"`
-	UnitAmount  int    `json:"unit_amount"`
-	HumanAmount int    `json:"human_amount"`
+	UnitAmount  int    `json:"unit_amount" mapstructure:"unit_amount"`
+	HumanAmount int    `json:"human_amount" mapstructure:"human_amount"`
 }
 
 type createCheckoutSessionResponse struct {
 	SessionID string `json:"id"`
 }
 
-type PaymentService struct {
-	paymentOptions []PaymentOption
-	domain         string
-	webhookSecret  string
-	logContext     logrus.FieldLogger
+type PaymentServiceConfig struct {
+	Server        string
+	WebhookSecret string
+	PrivateKey    string
+	Options       []PaymentOption
 }
 
-func NewService(webhookSecret string, options string, log logrus.FieldLogger) PaymentService {
-	options = strings.TrimSpace(options)
+type PaymentService struct {
+	config     PaymentServiceConfig
+	logContext logrus.FieldLogger
+}
 
-	s := PaymentService{
-		domain:        "http://localhost:4242",
-		webhookSecret: webhookSecret,
-		logContext:    log,
+func NewService(config PaymentServiceConfig, log logrus.FieldLogger) PaymentService {
+	// This is your real test secret API key.
+	stripe.Key = config.PrivateKey
+	return PaymentService{
+		config:     config,
+		logContext: log,
 	}
-
-	err := json.Unmarshal([]byte(options), &s.paymentOptions)
-	if err != nil {
-		log.Fatal("Payment options are wrong")
-	}
-	return s
 }
 
 func (s PaymentService) Serve(router *echo.Group) error {
 	// TODO Do I need to serve the files or can I mix and match with hugo (should be able to)
-	router.GET("/create-checkout-session", s.CreateCheckoutSession)
+	router.POST("/create-checkout-session", s.CreateCheckoutSession)
 	router.POST("/webhook", s.Webhook)
 	return nil
 }
@@ -77,7 +81,7 @@ func (s PaymentService) Webhook(c echo.Context) error {
 
 	fmt.Println(string(b))
 
-	event, err := webhook.ConstructEvent(b, r.Header.Get("Stripe-Signature"), s.webhookSecret)
+	event, err := webhook.ConstructEvent(b, r.Header.Get("Stripe-Signature"), s.config.WebhookSecret)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Printf("webhook.ConstructEvent: %v", err)
@@ -101,11 +105,35 @@ func (s PaymentService) CreateCheckoutSession(c echo.Context) error {
 	}).Info("Make the money")
 
 	clientReferenceID := userUUID
+
+	var input SupportV1Input
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	err := json.Unmarshal(jsonBytes, &input)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: "TODO: json",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
 	// TODO Need to get product ID
-	priceReferenceID := "price_1IXSzr2Ez2ncWz0NI8f4ffJG"
+	priceReferenceID := input.PriceID
+	// TODO check if priceID is in options
+	valid := funk.Contains(s.config.Options, func(option PaymentOption) bool {
+		return option.ID == priceReferenceID
+	})
+
+	if !valid {
+		response := api.HTTPResponseMessage{
+			Message: "TODO: price_id",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
 	// TODO
-	prefix := fmt.Sprintf("%s/purchase", s.domain)
+	prefix := fmt.Sprintf("%s/payment", s.config.Server)
 	successURL := prefix + "/success.html"
 	cancelURL := prefix + "/cancel.html"
 
@@ -139,6 +167,20 @@ func (s PaymentService) CreateCheckoutSession(c echo.Context) error {
 		SessionID: session.ID,
 	}
 
-	js, _ := json.Marshal(data)
-	return c.JSON(http.StatusOK, js)
+	return c.JSON(http.StatusOK, data)
+}
+
+// LoadOptions given a path, try to load the file and return payment options
+func LoadOptions(pathTo string) ([]PaymentOption, error) {
+	var options []PaymentOption
+	data, err := ioutil.ReadFile(pathTo)
+	if err != nil {
+		return options, err
+	}
+
+	err = json.Unmarshal(data, &options)
+	if err != nil {
+		return options, err
+	}
+	return options, err
 }
