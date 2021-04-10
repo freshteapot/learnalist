@@ -15,4 +15,4 @@ css_include: ["main", "payment-v1"]
 - The ability to make public lists
 
 # Take my money
-**Payments are handled via Stripe, not learnalist.net**
+**Payments are handled via stripe.com, not learnalist.net**
