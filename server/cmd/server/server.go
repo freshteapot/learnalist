@@ -56,6 +56,7 @@ var ServerCmd = &cobra.Command{
 		viper.SetDefault("server.userRegisterKey", "")
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
 		viper.BindEnv("server.payment.privateKey", "PAYMENT_PRIVATE_KEY")
+		viper.BindEnv("server.payment.webhookSecret", "PAYMENT_WEBHOOK_SECRET")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:       viper.GetString("server.loginWith.google.clientID"),
@@ -281,9 +282,9 @@ var ServerCmd = &cobra.Command{
 			Skip:         payment.SkipAuth,
 		}
 		// This is a little decoupled from /payment inside the service
-		paymentsRouter := server.Server.Group("/payment")
+		paymentsRouter := server.Server.Group("/payments")
 		paymentsRouter.Use(authenticate.Auth(authConfig))
-		paymentService.Serve(paymentsRouter)
+		paymentService.Serve("/payments", paymentsRouter)
 
 		server.InitApi(
 			apiManager,
