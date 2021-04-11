@@ -32,7 +32,7 @@ hugo/static/css/v1.*
 hugo/static/css/v2.*
 hugo/static/css/v3.*
 hugo/static/css/v4.*
-hugo/static/css/toolbox-.*
+hugo/static/css/toolbox*
 hugo/static/css/payment*
 ## JS
 hugo/static/js/base.*
@@ -45,7 +45,7 @@ hugo/static/js/v1.*
 hugo/static/js/v2.*
 hugo/static/js/v3.*
 hugo/static/js/v4.*
-hugo/static/js/toolbox-.*
+hugo/static/js/toolbox*
 hugo/static/js/payment*
 ## Manifests
 hugo/data/manifest_css.json
