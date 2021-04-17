@@ -1,4 +1,38 @@
 # Payments V1
+- [ ] Store event_id + payload + created + type
+- [ ] Slack event_id + type and when
+- [ ] V1 event.type == checkout.session.completed
+    UserID paid X
+- [ ] Payment V1 event.type == checkout.session.completed
+        Get userID
+        Trigger public access
+
+# Notes
+
+id + data.object.id
+data.object.client_reference_id
+
+data.object.payment_intent.pi_1IfUHd2Ez2ncWz0N8QToTDU0
+
+charge.succeeded includes payment_intent + ch
+
+payment_intent
+
+
+"payment_intent.created" = data.object.id
+"payment_intent.succeeded" = = data.object.id
+"checkout.session.completed" = data.object.payment_intent
+"charge.succeeded" = data.object.payment_intent
+
+
+To start with:
+- store:
+    - id
+    - type
+    - paymentIntentID (can be null if missing)
+    - created
+
+- store data + id, + type
 # Pre work
 - Setup the prices
 - Update dev.config with the prices data
@@ -48,6 +82,15 @@ TOPIC=payments \
 EVENTS_STAN_CLIENT_ID=nats-reader \
 go run main.go --config=../config/dev.config.yaml \
 tools natsutils read
+```
+
+
+## Write events to slack
+```
+TOPIC=payments \
+EVENTS_PAYMENTS_SLACK_WEBHOOK="XXX" \
+go run main.go --config=../config/dev.config.yaml \
+tools payments slack
 ```
 
 

@@ -281,6 +281,7 @@ var ServerCmd = &cobra.Command{
 			LookupBearer: userSession.GetUserUUIDByToken,
 			Skip:         payment.SkipAuth,
 		}
+
 		// This is a little decoupled from /payment inside the service
 		paymentsRouter := server.Server.Group("/payments")
 		paymentsRouter.Use(authenticate.Auth(authConfig))
