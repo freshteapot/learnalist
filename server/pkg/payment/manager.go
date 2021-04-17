@@ -63,6 +63,7 @@ func (l *managerListener) OnEvent(entry event.Eventlog) {
 	// TODO Write to db
 	// TODO need repo
 	// TODO do I want this to be a different db?
+	// Or do I look to write the webhooks from nats on a cronjob or something?
 
 	if stripeEvent.Type != "checkout.session.completed" {
 		return
