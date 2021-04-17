@@ -74,7 +74,7 @@ yq w -i $SERVER_CONFIG hugo.environment "dev_external"
 yq w -i $SERVER_CONFIG server.cookie.domain "${_BIND}"
 yq w -i $SERVER_CONFIG server.loginWith.google.server "${_APISERVER}"
 yq w -i $SERVER_CONFIG server.loginWith.appleID.web.server "${_APISERVER}"
-yq w -i $SERVER_CONFIG server.payment.server "${_APISERVER}"
+yq w -i $SERVER_CONFIG payment.server "${_APISERVER}"
 
 # Update config hugo
 mkdir -p $HUGO_CONFIG_DIR

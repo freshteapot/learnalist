@@ -55,8 +55,8 @@ var ServerCmd = &cobra.Command{
 
 		viper.SetDefault("server.userRegisterKey", "")
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
-		viper.BindEnv("server.payment.privateKey", "PAYMENT_PRIVATE_KEY")
-		viper.BindEnv("server.payment.webhookSecret", "PAYMENT_WEBHOOK_SECRET")
+		viper.BindEnv("payment.privateKey", "PAYMENT_PRIVATE_KEY")
+		viper.BindEnv("payment.webhookSecret", "PAYMENT_WEBHOOK_SECRET")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:       viper.GetString("server.loginWith.google.clientID"),
@@ -110,9 +110,9 @@ var ServerCmd = &cobra.Command{
 		}
 
 		var paymentPriceOptions []payment.PaymentOption
-		err = viper.UnmarshalKey("server.payment.prices", &paymentPriceOptions)
+		err = viper.UnmarshalKey("payment.prices", &paymentPriceOptions)
 		// Little hack to make AllSettings happy
-		viper.Set("server.payment.prices", paymentPriceOptions)
+		viper.Set("payment.prices", paymentPriceOptions)
 
 		logger.WithFields(logrus.Fields{
 			"settings": viper.AllSettings(),
@@ -252,25 +252,11 @@ var ServerCmd = &cobra.Command{
 			logger.WithField("context", "acl-service"),
 		)
 
-		//paymentPriceOptions, err := payment.LoadOptions(viper.GetString("server.payment.prices"))
-		//if err != nil {
-		//	logger.WithFields(logrus.Fields{
-		//		"context": "payment-service",
-		//		"error":   err,
-		//		"what":    "getting price options",
-		//	},
-		//	).Fatal("starting")
-		//}
-
-		//var paymentPriceOptions []payment.PaymentOption
-		//err = viper.UnmarshalKey("server.payment.prices", &paymentPriceOptions)
-		//fmt.Println("paymentPriceOptions", err)
-
 		paymentService := payment.NewService(
 			payment.PaymentServiceConfig{
-				Server:        viper.GetString("server.payment.server"),
-				WebhookSecret: viper.GetString("server.payment.webhookSecret"),
-				PrivateKey:    viper.GetString("server.payment.privateKey"),
+				Server:        viper.GetString("payment.server"),
+				WebhookSecret: viper.GetString("payment.webhookSecret"),
+				PrivateKey:    viper.GetString("payment.privateKey"),
 				Options:       paymentPriceOptions,
 			},
 			logger.WithField("context", "payment-service"),

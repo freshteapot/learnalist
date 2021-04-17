@@ -11,14 +11,17 @@ import (
 )
 
 type managerListener struct {
+	repo         PaymentRepository
 	subscription stan.Subscription
 	logContext   logrus.FieldLogger
 }
 
 func NewManagerListener(
+	repo PaymentRepository,
 	logContext logrus.FieldLogger,
 ) *managerListener {
 	return &managerListener{
+		repo:       repo,
 		logContext: logContext,
 	}
 }
@@ -59,9 +62,16 @@ func (l *managerListener) OnEvent(entry event.Eventlog) {
 	// eventID + type
 	stripeEvent := stripe.Event{}
 	b, _ := json.Marshal(entry.Data)
-	json.Unmarshal(b, &stripeEvent)
-	// TODO Write to db
-	// TODO need repo
+	_ = json.Unmarshal(b, &stripeEvent)
+
+	err := l.repo.Save(stripeEvent)
+	if err != nil {
+		l.logContext.WithFields(logrus.Fields{
+			"event_id": stripeEvent.ID,
+			"error":    err,
+		}).Fatal("Writing to storage")
+	}
+
 	// TODO do I want this to be a different db?
 	// Or do I look to write the webhooks from nats on a cronjob or something?
 

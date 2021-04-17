@@ -1,12 +1,12 @@
-package payments
+package payment
 
 import (
 	"github.com/spf13/cobra"
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "payments",
-	Short: "payments commands",
+	Use:   "payment",
+	Short: "payment commands",
 }
 
 func init() {
