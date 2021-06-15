@@ -25,6 +25,22 @@ type AclChallenge interface {
 	AclWriterChallenge
 }
 
+type AclPlankHistory interface {
+	AclReaderPlankHistory
+	AclWriterPlankHistory
+}
+
+type AclReaderPlankHistory interface {
+	HasUserPlankHistoryReadAccess(alistUUID string, userUUID string) (bool, error)
+}
+
+type AclWriterPlankHistory interface {
+	GrantUserPlankHistoryReadAccess(extUUID string, userUUID string) error
+	RevokeUserPlankHistoryReadAccess(extUUID string, userUUID string) error
+	SharePlankHistoryWithPublic(extUUID string) error
+	MakePlankHistoryPrivate(extUUID string, userUUID string) error
+}
+
 type AclReaderChallenge interface {
 	HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error)
 	HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error)

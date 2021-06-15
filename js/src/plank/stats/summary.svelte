@@ -146,6 +146,7 @@
           class:bg-green={dayRecord.active}
           class:red={!dayRecord.active}
           class:bg-red={!dayRecord.active}
+          title={dayRecord.day.toLocaleDateString("en-CA")}
         >
           &nbsp;
         </div>

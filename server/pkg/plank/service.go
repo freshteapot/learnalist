@@ -9,6 +9,7 @@ import (
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -22,26 +23,59 @@ import (
 type PlankService struct {
 	repo       PlankRepository
 	logContext logrus.FieldLogger
+	acl        acl.AclPlankHistory
 }
 
 // @openapi.path.tag: plank
-func NewService(repo PlankRepository, log logrus.FieldLogger) PlankService {
+func NewService(repo PlankRepository, acl acl.AclPlankHistory, log logrus.FieldLogger) PlankService {
 	s := PlankService{
 		repo:       repo,
 		logContext: log,
+		acl:        acl,
 	}
 
 	event.GetBus().Subscribe(event.TopicMonolog, "plank", s.monologSubscribe)
 	return s
 }
 
-func (s PlankService) History(c echo.Context) error {
+func (s PlankService) HistoryByUserUUID(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	history, err := s.repo.History(user.Uuid)
+	uuid := c.Param("uuid")
+	if uuid == "" {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InputMissingListUuid,
+		}
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	if user.Uuid != uuid {
+		allow, err := s.acl.HasUserPlankHistoryReadAccess(uuid, user.Uuid)
+		if err != nil {
+			response := api.HTTPResponseMessage{
+				Message: i18n.InternalServerErrorAclLookup,
+			}
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+		if !allow {
+			response := api.HTTPResponseMessage{
+				Message: i18n.AclHttpAccessDeny,
+			}
+			return c.JSON(http.StatusForbidden, response)
+		}
+	}
+
+	history, err := s.repo.History(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	return c.JSON(http.StatusOK, history)
+}
+
+func (s PlankService) History(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	c.SetParamNames("uuid")
+	c.SetParamValues(user.Uuid)
+	return s.HistoryByUserUUID(c)
 }
 
 // RecordPlank Document the plank
