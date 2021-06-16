@@ -14,8 +14,8 @@ func (store *Sqlite) SharePlankHistoryWithPublic(extUUID string) error {
 }
 
 // Share a plank history only with yourself, this should remove any previous access rules
-func (store *Sqlite) MakePlankHistoryPrivate(extUUID string, userUUID string) error {
-	return store.MakeKindPrivate("plank/history", extUUID, userUUID)
+func (store *Sqlite) MakePlankHistoryPrivate(userUUID string) error {
+	return store.MakeKindPrivate("plank/history", userUUID, userUUID)
 }
 
 func (store *Sqlite) HasUserPlankHistoryReadAccess(extUUID string, userUUID string) (bool, error) {

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	stan "github.com/nats-io/"
+	stan "github.com/nats-io/stan.go"
 	mock "github.com/stretchr/testify/mock"
 )
 

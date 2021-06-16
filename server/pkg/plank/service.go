@@ -4,12 +4,14 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
 	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -76,6 +78,43 @@ func (s PlankService) History(c echo.Context) error {
 	c.SetParamNames("uuid")
 	c.SetParamValues(user.Uuid)
 	return s.HistoryByUserUUID(c)
+}
+
+func (s PlankService) ShareHistory(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	// TODO maybe we support an array
+	var input openapi.HttpPlankHistoryShareRequestBody
+
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	err := json.Unmarshal(jsonBytes, &input)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: i18n.PostShareListJSONFailure,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	sharedWith := input.Action
+
+	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
+	if !utils.StringArrayContains(allowed, sharedWith) {
+		response := api.HTTPResponseMessage{
+			Message: "Check the documentation",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	switch sharedWith {
+	case aclKeys.SharedWithPublic:
+		err = s.acl.SharePlankHistoryWithPublic(user.Uuid)
+	case aclKeys.NotShared:
+		err = s.acl.MakePlankHistoryPrivate(user.Uuid)
+	}
+
+	// TODO Do I want to send an event?
+	return c.NoContent(http.StatusOK)
 }
 
 // RecordPlank Document the plank

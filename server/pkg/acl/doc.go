@@ -38,7 +38,7 @@ type AclWriterPlankHistory interface {
 	GrantUserPlankHistoryReadAccess(extUUID string, userUUID string) error
 	RevokeUserPlankHistoryReadAccess(extUUID string, userUUID string) error
 	SharePlankHistoryWithPublic(extUUID string) error
-	MakePlankHistoryPrivate(extUUID string, userUUID string) error
+	MakePlankHistoryPrivate(userUUID string) error
 }
 
 type AclReaderChallenge interface {

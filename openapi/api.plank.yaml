@@ -1,5 +1,15 @@
 components:
   schemas:
+    HttpPlankHistoryShareRequestBody:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - private
+            - public
     Plank:
       type: object
       required:

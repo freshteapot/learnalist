@@ -110,6 +110,7 @@ func InitApi(
 	plank.Use(authenticate.Auth(authConfig))
 	plank.GET("/history", plankService.History)
 	plank.GET("/history/:uuid", plankService.HistoryByUserUUID)
+	plank.POST("/history/share", plankService.ShareHistory)
 	plank.DELETE("/:uuid", plankService.DeletePlankRecord)
 	plank.POST("/", plankService.RecordPlank)
 
