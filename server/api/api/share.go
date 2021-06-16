@@ -100,6 +100,7 @@ func (m *Manager) V1ShareListReadAccess(c echo.Context) error {
 		m.Acl.RevokeUserListReadAccess(input.AlistUUID, input.UserUUID)
 	}
 
+	// TODO Do I want to send an event that this happened?
 	return c.JSON(http.StatusOK, input)
 }
 

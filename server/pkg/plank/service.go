@@ -82,7 +82,6 @@ func (s PlankService) History(c echo.Context) error {
 
 func (s PlankService) ShareHistory(c echo.Context) error {
 	user := c.Get("loggedInUser").(uuid.User)
-	// TODO maybe we support an array
 	var input openapi.HttpPlankHistoryShareRequestBody
 
 	defer c.Request().Body.Close()
@@ -91,7 +90,7 @@ func (s PlankService) ShareHistory(c echo.Context) error {
 	err := json.Unmarshal(jsonBytes, &input)
 	if err != nil {
 		response := api.HTTPResponseMessage{
-			Message: i18n.PostShareListJSONFailure,
+			Message: i18n.InputJSONFailure,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -113,8 +112,11 @@ func (s PlankService) ShareHistory(c echo.Context) error {
 		err = s.acl.MakePlankHistoryPrivate(user.Uuid)
 	}
 
-	// TODO Do I want to send an event?
-	return c.NoContent(http.StatusOK)
+	// TODO Do I want to send an event that this happened?
+	response := api.HTTPResponseMessage{
+		Message: "Update",
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 // RecordPlank Document the plank
