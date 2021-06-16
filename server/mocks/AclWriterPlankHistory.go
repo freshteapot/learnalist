@@ -23,13 +23,13 @@ func (_m *AclWriterPlankHistory) GrantUserPlankHistoryReadAccess(extUUID string,
 	return r0
 }
 
-// MakePlankHistoryPrivate provides a mock function with given fields: extUUID, userUUID
-func (_m *AclWriterPlankHistory) MakePlankHistoryPrivate(extUUID string, userUUID string) error {
-	ret := _m.Called(extUUID, userUUID)
+// MakePlankHistoryPrivate provides a mock function with given fields: userUUID
+func (_m *AclWriterPlankHistory) MakePlankHistoryPrivate(userUUID string) error {
+	ret := _m.Called(userUUID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(extUUID, userUUID)
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}

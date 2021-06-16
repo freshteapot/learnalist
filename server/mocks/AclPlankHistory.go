@@ -9,13 +9,48 @@ type AclPlankHistory struct {
 	mock.Mock
 }
 
-// DeleteChallenge provides a mock function with given fields: extUUID
-func (_m *AclPlankHistory) DeleteChallenge(extUUID string) error {
-	ret := _m.Called(extUUID)
+// GrantUserPlankHistoryReadAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *AclPlankHistory) GrantUserPlankHistoryReadAccess(extUUID string, userUUID string) error {
+	ret := _m.Called(extUUID, userUUID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(extUUID, userUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// HasUserPlankHistoryReadAccess provides a mock function with given fields: alistUUID, userUUID
+func (_m *AclPlankHistory) HasUserPlankHistoryReadAccess(alistUUID string, userUUID string) (bool, error) {
+	ret := _m.Called(alistUUID, userUUID)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(alistUUID, userUUID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(alistUUID, userUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MakePlankHistoryPrivate provides a mock function with given fields: userUUID
+func (_m *AclPlankHistory) MakePlankHistoryPrivate(userUUID string) error {
+	ret := _m.Called(userUUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(extUUID)
+		r0 = rf(userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -23,8 +58,8 @@ func (_m *AclPlankHistory) DeleteChallenge(extUUID string) error {
 	return r0
 }
 
-// GrantUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclPlankHistory) GrantUserChallengeWriteAccess(extUUID string, userUUID string) error {
+// RevokeUserPlankHistoryReadAccess provides a mock function with given fields: extUUID, userUUID
+func (_m *AclPlankHistory) RevokeUserPlankHistoryReadAccess(extUUID string, userUUID string) error {
 	ret := _m.Called(extUUID, userUUID)
 
 	var r0 error
@@ -37,78 +72,8 @@ func (_m *AclPlankHistory) GrantUserChallengeWriteAccess(extUUID string, userUUI
 	return r0
 }
 
-// HasUserChallengeOwnerAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclPlankHistory) HasUserChallengeOwnerAccess(extUUID string, userUUID string) (bool, error) {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(extUUID, userUUID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(extUUID, userUUID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// HasUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclPlankHistory) HasUserChallengeWriteAccess(extUUID string, userUUID string) (bool, error) {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(extUUID, userUUID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(extUUID, userUUID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MakeChallengePrivate provides a mock function with given fields: extUUID, userUUID
-func (_m *AclPlankHistory) MakeChallengePrivate(extUUID string, userUUID string) error {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(extUUID, userUUID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// RevokeUserChallengeWriteAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclPlankHistory) RevokeUserChallengeWriteAccess(extUUID string, userUUID string) error {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(extUUID, userUUID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// ShareChallengeWithPublic provides a mock function with given fields: extUUID
-func (_m *AclPlankHistory) ShareChallengeWithPublic(extUUID string) error {
+// SharePlankHistoryWithPublic provides a mock function with given fields: extUUID
+func (_m *AclPlankHistory) SharePlankHistoryWithPublic(extUUID string) error {
 	ret := _m.Called(extUUID)
 
 	var r0 error
