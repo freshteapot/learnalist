@@ -29,6 +29,8 @@ func NewDaily(
 	settingsRepo RemindDailySettingsRepository,
 	mobileRepo mobile.MobileRepository,
 	logContext logrus.FieldLogger) *dailyManager {
+	// TODO could parse in templateHandlers?
+
 	return &dailyManager{
 		settingsRepo: settingsRepo,
 		mobileRepo:   mobileRepo,
@@ -199,6 +201,7 @@ func (m *dailyManager) shouldSendNotification(r RemindMe) bool {
 	}
 
 	// RemindV1 specific rules
+	// TODO add	apps.PlankV1
 	if r.Settings.AppIdentifier != apps.RemindV1 {
 		return false
 	}
@@ -223,9 +226,6 @@ func (m *dailyManager) SendNotifications() {
 		return
 	}
 
-	// Hardcoded to only work for apps.RemindV1
-	title := "Daily Reminder"
-
 	msgSent := 0
 	msgSkipped := 0
 	for _, remind := range reminders {
@@ -241,9 +241,21 @@ func (m *dailyManager) SendNotifications() {
 			continue
 		}
 
-		template := "What shall we learn today"
-		if remind.Activity {
-			template = "Nice work!"
+		title := ""
+		template := ""
+		switch remind.Settings.AppIdentifier {
+		case apps.PlankV1:
+			title, template = m.templatePlankV1(remind)
+		case apps.RemindV1:
+			title, template = m.templateRemindV1(remind)
+		default:
+			m.logContext.WithFields(logrus.Fields{
+				"error":          "no template or title found",
+				"app_identifier": remind.Settings.AppIdentifier,
+			}).Error("Skipping due to unsupported appIdentifier")
+			m.updateSettingsWithWhenNext(remind.UserUUID, remind.Settings)
+			msgSkipped++
+			continue
 		}
 
 		body := template
