@@ -1,8 +1,8 @@
 <script>
   // TODO do I want the streak to be calculated via events?
-  import { loggedIn, notify, clearNotification } from "../../shared.js";
+  import { loggedIn, notify, clearNotification } from "../../../shared.js";
 
-  import store from "../store.js";
+  import store from "../../store.js";
   import Summary from "./summary.svelte";
   import Table from "./table.svelte";
 

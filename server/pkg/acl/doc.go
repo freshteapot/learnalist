@@ -32,6 +32,7 @@ type AclPlankHistory interface {
 
 type AclReaderPlankHistory interface {
 	HasUserPlankHistoryReadAccess(alistUUID string, userUUID string) (bool, error)
+	IsPlankHistoryPublic(extUUID string) (bool, error)
 }
 
 type AclWriterPlankHistory interface {

@@ -157,5 +157,5 @@
 </article>
 
 <style>
-  @import "../../../all.css";
+  @import "../../../../all.css";
 </style>

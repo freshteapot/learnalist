@@ -41,17 +41,24 @@ func NewService(repo PlankRepository, acl acl.AclPlankHistory, log logrus.FieldL
 }
 
 func (s PlankService) HistoryByUserUUID(c echo.Context) error {
-	user := c.Get("loggedInUser").(uuid.User)
-	uuid := c.Param("uuid")
-	if uuid == "" {
+	user := c.Get("loggedInUser")
+	extUUID := c.Param("uuid")
+
+	userUUID := ""
+	if user != nil {
+		userUUID = user.(uuid.User).Uuid
+	}
+
+	if extUUID == "" {
 		response := api.HTTPResponseMessage{
 			Message: i18n.InputMissingListUuid,
 		}
 		return c.JSON(http.StatusNotFound, response)
 	}
 
-	if user.Uuid != uuid {
-		allow, err := s.acl.HasUserPlankHistoryReadAccess(uuid, user.Uuid)
+	if userUUID != extUUID {
+		allow, err := s.acl.IsPlankHistoryPublic(extUUID)
+		//allow, err := s.acl.HasUserPlankHistoryReadAccess(extUUID, userUUID)
 		if err != nil {
 			response := api.HTTPResponseMessage{
 				Message: i18n.InternalServerErrorAclLookup,
@@ -66,7 +73,7 @@ func (s PlankService) HistoryByUserUUID(c echo.Context) error {
 		}
 	}
 
-	history, err := s.repo.History(uuid)
+	history, err := s.repo.History(extUUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}

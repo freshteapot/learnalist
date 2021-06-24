@@ -14,7 +14,7 @@
     todayTotals,
     weekTotals,
     monthTotals,
-  } from "./stats/helpers";
+  } from "./stats/v1/helpers";
 
   dayjs.locale({
     ...en,

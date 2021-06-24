@@ -21,3 +21,7 @@ func (store *Sqlite) MakePlankHistoryPrivate(userUUID string) error {
 func (store *Sqlite) HasUserPlankHistoryReadAccess(extUUID string, userUUID string) (bool, error) {
 	return store.HasUserKindReadAccess("plank/history", extUUID, userUUID)
 }
+
+func (store *Sqlite) IsPlankHistoryPublic(extUUID string) (bool, error) {
+	return store.IsKindPublic("plank/history", extUUID)
+}

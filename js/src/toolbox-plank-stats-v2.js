@@ -1,5 +1,5 @@
 // Auto generated from rollup.config.toolbox.js
-import Experience from "./plank/stats/v1/v1.svelte";
+import Experience from "./plank/stats/v2/v2.svelte";
 
 // Actual app to handle the interactions
 let app;

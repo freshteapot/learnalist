@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/freshteapot/learnalist-api/server/pkg/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,6 +25,21 @@ func Skip(c echo.Context) bool {
 		if strings.HasPrefix(url, "/oauth/") {
 			return true
 		}
+
+		if strings.Contains(url, "/plank/history/") {
+			// A hack to try and get access to the plank/history/:uuid
+			// If we add more than one, turn it into a filter
+			authorization := c.Request().Header.Get("Authorization")
+			if authorization == "" {
+				//cookie.
+				_, err := utils.GetCookieByName(c.Request().Cookies(), "x-authentication-bearer")
+				if err != nil {
+					return true
+				}
+			}
+			return false
+		}
+
 	case http.MethodPost:
 		// TODO Add a secret if you want to control who can register
 		// Unfiltered ability to register a user
