@@ -8,7 +8,6 @@ import (
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/experimental"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/natsutils"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/notifications"
-	"github.com/freshteapot/learnalist-api/server/cmd/tools/payment"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/remind"
 	"github.com/freshteapot/learnalist-api/server/cmd/tools/user"
 	"github.com/spf13/cobra"
@@ -35,5 +34,4 @@ func init() {
 	RootCmd.AddCommand(slackEventsCMD)
 	RootCmd.AddCommand(experimental.RootCmd)
 	RootCmd.AddCommand(alist.RootCmd)
-	RootCmd.AddCommand(payment.RootCmd)
 }
