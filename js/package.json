@@ -16,10 +16,9 @@
     "dev:js:alist:srs": "rollup -c rollup.config.alist.srs.js -w",
     "dev:js:alist:editor": "rollup -c rollup.config.alist.editor.js -w",
     "dev:js:plank:v1": "rollup -c rollup.config.plank.v1.js -w",
-    "dev:js:payment:v1": "rollup -c rollup.config.payment.v1.js -w",
     "dev:js:toolbox": "rollup -c rollup.config.toolbox.js -w",
     "dev:js:browser-extension:import-play": "rollup -c rollup.config.browser-extension.import-play.js -w",
-    "dev:js:components": "concurrently 'npm run dev:js:shared' 'npm run dev:js:main' 'npm run dev:js:alist:v1' 'npm run dev:js:alist:v2' 'npm run dev:js:alist:v3' 'npm run dev:js:alist:v4' 'npm run dev:js:alist:srs' 'npm run dev:js:alist:editor' 'npm run dev:js:plank:v1' 'npm run dev:js:payment:v1' 'npm run dev:js:browser-extension:import-play' 'npm run dev:js:toolbox'",
+    "dev:js:components": "concurrently 'npm run dev:js:shared' 'npm run dev:js:main' 'npm run dev:js:alist:v1' 'npm run dev:js:alist:v2' 'npm run dev:js:alist:v3' 'npm run dev:js:alist:v4' 'npm run dev:js:alist:srs' 'npm run dev:js:alist:editor' 'npm run dev:js:plank:v1' 'npm run dev:js:browser-extension:import-play' 'npm run dev:js:toolbox'",
     "dev": "concurrently \"npm run dev:hugo\" \"npm run dev:js:components\" \"npm run dev:api-server\"",
     "build:hugo": "cd ../hugo && hugo",
     "build:js:shared": "rollup -c rollup.config.shared.js",
@@ -31,10 +30,9 @@
     "build:js:alist:v4": "rollup -c rollup.config.alist.v4.js",
     "build:js:alist:srs": "rollup -c rollup.config.alist.srs.js",
     "build:js:plank:v1": "rollup -c rollup.config.plank.v1.js",
-    "build:js:payment:v1": "rollup -c rollup.config.payment.v1.js",
     "build:js:toolbox": "rollup -c rollup.config.toolbox.js",
     "build:js:browser-extension:import-play": "rollup -c rollup.config.browser-extension.import-play.js",
-    "build:js:components": "npm run build:js:main && npm run build:js:shared && npm run build:js:alist:v1 && npm run build:js:alist:v2 && npm run build:js:alist:v3 && npm run build:js:alist:v4 && npm run build:js:alist:srs && npm run build:js:alist:editor && npm run build:js:plank:v1 && npm run build:js:payment:v1 && npm run build:js:toolbox",
+    "build:js:components": "npm run build:js:main && npm run build:js:shared && npm run build:js:alist:v1 && npm run build:js:alist:v2 && npm run build:js:alist:v3 && npm run build:js:alist:v4 && npm run build:js:alist:srs && npm run build:js:alist:editor && npm run build:js:plank:v1 && npm run build:js:toolbox",
     "build": "npm run build:js:components && npm run build:hugo"
   },
   "devDependencies": {
