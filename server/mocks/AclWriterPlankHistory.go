@@ -9,20 +9,6 @@ type AclWriterPlankHistory struct {
 	mock.Mock
 }
 
-// GrantUserPlankHistoryReadAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclWriterPlankHistory) GrantUserPlankHistoryReadAccess(extUUID string, userUUID string) error {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(extUUID, userUUID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // MakePlankHistoryPrivate provides a mock function with given fields: userUUID
 func (_m *AclWriterPlankHistory) MakePlankHistoryPrivate(userUUID string) error {
 	ret := _m.Called(userUUID)
@@ -30,20 +16,6 @@ func (_m *AclWriterPlankHistory) MakePlankHistoryPrivate(userUUID string) error 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string) error); ok {
 		r0 = rf(userUUID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// RevokeUserPlankHistoryReadAccess provides a mock function with given fields: extUUID, userUUID
-func (_m *AclWriterPlankHistory) RevokeUserPlankHistoryReadAccess(extUUID string, userUUID string) error {
-	ret := _m.Called(extUUID, userUUID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(extUUID, userUUID)
 	} else {
 		r0 = ret.Error(0)
 	}

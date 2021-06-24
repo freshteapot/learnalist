@@ -9,20 +9,20 @@ type AclReaderPlankHistory struct {
 	mock.Mock
 }
 
-// HasUserPlankHistoryReadAccess provides a mock function with given fields: alistUUID, userUUID
-func (_m *AclReaderPlankHistory) HasUserPlankHistoryReadAccess(alistUUID string, userUUID string) (bool, error) {
-	ret := _m.Called(alistUUID, userUUID)
+// IsPlankHistoryPublic provides a mock function with given fields: extUUID
+func (_m *AclReaderPlankHistory) IsPlankHistoryPublic(extUUID string) (bool, error) {
+	ret := _m.Called(extUUID)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(alistUUID, userUUID)
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(extUUID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(alistUUID, userUUID)
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(extUUID)
 	} else {
 		r1 = ret.Error(1)
 	}
