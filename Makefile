@@ -31,11 +31,6 @@ rebuild-db-remind-manager:
 	rm -f /tmp/learnalist/remind-daily.db
 	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/remind-daily.db
 
-rebuild-db-payment:
-	mkdir -p /tmp/learnalist/
-	rm -f /tmp/learnalist/payment.db
-	ls server/db/*.sql | sort | xargs cat | sqlite3 /tmp/learnalist/payment.db
-
 rebuild-static-site:
 	cd server && \
 	EVENTS_STAN_CLIENT_ID=rebuild-static-site \
