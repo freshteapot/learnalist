@@ -115,3 +115,6 @@ When you click sooner, you are helping us know to decrease the time until we sho
 # Reference
 - [Spaced Repetition on wikipedia](https://en.wikipedia.org/wiki/Spaced_repetition)
 - [ridiculous on wiktionary](https://en.wiktionary.org/wiki/ridiculous)
+
+# Give us feedback
+We would love to hear from you, [please create an issue on github](https://github.com/learnalist/support/issues/new).

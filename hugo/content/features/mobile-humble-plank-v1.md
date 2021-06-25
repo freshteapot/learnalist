@@ -25,3 +25,6 @@ Record your plank activity, alone or with friends
 
 # On youtube
 - A little video https://youtu.be/E9EHonpn7CA
+
+# Give us feedback
+We would love to hear from you, [please create an issue on github](https://github.com/learnalist/support/issues/new).

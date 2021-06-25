@@ -33,3 +33,8 @@ css_include: ["main"]
     - Find where localstorage is and clear it.
     - Goto [the frontpage](/) and hopefully it will fix itself.
 - A growing list of issues (feature requests and bugs) can be found [https://github.com/freshteapot/learnalist-api/issues](https://github.com/freshteapot/learnalist-api/issues).
+
+# Support
+- [Mobile Humble Plank](/faq/support-mobile-humble-plank-v1.md)
+- [Mobile Remind](/faq/support-mobile-remind-v1.md)
+- [Create new issue on github](https://github.com/learnalist/support/issues/new)
