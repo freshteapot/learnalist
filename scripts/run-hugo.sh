@@ -50,7 +50,16 @@ kill -9 $(lsof -ti tcp:1234) >/dev/null 2>&1
 check_installed
 
 # Config setup
-_BIND="${LAL_BIND:-$(ipconfig getifaddr en0)}"
+_INTERFACE="${LAL_INTERFACE:-en0}"
+_BIND="${LAL_BIND:-$(ipconfig getifaddr $_INTERFACE)}"
+# Poor mans attempt to find the internet
+internetFound=$?
+if [[ $internetFound != 0 ]]; then
+	echo "Your internet can not be found on en0, you will need to manually fix this for now"
+	echo "LAL_INTERFACE=en7 make develop"
+	exit 1
+fi
+
 _BASEURL="http://${_BIND}:1313"
 _APISERVER="http://${_BIND}:1234"
 

@@ -5,7 +5,7 @@ css_include: ["main"]
 ---
 
 # What is the Remind mobile app
-[Overview of why you might want to download remind](../features/mobile-remind-v1.md)
+[Overview of why you might want to download remind]({{< ref "/features/mobile-remind-v1.md" >}})
 
 # Something wrong?
 Please [report your problem](https://github.com/learnalist/support/issues/new).

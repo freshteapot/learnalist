@@ -35,6 +35,6 @@ css_include: ["main"]
 - A growing list of issues (feature requests and bugs) can be found [https://github.com/freshteapot/learnalist-api/issues](https://github.com/freshteapot/learnalist-api/issues).
 
 # Support
-- [Mobile Humble Plank](/faq/support-mobile-humble-plank-v1.md)
-- [Mobile Remind](/faq/support-mobile-remind-v1.md)
+- [Mobile Humble Plank]({{< ref "/faq/support-mobile-humble-plank-v1.md" >}})
+- [Mobile Remind]({{< ref "/faq/support-mobile-remind-v1.md" >}})
 - [Create new issue on github](https://github.com/learnalist/support/issues/new)

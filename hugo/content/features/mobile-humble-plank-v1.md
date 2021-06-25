@@ -28,3 +28,9 @@ Record your plank activity, alone or with friends
 
 # Give us feedback
 We would love to hear from you, [please create an issue on github](https://github.com/learnalist/support/issues/new).
+
+# Reference
+- [Spaced Repetition on wikipedia](https://en.wikipedia.org/wiki/Spaced_repetition)
+- [ridiculous on wiktionary](https://en.wiktionary.org/wiki/ridiculous)
+- [Privacy-Policy]({{< ref "/faq/privacy-policy.md" >}})
+- [Support]({{< ref "/faq/support-mobile-humble-plank-v1.md" >}})
