@@ -17,7 +17,6 @@ make run-nats-from-docker
 
 ```sh
 make clear-site rebuild-db
-EVENTS_STAN_CLIENT_ID="lal-server" \
 make develop
 ```
 

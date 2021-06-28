@@ -10,6 +10,7 @@ css_include: ["main"]
 # Today
 - Learnalist, a place for learning.
 - [Privacy Policy](https://learnalist.net/faq/privacy-policy.html)
+
 ## Lists
 - You can make private lists.
 - You can make public lists.
@@ -22,6 +23,7 @@ css_include: ["main"]
 ## Plank
 - You can use [plank timer](/plank.html) to record planks (not really learning), or via [The Humble Plank App](/features/mobile-humble-plank-v1.html).
 - [A pretty stats page for your plank history](https://learnalist.net/toolbox/plank-stats-v1.html)
+- [A stats page you can share with the world](https://learnalist.net/toolbox/plank-stats-v2.html)
 
 ## Follow the progress
 - [Technical Changelog](/features/technical-changelog.html)

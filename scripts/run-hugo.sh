@@ -76,12 +76,14 @@ HUGO_CONFIG="${HUGO_CONFIG_DIR}/config.yaml"
 echo "Running hugo on ${_APISERVER} with config from ${HUGO_CONFIG}."
 echo "Running server with config from ${SERVER_CONFIG}."
 
-
 # Update config server
 rm -f $SERVER_CONFIG
 cp "${CWD}/../config/dev.config.yaml" $SERVER_CONFIG
 yq w -i $SERVER_CONFIG hugo.environment "dev_external"
 yq w -i $SERVER_CONFIG server.cookie.domain "${_BIND}"
+yq w -i $SERVER_CONFIG server.loginWith.google.server "${_APISERVER}"
+yq w -i $SERVER_CONFIG server.loginWith.appleID.web.server "${_APISERVER}"
+yq w -i $SERVER_CONFIG payment.server "${_APISERVER}"
 
 # Update config hugo
 mkdir -p $HUGO_CONFIG_DIR
@@ -96,18 +98,15 @@ rm -rf "$HUGO_DIR/public/"*
 mkdir -p $HUGO_DIR/{public/alist,public/alistsbyuser}
 ls -lah "$HUGO_DIR/public"
 
-
 # Static files
 cd $HUGO_DIR && \
 hugo -e dev_external \
 -b $_BASEURL
 
-
 # Start the server
 cd $SERVER_DIR && \
 EVENTS_STAN_CLIENT_ID=lal-server \
 go run --tags="json1" main.go --config=$SERVER_CONFIG server &
-
 
 # Start static site engine
 if [[ $STATIC_SITE_EXTERNAL == "true" ]]; then

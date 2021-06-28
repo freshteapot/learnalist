@@ -20,10 +20,18 @@ const tools = [
     },
     {
         input: "toolbox-plank-stats",
-        src: "./plank/stats/v1",
+        src: "./plank/stats/v1/v1",
         content: {
             stub: "plank-stats-v1",
             title: "Plank stats",
+        },
+    },
+    {
+        input: "toolbox-plank-stats-v2",
+        src: "./plank/stats/v2/v2",
+        content: {
+            stub: "plank-stats-v2",
+            title: "Have I planked Today",
         },
     }
 ];

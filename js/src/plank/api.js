@@ -14,12 +14,13 @@ async function deleteEntry(uuid) {
 // then it would be easier to delete
 async function history() {
     try {
-        return await api.getPlankHistoryByUser();
+        return await api.getPlankHistoryByLoggedInUser();
     } catch (error) {
         console.error("history", error);
         throw (error);
     }
 }
+
 
 // TODO one by one
 // VS all at once and return
@@ -37,4 +38,3 @@ export {
     saveEntry,
     deleteEntry
 }
-

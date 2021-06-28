@@ -186,6 +186,7 @@ var ServerCmd = &cobra.Command{
 
 		plankService := plank.NewService(
 			plank.NewSqliteRepository(db),
+			aclRepo,
 			logger.WithField("context", "plank-service"),
 		)
 
