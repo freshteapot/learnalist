@@ -1,0 +1,53 @@
+{
+  "key": "pk_test_cat8BEGczgjMN3gQoB4G4itc",
+  "options": [
+    {
+      "id": "price_1IXTbM2Ez2ncWz0N8WizgpC2",
+      "currency": "nok",
+      "unit_amount": 20000,
+      "human_amount": 200
+    },
+    {
+      "id": "price_1IXTbM2Ez2ncWz0N4IV0mItW",
+      "currency": "nok",
+      "unit_amount": 10000,
+      "human_amount": 100
+    },
+    {
+      "id": "price_1IXTbL2Ez2ncWz0NUfscTyKG",
+      "currency": "eur",
+      "unit_amount": 2000,
+      "human_amount": 20
+    },
+    {
+      "id": "price_1IXTbL2Ez2ncWz0NZxwRApVJ",
+      "currency": "eur",
+      "unit_amount": 1000,
+      "human_amount": 10
+    },
+    {
+      "id": "price_1IXTbK2Ez2ncWz0NPtuDbVAQ",
+      "currency": "gbp",
+      "unit_amount": 2000,
+      "human_amount": 20
+    },
+    {
+      "id": "price_1IXTbK2Ez2ncWz0NE4S6WBR1",
+      "currency": "gbp",
+      "unit_amount": 1000,
+      "human_amount": 10
+    },
+    {
+      "id": "price_1IXTbK2Ez2ncWz0NBYf71GLp",
+      "currency": "usd",
+      "unit_amount": 2000,
+      "human_amount": 20
+    },
+    {
+      "id": "price_1IXTbJ2Ez2ncWz0NnE3M5dIk",
+      "currency": "usd",
+      "unit_amount": 1000,
+      "human_amount": 10
+    }
+  ]
+}

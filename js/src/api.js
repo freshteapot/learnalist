@@ -196,10 +196,10 @@ async function updateSpacedRepetitionEntry(entry) {
 }
 
 
-async function getPlankHistoryByUser() {
+async function getPlankHistoryByLoggedInUser() {
   const api = getApi(Services.Plank);
   try {
-    return await api.getPlankHistoryByUser();
+    return await api.getPlankHistoryByLoggedInUser();
   } catch (error) {
     throw new Error({
       message: "Failed to get planks",
@@ -281,12 +281,13 @@ async function spacedRepetitionRemoveListFromOvertime(userUuid, alistUuid) {
 
 export {
   getServer,
+  getApi,
   postLogin,
   getListsByMe,
   addList,
   updateList,
   deleteList,
-  getPlankHistoryByUser,
+  getPlankHistoryByLoggedInUser,
   addPlankEntry,
   deletePlankEntry,
   getServerVersion,

@@ -1,5 +1,15 @@
 components:
   schemas:
+    HttpPlankHistoryShareRequestBody:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - private
+            - public
     Plank:
       type: object
       required:
@@ -72,8 +82,8 @@ paths:
     get:
       tags:
         - plank
-      description: Get all planks for a given user
-      operationId: getPlankHistoryByUser
+      description: Get all planks for logged in user
+      operationId: getPlankHistoryByLoggedInUser
       responses:
         "200":
           description: Return list of all entries
@@ -89,6 +99,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HttpResponseMessage"
+  /plank/history/{uuid}:
+    get:
+      tags:
+        - plank
+      description: Get all planks for a given user
+      operationId: getPlankHistoryByUser
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Return list of all entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plank"
+        "500":
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HttpResponseMessage"
+
   /plank/{uuid}:
     delete:
       tags:

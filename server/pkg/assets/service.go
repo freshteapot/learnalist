@@ -181,6 +181,7 @@ func (s *AssetService) Share(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 
+	// TODO Do I want to send an event that this happened?
 	response.Message = "Updated"
 	return c.JSON(http.StatusOK, response)
 }

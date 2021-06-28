@@ -28,6 +28,7 @@ var _ = Describe("Testing API", func() {
 		sampleRecords   = `[{"beginningTime":1602264153548,"currentTime":1602264219291,"intervalTime":15,"intervalTimerNow":5681,"laps":4,"showIntervals":true,"timerNow":65743,"uuid":"98952178a3d23a356a396ffdc9e726629f80b8a8"}]`
 		service         plank.PlankService
 		repo            *mocks.PlankRepository
+		aclRepo         *mocks.AclPlankHistory
 		eventMessageBus *mocks.EventlogPubSub
 		logger          *logrus.Logger
 		c               echo.Context
@@ -51,7 +52,8 @@ var _ = Describe("Testing API", func() {
 
 		logger, _ = test.NewNullLogger()
 		repo = &mocks.PlankRepository{}
-		service = plank.NewService(repo, logger)
+		aclRepo = &mocks.AclPlankHistory{}
+		service = plank.NewService(repo, aclRepo, logger)
 
 		json.Unmarshal([]byte(sampleRecords), &records)
 		record = records[0]

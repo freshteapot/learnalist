@@ -10,6 +10,7 @@ css_include: ["main"]
 # Today
 - Learnalist, a place for learning.
 - [Privacy Policy](https://learnalist.net/faq/privacy-policy.html)
+- [Support the development or unlock some paid features](/payment/support.html)
 ## Lists
 - You can make private lists.
 - You can make public lists.

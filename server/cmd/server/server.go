@@ -28,6 +28,7 @@ import (
 	"github.com/freshteapot/learnalist-api/server/pkg/logging"
 	"github.com/freshteapot/learnalist-api/server/pkg/mobile"
 	"github.com/freshteapot/learnalist-api/server/pkg/oauth"
+	"github.com/freshteapot/learnalist-api/server/pkg/payment"
 	"github.com/freshteapot/learnalist-api/server/pkg/plank"
 	"github.com/freshteapot/learnalist-api/server/pkg/remind"
 	"github.com/freshteapot/learnalist-api/server/pkg/staticsite/hugo"
@@ -54,6 +55,8 @@ var ServerCmd = &cobra.Command{
 
 		viper.SetDefault("server.userRegisterKey", "")
 		viper.BindEnv("server.userRegisterKey", "USER_REGISTER_KEY")
+		viper.BindEnv("payment.privateKey", "PAYMENT_PRIVATE_KEY")
+		viper.BindEnv("payment.webhookSecret", "PAYMENT_WEBHOOK_SECRET")
 
 		googleOauthConfig := oauth.NewGoogle(oauth.GoogleConfig{
 			Key:       viper.GetString("server.loginWith.google.clientID"),
@@ -67,7 +70,9 @@ var ServerCmd = &cobra.Command{
 		viper.UnmarshalKey("server.loginWith.appleid.web", &appleWebAudience)
 
 		var appleAudiences []oauth.AppleConfig
-		viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		err := viper.UnmarshalKey("server.loginWith.appleid.apps", &appleAudiences)
+		fmt.Println(err)
+
 		appleAudiences = append(appleAudiences, appleWebAudience)
 
 		appleIDOauthConfig := oauth.NewAppleID(appleWebAudience, appleAudiences)
@@ -103,6 +108,11 @@ var ServerCmd = &cobra.Command{
 			Domain: viper.GetString("server.cookie.domain"),
 			Secure: viper.GetBool("server.cookie.secure"),
 		}
+
+		var paymentPriceOptions []payment.PaymentOption
+		err = viper.UnmarshalKey("payment.prices", &paymentPriceOptions)
+		// Little hack to make AllSettings happy
+		viper.Set("payment.prices", paymentPriceOptions)
 
 		logger.WithFields(logrus.Fields{
 			"settings": viper.AllSettings(),
@@ -186,6 +196,7 @@ var ServerCmd = &cobra.Command{
 
 		plankService := plank.NewService(
 			plank.NewSqliteRepository(db),
+			aclRepo,
 			logger.WithField("context", "plank-service"),
 		)
 
@@ -241,6 +252,27 @@ var ServerCmd = &cobra.Command{
 			aclRepo,
 			logger.WithField("context", "acl-service"),
 		)
+
+		paymentService := payment.NewService(
+			payment.PaymentServiceConfig{
+				Server:        viper.GetString("payment.server"),
+				WebhookSecret: viper.GetString("payment.webhookSecret"),
+				PrivateKey:    viper.GetString("payment.privateKey"),
+				Options:       paymentPriceOptions,
+			},
+			logger.WithField("context", "payment-service"),
+		)
+
+		authConfig := authenticate.Config{
+			LookupBasic:  userWithUsernameAndPassword.Lookup,
+			LookupBearer: userSession.GetUserUUIDByToken,
+			Skip:         payment.SkipAuth,
+		}
+
+		// This is a little decoupled from /payment inside the service
+		paymentsRouter := server.Server.Group("/payments")
+		paymentsRouter.Use(authenticate.Auth(authConfig))
+		paymentService.Serve("/payments", paymentsRouter)
 
 		server.InitApi(
 			apiManager,

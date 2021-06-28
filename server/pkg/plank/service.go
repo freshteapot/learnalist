@@ -4,11 +4,14 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/freshteapot/learnalist-api/server/api/i18n"
 	"github.com/freshteapot/learnalist-api/server/api/uuid"
+	"github.com/freshteapot/learnalist-api/server/pkg/acl"
+	aclKeys "github.com/freshteapot/learnalist-api/server/pkg/acl/keys"
 	"github.com/freshteapot/learnalist-api/server/pkg/api"
 	"github.com/freshteapot/learnalist-api/server/pkg/challenge"
 	"github.com/freshteapot/learnalist-api/server/pkg/event"
@@ -22,26 +25,105 @@ import (
 type PlankService struct {
 	repo       PlankRepository
 	logContext logrus.FieldLogger
+	acl        acl.AclPlankHistory
 }
 
 // @openapi.path.tag: plank
-func NewService(repo PlankRepository, log logrus.FieldLogger) PlankService {
+func NewService(repo PlankRepository, acl acl.AclPlankHistory, log logrus.FieldLogger) PlankService {
 	s := PlankService{
 		repo:       repo,
 		logContext: log,
+		acl:        acl,
 	}
 
 	event.GetBus().Subscribe(event.TopicMonolog, "plank", s.monologSubscribe)
 	return s
 }
 
-func (s PlankService) History(c echo.Context) error {
-	user := c.Get("loggedInUser").(uuid.User)
-	history, err := s.repo.History(user.Uuid)
+func (s PlankService) HistoryByUserUUID(c echo.Context) error {
+	user := c.Get("loggedInUser")
+	extUUID := c.Param("uuid")
+
+	userUUID := ""
+	if user != nil {
+		userUUID = user.(uuid.User).Uuid
+	}
+
+	if extUUID == "" {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InputMissingListUuid,
+		}
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	if userUUID != extUUID {
+		allow, err := s.acl.IsPlankHistoryPublic(extUUID)
+		//allow, err := s.acl.HasUserPlankHistoryReadAccess(extUUID, userUUID)
+		if err != nil {
+			response := api.HTTPResponseMessage{
+				Message: i18n.InternalServerErrorAclLookup,
+			}
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+		if !allow {
+			response := api.HTTPResponseMessage{
+				Message: i18n.AclHttpAccessDeny,
+			}
+			return c.JSON(http.StatusForbidden, response)
+		}
+	}
+
+	history, err := s.repo.History(extUUID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, api.HTTPErrorResponse)
 	}
 	return c.JSON(http.StatusOK, history)
+}
+
+func (s PlankService) History(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	c.SetParamNames("uuid")
+	c.SetParamValues(user.Uuid)
+	return s.HistoryByUserUUID(c)
+}
+
+func (s PlankService) ShareHistory(c echo.Context) error {
+	user := c.Get("loggedInUser").(uuid.User)
+	var input openapi.HttpPlankHistoryShareRequestBody
+
+	defer c.Request().Body.Close()
+	jsonBytes, _ := ioutil.ReadAll(c.Request().Body)
+
+	err := json.Unmarshal(jsonBytes, &input)
+	if err != nil {
+		response := api.HTTPResponseMessage{
+			Message: i18n.InputJSONFailure,
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	sharedWith := input.Action
+
+	allowed := []string{aclKeys.SharedWithPublic, aclKeys.NotShared}
+	if !utils.StringArrayContains(allowed, sharedWith) {
+		response := api.HTTPResponseMessage{
+			Message: "Check the documentation",
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	switch sharedWith {
+	case aclKeys.SharedWithPublic:
+		err = s.acl.SharePlankHistoryWithPublic(user.Uuid)
+	case aclKeys.NotShared:
+		err = s.acl.MakePlankHistoryPrivate(user.Uuid)
+	}
+
+	// TODO Do I want to send an event that this happened?
+	response := api.HTTPResponseMessage{
+		Message: "Update",
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 // RecordPlank Document the plank

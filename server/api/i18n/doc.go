@@ -36,6 +36,7 @@ const (
 	InputAlistJSONFailure                       = "Your input is invalid json."
 	PostShareListJSONFailure                    = "Your input is invalid json."
 	InputLogoutJSONFailure                      = "Your input is invalid json."
+	InputJSONFailure                            = "Your input is invalid json."
 	InputMissingListUuid                        = "The uuid is missing."
 	InternalServerErrorDeleteAlist              = "We have failed to remove your list."
 	ApiMethodNotSupported                       = "This method is not supported."

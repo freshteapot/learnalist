@@ -27,6 +27,7 @@ const (
 	TopicMonolog                    = "lal.monolog"
 	TopicStaticSite                 = "lal.staticSite"
 	TopicNotifications              = "notifications"
+	TopicPayments                   = "payments"
 	KindUserRegisterUsername        = "username"
 	KindUserRegisterIDPApple        = "idp:apple"
 	KindUserLoginIDPApple           = "idp:apple"
@@ -39,6 +40,7 @@ const (
 	KindUserLogoutSession            = "logout.session"
 	KindUserLogoutSessions           = "logout.sessions"
 	KindPushNotification             = "push-notification"
+	KindPaymentsStripe               = "payments-stripe"
 
 	ActionNew            = "new"
 	ActionCreated        = "created"
